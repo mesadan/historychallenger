@@ -216,7 +216,8 @@ async function doGenerate(){
   if(st)st.innerHTML='<span class="spin"></span>Checking theme and sourcing events...';
   if(pv)pv.classList.remove('show');
   try{
-    const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({theme:themeQ,diff:S.diff,rounds:Math.min(S.rounds,8)})});
+    const WORKER_URL = 'https://histroychallenger-api.maletethan.workers.dev';
+    const res=await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({theme:themeQ,diff:S.diff,rounds:Math.min(S.rounds,8)})});
     const data=await res.json();
     if(!res.ok||data.error){
       // Show user-friendly error from the server
