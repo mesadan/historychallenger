@@ -778,7 +778,13 @@ function renderStep2(lOk,rOk){
   const placed=new Set(Object.keys(S.midP));
   const pool=middle.filter(e=>!placed.has(e.id));
 
-  const pH=pool.map(e=>`<div class="ecard${S.selectedCard===e.id?' selected-card':''}" onclick="tapCard2('${e.id}')"${!mobile?` draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()"`:''} >${e.name}</div>`).join('');
+  const pH=pool.map(e=>`<div class="ecard${S.selectedCard===e.id?' selected-card':''}" 
+    onclick="tapCard2('${e.id}')"
+    ontouchstart="cardTouchStart(event,'${e.id}')" 
+    ontouchmove="cardTouchMove(event)" 
+    ontouchend="cardTouchEnd(event)"
+    ${!mobile?`draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()"`:''} 
+    >${e.name}</div>`).join('');
 
   // Build desktop pins
   let pins='';
@@ -871,6 +877,63 @@ function tapBar2(e){
 function tapMobilePin(id){delete S.midP[id];renderStep2();}
 function clearMiddle(){S.midP={};S.selectedCard=null;renderStep2();}
 
+/* ── TOUCH DRAG (mobile card → bar) ── */
+let _touchDragId=null;
+let _touchDragging=false;
+
+function cardTouchStart(e,id){
+  _touchDragId=id;_touchDragging=false;
+  // Don't prevent default yet — wait to see if it's a drag or a tap
+}
+
+function cardTouchMove(e){
+  if(!_touchDragId)return;
+  _touchDragging=true;
+  e.preventDefault(); // prevent scroll once dragging
+  const touch=e.touches[0];
+  // Show bracket tooltip if over the bar area
+  const bar=document.getElementById('mobile-bar');
+  if(!bar)return;
+  const r=bar.getBoundingClientRect();
+  if(touch.clientY>=r.top-20&&touch.clientY<=r.bottom+20){
+    const pct=Math.max(0,Math.min(1,(touch.clientX-r.left)/r.width));
+    const minY=parseInt(bar.dataset.miny);const maxY=parseInt(bar.dataset.maxy);
+    showTooltip(touch.clientX,r.top-50,bracketAtPct(pct,minY,maxY));
+  } else {
+    hideTooltip();
+  }
+}
+
+function cardTouchEnd(e){
+  hideTooltip();
+  if(!_touchDragId){return;}
+  if(!_touchDragging){
+    // It was a tap — handle as normal tap
+    _touchDragId=null;return;
+  }
+  // It was a drag — check if finger is over the mobile bar
+  const touch=e.changedTouches[0];
+  const bar=document.getElementById('mobile-bar');
+  if(bar){
+    const r=bar.getBoundingClientRect();
+    if(touch.clientY>=r.top-20&&touch.clientY<=r.bottom+20){
+      const pct=Math.max(0.02,Math.min(0.98,(touch.clientX-r.left)/r.width));
+      const evt=S.events.find(x=>x.id===_touchDragId);
+      if(evt){
+        delete S.midP[_touchDragId]; // remove if already placed
+        S.midP[_touchDragId]=pct;
+        S.selectedCard=null;
+        _touchDragId=null;_touchDragging=false;
+        renderStep2();return;
+      }
+    }
+  }
+  // Dropped outside bar — just select the card
+  S.selectedCard=_touchDragId;
+  _touchDragId=null;_touchDragging=false;
+  renderStep2();
+}
+
 /* ── TOOLTIP ── */
 let _touchTimer=null;
 
@@ -925,9 +988,20 @@ function aOv(e,s){e.preventDefault();document.getElementById('d'+s[0])?.classLis
 function aLv(s){document.getElementById('d'+s[0])?.classList.remove('over');}
 function rtp(id,from){if(from==='bar')delete S.midP[id];}
 function gPct(e){const b=document.getElementById('tl-bar');if(!b)return.5;const r=b.getBoundingClientRect();return Math.max(.01,Math.min(.99,(e.clientX-r.left)/r.width));}
-function bOv(e){e.preventDefault();document.getElementById('tl-track')?.style.setProperty('background','#c8903a');uG(e);}
-function bLv(){document.getElementById('tl-track')?.style.setProperty('background','#2a2a2a');hG();}
-function bMv(e){if(S.dragId)uG(e);}
+function bOv(e){
+  e.preventDefault();
+  document.getElementById('tl-track')?.style.setProperty('background','#c8903a');
+  uG(e);
+  // Show bracket tooltip during drag
+  const bar=document.getElementById('tl-bar');if(!bar)return;
+  const r=bar.getBoundingClientRect();
+  const pct=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
+  const minY=parseInt(bar.dataset.miny);const maxY=parseInt(bar.dataset.maxy);
+  if(minY!==undefined&&!isNaN(minY))showTooltip(e.clientX,r.top-8,bracketAtPct(pct,minY,maxY));
+}
+function bLv(){document.getElementById('tl-track')?.style.setProperty('background','#2a2a2a');hG();hideTooltip();}
+function barMove(e){uG(e);}
+function barLeave(){hideTooltip();hG();}
 function uG(e){const g=document.getElementById('ghost');const gl=document.getElementById('ghost-lbl');if(!g||!S.dragId)return;g.style.left=(gPct(e)*100)+'%';g.style.display='flex';if(gl)gl.textContent=S.ghostName;}
 function hG(){const g=document.getElementById('ghost');if(g)g.style.display='none';}
 function bDr(e){
@@ -947,13 +1021,21 @@ function doSubmit(){
   const middle=sorted.slice(1,4);
   const iP={};middle.forEach(e=>{iP[e.id]=(e.year-minY)/range;});
 
-  // Binary bracket scoring — 20pts if dropped in correct 50-year bucket, 0 if not
+  // Graduated scoring — 20pts in correct bracket, decays linearly to 0 at 500yr error
+  const MAX_ERR=500; // years beyond which score is 0
   let spacingPts=0;const sPer={};const bracketOk={};
   middle.forEach(ev=>{
     const placed=S.midP[ev.id]??0.5;
-    const ok=inCorrectBracket(placed,ev.year,minY,maxY);
-    const score=ok?20:0;
-    sPer[ev.id]=score;spacingPts+=score;bracketOk[ev.id]=ok;
+    const placedYear=Math.round(minY+placed*range);
+    const errYears=Math.abs(placedYear-ev.year);
+    const inBracket=inCorrectBracket(placed,ev.year,minY,maxY);
+    let score;
+    if(inBracket){
+      score=20; // full marks for correct bracket
+    } else {
+      score=Math.max(0,Math.round(20*(1-errYears/MAX_ERR)));
+    }
+    sPer[ev.id]=score;spacingPts+=score;bracketOk[ev.id]=inBracket;
   });
 
   const tot=Math.min(100,S.anchorPts+spacingPts);
@@ -984,7 +1066,11 @@ function doSubmit(){
   const middleRows=middle.map(ev=>{
     const ok=bracketOk[ev.id];const sp=sPer[ev.id];
     const bracket=yearBracket(ev.year);
-    return `<div class="res-row"><div class="dot ${ok?'ok':'bad'}">${ok?'✓':'✗'}</div><div><span style="font-weight:700;color:#ffffff">${yr(ev.year)} — ${ev.name}</span><br><span style="color:#666;font-size:12px">${ev.desc}</span><br><span style="font-size:12px;color:#444">${t('spacing')}: ${sp}/20 ${t('pts')} · ${ok?'Correct bracket':'Should be: '+bracket}</span></div></div>`;
+    const placed=S.midP[ev.id]??0.5;
+    const placedYear=Math.round(minY+placed*range);
+    const errYears=Math.abs(placedYear-ev.year);
+    const errStr=errYears===0?'Spot on':(errYears<=50?'Within bracket ✓':`~${errYears} yr error`);
+    return `<div class="res-row"><div class="dot ${ok?'ok':sp>0?'ok':'bad'}">${sp===20?'✓':sp>0?'~':'✗'}</div><div><span style="font-weight:700;color:#ffffff">${yr(ev.year)} — ${ev.name}</span><br><span style="color:#666;font-size:12px">${ev.desc}</span><br><span style="font-size:12px;color:#444">${sp}/20 ${t('pts')} · ${ok?'Correct bracket ('+bracket+')':errStr+' · Correct: '+bracket}</span></div></div>`;
   }).join('');
 
   const isLast=S.round+1>=S.rounds;
