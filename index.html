@@ -160,7 +160,7 @@ function renderSetup(){
     <div class="custom-row">
       <input class="ci" id="ci" type="text" placeholder="Or type a custom theme..." value="${S.customTheme}" oninput="onCI(this.value)">
       <button class="btn" onclick="clearTheme()">Clear</button>
-      <button class="btn btn-p" id="gen-btn" onclick="doGenerate()" style="${(S.customTheme||S.theme)&&S.diff?'':'display:none'">Generate events &#8594;</button>
+      <button class="btn btn-p" id="gen-btn" onclick="doGenerate()" style="${(S.customTheme||S.theme)&&S.diff?'display:inline-block':'display:none'}">Generate events &#8594;</button>
     </div>
     ${themeQ&&!S.diff?'<div style="font-size:12px;color:#b03020;font-family:-apple-system,sans-serif;margin-bottom:.75rem">Select a difficulty first, then generate.</div>':''}
     <div class="gen-box ${themeQ&&S.diff?'show':''}" id="gen-box">
