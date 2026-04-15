@@ -484,17 +484,26 @@ const POOLS={
 const DIFFS={disciple:{tolerance:180},master:{tolerance:60},keeper:{tolerance:20}};
 
 // Track which sets have been used this game
-let _usedSets={disciple:new Set(),master:new Set(),keeper:new Set()};
+// Shuffled queues — each diff gets a shuffled order that fully cycles before repeating
+let _queues={disciple:[],master:[],keeper:[]};
+
+function resetQueues(){
+  _queues={disciple:[],master:[],keeper:[]};
+}
 
 function pickSet(diff){
-  const pool=POOLS[diff];if(!pool)return null;
-  const used=_usedSets[diff];
-  // Reset if all used
-  if(used.size>=pool.length)used.clear();
-  // Pick random unused index
-  let idx;do{idx=Math.floor(Math.random()*pool.length);}while(used.has(idx));
-  used.add(idx);
-  return pool[idx];
+  const pool=POOLS[diff];if(!pool||!pool.length)return null;
+  // Refill queue with a fresh shuffle when empty
+  if(!_queues[diff]||_queues[diff].length===0){
+    const indices=Array.from({length:pool.length},(_,i)=>i);
+    // Fisher-Yates shuffle
+    for(let i=indices.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [indices[i],indices[j]]=[indices[j],indices[i]];
+    }
+    _queues[diff]=indices;
+  }
+  return pool[_queues[diff].pop()];
 }
 
 /* ── BRACKET HELPERS ── */
@@ -632,6 +641,7 @@ function onCI(v){
 }
 
 async function startSeries(){
+  resetQueues(); // fresh shuffle every time a new game starts
   S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';
   const themeObj=S.theme!==null?themes()[S.theme]:null;
   const themeQ=S.customTheme||(themeObj?themeObj.q:null);
@@ -1110,7 +1120,7 @@ function showFinal(){
   document.getElementById('rn').textContent=t('round');
 }
 
-function beginGame(){S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';_usedSets={disciple:new Set(),master:new Set(),keeper:new Set()};startRound();}
+function beginGame(){S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';resetQueues();startRound();}
 function restartSetup(){S.phase='setup';S.path=null;S.diff=null;S.rounds=5;S.generatedSets=[];S.theme=null;S.customTheme='';renderSetup();}
 renderSetup();
 </script>
