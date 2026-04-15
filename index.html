@@ -34,7 +34,8 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
 .section-num{font-size:11px;color:#c8903a;letter-spacing:.1em;text-transform:uppercase;font-family:-apple-system,sans-serif;font-weight:700;margin-bottom:.2rem}
 .setup-title{font-size:17px;font-weight:700;color:#ffffff;margin-bottom:.35rem;font-family:Georgia,serif}
 .setup-sub{font-size:13px;color:#666;margin-bottom:1rem;line-height:1.6}
-.diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.25rem}
+.diff-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1.25rem}
+@media(max-width:500px){.diff-grid{grid-template-columns:1fr}}
 .dc{border:1px solid #2a2a2a;border-radius:10px;padding:10px 12px;cursor:pointer;background:#111;transition:border-color .12s,background .12s;-webkit-tap-highlight-color:transparent}
 .dc:hover{background:#181818;border-color:#555}
 .dc.sel{border-color:#c8903a;background:#1a1000}
@@ -169,7 +170,8 @@ const T={
     subtitle:'Prove your historical mastery',
     avg:'Avg',round:'Round',
     secI:'I — Difficulty',chooseLevel:'Choose your level',
-    levelSub:'Events get closer together and more obscure as the level rises.',
+    levelSub:'Three levels based on how events are mixed across historical eras — not just how far apart they are.',
+    howToPlay:`<strong style="color:#c8903a">How to play:</strong> You have 5 events. First, identify which is <strong>Earliest</strong> and which is <strong>Most Recent</strong> — drag or tap them into those anchor boxes. This is important: those two events define the full time scale of the round. The bar between them becomes a proportional ruler — if Earliest is 500 BC and Most Recent is 1900 AD, the midpoint of the bar represents roughly 700 AD. Place the remaining 3 events at the correct proportional position along that ruler. Scoring is 50% for getting the order right, 50% for accurate spacing.`,
     secII:'II — Theme',chooseTheme:'Choose a theme',
     themeOptional:'— optional, AI generates focused events',
     themeSub:'Pick an era or topic, or type your own — "Punic Wars", "Space Race", "The Black Death". Without a theme, curated event sets are used.',
@@ -190,12 +192,11 @@ const T={
     connError:'Connection error — please try again.',
     noSets:'Could not generate events for this theme — try rephrasing it.',
     curatedSets:'Curated sets',
-    medals:{90:'🎉 Grand Master',70:'⭐ Scholar',50:'📚 Student',0:'🚀 Preschooler'},
+    medals:{90:'🏆 Keeper of Time',70:'⚔️ Master',50:'🕯️ Disciple',0:'📜 Initiate'},
     diffs:{
-      preschooler:{label:'Preschooler',tag:'Centuries apart · Household names',desc:'The biggest events in history — things your grandparents could place. Very forgiving.'},
-      student:{label:'Student',tag:'Decades apart · Classroom knowledge',desc:'Events you would have studied at school — significant but requiring real recall.'},
-      scholar:{label:'Scholar',tag:'Years apart · University level',desc:'Events tightly clustered in time — deep period knowledge required.'},
-      grandmaster:{label:'Grand Master',tag:'Months apart · Archival precision',desc:'Events sometimes separated by months. Only serious historians score well here.'}
+      disciple:{label:'Disciple',tag:'Mixed eras · 3+ events from different periods',desc:'At least 3 of the 5 events span distinct historical eras — ancient, medieval, modern. Wide gaps make spacing forgiving.'},
+      master:{label:'Master',tag:'Mostly one era · 3 events clustered, 2 outliers',desc:'3 events share the same era while 2 come from different periods. You must judge relative distance carefully.'},
+      keeper:{label:'Keeper of Time',tag:'Single era · All 5 from the same period',desc:'All 5 events fall within the same historical era. Gaps are tight, precision is everything.'}
     },
     themes:[
       {label:'Bronze Age',q:'the Bronze Age civilisations: Mesopotamia, Egypt, Mycenae, Hittites, Indus Valley'},
@@ -218,7 +219,8 @@ const T={
     subtitle:'Prouvez votre maîtrise historique',
     avg:'Moy.',round:'Manche',
     secI:'I — Difficulté',chooseLevel:'Choisissez votre niveau',
-    levelSub:'Les événements se rapprochent et deviennent plus obscurs à chaque niveau.',
+    levelSub:'Trois niveaux basés sur la façon dont les événements sont mélangés entre les époques historiques.',
+    howToPlay:`<strong style="color:#c8903a">Comment jouer :</strong> Vous avez 5 événements. D'abord, identifiez lequel est le <strong>plus ancien</strong> et lequel est le <strong>plus récent</strong> — faites-les glisser dans les cases d'ancrage. Ces deux événements définissent l'échelle de temps du round. La barre entre eux devient une règle proportionnelle — si le plus ancien est en 500 av. J.-C. et le plus récent en 1900, le milieu de la barre représente environ 700 apr. J.-C. Placez les 3 autres événements à la bonne position proportionnelle. Le score est 50% pour l'ordre, 50% pour l'espacement.`,
     secII:'II — Thème',chooseTheme:'Choisissez un thème',
     themeOptional:'— facultatif, l\'IA génère des événements ciblés',
     themeSub:'Choisissez une époque ou tapez votre propre thème — "Guerres puniques", "Course spatiale", "La Peste noire". Sans thème, des séries présélectionnées sont utilisées.',
@@ -239,12 +241,11 @@ const T={
     connError:'Erreur de connexion — veuillez réessayer.',
     noSets:'Impossible de générer des événements — essayez de reformuler le thème.',
     curatedSets:'Séries présélectionnées',
-    medals:{90:'🎉 Grand Maître',70:'⭐ Érudit',50:'📚 Étudiant',0:'🚀 Débutant'},
+    medals:{90:'🏆 Gardien du Temps',70:'⚔️ Maître',50:'🕯️ Disciple',0:'📜 Initié'},
     diffs:{
-      preschooler:{label:'Débutant',tag:'Siècles d\'écart · Noms connus de tous',desc:'Les plus grands événements de l\'histoire — très indulgent.'},
-      student:{label:'Étudiant',tag:'Décennies d\'écart · Niveau scolaire',desc:'Événements étudiés à l\'école — significatifs mais exigeant une vraie mémoire.'},
-      scholar:{label:'Érudit',tag:'Années d\'écart · Niveau universitaire',desc:'Événements proches dans le temps — connaissance approfondie requise.'},
-      grandmaster:{label:'Grand Maître',tag:'Mois d\'écart · Précision d\'archive',desc:'Événements parfois séparés de quelques mois. Réservé aux vrais historiens.'}
+      disciple:{label:'Disciple',tag:'Époques mixtes · 3+ événements de périodes différentes',desc:'Au moins 3 des 5 événements couvrent des époques distinctes — antique, médiévale, moderne. Les grands écarts rendent le placement indulgent.'},
+      master:{label:'Maître',tag:'Surtout une époque · 3 groupés, 2 outliers',desc:'3 événements partagent la même époque, 2 viennent d\'ailleurs. Vous devez évaluer les distances relatives avec soin.'},
+      keeper:{label:'Gardien du Temps',tag:'Époque unique · Les 5 dans la même période',desc:'Les 5 événements appartiennent à la même époque historique. Les écarts sont serrés, la précision est essentielle.'}
     },
     themes:[
       {label:'Âge du Bronze',q:'les civilisations de l\'Âge du Bronze: Mésopotamie, Égypte, Mycènes, Hittites, Vallée de l\'Indus'},
@@ -267,7 +268,8 @@ const T={
     subtitle:'Beweisen Sie Ihr historisches Wissen',
     avg:'Ø',round:'Runde',
     secI:'I — Schwierigkeit',chooseLevel:'Wählen Sie Ihr Niveau',
-    levelSub:'Die Ereignisse rücken näher zusammen und werden schwieriger mit steigendem Niveau.',
+    levelSub:'Drei Stufen basierend darauf, wie Ereignisse über historische Epochen gemischt werden.',
+    howToPlay:`<strong style="color:#c8903a">Spielanleitung:</strong> Sie haben 5 Ereignisse. Bestimmen Sie zuerst, welches das <strong>früheste</strong> und welches das <strong>neueste</strong> ist — ziehen Sie diese in die Ankerboxen. Diese zwei Ereignisse definieren den Zeitmaßstab der Runde. Die Leiste wird zur proportionalen Skala — liegt das früheste bei 500 v. Chr. und das neueste bei 1900, entspricht die Mitte etwa 700 n. Chr. Platzieren Sie die restlichen 3 Ereignisse proportional korrekt. 50% der Punkte für die Reihenfolge, 50% für den Abstand.`,
     secII:'II — Thema',chooseTheme:'Wählen Sie ein Thema',
     themeOptional:'— optional, KI generiert gezielte Ereignisse',
     themeSub:'Wählen Sie eine Epoche oder geben Sie Ihr eigenes Thema ein — "Punische Kriege", "Wettlauf ins All". Ohne Thema werden kuratierte Ereignissets verwendet.',
@@ -288,12 +290,11 @@ const T={
     connError:'Verbindungsfehler — bitte erneut versuchen.',
     noSets:'Keine Ereignisse für dieses Thema gefunden — bitte anders formulieren.',
     curatedSets:'Kuratierte Sets',
-    medals:{90:'🎉 Großmeister',70:'⭐ Gelehrter',50:'📚 Student',0:'🚀 Anfänger'},
+    medals:{90:'🏆 Hüter der Zeit',70:'⚔️ Meister',50:'🕯️ Schüler',0:'📜 Novize'},
     diffs:{
-      preschooler:{label:'Anfänger',tag:'Jahrhunderte Abstand · Allbekannte Namen',desc:'Die größten Ereignisse der Geschichte — sehr vergebend.'},
-      student:{label:'Student',tag:'Jahrzehnte Abstand · Schulwissen',desc:'Ereignisse aus dem Schulunterricht — bedeutsam aber Gedächtnisleistung erforderlich.'},
-      scholar:{label:'Gelehrter',tag:'Jahre Abstand · Universitätsniveau',desc:'Zeitlich eng beieinander — tiefes Periodenwissen erforderlich.'},
-      grandmaster:{label:'Großmeister',tag:'Monate Abstand · Archivpräzision',desc:'Ereignisse manchmal nur Monate auseinander. Nur für echte Historiker.'}
+      disciple:{label:'Schüler',tag:'Gemischte Epochen · 3+ Ereignisse aus verschiedenen Zeiten',desc:'Mindestens 3 der 5 Ereignisse stammen aus unterschiedlichen Epochen — Antike, Mittelalter, Neuzeit. Weite Abstände machen die Platzierung vergebend.'},
+      master:{label:'Meister',tag:'Meist eine Epoche · 3 geclustert, 2 Ausreißer',desc:'3 Ereignisse teilen dieselbe Epoche, 2 kommen von woanders. Sie müssen relative Abstände sorgfältig abschätzen.'},
+      keeper:{label:'Hüter der Zeit',tag:'Einzelne Epoche · Alle 5 in derselben Periode',desc:'Alle 5 Ereignisse liegen in derselben historischen Epoche. Die Abstände sind eng, Präzision ist entscheidend.'}
     },
     themes:[
       {label:'Bronzezeit',q:'die Bronzezeit-Zivilisationen: Mesopotamien, Ägypten, Mykene, Hethiter, Indus-Tal'},
@@ -316,7 +317,8 @@ const T={
     subtitle:'Demuestra tu dominio histórico',
     avg:'Prom.',round:'Ronda',
     secI:'I — Dificultad',chooseLevel:'Elige tu nivel',
-    levelSub:'Los eventos se acercan más y se vuelven más oscuros a medida que sube el nivel.',
+    levelSub:'Tres niveles basados en cómo se mezclan los eventos entre épocas históricas.',
+    howToPlay:`<strong style="color:#c8903a">Cómo jugar:</strong> Tienes 5 eventos. Primero identifica cuál es el <strong>más antiguo</strong> y cuál es el <strong>más reciente</strong> — arrástralos a las casillas de anclaje. Esos dos eventos definen la escala de tiempo de la ronda. La barra entre ellos se convierte en una regla proporcional — si el más antiguo es 500 a.C. y el más reciente es 1900, el punto medio de la barra representa aproximadamente el año 700. Coloca los 3 eventos restantes en la posición proporcional correcta. 50% de puntos por el orden, 50% por el espaciado.`,
     secII:'II — Tema',chooseTheme:'Elige un tema',
     themeOptional:'— opcional, la IA genera eventos enfocados',
     themeSub:'Elige una época o escribe tu propio tema — "Guerras púnicas", "Carrera espacial", "La Peste Negra". Sin tema, se usan conjuntos seleccionados.',
@@ -337,12 +339,11 @@ const T={
     connError:'Error de conexión — por favor inténtalo de nuevo.',
     noSets:'No se pudieron generar eventos para este tema — intenta reformularlo.',
     curatedSets:'Conjuntos seleccionados',
-    medals:{90:'🎉 Gran Maestro',70:'⭐ Erudito',50:'📚 Estudiante',0:'🚀 Principiante'},
+    medals:{90:'🏆 Guardián del Tiempo',70:'⚔️ Maestro',50:'🕯️ Discípulo',0:'📜 Iniciado'},
     diffs:{
-      preschooler:{label:'Principiante',tag:'Siglos de diferencia · Nombres conocidos',desc:'Los mayores eventos de la historia — muy indulgente.'},
-      student:{label:'Estudiante',tag:'Décadas de diferencia · Nivel escolar',desc:'Eventos estudiados en la escuela — significativos pero requieren memoria real.'},
-      scholar:{label:'Erudito',tag:'Años de diferencia · Nivel universitario',desc:'Eventos agrupados en el tiempo — se requiere conocimiento profundo del período.'},
-      grandmaster:{label:'Gran Maestro',tag:'Meses de diferencia · Precisión archivística',desc:'Eventos a veces separados por meses. Solo para historiadores serios.'}
+      disciple:{label:'Discípulo',tag:'Épocas mixtas · 3+ eventos de períodos distintos',desc:'Al menos 3 de los 5 eventos abarcan épocas distintas — antigua, medieval, moderna. Los grandes intervalos hacen el espaciado indulgente.'},
+      master:{label:'Maestro',tag:'Principalmente una época · 3 agrupados, 2 atípicos',desc:'3 eventos comparten la misma época mientras 2 provienen de otros períodos. Debes juzgar las distancias relativas con cuidado.'},
+      keeper:{label:'Guardián del Tiempo',tag:'Época única · Los 5 en el mismo período',desc:'Los 5 eventos pertenecen a la misma época histórica. Los intervalos son estrechos, la precisión lo es todo.'}
     },
     themes:[
       {label:'Edad del Bronce',q:'las civilizaciones de la Edad del Bronce: Mesopotamia, Egipto, Micenas, Hititas, Valle del Indo'},
@@ -384,21 +385,23 @@ function setLang(l){
 
 /* ── GAME DATA ── */
 const DIFFS={
-  preschooler:{tolerance:150,events:[
-    [{name:"Great Pyramid of Giza completed",year:-2560,desc:"Pharaoh Khufu's pyramid at Giza is completed, the largest ever built."},{name:"Alexander the Great dies",year:-323,desc:"Alexander dies in Babylon after conquering an empire from Greece to India."},{name:"Roman Empire falls in the West",year:476,desc:"Romulus Augustulus is deposed, ending Western Roman rule."},{name:"Columbus reaches the Americas",year:1492,desc:"Columbus lands in the Caribbean, opening the Age of Exploration."},{name:"First Moon landing",year:1969,desc:"Apollo 11 astronauts become the first humans to walk on the Moon."}],
-    [{name:"Homer composes the Iliad",year:-750,desc:"Homer's epic about the Trojan War is composed in ancient Greece."},{name:"Julius Caesar assassinated",year:-44,desc:"Caesar is stabbed to death in the Roman Senate."},{name:"Magna Carta signed",year:1215,desc:"English barons force King John to limit royal power."},{name:"Gutenberg's printing press",year:1440,desc:"Movable type revolutionises the spread of knowledge across Europe."},{name:"Berlin Wall falls",year:1989,desc:"East Germany opens its borders; Germany begins reunification."}]
+  disciple:{tolerance:180,events:[
+    // 3+ from distinct eras — ancient, medieval, early modern, modern, 20th century all mixed
+    [{name:"Great Pyramid of Giza completed",year:-2560,desc:"Pharaoh Khufu's pyramid at Giza is completed, the largest ever built."},{name:"Battle of Hastings",year:1066,desc:"William the Conqueror defeats Harold II, transforming England."},{name:"Columbus reaches the Americas",year:1492,desc:"Columbus lands in the Caribbean, opening the Age of Exploration."},{name:"American Declaration of Independence",year:1776,desc:"The thirteen colonies declare independence from Britain."},{name:"First Moon landing",year:1969,desc:"Apollo 11 astronauts become the first humans to walk on the Moon."}],
+    [{name:"Julius Caesar assassinated",year:-44,desc:"Caesar is stabbed to death in the Roman Senate."},{name:"Magna Carta signed",year:1215,desc:"English barons force King John to limit royal power."},{name:"Gutenberg's printing press",year:1440,desc:"Movable type revolutionises the spread of knowledge across Europe."},{name:"French Revolution begins",year:1789,desc:"Storming of the Bastille ignites revolution reshaping Europe."},{name:"Berlin Wall falls",year:1989,desc:"East Germany opens its borders; Germany begins reunification."}],
+    [{name:"Homer composes the Iliad",year:-750,desc:"Homer's epic about the Trojan War is composed in ancient Greece."},{name:"Fall of Rome in the West",year:476,desc:"Romulus Augustulus is deposed, ending Western Roman rule."},{name:"Black Death arrives in Europe",year:1347,desc:"The bubonic plague reaches Sicily, spreading rapidly westward."},{name:"Newton publishes Principia",year:1687,desc:"Isaac Newton sets out his laws of motion and universal gravitation."},{name:"World War II ends",year:1945,desc:"Germany surrenders in May and Japan in September, ending the deadliest war in history."}]
   ]},
-  student:{tolerance:40,events:[
-    [{name:"Battle of Hastings",year:1066,desc:"William the Conqueror defeats Harold II, transforming England."},{name:"First Crusade launched",year:1096,desc:"Pope Urban II calls for a military expedition to reclaim Jerusalem."},{name:"Magna Carta signed",year:1215,desc:"English barons force King John to limit royal power."},{name:"Mongols sack Baghdad",year:1258,desc:"Hulagu Khan destroys the Abbasid capital, ending its golden age."},{name:"Black Death arrives in Europe",year:1347,desc:"The bubonic plague reaches Sicily, spreading rapidly westward."}],
-    [{name:"American Declaration of Independence",year:1776,desc:"The thirteen colonies declare independence from Britain."},{name:"French Revolution begins",year:1789,desc:"Storming of the Bastille ignites revolution reshaping Europe."},{name:"Napoleon crowned Emperor",year:1804,desc:"Napoleon crowns himself Emperor in Notre-Dame Cathedral."},{name:"Battle of Waterloo",year:1815,desc:"Napoleon is decisively defeated by Wellington and Blucher."},{name:"First Reform Act in Britain",year:1832,desc:"Parliament passes sweeping electoral reform, extending the vote."}]
+  master:{tolerance:60,events:[
+    // 3 from one era, 2 outliers — e.g. 3 Napoleonic + 2 ancient/modern
+    [{name:"Napoleon crowned Emperor",year:1804,desc:"Napoleon crowns himself Emperor in Notre-Dame Cathedral."},{name:"Battle of Trafalgar",year:1805,desc:"Nelson defeats the Franco-Spanish fleet, establishing British naval supremacy."},{name:"Battle of Waterloo",year:1815,desc:"Napoleon is decisively defeated by Wellington and Blucher."},{name:"Julius Caesar crosses the Rubicon",year:-49,desc:"Caesar marches into Italy, triggering civil war against the Senate."},{name:"World War I begins",year:1914,desc:"The assassination of Franz Ferdinand triggers global war."}],
+    [{name:"Mongols sack Baghdad",year:1258,desc:"Hulagu Khan destroys the Abbasid capital, ending its golden age."},{name:"Black Death arrives in Europe",year:1347,desc:"The bubonic plague reaches Sicily, spreading rapidly westward."},{name:"Fall of Constantinople",year:1453,desc:"Ottoman forces capture the Byzantine capital, ending the Eastern Roman Empire."},{name:"Roman Republic founded",year:-509,desc:"Romans expel their last king and establish a republic."},{name:"Berlin Wall falls",year:1989,desc:"East Germany opens its borders; Germany begins reunification."}],
+    [{name:"American Declaration of Independence",year:1776,desc:"The thirteen colonies formally break from British rule."},{name:"French Revolution begins",year:1789,desc:"The storming of the Bastille opens a decade of revolutionary upheaval."},{name:"Napoleon crowned Emperor",year:1804,desc:"Napoleon crowns himself Emperor in Notre-Dame Cathedral."},{name:"Battle of Marathon",year:-490,desc:"Athens defeats Persia, saving Greek democracy."},{name:"First Moon landing",year:1969,desc:"Apollo 11 astronauts become the first humans to walk on the Moon."}]
   ]},
-  scholar:{tolerance:15,events:[
+  keeper:{tolerance:20,events:[
+    // All 5 within the same tight era
     [{name:"American Declaration of Independence",year:1776,desc:"The thirteen colonies formally break from British rule."},{name:"US Constitution drafted",year:1787,desc:"Delegates draft a new constitution at Philadelphia."},{name:"French Revolution begins",year:1789,desc:"The storming of the Bastille opens a decade of upheaval."},{name:"US Bill of Rights ratified",year:1791,desc:"The first ten amendments protect fundamental civil liberties."},{name:"Execution of Louis XVI",year:1793,desc:"King Louis XVI is guillotined during the Terror."}],
-    [{name:"World War I begins",year:1914,desc:"The assassination of Franz Ferdinand triggers global war."},{name:"Gallipoli campaign begins",year:1915,desc:"Allied forces land at Gallipoli in a failed Ottoman campaign."},{name:"Battle of the Somme",year:1916,desc:"The bloodiest battle in British history; over one million casualties."},{name:"US enters World War I",year:1917,desc:"America declares war after the Zimmermann Telegram is revealed."},{name:"Armistice ends World War I",year:1918,desc:"Fighting ceases on the Western Front at 11am on 11 November."}]
-  ]},
-  grandmaster:{tolerance:5,events:[
-    [{name:"Caesar crosses the Rubicon",year:-49,desc:"Caesar marches into Italy, triggering civil war against the Senate."},{name:"Caesar defeats Pompey at Pharsalus",year:-48,desc:"Caesar crushes Pompey's army in Greece; Pompey flees to Egypt."},{name:"Caesar assassinated on Ides of March",year:-44,desc:"A group of senators stab Caesar 23 times in the Theatre of Pompey."},{name:"Second Triumvirate formed",year:-43,desc:"Octavian, Antony, and Lepidus form an official ruling coalition."},{name:"Battle of Actium",year:-31,desc:"Octavian defeats Antony and Cleopatra's fleet off the Greek coast."}],
-    [{name:"February Revolution — Tsar abdicates",year:1917,desc:"Mass protests force Nicholas II to abdicate; a provisional government takes power."},{name:"Lenin's April Theses published",year:1917,desc:"Lenin returns to Russia and demands immediate socialist revolution."},{name:"October Revolution — Bolsheviks seize power",year:1917,desc:"The Bolsheviks storm the Winter Palace and take control of Russia."},{name:"Treaty of Brest-Litovsk signed",year:1918,desc:"Russia exits WWI, ceding vast territory to Germany."},{name:"Russian Civil War ends",year:1922,desc:"The Bolsheviks defeat the White Army; the Soviet Union is established."}]
+    [{name:"World War I begins",year:1914,desc:"The assassination of Franz Ferdinand triggers global war."},{name:"Gallipoli campaign begins",year:1915,desc:"Allied forces land at Gallipoli in a failed Ottoman campaign."},{name:"Battle of the Somme",year:1916,desc:"The bloodiest battle in British history; over one million casualties."},{name:"US enters World War I",year:1917,desc:"America declares war after the Zimmermann Telegram is revealed."},{name:"Armistice ends World War I",year:1918,desc:"Fighting ceases on the Western Front at 11am on 11 November."}],
+    [{name:"Caesar crosses the Rubicon",year:-49,desc:"Caesar marches into Italy, triggering civil war against the Senate."},{name:"Caesar defeats Pompey at Pharsalus",year:-48,desc:"Caesar crushes Pompey's army in Greece; Pompey flees to Egypt."},{name:"Caesar assassinated on Ides of March",year:-44,desc:"A group of senators stab Caesar 23 times in the Theatre of Pompey."},{name:"Second Triumvirate formed",year:-43,desc:"Octavian, Antony, and Lepidus form an official ruling coalition."},{name:"Battle of Actium",year:-31,desc:"Octavian defeats Antony and Cleopatra's fleet off the Greek coast."}]
   ]}
 };
 
@@ -416,7 +419,7 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
 function isMobile(){return window.innerWidth<600;}
 function activeLabel(){
   if(S.customTheme)return'"'+S.customTheme+'"';
-  if(S.theme){const th=themes().find(x=>x.id===S.theme);return th?th.label:'';}
+  if(S.theme!==null){const th=themes()[S.theme];return th?th.label:'';}
   return t('curatedSets');
 }
 
@@ -557,7 +560,7 @@ function renderGame(){
   const mobileHint=Object.keys(S.midP).length===0?`<div class="tl-mobile-hint">${t('tapEarliest')}</div>`:'';
 
   document.getElementById('body').innerHTML=`
-    <p class="instr">Place one in <strong style="color:#c8903a">${t('earliest')}</strong> and one in <strong style="color:#c8903a">${t('mostRecent')}</strong> — figure out which is which. Place the other three on the bar.${tTag}</p>
+    <div class="instr">${t('howToPlay')}</div>
     ${mobile?`<span class="tap-hint">${t('tapHint')}</span>`:''}
     <div class="plbl">${t('placeEvents')}</div>
     <div class="pool" id="pool">${pH}</div>

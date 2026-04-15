@@ -16,24 +16,23 @@ export default {
     }
 
     const apiKey = env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      return json({ error: 'API key not configured on the server.' }, 500);
-    }
+    if (!apiKey) return json({ error: 'API key not configured.' }, 500);
 
     let body;
-    try {
-      body = await request.json();
-    } catch {
-      return json({ error: 'Invalid request.' }, 400);
-    }
+    try { body = await request.json(); }
+    catch { return json({ error: 'Invalid request.' }, 400); }
 
     const { theme, diff, rounds, lang } = body;
-    if (!theme || !diff) {
-      return json({ error: 'Missing theme or difficulty.' }, 400);
-    }
+    if (!theme || !diff) return json({ error: 'Missing theme or difficulty.' }, 400);
 
-    const langNames = { en: 'English', fr: 'French', de: 'German', es: 'Spanish' };
+    const langNames = { en:'English', fr:'French', de:'German', es:'Spanish' };
     const outputLang = langNames[lang] || 'English';
+
+    const eraRules = {
+      disciple: `ERA RULE — DISCIPLE: At least 3 of the 5 events MUST come from clearly distinct historical eras. Use at least 3 of these: Ancient (before 500 AD), Medieval (500-1400), Early Modern (1400-1700), Modern (1700-1900), Contemporary (1900-present). Events should span millennia where possible. Spacing tolerance is forgiving (±180 years).`,
+      master: `ERA RULE — MASTER: Exactly 3 events must share the same historical era (e.g. all three from the Napoleonic period, or all three from medieval Europe). The other 2 events must come from entirely different eras — one much earlier, one much later. This creates a challenging mix of clustered and outlier events. Spacing tolerance is moderate (±60 years).`,
+      keeper: `ERA RULE — KEEPER OF TIME: ALL 5 events must fall within the same tight historical era or period — for example all from the French Revolutionary Wars, all from the Roman Republic's final decades, or all from World War I. Events may be separated by only years or months. Spacing tolerance is tight (±20 years).`
+    };
 
     const SYS = `You are a historical fact database modelled on the Encyclopaedia Britannica, with a content moderation role.
 
@@ -45,47 +44,23 @@ First, evaluate whether the requested theme is suitable for a history quiz game.
 
 If the theme is unsuitable, return exactly: {"error":"<friendly explanation in ${outputLang}, one sentence, suggest an alternative if possible>"}
 
-If suitable, generate the events with these rules:
+If suitable, generate the events following ALL of these rules:
 1. Every event must be real and verifiable with a confirmed year. BC = negative integer.
-2. THEME FIDELITY - every event must be directly and specifically about the requested theme. Zero exceptions.
+2. THEME FIDELITY — every event must be directly and specifically about the requested theme.
 3. Event names: 4-8 words, Britannica article title style.
 4. Descriptions: one declarative sentence, past tense, factually grounded.
 5. Do not repeat events across sets.
-6. Vary event types within each set.
-7. LANGUAGE: Write all event names and descriptions in ${outputLang}.`;
-
-    const specMap = {
-      easy: 'Most famous, universally recognised events - introductory textbook level.',
-      intermediate: 'Notable events requiring real knowledge - beyond headlines, but mainstream.',
-      hard: 'Specific events requiring deep period knowledge - secondary battles, precise treaties.',
-      grandmaster: 'Archival-level - edicts, minor sieges, court decisions that specialists debate.',
-      preschooler: 'Most famous, universally recognised events - introductory textbook level.',
-      student: 'Notable events requiring real knowledge - beyond headlines, but mainstream.',
-      scholar: 'Specific events requiring deep period knowledge - secondary battles, precise treaties.',
-    };
-
-    const spanMap = {
-      easy: 'Events must span many centuries - minimum 200 years between any two.',
-      intermediate: 'Each set spans several decades to a century. No two events in the same year.',
-      hard: 'Each set spans 5-30 years total. Year precision matters greatly.',
-      grandmaster: 'Sets may span just a few years or the same year. Exact years are critical.',
-      preschooler: 'Events must span many centuries - minimum 200 years between any two.',
-      student: 'Each set spans several decades to a century. No two events in the same year.',
-      scholar: 'Each set spans 5-30 years total. Year precision matters greatly.',
-    };
+6. Vary event types within each set (battles, treaties, political acts, deaths, discoveries).
+7. LANGUAGE: Write all event names and descriptions in ${outputLang}.
+8. ${eraRules[diff] || eraRules.disciple}`;
 
     const needed = Math.min(rounds || 5, 8);
     const prompt = `Generate ${needed} sets of exactly 5 historical events, ALL specifically about: "${theme}".
 
-Every event must be directly about "${theme}" - not the broader era, not related conflicts, not background context.
-
 DIFFICULTY: ${diff.toUpperCase()}
-Specificity: ${specMap[diff] || specMap.student}
-Time span: ${spanMap[diff] || spanMap.student}
+OUTPUT LANGUAGE: ${outputLang}
 
-OUTPUT LANGUAGE: Write event names and descriptions in ${outputLang}.
-
-Return ONLY valid JSON, no markdown:
+Return ONLY valid JSON, no markdown, no explanation:
 {"sets":[[{"name":"Event name","year":1234,"desc":"One factual sentence."}]]}`;
 
     try {
@@ -105,20 +80,15 @@ Return ONLY valid JSON, no markdown:
       });
 
       const data = await res.json();
-
       if (data.error || !data.content) {
-        const msg = data.error?.message || JSON.stringify(data);
-        return json({ error: 'API error: ' + msg }, 500);
+        return json({ error: 'API error: ' + (data.error?.message || JSON.stringify(data)) }, 500);
       }
 
       const raw = data.content.map(b => b.text || '').join('');
       const clean = raw.replace(/```json|```/g, '').trim();
       const parsed = JSON.parse(clean);
 
-      if (parsed.error) {
-        return json({ error: parsed.error }, 422);
-      }
-
+      if (parsed.error) return json({ error: parsed.error }, 422);
       return json(parsed, 200);
 
     } catch (err) {
@@ -130,9 +100,6 @@ Return ONLY valid JSON, no markdown:
 function json(data, status) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    }
+    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
   });
 }
