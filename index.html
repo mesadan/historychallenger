@@ -64,6 +64,18 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
 .btn:disabled{opacity:.3;cursor:default}
 .err-msg{font-size:12px;color:#e05530;font-family:-apple-system,sans-serif;padding:8px 0;font-style:italic}
 
+/* TWO PATH SETUP */
+.path-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+@media(max-width:480px){.path-grid{grid-template-columns:1fr}}
+.path-card{border:1.5px solid #2a2a2a;border-radius:12px;padding:16px;cursor:pointer;background:#111;transition:border-color .15s,background .15s;-webkit-tap-highlight-color:transparent}
+.path-card:hover{border-color:#555;background:#181818}
+.path-card.active{border-color:#c8903a;background:#1a1000}
+.path-icon{font-size:24px;margin-bottom:8px}
+.path-title{font-size:15px;font-weight:700;color:#ffffff;margin-bottom:4px;font-family:Georgia,serif}
+.path-desc{font-size:12px;color:#666;line-height:1.5}
+.path-section{margin-top:1.25rem}
+.disclaimer{font-size:11px;color:#555;font-family:-apple-system,sans-serif;font-style:italic;margin-top:.5rem;line-height:1.5}
+
 /* OVERLAY */
 .overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.94);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100}
 .overlay-card{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:14px;padding:2rem 2.5rem;text-align:center;max-width:320px}
@@ -170,7 +182,12 @@ const T={
     subtitle:'Prove your historical mastery',
     avg:'Avg',round:'Round',
     secI:'I — Difficulty',chooseLevel:'Choose your level',
-    levelSub:'Three levels based on how events are mixed across historical eras — not just how far apart they are.',
+    levelSub:'Three levels based on how events are mixed across historical eras.',
+    pathTitle:'How do you want to play?',
+    pathRandomTitle:'Random Challenge',pathRandomDesc:'Events are curated and era-mixed. Choose your difficulty level — it controls how events are spread across history.',
+    pathThemeTitle:'Choose a Theme',pathThemeDesc:'Pick an era or type your own theme. AI generates focused events. Difficulty is variable — determined by how much history that theme spans.',
+    pathDisclaimer:'When playing with a theme, difficulty reflects the nature of the topic rather than a fixed setting.',
+    secRounds:'Rounds',
     howToPlay:`<strong style="color:#c8903a">How to play:</strong> You have 5 events. First, identify which is <strong>Earliest</strong> and which is <strong>Most Recent</strong> — drag or tap them into those anchor boxes. This is important: those two events define the full time scale of the round. The bar between them becomes a proportional ruler — if Earliest is 500 BC and Most Recent is 1900 AD, the midpoint of the bar represents roughly 700 AD. Place the remaining 3 events at the correct proportional position along that ruler. Scoring is 50% for getting the order right, 50% for accurate spacing.`,
     secII:'II — Theme',chooseTheme:'Choose a theme',
     themeOptional:'— optional, AI generates focused events',
@@ -219,7 +236,12 @@ const T={
     subtitle:'Prouvez votre maîtrise historique',
     avg:'Moy.',round:'Manche',
     secI:'I — Difficulté',chooseLevel:'Choisissez votre niveau',
-    levelSub:'Trois niveaux basés sur la façon dont les événements sont mélangés entre les époques historiques.',
+    levelSub:'Trois niveaux basés sur la façon dont les événements sont mélangés entre les époques.',
+    pathTitle:'Comment voulez-vous jouer ?',
+    pathRandomTitle:'Défi aléatoire',pathRandomDesc:'Les événements sont sélectionnés et mélangés entre époques. Choisissez votre niveau — il contrôle comment les événements sont répartis dans l\'histoire.',
+    pathThemeTitle:'Choisir un thème',pathThemeDesc:'Choisissez une époque ou tapez votre propre thème. L\'IA génère des événements ciblés. La difficulté est variable selon l\'étendue historique du thème.',
+    pathDisclaimer:'Avec un thème, la difficulté reflète la nature du sujet plutôt qu\'un réglage fixe.',
+    secRounds:'Manches',
     howToPlay:`<strong style="color:#c8903a">Comment jouer :</strong> Vous avez 5 événements. D'abord, identifiez lequel est le <strong>plus ancien</strong> et lequel est le <strong>plus récent</strong> — faites-les glisser dans les cases d'ancrage. Ces deux événements définissent l'échelle de temps du round. La barre entre eux devient une règle proportionnelle — si le plus ancien est en 500 av. J.-C. et le plus récent en 1900, le milieu de la barre représente environ 700 apr. J.-C. Placez les 3 autres événements à la bonne position proportionnelle. Le score est 50% pour l'ordre, 50% pour l'espacement.`,
     secII:'II — Thème',chooseTheme:'Choisissez un thème',
     themeOptional:'— facultatif, l\'IA génère des événements ciblés',
@@ -269,6 +291,11 @@ const T={
     avg:'Ø',round:'Runde',
     secI:'I — Schwierigkeit',chooseLevel:'Wählen Sie Ihr Niveau',
     levelSub:'Drei Stufen basierend darauf, wie Ereignisse über historische Epochen gemischt werden.',
+    pathTitle:'Wie möchten Sie spielen?',
+    pathRandomTitle:'Zufällige Herausforderung',pathRandomDesc:'Ereignisse sind kuratiert und epochengemischt. Wählen Sie Ihren Schwierigkeitsgrad — er bestimmt, wie Ereignisse über die Geschichte verteilt sind.',
+    pathThemeTitle:'Thema wählen',pathThemeDesc:'Wählen Sie eine Epoche oder geben Sie Ihr eigenes Thema ein. KI generiert gezielte Ereignisse. Die Schwierigkeit variiert je nach historischer Reichweite des Themas.',
+    pathDisclaimer:'Mit einem Thema spiegelt der Schwierigkeitsgrad die Natur des Themas wider, keine feste Einstellung.',
+    secRounds:'Runden',
     howToPlay:`<strong style="color:#c8903a">Spielanleitung:</strong> Sie haben 5 Ereignisse. Bestimmen Sie zuerst, welches das <strong>früheste</strong> und welches das <strong>neueste</strong> ist — ziehen Sie diese in die Ankerboxen. Diese zwei Ereignisse definieren den Zeitmaßstab der Runde. Die Leiste wird zur proportionalen Skala — liegt das früheste bei 500 v. Chr. und das neueste bei 1900, entspricht die Mitte etwa 700 n. Chr. Platzieren Sie die restlichen 3 Ereignisse proportional korrekt. 50% der Punkte für die Reihenfolge, 50% für den Abstand.`,
     secII:'II — Thema',chooseTheme:'Wählen Sie ein Thema',
     themeOptional:'— optional, KI generiert gezielte Ereignisse',
@@ -318,6 +345,11 @@ const T={
     avg:'Prom.',round:'Ronda',
     secI:'I — Dificultad',chooseLevel:'Elige tu nivel',
     levelSub:'Tres niveles basados en cómo se mezclan los eventos entre épocas históricas.',
+    pathTitle:'¿Cómo quieres jugar?',
+    pathRandomTitle:'Desafío aleatorio',pathRandomDesc:'Los eventos son seleccionados y mezclados entre épocas. Elige tu nivel de dificultad — controla cómo se distribuyen los eventos en la historia.',
+    pathThemeTitle:'Elegir un tema',pathThemeDesc:'Elige una época o escribe tu propio tema. La IA genera eventos enfocados. La dificultad es variable según el alcance histórico del tema.',
+    pathDisclaimer:'Con un tema, la dificultad refleja la naturaleza del tema en lugar de un ajuste fijo.',
+    secRounds:'Rondas',
     howToPlay:`<strong style="color:#c8903a">Cómo jugar:</strong> Tienes 5 eventos. Primero identifica cuál es el <strong>más antiguo</strong> y cuál es el <strong>más reciente</strong> — arrástralos a las casillas de anclaje. Esos dos eventos definen la escala de tiempo de la ronda. La barra entre ellos se convierte en una regla proporcional — si el más antiguo es 500 a.C. y el más reciente es 1900, el punto medio de la barra representa aproximadamente el año 700. Coloca los 3 eventos restantes en la posición proporcional correcta. 50% de puntos por el orden, 50% por el espaciado.`,
     secII:'II — Tema',chooseTheme:'Elige un tema',
     themeOptional:'— opcional, la IA genera eventos enfocados',
@@ -378,7 +410,7 @@ function setLang(l){
   document.getElementById('lbl-avg').textContent=t('avg');
   document.getElementById('lbl-round').textContent=t('round');
   // Reset theme selection since theme chips change
-  S.theme=null;S.customTheme='';S.generatedSets=[];
+  S.path=null;S.theme=null;S.customTheme='';S.generatedSets=[];
   if(S.phase==='setup')renderSetup();
   else renderGame();
 }
@@ -406,7 +438,7 @@ const DIFFS={
 };
 
 let S={
-  phase:'setup',diff:null,rounds:5,round:0,
+  phase:'setup',path:null,diff:null,rounds:5,round:0,
   theme:null,customTheme:'',generatedSets:[],
   totalPct:0,roundsPlayed:0,
   events:[],midP:{},aLeft:null,aRight:null,
@@ -436,37 +468,67 @@ function renderSetup(){
   document.getElementById('sc').textContent='—';
   const diffKeys=Object.keys(DIFFS);
   const roundOpts=[3,5,10,15,20];
-  const hasTheme=!!(S.customTheme||S.theme);
   const themeList=themes();
+  const isThemePath=S.path==='theme';
+  const isRandomPath=S.path==='random';
+
+  const randomSection=isRandomPath?`
+    <div class="path-section">
+      <div class="section-num">${t('secI')}</div>
+      <div class="setup-title">${t('chooseLevel')}</div>
+      <div class="setup-sub">${t('levelSub')}</div>
+      <div class="diff-grid">${diffKeys.map(k=>`<div class="dc ${S.diff===k?'sel':''}" onclick="selDiff('${k}')">
+        <div class="dn">${td(k,'label')}</div>
+        <div class="dt">${td(k,'tag')}</div>
+        <div class="dd">${td(k,'desc')}</div>
+      </div>`).join('')}</div>
+    </div>`:'';
+
+  const themeSection=isThemePath?`
+    <div class="path-section">
+      <div class="theme-grid">${themeList.map((th,i)=>`<div class="chip ${S.theme===i?'sel':''}" onclick="selTheme(${i})">${th.label}</div>`).join('')}</div>
+      <div class="custom-row">
+        <input class="ci" id="ci" type="text" placeholder="${t('typePlaceholder')}" value="${S.customTheme}" oninput="onCI(this.value)">
+        <button class="btn" onclick="clearTheme()">${t('clearBtn')}</button>
+      </div>
+      <div id="theme-err" class="err-msg" style="display:none"></div>
+      <div class="disclaimer">⚠ ${t('pathDisclaimer')}</div>
+    </div>`:'';
+
+  const canStart=(isRandomPath&&S.diff)||(isThemePath&&(S.customTheme||S.theme!==null));
+  const btnLabel=isThemePath?t('genStart'):t('startBtn');
+
   document.getElementById('body').innerHTML=`<div class="sf">
-    <div class="section-num">${t('secI')}</div>
-    <div class="setup-title">${t('chooseLevel')}</div>
-    <div class="setup-sub">${t('levelSub')}</div>
-    <div class="diff-grid">${diffKeys.map(k=>`<div class="dc ${S.diff===k?'sel':''}" onclick="selDiff('${k}')">
-      <div class="dn">${td(k,'label')}</div>
-      <div class="dt">${td(k,'tag')}</div>
-      <div class="dd">${td(k,'desc')}</div>
-    </div>`).join('')}</div>
-    <hr class="divider">
-    <div class="section-num">${t('secII')}</div>
-    <div class="setup-title">${t('chooseTheme')} <span style="font-size:11px;font-weight:400;color:#444">${t('themeOptional')}</span></div>
-    <div class="setup-sub" style="margin-bottom:.75rem">${t('themeSub')}</div>
-    <div class="theme-grid">${themeList.map((th,i)=>`<div class="chip ${!S.customTheme&&S.theme===i?'sel':''}" onclick="selTheme(${i})">${th.label}</div>`).join('')}</div>
-    <div class="custom-row">
-      <input class="ci" id="ci" type="text" placeholder="${t('typePlaceholder')}" value="${S.customTheme}" oninput="onCI(this.value)">
-      <button class="btn" onclick="clearTheme()">${t('clearBtn')}</button>
+    <div class="setup-title" style="margin-bottom:.75rem">${t('pathTitle')}</div>
+    <div class="path-grid">
+      <div class="path-card ${isRandomPath?'active':''}" onclick="selPath('random')">
+        <div class="path-icon">🎲</div>
+        <div class="path-title">${t('pathRandomTitle')}</div>
+        <div class="path-desc">${t('pathRandomDesc')}</div>
+      </div>
+      <div class="path-card ${isThemePath?'active':''}" onclick="selPath('theme')">
+        <div class="path-icon">📜</div>
+        <div class="path-title">${t('pathThemeTitle')}</div>
+        <div class="path-desc">${t('pathThemeDesc')}</div>
+      </div>
     </div>
-    <div id="theme-err" class="err-msg" style="display:none"></div>
-    <hr class="divider">
-    <div class="section-num">${t('secIII')}</div>
+    ${randomSection}
+    ${themeSection}
+    ${S.path?`<hr class="divider">
+    <div class="section-num">${t('secRounds')}</div>
     <div class="rounds-row">
-      <div class="rl">${t('round')}:</div>
       <div class="ropts">${roundOpts.map(n=>`<div class="ro ${S.rounds===n?'sel':''}" onclick="selRounds(${n})">${n}</div>`).join('')}</div>
     </div>
-    <button class="btn btn-p" id="start-btn" onclick="startSeries()" ${!S.diff?'disabled':''}>
-      ${hasTheme?t('genStart'):t('startBtn')}
-    </button>
+    <button class="btn btn-p" id="start-btn" onclick="startSeries()" ${!canStart?'disabled':''}>${btnLabel}</button>`:''}
   </div>`;}
+
+function selPath(p){
+  S.path=p;
+  if(p==='theme'){S.diff=null;}
+  else{S.theme=null;S.customTheme='';}
+  S.generatedSets=[];
+  renderSetup();
+}
 
 function selDiff(k){S.diff=k;S.generatedSets=[];renderSetup();}
 function selRounds(n){S.rounds=n;renderSetup();}
@@ -477,30 +539,32 @@ function onCI(v){
   if(S.customTheme)S.theme=null;
   S.generatedSets=[];
   const btn=document.getElementById('start-btn');
-  if(btn)btn.textContent=S.customTheme?t('genStart'):t('startBtn');
+  if(btn)btn.textContent=t('genStart');
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
 }
 
 async function startSeries(){
-  if(!S.diff)return;
   S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';
   const themeObj=S.theme!==null?themes()[S.theme]:null;
   const themeQ=S.customTheme||(themeObj?themeObj.q:null);
-  if(themeQ){
+  // Theme path — always generate, pass 'disciple' as default diff for the Worker spec rules
+  if(S.path==='theme'&&themeQ){
     showOverlay(t('generatingMsg')+' <strong style="color:#fff">'+activeLabel()+'</strong><br><br>'+t('generatingWait'));
-    const ok=await generateEvents(themeQ);
+    const ok=await generateEvents(themeQ,S.diff||'disciple');
     hideOverlay();
     if(!ok)return;
+    // Theme path uses disciple tolerance for scoring since difficulty is variable
+    if(!S.diff)S.diff='disciple';
   }
   startRound();
 }
 
-async function generateEvents(themeQ){
+async function generateEvents(themeQ,diffOverride){
   try{
     const res=await fetch(WORKER,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({theme:themeQ,diff:S.diff,rounds:Math.min(S.rounds,8),lang:LANG})
+      body:JSON.stringify({theme:themeQ,diff:diffOverride||S.diff||'disciple',rounds:Math.min(S.rounds,8),lang:LANG})
     });
     const data=await res.json();
     if(data.error){renderSetup();const el=document.getElementById('theme-err');if(el){el.textContent=data.error;el.style.display='block';}return false;}
@@ -730,7 +794,7 @@ function showFinal(){
 }
 
 function beginGame(){S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';startRound();}
-function restartSetup(){S.phase='setup';S.diff=null;S.rounds=5;S.generatedSets=[];renderSetup();}
+function restartSetup(){S.phase='setup';S.path=null;S.diff=null;S.rounds=5;S.generatedSets=[];S.theme=null;S.customTheme='';renderSetup();}
 renderSetup();
 </script>
 </body>
