@@ -8,70 +8,76 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{min-height:100vh}
-body{font-family:Georgia,'Times New Roman',serif;background:#0f0e0b;color:#e8d9b0;display:flex;justify-content:center;padding:1.25rem 0.75rem}
+body{font-family:Georgia,'Times New Roman',serif;background:#080705;color:#f0e8cc;display:flex;justify-content:center;padding:1.25rem 0.75rem}
 .wrap{width:100%;max-width:820px}
-.card{background:#1a1710;border:1px solid #3d3420;border-radius:14px;padding:1.25rem}
+.card{background:#141208;border:1px solid #4a3e1e;border-radius:14px;padding:1.25rem}
 @media(min-width:600px){.card{padding:1.75rem}}
 
 /* HEADER */
-.hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.1rem;border-bottom:1.5px solid #3d3420;padding-bottom:.9rem;flex-wrap:wrap;gap:8px}
-.ttl{font-size:20px;font-weight:700;color:#f0dfa0;letter-spacing:.01em}
+.hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.1rem;border-bottom:1.5px solid #4a3e1e;padding-bottom:.9rem;flex-wrap:wrap;gap:8px}
+.hdr-left{display:flex;flex-direction:column;gap:4px}
+.ttl{font-size:20px;font-weight:700;color:#ffffff;letter-spacing:.01em}
 @media(min-width:600px){.ttl{font-size:24px}}
-.ttl-sub{font-size:10px;color:#7a6a3a;letter-spacing:.09em;text-transform:uppercase;font-family:-apple-system,sans-serif;margin-top:3px}
+.ttl-sub{font-size:10px;color:#7a6a3a;letter-spacing:.09em;text-transform:uppercase;font-family:-apple-system,sans-serif}
+.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .mets{display:flex;gap:8px}
-.met{background:#241f12;border:1px solid #3d3420;border-radius:8px;padding:5px 12px;text-align:center;min-width:56px}
-.mv{font-size:18px;font-weight:700;color:#f0dfa0}
+.met{background:#1e1a0a;border:1px solid #4a3e1e;border-radius:8px;padding:5px 12px;text-align:center;min-width:56px}
+.mv{font-size:18px;font-weight:700;color:#ffffff}
 .ml{font-size:10px;color:#7a6a3a;font-family:-apple-system,sans-serif;letter-spacing:.04em}
+.lang-row{display:flex;gap:5px}
+.lang-btn{border:1px solid #3a3010;background:#1a1608;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;color:#8a7a4a;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.lang-btn:hover{border-color:#6b5a2a;color:#c8b47a}
+.lang-btn.active{border-color:#c8903a;background:#2a2010;color:#f0dfa0;font-weight:700}
 
 /* SETUP */
 .sf{font-family:-apple-system,sans-serif}
 .section-num{font-size:11px;color:#c8903a;letter-spacing:.1em;text-transform:uppercase;font-family:-apple-system,sans-serif;font-weight:700;margin-bottom:.2rem}
-.setup-title{font-size:17px;font-weight:700;color:#f0dfa0;margin-bottom:.35rem;font-family:Georgia,serif}
-.setup-sub{font-size:13px;color:#7a6a3a;margin-bottom:1rem;line-height:1.5}
+.setup-title{font-size:17px;font-weight:700;color:#ffffff;margin-bottom:.35rem;font-family:Georgia,serif}
+.setup-sub{font-size:13px;color:#8a7a4a;margin-bottom:1rem;line-height:1.5}
 .diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1.25rem}
-.dc{border:1.5px solid #3d3420;border-radius:10px;padding:10px 12px;cursor:pointer;background:#1f1c0f;transition:border-color .12s,background .12s;-webkit-tap-highlight-color:transparent}
-.dc:hover{background:#272210;border-color:#6b5a2a}
-.dc.sel{border-color:#c8903a;background:#2a2010}
-.dn{font-size:13px;font-weight:700;color:#f0dfa0;margin-bottom:2px}
-.dt{font-size:10px;color:#c8903a;background:#251e0a;border:1px solid #3d3420;border-radius:3px;padding:1px 5px;display:inline-block;margin-bottom:4px;letter-spacing:.02em}
-.dd{font-size:11px;color:#8a7a4a;line-height:1.4}
-.divider{border:none;border-top:1px solid #3d3420;margin:1.1rem 0}
+.dc{border:1.5px solid #3a3010;border-radius:10px;padding:10px 12px;cursor:pointer;background:#1a1608;transition:border-color .12s,background .12s;-webkit-tap-highlight-color:transparent}
+.dc:hover{background:#221e0c;border-color:#6b5a2a}
+.dc.sel{border-color:#c8903a;background:#261e08}
+.dn{font-size:13px;font-weight:700;color:#ffffff;margin-bottom:2px}
+.dt{font-size:10px;color:#c8903a;background:#1e1808;border:1px solid #3a3010;border-radius:3px;padding:1px 5px;display:inline-block;margin-bottom:4px;letter-spacing:.02em}
+.dd{font-size:11px;color:#7a6a3a;line-height:1.4}
+.divider{border:none;border-top:1px solid #3a3010;margin:1.1rem 0}
 .theme-grid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:.85rem}
-.chip{border:1px solid #3d3420;background:#1f1c0f;border-radius:18px;padding:5px 13px;font-size:12px;cursor:pointer;color:#c8b47a;font-family:-apple-system,sans-serif;transition:all .12s;-webkit-tap-highlight-color:transparent}
-.chip:hover{background:#272210;border-color:#6b5a2a}
-.chip.sel{border-color:#c8903a;background:#2a2010;color:#f0dfa0;font-weight:600}
+.chip{border:1px solid #3a3010;background:#1a1608;border-radius:18px;padding:5px 13px;font-size:12px;cursor:pointer;color:#c8b47a;font-family:-apple-system,sans-serif;transition:all .12s;-webkit-tap-highlight-color:transparent}
+.chip:hover{background:#221e0c;border-color:#6b5a2a}
+.chip.sel{border-color:#c8903a;background:#261e08;color:#ffffff;font-weight:600}
 .custom-row{display:flex;gap:8px;align-items:center;margin-bottom:.6rem}
-.ci{flex:1;border:1px solid #3d3420;background:#1f1c0f;border-radius:8px;padding:8px 12px;font-size:14px;color:#e8d9b0;font-family:-apple-system,sans-serif;outline:none;-webkit-appearance:none}
+.ci{flex:1;border:1px solid #4a3e1e;background:#1a1608;border-radius:8px;padding:8px 12px;font-size:14px;color:#f0e8cc;font-family:-apple-system,sans-serif;outline:none;-webkit-appearance:none}
 .ci:focus{border-color:#c8903a}
-.ci::placeholder{color:#4a4020}
+.ci::placeholder{color:#3a3010}
 .rounds-row{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;flex-wrap:wrap}
-.rl{font-size:13px;color:#8a7a4a;font-family:-apple-system,sans-serif}
+.rl{font-size:13px;color:#7a6a3a;font-family:-apple-system,sans-serif}
 .ropts{display:flex;gap:7px;flex-wrap:wrap}
-.ro{border:1px solid #3d3420;background:#1f1c0f;border-radius:7px;padding:6px 13px;font-size:13px;cursor:pointer;color:#c8b47a;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-.ro:hover{background:#272210}
-.ro.sel{border-color:#c8903a;background:#2a2010;color:#f0dfa0;font-weight:600}
-.btn{border:1px solid #3d3420;background:#241f12;color:#e8d9b0;border-radius:8px;padding:9px 18px;font-size:13px;cursor:pointer;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-.btn:hover{background:#2e2815}
-.btn-p{background:#7a3b0e;color:#fdf6e3;border-color:#7a3b0e}
-.btn-p:hover{background:#8f4510}
+.ro{border:1px solid #3a3010;background:#1a1608;border-radius:7px;padding:6px 13px;font-size:13px;cursor:pointer;color:#c8b47a;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.ro:hover{background:#221e0c}
+.ro.sel{border-color:#c8903a;background:#261e08;color:#ffffff;font-weight:600}
+.btn{border:1px solid #4a3e1e;background:#1e1a0a;color:#f0e8cc;border-radius:8px;padding:9px 18px;font-size:13px;cursor:pointer;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.btn:hover{background:#272210}
+.btn-p{background:#9a5a10;color:#ffffff;border-color:#9a5a10}
+.btn-p:hover{background:#b06a18}
 .btn:disabled{opacity:.3;cursor:default}
-.err-msg{font-size:12px;color:#e05530;font-family:-apple-system,sans-serif;padding:8px 0;font-style:italic}
+.err-msg{font-size:12px;color:#e06040;font-family:-apple-system,sans-serif;padding:8px 0;font-style:italic}
 
 /* OVERLAY */
-.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,9,6,0.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100}
-.overlay-card{background:#1a1710;border:1px solid #3d3420;border-radius:14px;padding:2rem 2.5rem;text-align:center;max-width:320px}
-.overlay-title{font-size:18px;font-weight:700;color:#f0dfa0;font-family:Georgia,serif;margin-bottom:.5rem}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(4,3,2,0.92);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100}
+.overlay-card{background:#141208;border:1px solid #4a3e1e;border-radius:14px;padding:2rem 2.5rem;text-align:center;max-width:320px}
+.overlay-title{font-size:18px;font-weight:700;color:#ffffff;font-family:Georgia,serif;margin-bottom:.5rem}
 .overlay-sub{font-size:13px;color:#7a6a3a;margin-bottom:1.25rem;line-height:1.5;font-family:-apple-system,sans-serif}
-.spin{display:inline-block;width:28px;height:28px;border:3px solid #3d3420;border-top-color:#c8903a;border-radius:50%;animation:spin .8s linear infinite}
+.spin{display:inline-block;width:28px;height:28px;border:3px solid #3a3010;border-top-color:#c8903a;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* GAME */
-.instr{font-size:13px;color:#8a7a4a;line-height:1.6;margin-bottom:1rem;padding:9px 12px;background:#1f1c0f;border-radius:8px;border-left:3px solid #c8903a;font-family:-apple-system,sans-serif}
-.plbl{font-size:10px;color:#5a4e28;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-family:-apple-system,sans-serif}
-.pool{display:flex;flex-wrap:wrap;gap:7px;min-height:44px;padding:7px;border:1px dashed #3d3420;border-radius:8px;margin-bottom:1.25rem;align-items:flex-start;background:#161410}
-.ecard{background:#1f1c0f;border:1.5px solid #3d3420;border-radius:7px;padding:7px 11px;font-size:12px;cursor:pointer;user-select:none;color:#e8d9b0;line-height:1.4;font-family:-apple-system,sans-serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.ecard:hover{border-color:#6b5a2a;background:#272210}
-.ecard.selected-card{border-color:#c8903a;background:#2a2010;color:#f0dfa0;font-weight:600}
+.instr{font-size:13px;color:#a09070;line-height:1.6;margin-bottom:1rem;padding:9px 12px;background:#1a1608;border-radius:8px;border-left:3px solid #c8903a;font-family:-apple-system,sans-serif}
+.plbl{font-size:10px;color:#4a4020;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-family:-apple-system,sans-serif}
+.pool{display:flex;flex-wrap:wrap;gap:7px;min-height:44px;padding:7px;border:1px dashed #3a3010;border-radius:8px;margin-bottom:1.25rem;align-items:flex-start;background:#100e06}
+.ecard{background:#1a1608;border:1.5px solid #4a3e1e;border-radius:7px;padding:7px 11px;font-size:12px;cursor:pointer;user-select:none;color:#f0e8cc;line-height:1.4;font-family:-apple-system,sans-serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.ecard:hover{border-color:#6b5a2a;background:#221e0c}
+.ecard.selected-card{border-color:#c8903a;background:#261e08;color:#ffffff;font-weight:600}
 
 /* TIMELINE */
 .tl-section{margin-bottom:1.25rem}
@@ -79,77 +85,75 @@ body{font-family:Georgia,'Times New Roman',serif;background:#0f0e0b;color:#e8d9b
 .tl-anchors{display:flex;justify-content:space-between;gap:8px;margin-bottom:10px}
 .anchor-zone{flex:0 0 calc(50% - 4px)}
 @media(min-width:600px){.anchor-zone{flex:0 0 145px}}
-.anchor-label{font-size:10px;color:#5a4e28;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;text-align:center;font-family:-apple-system,sans-serif}
-.anchor-drop{min-height:48px;border:1px dashed #3d3420;border-radius:8px;padding:5px 7px;display:flex;align-items:center;justify-content:center;text-align:center;background:#161410;transition:border-color .12s,background .12s;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.anchor-drop.over{border-color:#c8903a;background:#1f1c0f}
-.anchor-drop.filled{border-style:solid;border-color:#4d4020;background:#1f1c0f}
-.anchor-card{font-size:11px;color:#e8d9b0;line-height:1.3;cursor:pointer;user-select:none;text-align:center;font-weight:600;font-family:-apple-system,sans-serif}
-.anchor-ok{border-color:#2e6b3e !important;background:#0f2218 !important}
-.anchor-bad{border-color:#7a2a18 !important;background:#200e0a !important}
-
-/* desktop bar */
+.anchor-label{font-size:10px;color:#4a4020;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;text-align:center;font-family:-apple-system,sans-serif}
+.anchor-drop{min-height:48px;border:1px dashed #3a3010;border-radius:8px;padding:5px 7px;display:flex;align-items:center;justify-content:center;text-align:center;background:#100e06;transition:border-color .12s,background .12s;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.anchor-drop.over{border-color:#c8903a;background:#1a1608}
+.anchor-drop.filled{border-style:solid;border-color:#5a4e28;background:#1a1608}
+.anchor-card{font-size:11px;color:#f0e8cc;line-height:1.3;cursor:pointer;user-select:none;text-align:center;font-weight:600;font-family:-apple-system,sans-serif}
+.anchor-ok{border-color:#2e8b4e !important;background:#0a1e10 !important}
+.anchor-bad{border-color:#8b3020 !important;background:#1a0a06 !important}
 .tl-bar-row{display:none}
 @media(min-width:600px){.tl-bar-row{display:flex;align-items:center;margin-top:4px}}
-.tl-anchor-line{width:145px;flex-shrink:0;height:6px;background:#3d3420}
+.tl-anchor-line{width:145px;flex-shrink:0;height:6px;background:#3a3010}
 .tl-bar-wrap{flex:1;position:relative;height:6px}
 .tl-bar{position:absolute;top:-17px;left:0;right:0;height:40px;cursor:crosshair;z-index:5}
-.tl-track{position:absolute;top:0;left:0;right:0;height:6px;background:#3d3420;transition:background .12s}
+.tl-track{position:absolute;top:0;left:0;right:0;height:6px;background:#3a3010;transition:background .12s}
 .tl-bar.active .tl-track{background:#c8903a}
 .pins-layer{position:absolute;top:0;left:0;right:0;height:0;pointer-events:none;z-index:10}
 .pin{position:absolute;top:0;display:flex;flex-direction:column;align-items:center;transform:translateX(-50%);pointer-events:all;cursor:grab}
-.pin-dot{width:13px;height:13px;border-radius:50%;background:#c8903a;border:2px solid #1a1710;outline:1.5px solid #c8903a;flex-shrink:0;margin-top:-4px}
+.pin-dot{width:13px;height:13px;border-radius:50%;background:#c8903a;border:2px solid #141208;outline:1.5px solid #c8903a;flex-shrink:0;margin-top:-4px}
 .pin-stem{width:1.5px;height:14px;background:#c8903a}
-.pin-label{background:#1f1c0f;border:1px solid #4d4020;border-radius:6px;padding:4px 8px;font-size:11px;color:#e8d9b0;max-width:110px;text-align:center;line-height:1.3;font-family:-apple-system,sans-serif}
+.pin-label{background:#1a1608;border:1px solid #5a4e28;border-radius:6px;padding:4px 8px;font-size:11px;color:#f0e8cc;max-width:110px;text-align:center;line-height:1.3;font-family:-apple-system,sans-serif}
 .ghost-pin{position:absolute;top:0;display:flex;flex-direction:column;align-items:center;transform:translateX(-50%);pointer-events:none;opacity:0.35}
-.ghost-dot{width:13px;height:13px;border-radius:50%;background:#c8903a;border:2px solid #1a1710;flex-shrink:0;margin-top:-4px}
+.ghost-dot{width:13px;height:13px;border-radius:50%;background:#c8903a;border:2px solid #141208;flex-shrink:0;margin-top:-4px}
 .ghost-stem{width:1.5px;height:14px;background:#c8903a}
-.ghost-label{background:#1f1c0f;border:1px dashed #3d3420;border-radius:6px;padding:4px 8px;font-size:11px;color:#7a6a3a;max-width:110px;text-align:center;line-height:1.3;font-family:-apple-system,sans-serif}
-
-/* answer pins */
+.ghost-label{background:#1a1608;border:1px dashed #3a3010;border-radius:6px;padding:4px 8px;font-size:11px;color:#7a6a3a;max-width:110px;text-align:center;line-height:1.3;font-family:-apple-system,sans-serif}
 .answer-pin{position:absolute;display:flex;flex-direction:column;align-items:center;transform:translateX(-50%);pointer-events:none}
-.answer-dot{width:10px;height:10px;border-radius:50%;background:#2a7a4a;border:2px solid #1a1710;flex-shrink:0;opacity:0.6}
-.answer-stem{width:1.5px;background:#2a7a4a;opacity:0.4}
-.answer-label{background:rgba(42,122,74,0.1);border:1px solid rgba(42,122,74,0.3);border-radius:5px;padding:2px 6px;font-size:10px;color:#4aaa74;max-width:105px;text-align:center;line-height:1.3;font-family:-apple-system,sans-serif;font-weight:600;opacity:0.75}
-
-/* mobile bar */
-.tl-mobile-bar{display:block;margin-top:12px;position:relative;height:52px;background:#161410;border:1px dashed #3d3420;border-radius:8px;cursor:pointer;overflow:visible}
+.answer-dot{width:10px;height:10px;border-radius:50%;background:#2a8a5a;border:2px solid #141208;flex-shrink:0;opacity:0.65}
+.answer-stem{width:1.5px;background:#2a8a5a;opacity:0.45}
+.answer-label{background:rgba(42,138,90,0.1);border:1px solid rgba(42,138,90,0.35);border-radius:5px;padding:2px 6px;font-size:10px;color:#5aaa7a;max-width:105px;text-align:center;line-height:1.3;font-family:-apple-system,sans-serif;font-weight:600;opacity:0.8}
+.tl-mobile-bar{display:block;margin-top:12px;position:relative;height:52px;background:#100e06;border:1px dashed #3a3010;border-radius:8px;cursor:pointer;overflow:visible}
 @media(min-width:600px){.tl-mobile-bar{display:none}}
-.tl-mobile-track{position:absolute;top:50%;left:12px;right:12px;height:5px;background:#3d3420;border-radius:2px;transform:translateY(-50%)}
-.tl-mobile-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;color:#4a4020;font-family:-apple-system,sans-serif;white-space:nowrap;pointer-events:none}
+.tl-mobile-track{position:absolute;top:50%;left:12px;right:12px;height:5px;background:#3a3010;border-radius:2px;transform:translateY(-50%)}
+.tl-mobile-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;color:#3a3010;font-family:-apple-system,sans-serif;white-space:nowrap;pointer-events:none}
 .mobile-pin{position:absolute;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;pointer-events:all;cursor:pointer}
-.mobile-pin-dot{width:14px;height:14px;border-radius:50%;background:#c8903a;border:2px solid #1a1710;flex-shrink:0}
-.mobile-pin-lbl{background:#1f1c0f;border:1px solid #4d4020;border-radius:5px;padding:2px 6px;font-size:10px;color:#e8d9b0;white-space:normal;max-width:80px;text-align:center;line-height:1.3;font-family:-apple-system,sans-serif;margin-top:3px}
-
-/* mobile tap instruction — shown above bar */
-.mobile-bar-instr{display:block;font-size:11px;color:#5a4e28;font-family:-apple-system,sans-serif;font-style:italic;margin-top:8px;margin-bottom:4px;text-align:center}
+.mobile-pin-dot{width:14px;height:14px;border-radius:50%;background:#c8903a;border:2px solid #141208;flex-shrink:0}
+.mobile-pin-lbl{background:#1a1608;border:1px solid #5a4e28;border-radius:5px;padding:2px 6px;font-size:10px;color:#f0e8cc;white-space:normal;max-width:80px;text-align:center;line-height:1.3;font-family:-apple-system,sans-serif;margin-top:3px}
+.mobile-bar-instr{display:block;font-size:11px;color:#4a4020;font-family:-apple-system,sans-serif;font-style:italic;margin-top:8px;margin-bottom:4px;text-align:center}
 @media(min-width:600px){.mobile-bar-instr{display:none}}
-.tap-hint{font-size:11px;color:#5a4e28;font-family:-apple-system,sans-serif;font-style:italic;margin-bottom:6px;display:block}
+.tap-hint{font-size:11px;color:#4a4020;font-family:-apple-system,sans-serif;font-style:italic;margin-bottom:6px;display:block}
 @media(min-width:600px){.tap-hint{display:none}}
-
-/* actions + results */
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:.5rem;align-items:center}
-.res{margin-top:1.25rem;padding:1.2rem;border:1px solid #3d3420;border-radius:12px;background:#161410}
-.score-big{font-size:38px;font-weight:700;color:#c8903a;font-family:Georgia,serif}
-.score-bar-wrap{background:#241f12;border-radius:6px;height:8px;margin:.45rem 0 .35rem;overflow:hidden}
+.res{margin-top:1.25rem;padding:1.2rem;border:1px solid #4a3e1e;border-radius:12px;background:#100e06}
+.score-big{font-size:42px;font-weight:700;color:#c8903a;font-family:Georgia,serif}
+.score-bar-wrap{background:#1e1a0a;border-radius:6px;height:8px;margin:.45rem 0 .35rem;overflow:hidden}
 .score-bar-fill{height:100%;background:#c8903a;border-radius:6px;transition:width .7s ease}
 .res-sub{font-size:12px;color:#5a4e28;margin-bottom:.9rem;font-family:-apple-system,sans-serif}
 .res-row{display:flex;gap:9px;margin-bottom:9px;font-size:13px;line-height:1.5;align-items:flex-start;font-family:-apple-system,sans-serif}
 .dot{width:18px;height:18px;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
-.ok{background:#0f2218;color:#4aaa74}
-.bad{background:#200e0a;color:#e05530}
+.ok{background:#0a2218;color:#5aaa7a}
+.bad{background:#1a0806;color:#e06040}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="card">
     <div class="hdr">
-      <div>
+      <div class="hdr-left">
         <div class="ttl">History Challenger</div>
-        <div class="ttl-sub">Prove your historical mastery</div>
+        <div class="ttl-sub" id="ttl-sub">Prove your historical mastery</div>
       </div>
-      <div class="mets">
-        <div class="met"><div class="mv" id="sc">—</div><div class="ml">Avg</div></div>
-        <div class="met"><div class="mv" id="rn">—</div><div class="ml">Round</div></div>
+      <div class="hdr-right">
+        <div class="mets">
+          <div class="met"><div class="mv" id="sc">—</div><div class="ml" id="lbl-avg">Avg</div></div>
+          <div class="met"><div class="mv" id="rn">—</div><div class="ml" id="lbl-round">Round</div></div>
+        </div>
+        <div class="lang-row">
+          <button class="lang-btn active" onclick="setLang('en')">EN</button>
+          <button class="lang-btn" onclick="setLang('fr')">FR</button>
+          <button class="lang-btn" onclick="setLang('de')">DE</button>
+          <button class="lang-btn" onclick="setLang('es')">ES</button>
+        </div>
       </div>
     </div>
     <div id="body"></div>
@@ -159,47 +163,163 @@ body{font-family:Georgia,'Times New Roman',serif;background:#0f0e0b;color:#e8d9b
 <script>
 const WORKER='https://histroychallenger-api.maletethan.workers.dev';
 
-const DIFFS={
-  preschooler:{
-    label:'Preschooler',
-    tag:'Centuries apart · Household names',
-    desc:'The biggest events in human history — things your grandparents could place. Widely spaced, very forgiving.',
-    tolerance:150,
-    events:[
-      [{name:"Great Pyramid of Giza completed",year:-2560,desc:"Pharaoh Khufu's pyramid at Giza is completed, the largest ever built."},{name:"Alexander the Great dies",year:-323,desc:"Alexander dies in Babylon after conquering an empire from Greece to India."},{name:"Roman Empire falls in the West",year:476,desc:"Romulus Augustulus is deposed, ending Western Roman rule."},{name:"Columbus reaches the Americas",year:1492,desc:"Columbus lands in the Caribbean, opening the Age of Exploration."},{name:"First Moon landing",year:1969,desc:"Apollo 11 astronauts become the first humans to walk on the Moon."}],
-      [{name:"Homer composes the Iliad",year:-750,desc:"Homer's epic about the Trojan War is composed in ancient Greece."},{name:"Julius Caesar assassinated",year:-44,desc:"Caesar is stabbed to death in the Roman Senate."},{name:"Magna Carta signed",year:1215,desc:"English barons force King John to limit royal power."},{name:"Gutenberg's printing press",year:1440,desc:"Movable type revolutionises the spread of knowledge across Europe."},{name:"Berlin Wall falls",year:1989,desc:"East Germany opens its borders; Germany begins reunification."}]
-    ]
+/* ── TRANSLATIONS ── */
+const T={
+  en:{
+    subtitle:'Prove your historical mastery',
+    avg:'Avg',round:'Round',
+    secI:'I — Difficulty',chooseLevel:'Choose your level',levelSub:'Events get closer together and more obscure as the level rises.',
+    secII:'II — Theme',chooseTheme:'Choose a theme',themeSub:'Pick an era or topic, or type your own — "Punic Wars", "Space Race", "The Black Death". Without a theme, curated event sets are used.',
+    themeOptional:'— optional, AI generates focused events',
+    typePlaceholder:'Or type any theme...',clearBtn:'Clear',
+    secIII:'III — Rounds',
+    genStart:'Generate & Start →',startBtn:'Start →',
+    earliest:'Earliest',mostRecent:'Most recent',
+    tapHint:'Tap a card to select it (it highlights), then tap where to place it',
+    dropEarliest:'Drop earliest here',dropRecent:'Drop most recent here',
+    tapEarliest:'Tap a card then tap here',tapRecent:'Tap a card then tap here',
+    barInstr:'Select a card above, then tap the bar to place it',
+    placeEvents:'Events to place',allPlaced:'All placed',
+    submitBtn:'Submit',clearAll:'Clear all',menuBtn:'← Menu',
+    orderSpacing:'order · spacing · Green = correct positions',
+    spacing:'Spacing',
+    nextRound:'Next round →',finalScore:'Final score →',playAgain:'Play again',
+    generatingMsg:'Sourcing events for',generatingWait:'This may take a moment...',
+    connError:'Connection error — please try again.',noSets:'Could not generate events for this theme — try rephrasing it.',
+    curatedSets:'Curated sets',
+    medals:{90:'🎉 Grand Master',70:'⭐ Scholar',50:'📚 Student',0:'🚀 Preschooler'},
+    diffs:{
+      preschooler:{label:'Preschooler',tag:'Centuries apart · Household names',desc:'The biggest events in history — things your grandparents could place. Very forgiving.'},
+      student:{label:'Student',tag:'Decades apart · Classroom knowledge',desc:'Events you would have studied at school — significant but requiring real recall.'},
+      scholar:{label:'Scholar',tag:'Years apart · University level',desc:'Events tightly clustered in time — deep period knowledge required.'},
+      grandmaster:{label:'Grand Master',tag:'Months apart · Archival precision',desc:'Events sometimes separated by months. Only serious historians score well here.'}
+    }
   },
-  student:{
-    label:'Student',
-    tag:'Decades apart · Classroom knowledge',
-    desc:'Events you would have studied at school — significant, well-documented, but requiring real recall.',
-    tolerance:40,
-    events:[
-      [{name:"Battle of Hastings",year:1066,desc:"William the Conqueror defeats Harold II, transforming England."},{name:"First Crusade launched",year:1096,desc:"Pope Urban II calls for a military expedition to reclaim Jerusalem."},{name:"Magna Carta signed",year:1215,desc:"English barons force King John to limit royal power."},{name:"Mongols sack Baghdad",year:1258,desc:"Hulagu Khan destroys the Abbasid capital, ending its golden age."},{name:"Black Death arrives in Europe",year:1347,desc:"The bubonic plague reaches Sicily, spreading rapidly westward."}],
-      [{name:"American Declaration of Independence",year:1776,desc:"The thirteen colonies declare independence from Britain."},{name:"French Revolution begins",year:1789,desc:"Storming of the Bastille ignites revolution reshaping Europe."},{name:"Napoleon crowned Emperor",year:1804,desc:"Napoleon crowns himself Emperor in Notre-Dame Cathedral."},{name:"Battle of Waterloo",year:1815,desc:"Napoleon is decisively defeated by Wellington and Blucher."},{name:"First Reform Act in Britain",year:1832,desc:"Parliament passes sweeping electoral reform, extending the vote."}]
-    ]
+  fr:{
+    subtitle:'Prouvez votre maîtrise historique',
+    avg:'Moy.',round:'Manche',
+    secI:'I — Difficulté',chooseLevel:'Choisissez votre niveau',levelSub:'Les événements se rapprochent et deviennent plus obscurs à chaque niveau.',
+    secII:'II — Thème',chooseTheme:'Choisissez un thème',themeSub:'Choisissez une époque ou tapez votre propre thème — "Guerres puniques", "Course spatiale", "La Peste noire". Sans thème, des séries d\'événements présélectionnées sont utilisées.',
+    themeOptional:'— facultatif, l\'IA génère des événements ciblés',
+    typePlaceholder:'Ou tapez un thème...',clearBtn:'Effacer',
+    secIII:'III — Manches',
+    genStart:'Générer & Commencer →',startBtn:'Commencer →',
+    earliest:'Le plus ancien',mostRecent:'Le plus récent',
+    tapHint:'Appuyez sur une carte pour la sélectionner, puis appuyez où la placer',
+    dropEarliest:'Déposez le plus ancien ici',dropRecent:'Déposez le plus récent ici',
+    tapEarliest:'Appuyez sur une carte puis ici',tapRecent:'Appuyez sur une carte puis ici',
+    barInstr:'Sélectionnez une carte, puis appuyez sur la barre',
+    placeEvents:'Événements à placer',allPlaced:'Tout placé',
+    submitBtn:'Valider',clearAll:'Tout effacer',menuBtn:'← Menu',
+    orderSpacing:'ordre · espacement · Vert = positions correctes',
+    spacing:'Espacement',
+    nextRound:'Manche suivante →',finalScore:'Score final →',playAgain:'Rejouer',
+    generatingMsg:'Recherche d\'événements pour',generatingWait:'Cela peut prendre un moment...',
+    connError:'Erreur de connexion — veuillez réessayer.',noSets:'Impossible de générer des événements pour ce thème — essayez de le reformuler.',
+    curatedSets:'Séries présélectionnées',
+    medals:{90:'🎉 Grand Maître',70:'⭐ Érudit',50:'📚 Étudiant',0:'🚀 Débutant'},
+    diffs:{
+      preschooler:{label:'Débutant',tag:'Siècles d\'écart · Noms connus de tous',desc:'Les plus grands événements de l\'histoire — très indulgent.'},
+      student:{label:'Étudiant',tag:'Décennies d\'écart · Niveau scolaire',desc:'Événements étudiés à l\'école — significatifs mais exigeant une vraie mémoire.'},
+      scholar:{label:'Érudit',tag:'Années d\'écart · Niveau universitaire',desc:'Événements proches dans le temps — connaissance approfondie requise.'},
+      grandmaster:{label:'Grand Maître',tag:'Mois d\'écart · Précision d\'archive',desc:'Événements parfois séparés de quelques mois. Réservé aux vrais historiens.'}
+    }
   },
-  scholar:{
-    label:'Scholar',
-    tag:'Years apart · University level',
-    desc:'Events that require deep period knowledge — tightly clustered, where a decade feels like a century.',
-    tolerance:15,
-    events:[
-      [{name:"American Declaration of Independence",year:1776,desc:"The thirteen colonies formally break from British rule."},{name:"US Constitution drafted",year:1787,desc:"Delegates draft a new constitution at Philadelphia."},{name:"French Revolution begins",year:1789,desc:"The storming of the Bastille opens a decade of upheaval."},{name:"US Bill of Rights ratified",year:1791,desc:"The first ten amendments protect fundamental civil liberties."},{name:"Execution of Louis XVI",year:1793,desc:"King Louis XVI is guillotined during the Terror."}],
-      [{name:"World War I begins",year:1914,desc:"The assassination of Franz Ferdinand triggers global war."},{name:"Gallipoli campaign begins",year:1915,desc:"Allied forces land at Gallipoli in a failed Ottoman campaign."},{name:"Battle of the Somme",year:1916,desc:"The bloodiest battle in British history; over one million casualties."},{name:"US enters World War I",year:1917,desc:"America declares war after the Zimmermann Telegram is revealed."},{name:"Armistice ends World War I",year:1918,desc:"Fighting ceases on the Western Front at 11am on 11 November."}]
-    ]
+  de:{
+    subtitle:'Beweisen Sie Ihr historisches Wissen',
+    avg:'Ø',round:'Runde',
+    secI:'I — Schwierigkeit',chooseLevel:'Wählen Sie Ihr Niveau',levelSub:'Die Ereignisse rücken näher zusammen und werden schwieriger mit steigendem Niveau.',
+    secII:'II — Thema',chooseTheme:'Wählen Sie ein Thema',themeSub:'Wählen Sie eine Epoche oder geben Sie Ihr eigenes Thema ein — "Punische Kriege", "Wettlauf ins All". Ohne Thema werden kuratierte Ereignissets verwendet.',
+    themeOptional:'— optional, KI generiert gezielte Ereignisse',
+    typePlaceholder:'Oder Thema eingeben...',clearBtn:'Löschen',
+    secIII:'III — Runden',
+    genStart:'Generieren & Starten →',startBtn:'Starten →',
+    earliest:'Frühestes',mostRecent:'Neuestes',
+    tapHint:'Tippen Sie eine Karte an, um sie auszuwählen, dann tippen Sie wo sie platziert werden soll',
+    dropEarliest:'Frühestes hier ablegen',dropRecent:'Neuestes hier ablegen',
+    tapEarliest:'Karte antippen dann hier',tapRecent:'Karte antippen dann hier',
+    barInstr:'Karte auswählen, dann auf die Leiste tippen',
+    placeEvents:'Zu platzierende Ereignisse',allPlaced:'Alle platziert',
+    submitBtn:'Einreichen',clearAll:'Alles löschen',menuBtn:'← Menü',
+    orderSpacing:'Reihenfolge · Abstände · Grün = korrekte Positionen',
+    spacing:'Abstand',
+    nextRound:'Nächste Runde →',finalScore:'Endergebnis →',playAgain:'Nochmal spielen',
+    generatingMsg:'Ereignisse werden gesucht für',generatingWait:'Dies kann einen Moment dauern...',
+    connError:'Verbindungsfehler — bitte erneut versuchen.',noSets:'Keine Ereignisse für dieses Thema gefunden — bitte anders formulieren.',
+    curatedSets:'Kuratierte Sets',
+    medals:{90:'🎉 Großmeister',70:'⭐ Gelehrter',50:'📚 Student',0:'🚀 Anfänger'},
+    diffs:{
+      preschooler:{label:'Anfänger',tag:'Jahrhunderte Abstand · Allbekannte Namen',desc:'Die größten Ereignisse der Geschichte — sehr vergebend.'},
+      student:{label:'Student',tag:'Jahrzehnte Abstand · Schulwissen',desc:'Ereignisse aus dem Schulunterricht — bedeutsam aber Gedächtnisleistung erforderlich.'},
+      scholar:{label:'Gelehrter',tag:'Jahre Abstand · Universitätsniveau',desc:'Zeitlich eng beieinander — tiefes Periodenwissen erforderlich.'},
+      grandmaster:{label:'Großmeister',tag:'Monate Abstand · Archivpräzision',desc:'Ereignisse manchmal nur Monate auseinander. Nur für echte Historiker.'}
+    }
   },
-  grandmaster:{
-    label:'Grand Master',
-    tag:'Months apart · Archival precision',
-    desc:'Events sometimes separated by months or the same year. Only serious historians will score well here.',
-    tolerance:5,
-    events:[
-      [{name:"Caesar crosses the Rubicon",year:-49,desc:"Caesar marches into Italy, triggering civil war against the Senate."},{name:"Caesar defeats Pompey at Pharsalus",year:-48,desc:"Caesar crushes Pompey's army in Greece; Pompey flees to Egypt."},{name:"Caesar assassinated on Ides of March",year:-44,desc:"A group of senators stab Caesar 23 times in the Theatre of Pompey."},{name:"Second Triumvirate formed",year:-43,desc:"Octavian, Antony, and Lepidus form an official ruling coalition."},{name:"Battle of Actium",year:-31,desc:"Octavian defeats Antony and Cleopatra's fleet off the Greek coast."}],
-      [{name:"February Revolution — Tsar abdicates",year:1917,desc:"Mass protests force Nicholas II to abdicate; a provisional government takes power."},{name:"Lenin's April Theses published",year:1917,desc:"Lenin returns to Russia and demands immediate socialist revolution."},{name:"October Revolution — Bolsheviks seize power",year:1917,desc:"The Bolsheviks storm the Winter Palace and take control of Russia."},{name:"Treaty of Brest-Litovsk signed",year:1918,desc:"Russia exits WWI, ceding vast territory to Germany."},{name:"Russian Civil War ends",year:1922,desc:"The Bolsheviks defeat the White Army; the Soviet Union is established."}]
-    ]
+  es:{
+    subtitle:'Demuestra tu dominio histórico',
+    avg:'Prom.',round:'Ronda',
+    secI:'I — Dificultad',chooseLevel:'Elige tu nivel',levelSub:'Los eventos se acercan más y se vuelven más oscuros a medida que sube el nivel.',
+    secII:'II — Tema',chooseTheme:'Elige un tema',themeSub:'Elige una época o escribe tu propio tema — "Guerras púnicas", "Carrera espacial", "La Peste Negra". Sin tema, se usan conjuntos de eventos seleccionados.',
+    themeOptional:'— opcional, la IA genera eventos enfocados',
+    typePlaceholder:'O escribe cualquier tema...',clearBtn:'Borrar',
+    secIII:'III — Rondas',
+    genStart:'Generar & Empezar →',startBtn:'Empezar →',
+    earliest:'El más antiguo',mostRecent:'El más reciente',
+    tapHint:'Toca una carta para seleccionarla, luego toca donde colocarla',
+    dropEarliest:'Suelta el más antiguo aquí',dropRecent:'Suelta el más reciente aquí',
+    tapEarliest:'Toca una carta y luego aquí',tapRecent:'Toca una carta y luego aquí',
+    barInstr:'Selecciona una carta, luego toca la barra para colocarla',
+    placeEvents:'Eventos a colocar',allPlaced:'Todo colocado',
+    submitBtn:'Enviar',clearAll:'Borrar todo',menuBtn:'← Menú',
+    orderSpacing:'orden · espaciado · Verde = posiciones correctas',
+    spacing:'Espaciado',
+    nextRound:'Siguiente ronda →',finalScore:'Puntuación final →',playAgain:'Jugar de nuevo',
+    generatingMsg:'Buscando eventos para',generatingWait:'Esto puede tardar un momento...',
+    connError:'Error de conexión — por favor inténtalo de nuevo.',noSets:'No se pudieron generar eventos para este tema — intenta reformularlo.',
+    curatedSets:'Conjuntos seleccionados',
+    medals:{90:'🎉 Gran Maestro',70:'⭐ Erudito',50:'📚 Estudiante',0:'🚀 Principiante'},
+    diffs:{
+      preschooler:{label:'Principiante',tag:'Siglos de diferencia · Nombres conocidos',desc:'Los mayores eventos de la historia — muy indulgente.'},
+      student:{label:'Estudiante',tag:'Décadas de diferencia · Nivel escolar',desc:'Eventos estudiados en la escuela — significativos pero requieren memoria real.'},
+      scholar:{label:'Erudito',tag:'Años de diferencia · Nivel universitario',desc:'Eventos agrupados en el tiempo — se requiere conocimiento profundo del período.'},
+      grandmaster:{label:'Gran Maestro',tag:'Meses de diferencia · Precisión archivística',desc:'Eventos a veces separados por meses. Solo para historiadores serios.'}
+    }
   }
+};
+
+let LANG='en';
+function t(key){return T[LANG][key]||T.en[key]||key;}
+function td(diff,key){return T[LANG].diffs[diff]?.[key]||T.en.diffs[diff]?.[key]||'';}
+function medal(pct){const m=T[LANG].medals;if(pct>=90)return m[90];if(pct>=70)return m[70];if(pct>=50)return m[50];return m[0];}
+
+function setLang(l){
+  LANG=l;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));
+  document.getElementById('ttl-sub').textContent=t('subtitle');
+  document.getElementById('lbl-avg').textContent=t('avg');
+  document.getElementById('lbl-round').textContent=t('round');
+  if(S.phase==='setup')renderSetup();
+  else if(S.phase==='game')renderGame();
+}
+
+/* ── DATA ── */
+const DIFFS={
+  preschooler:{tolerance:150,events:[
+    [{name:"Great Pyramid of Giza completed",year:-2560,desc:"Pharaoh Khufu's pyramid at Giza is completed, the largest ever built."},{name:"Alexander the Great dies",year:-323,desc:"Alexander dies in Babylon after conquering an empire from Greece to India."},{name:"Roman Empire falls in the West",year:476,desc:"Romulus Augustulus is deposed, ending Western Roman rule."},{name:"Columbus reaches the Americas",year:1492,desc:"Columbus lands in the Caribbean, opening the Age of Exploration."},{name:"First Moon landing",year:1969,desc:"Apollo 11 astronauts become the first humans to walk on the Moon."}],
+    [{name:"Homer composes the Iliad",year:-750,desc:"Homer's epic about the Trojan War is composed in ancient Greece."},{name:"Julius Caesar assassinated",year:-44,desc:"Caesar is stabbed to death in the Roman Senate."},{name:"Magna Carta signed",year:1215,desc:"English barons force King John to limit royal power."},{name:"Gutenberg's printing press",year:1440,desc:"Movable type revolutionises the spread of knowledge across Europe."},{name:"Berlin Wall falls",year:1989,desc:"East Germany opens its borders; Germany begins reunification."}]
+  ]},
+  student:{tolerance:40,events:[
+    [{name:"Battle of Hastings",year:1066,desc:"William the Conqueror defeats Harold II, transforming England."},{name:"First Crusade launched",year:1096,desc:"Pope Urban II calls for a military expedition to reclaim Jerusalem."},{name:"Magna Carta signed",year:1215,desc:"English barons force King John to limit royal power."},{name:"Mongols sack Baghdad",year:1258,desc:"Hulagu Khan destroys the Abbasid capital, ending its golden age."},{name:"Black Death arrives in Europe",year:1347,desc:"The bubonic plague reaches Sicily, spreading rapidly westward."}],
+    [{name:"American Declaration of Independence",year:1776,desc:"The thirteen colonies declare independence from Britain."},{name:"French Revolution begins",year:1789,desc:"Storming of the Bastille ignites revolution reshaping Europe."},{name:"Napoleon crowned Emperor",year:1804,desc:"Napoleon crowns himself Emperor in Notre-Dame Cathedral."},{name:"Battle of Waterloo",year:1815,desc:"Napoleon is decisively defeated by Wellington and Blucher."},{name:"First Reform Act in Britain",year:1832,desc:"Parliament passes sweeping electoral reform, extending the vote."}]
+  ]},
+  scholar:{tolerance:15,events:[
+    [{name:"American Declaration of Independence",year:1776,desc:"The thirteen colonies formally break from British rule."},{name:"US Constitution drafted",year:1787,desc:"Delegates draft a new constitution at Philadelphia."},{name:"French Revolution begins",year:1789,desc:"The storming of the Bastille opens a decade of upheaval."},{name:"US Bill of Rights ratified",year:1791,desc:"The first ten amendments protect fundamental civil liberties."},{name:"Execution of Louis XVI",year:1793,desc:"King Louis XVI is guillotined during the Terror."}],
+    [{name:"World War I begins",year:1914,desc:"The assassination of Franz Ferdinand triggers global war."},{name:"Gallipoli campaign begins",year:1915,desc:"Allied forces land at Gallipoli in a failed Ottoman campaign."},{name:"Battle of the Somme",year:1916,desc:"The bloodiest battle in British history; over one million casualties."},{name:"US enters World War I",year:1917,desc:"America declares war after the Zimmermann Telegram is revealed."},{name:"Armistice ends World War I",year:1918,desc:"Fighting ceases on the Western Front at 11am on 11 November."}]
+  ]},
+  grandmaster:{tolerance:5,events:[
+    [{name:"Caesar crosses the Rubicon",year:-49,desc:"Caesar marches into Italy, triggering civil war against the Senate."},{name:"Caesar defeats Pompey at Pharsalus",year:-48,desc:"Caesar crushes Pompey's army in Greece; Pompey flees to Egypt."},{name:"Caesar assassinated on Ides of March",year:-44,desc:"A group of senators stab Caesar 23 times in the Theatre of Pompey."},{name:"Second Triumvirate formed",year:-43,desc:"Octavian, Antony, and Lepidus form an official ruling coalition."},{name:"Battle of Actium",year:-31,desc:"Octavian defeats Antony and Cleopatra's fleet off the Greek coast."}],
+    [{name:"February Revolution — Tsar abdicates",year:1917,desc:"Mass protests force Nicholas II to abdicate; a provisional government takes power."},{name:"Lenin's April Theses published",year:1917,desc:"Lenin returns to Russia and demands immediate socialist revolution."},{name:"October Revolution — Bolsheviks seize power",year:1917,desc:"The Bolsheviks storm the Winter Palace and take control of Russia."},{name:"Treaty of Brest-Litovsk signed",year:1918,desc:"Russia exits WWI, ceding vast territory to Germany."},{name:"Russian Civil War ends",year:1922,desc:"The Bolsheviks defeat the White Army; the Soviet Union is established."}]
+  ]}
 };
 
 const ERA_THEMES=[
@@ -233,8 +353,8 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random
 function isMobile(){return window.innerWidth<600;}
 function activeLabel(){
   if(S.customTheme)return'"'+S.customTheme+'"';
-  if(S.theme)return ERA_THEMES.find(t=>t.q===S.theme)?.label||'';
-  return'Curated sets';
+  if(S.theme)return ERA_THEMES.find(t2=>t2.q===S.theme)?.label||'';
+  return t('curatedSets');
 }
 
 function showOverlay(msg){
@@ -252,27 +372,32 @@ function renderSetup(){
   const roundOpts=[3,5,10,15,20];
   const hasTheme=!!(S.customTheme||S.theme);
   document.getElementById('body').innerHTML=`<div class="sf">
-    <div class="section-num">I &mdash; Difficulty</div>
-    <div class="setup-title">Choose your level</div>
-    <div class="setup-sub">Events get closer together and more obscure as the level rises.</div>
-    <div class="diff-grid">${diffKeys.map(k=>`<div class="dc ${S.diff===k?'sel':''}" onclick="selDiff('${k}')"><div class="dn">${DIFFS[k].label}</div><div class="dt">${DIFFS[k].tag}</div><div class="dd">${DIFFS[k].desc}</div></div>`).join('')}</div>
+    <div class="section-num">${t('secI')}</div>
+    <div class="setup-title">${t('chooseLevel')}</div>
+    <div class="setup-sub">${t('levelSub')}</div>
+    <div class="diff-grid">${diffKeys.map(k=>`<div class="dc ${S.diff===k?'sel':''}" onclick="selDiff('${k}')">
+      <div class="dn">${td(k,'label')}</div>
+      <div class="dt">${td(k,'tag')}</div>
+      <div class="dd">${td(k,'desc')}</div>
+    </div>`).join('')}</div>
     <hr class="divider">
-    <div class="section-num">II &mdash; Theme</div>
-    <div class="setup-title">Choose a theme <span style="font-size:11px;font-weight:400;color:#5a4e28">— optional, AI generates focused events</span></div>
-    <div class="setup-sub" style="margin-bottom:.75rem">Pick an era or topic, or type your own — "Punic Wars", "Space Race", "The Black Death". Without a theme, curated event sets are used.</div>
-    <div class="theme-grid">${ERA_THEMES.map(t=>`<div class="chip ${!S.customTheme&&S.theme===t.q?'sel':''}" onclick="selTheme('${t.q.replace(/'/g,"\\'")}')">${t.label}</div>`).join('')}</div>
+    <div class="section-num">${t('secII')}</div>
+    <div class="setup-title">${t('chooseTheme')} <span style="font-size:11px;font-weight:400;color:#4a4020">${t('themeOptional')}</span></div>
+    <div class="setup-sub" style="margin-bottom:.75rem">${t('themeSub')}</div>
+    <div class="theme-grid">${ERA_THEMES.map(th=>`<div class="chip ${!S.customTheme&&S.theme===th.q?'sel':''}" onclick="selTheme('${th.q.replace(/'/g,"\\'")}')">${th.label}</div>`).join('')}</div>
     <div class="custom-row">
-      <input class="ci" id="ci" type="text" placeholder="Or type any theme..." value="${S.customTheme}" oninput="onCI(this.value)">
-      <button class="btn" onclick="clearTheme()">Clear</button>
+      <input class="ci" id="ci" type="text" placeholder="${t('typePlaceholder')}" value="${S.customTheme}" oninput="onCI(this.value)">
+      <button class="btn" onclick="clearTheme()">${t('clearBtn')}</button>
     </div>
     <div id="theme-err" class="err-msg" style="display:none"></div>
     <hr class="divider">
+    <div class="section-num">${t('secIII')}</div>
     <div class="rounds-row">
-      <div class="rl">Rounds:</div>
+      <div class="rl">${t('round')}:</div>
       <div class="ropts">${roundOpts.map(n=>`<div class="ro ${S.rounds===n?'sel':''}" onclick="selRounds(${n})">${n}</div>`).join('')}</div>
     </div>
     <button class="btn btn-p" id="start-btn" onclick="startSeries()" ${!S.diff?'disabled':''}>
-      ${hasTheme?'Generate &amp; Start &#8594;':'Start &#8594;'}
+      ${hasTheme?t('genStart'):t('startBtn')}
     </button>
   </div>`;}
 
@@ -285,7 +410,7 @@ function onCI(v){
   if(S.customTheme)S.theme=null;
   S.generatedSets=[];
   const btn=document.getElementById('start-btn');
-  if(btn)btn.innerHTML=S.customTheme?'Generate &amp; Start &#8594;':'Start &#8594;';
+  if(btn)btn.textContent=S.customTheme?t('genStart'):t('startBtn');
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
 }
 
@@ -294,7 +419,7 @@ async function startSeries(){
   S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';
   const themeQ=S.customTheme||S.theme;
   if(themeQ){
-    showOverlay('Sourcing events for <strong style="color:#f0dfa0">'+activeLabel()+'</strong><br><br>This may take a moment...');
+    showOverlay(t('generatingMsg')+' <strong style="color:#ffffff">'+activeLabel()+'</strong><br><br>'+t('generatingWait'));
     const ok=await generateEvents(themeQ);
     hideOverlay();
     if(!ok)return;
@@ -317,15 +442,14 @@ async function generateEvents(themeQ){
     if(!sets.length){
       renderSetup();
       const errEl=document.getElementById('theme-err');
-      if(errEl){errEl.textContent='Could not generate events for this theme — try rephrasing it.';errEl.style.display='block';}
+      if(errEl){errEl.textContent=t('noSets');errEl.style.display='block';}
       return false;
     }
-    S.generatedSets=sets;
-    return true;
+    S.generatedSets=sets;return true;
   }catch(e){
     renderSetup();
     const errEl=document.getElementById('theme-err');
-    if(errEl){errEl.textContent='Connection error — please try again.';errEl.style.display='block';}
+    if(errEl){errEl.textContent=t('connError');errEl.style.display='block';}
     return false;
   }
 }
@@ -349,16 +473,16 @@ function allP(){return pIds().size===5;}
 function renderGame(){
   const placed=pIds();
   const pool=S.events.filter(e=>!placed.has(e.id));
-  const tTag=activeLabel()!=='Curated sets'?` <span style="color:#c8903a;font-weight:600">Theme: ${activeLabel()}</span>`:'';
+  const tTag=activeLabel()!==t('curatedSets')?` <span style="color:#c8903a;font-weight:600">${activeLabel()}</span>`:'';
   const dis=(!allP()||S.submitted)?'disabled':'';
   const mobile=isMobile();
 
   const pH=pool.length
     ?pool.map(e=>`<div class="ecard${S.selectedCard===e.id?' selected-card':''}" onclick="tapCard('${e.id}')"${!mobile?` draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()"`:''} >${e.name}</div>`).join('')
-    :'<span style="font-size:12px;color:#5a4e28;font-family:-apple-system,sans-serif">All placed</span>';
+    :`<span style="font-size:12px;color:#4a4020;font-family:-apple-system,sans-serif">${t('allPlaced')}</span>`;
 
-  const lPlaceholder=`<span style="font-size:10px;color:#4a4020;font-family:-apple-system,sans-serif">${mobile?'Tap a card then tap here':'Drop earliest here'}</span>`;
-  const rPlaceholder=`<span style="font-size:10px;color:#4a4020;font-family:-apple-system,sans-serif">${mobile?'Tap a card then tap here':'Drop most recent here'}</span>`;
+  const lPlaceholder=`<span style="font-size:10px;color:#3a3010;font-family:-apple-system,sans-serif">${mobile?t('tapEarliest'):t('dropEarliest')}</span>`;
+  const rPlaceholder=`<span style="font-size:10px;color:#3a3010;font-family:-apple-system,sans-serif">${mobile?t('tapRecent'):t('dropRecent')}</span>`;
   const lC=S.aLeft?`<div class="anchor-card" onclick="tapAnchor('left')"${!mobile?` draggable="true" ondragstart="ds(event,'${S.aLeft.id}','left')" ondragend="de()"`:''} >${S.aLeft.name}</div>`:lPlaceholder;
   const rC=S.aRight?`<div class="anchor-card" onclick="tapAnchor('right')"${!mobile?` draggable="true" ondragstart="ds(event,'${S.aRight.id}','right')" ondragend="de()"`:''} >${S.aRight.name}</div>`:rPlaceholder;
 
@@ -374,65 +498,58 @@ function renderGame(){
     const evt=S.events.find(e=>e.id===id);if(!evt)continue;
     mobilePins+=`<div class="mobile-pin" style="left:${pct*100}%" onclick="tapMobilePin('${id}')"><div class="mobile-pin-dot"></div><div class="mobile-pin-lbl">${evt.name}</div></div>`;
   }
-  const mobileHint=Object.keys(S.midP).length===0?'<div class="tl-mobile-hint">Tap a card, then tap here to place</div>':'';
+  const mobileHint=Object.keys(S.midP).length===0?`<div class="tl-mobile-hint">${t('tapEarliest')}</div>`:'';
 
   document.getElementById('body').innerHTML=`
-    <p class="instr">Place one in <strong style="color:#f0dfa0">Earliest</strong> and one in <strong style="color:#f0dfa0">Most recent</strong> — you still need to figure out which is which. Place the other three on the bar.${tTag}</p>
-    ${mobile?'<span class="tap-hint">Tap a card to select it (it highlights), then tap where to place it</span>':''}
-    <div class="plbl">Events to place</div>
+    <p class="instr">Place one in <strong style="color:#ffffff">${t('earliest')}</strong> and one in <strong style="color:#ffffff">${t('mostRecent')}</strong> — figure out which is which. Place the other three on the bar.${tTag}</p>
+    ${mobile?`<span class="tap-hint">${t('tapHint')}</span>`:''}
+    <div class="plbl">${t('placeEvents')}</div>
     <div class="pool" id="pool">${pH}</div>
-    <div class="tl-section">
-      <div class="tl-outer">
-        <div class="tl-anchors">
-          <div class="anchor-zone" id="zl">
-            <div class="anchor-label">Earliest</div>
-            <div class="anchor-drop ${S.aLeft?'filled':''}" id="dl"
-              onclick="tapAnchor('left')"
-              ondragover="aOv(event,'left')" ondragleave="aLv('left')" ondrop="aDr(event,'left')">${lC}</div>
-          </div>
-          <div class="anchor-zone" id="zr">
-            <div class="anchor-label">Most recent</div>
-            <div class="anchor-drop ${S.aRight?'filled':''}" id="dr"
-              onclick="tapAnchor('right')"
-              ondragover="aOv(event,'right')" ondragleave="aLv('right')" ondrop="aDr(event,'right')">${rC}</div>
-          </div>
+    <div class="tl-section"><div class="tl-outer">
+      <div class="tl-anchors">
+        <div class="anchor-zone" id="zl">
+          <div class="anchor-label">${t('earliest')}</div>
+          <div class="anchor-drop ${S.aLeft?'filled':''}" id="dl"
+            onclick="tapAnchor('left')"
+            ondragover="aOv(event,'left')" ondragleave="aLv('left')" ondrop="aDr(event,'left')">${lC}</div>
         </div>
-        <div class="tl-bar-row">
-          <div class="tl-anchor-line"></div>
-          <div class="tl-bar-wrap">
-            <div class="tl-bar" id="tl-bar"
-              ondragover="bOv(event)" ondragleave="bLv()" ondrop="bDr(event)"
-              onmousemove="bMv(event)" onmouseleave="hG()">
-              <div class="tl-track" id="tl-track"></div>
-            </div>
-            <div class="pins-layer" id="pl">${pins}${ghost}</div>
-          </div>
-          <div class="tl-anchor-line"></div>
-        </div>
-        ${mobile?`<div class="mobile-bar-instr">Select a card above, then tap the bar to place it</div>`:''}
-        <div class="tl-mobile-bar" id="mobile-bar" onclick="tapBar(event)">
-          <div class="tl-mobile-track"></div>
-          ${mobileHint}
-          ${mobilePins}
+        <div class="anchor-zone" id="zr">
+          <div class="anchor-label">${t('mostRecent')}</div>
+          <div class="anchor-drop ${S.aRight?'filled':''}" id="dr"
+            onclick="tapAnchor('right')"
+            ondragover="aOv(event,'right')" ondragleave="aLv('right')" ondrop="aDr(event,'right')">${rC}</div>
         </div>
       </div>
-    </div>
+      <div class="tl-bar-row">
+        <div class="tl-anchor-line"></div>
+        <div class="tl-bar-wrap">
+          <div class="tl-bar" id="tl-bar" ondragover="bOv(event)" ondragleave="bLv()" ondrop="bDr(event)" onmousemove="bMv(event)" onmouseleave="hG()">
+            <div class="tl-track" id="tl-track"></div>
+          </div>
+          <div class="pins-layer" id="pl">${pins}${ghost}</div>
+        </div>
+        <div class="tl-anchor-line"></div>
+      </div>
+      ${mobile?`<div class="mobile-bar-instr">${t('barInstr')}</div>`:''}
+      <div class="tl-mobile-bar" id="mobile-bar" onclick="tapBar(event)">
+        <div class="tl-mobile-track"></div>
+        ${mobileHint}${mobilePins}
+      </div>
+    </div></div>
     <div class="actions">
-      <button class="btn btn-p" onclick="doSubmit()" ${dis}>Submit</button>
-      <button class="btn" onclick="clearAll()">Clear all</button>
-      <button class="btn" onclick="restartSetup()" style="margin-left:auto">&#8592; Menu</button>
+      <button class="btn btn-p" onclick="doSubmit()" ${dis}>${t('submitBtn')}</button>
+      <button class="btn" onclick="clearAll()">${t('clearAll')}</button>
+      <button class="btn" onclick="restartSetup()" style="margin-left:auto">${t('menuBtn')}</button>
     </div>
     <div id="res-area"></div>`;
 }
 
-/* MOBILE TAP */
 function tapCard(id){
   if(S.submitted)return;
   if(S.midP[id]){delete S.midP[id];S.selectedCard=null;renderGame();return;}
   if(S.aLeft&&S.aLeft.id===id){S.aLeft=null;S.selectedCard=null;renderGame();return;}
   if(S.aRight&&S.aRight.id===id){S.aRight=null;S.selectedCard=null;renderGame();return;}
-  S.selectedCard=S.selectedCard===id?null:id;
-  renderGame();
+  S.selectedCard=S.selectedCard===id?null:id;renderGame();
 }
 function tapAnchor(side){
   if(S.submitted)return;
@@ -453,12 +570,10 @@ function tapBar(e){
   const pct=Math.max(0.02,Math.min(0.98,(e.clientX-r.left)/r.width));
   const evt=S.events.find(x=>x.id===S.selectedCard);if(!evt)return;
   rtp(S.selectedCard,'pool');
-  S.midP[S.selectedCard]=pct;
-  S.selectedCard=null;renderGame();
+  S.midP[S.selectedCard]=pct;S.selectedCard=null;renderGame();
 }
 function tapMobilePin(id){if(S.submitted)return;delete S.midP[id];renderGame();}
 
-/* DESKTOP DRAG */
 function ds(e,id,from){S.dragId=id;S.dragFrom=from;const ev=S.events.find(x=>x.id===id);S.ghostName=ev?ev.name:'';}
 function de(){S.dragId=null;S.dragFrom=null;S.ghostName='';hG();}
 function aOv(e,s){e.preventDefault();document.getElementById('d'+s[0])?.classList.add('over');}
@@ -468,35 +583,20 @@ function aDr(e,side){
   if(!S.dragId)return;
   const ev=S.events.find(x=>x.id===S.dragId);if(!ev)return;
   rtp(S.dragId,S.dragFrom);
-  if(side==='left')S.aLeft=ev;else S.aRight=ev;
-  renderGame();
+  if(side==='left')S.aLeft=ev;else S.aRight=ev;renderGame();
 }
 function rtp(id,from){
   if(from==='bar')delete S.midP[id];
   else if(from==='left')S.aLeft=null;
   else if(from==='right')S.aRight=null;
 }
-function gPct(e){
-  const b=document.getElementById('tl-bar');if(!b)return.5;
-  const r=b.getBoundingClientRect();
-  return Math.max(.01,Math.min(.99,(e.clientX-r.left)/r.width));
-}
+function gPct(e){const b=document.getElementById('tl-bar');if(!b)return.5;const r=b.getBoundingClientRect();return Math.max(.01,Math.min(.99,(e.clientX-r.left)/r.width));}
 function bOv(e){e.preventDefault();document.getElementById('tl-track')?.style.setProperty('background','#c8903a');document.getElementById('tl-bar')?.classList.add('active');uG(e);}
-function bLv(){document.getElementById('tl-track')?.style.setProperty('background','#3d3420');document.getElementById('tl-bar')?.classList.remove('active');hG();}
+function bLv(){document.getElementById('tl-track')?.style.setProperty('background','#3a3010');document.getElementById('tl-bar')?.classList.remove('active');hG();}
 function bMv(e){if(S.dragId)uG(e);}
-function uG(e){
-  const g=document.getElementById('ghost');const gl=document.getElementById('ghost-lbl');
-  if(!g||!S.dragId)return;
-  g.style.left=(gPct(e)*100)+'%';g.style.display='flex';if(gl)gl.textContent=S.ghostName;
-}
+function uG(e){const g=document.getElementById('ghost');const gl=document.getElementById('ghost-lbl');if(!g||!S.dragId)return;g.style.left=(gPct(e)*100)+'%';g.style.display='flex';if(gl)gl.textContent=S.ghostName;}
 function hG(){const g=document.getElementById('ghost');if(g)g.style.display='none';}
-function bDr(e){
-  e.preventDefault();bLv();hG();
-  if(!S.dragId)return;
-  const ev=S.events.find(x=>x.id===S.dragId);if(!ev)return;
-  rtp(S.dragId,S.dragFrom);
-  S.midP[S.dragId]=gPct(e);renderGame();
-}
+function bDr(e){e.preventDefault();bLv();hG();if(!S.dragId)return;const ev=S.events.find(x=>x.id===S.dragId);if(!ev)return;rtp(S.dragId,S.dragFrom);S.midP[S.dragId]=gPct(e);renderGame();}
 function clearAll(){S.midP={};S.aLeft=null;S.aRight=null;S.selectedCard=null;renderGame();}
 
 function doSubmit(){
@@ -513,83 +613,65 @@ function doSubmit(){
   const oPct=Math.round((oc/5)*50);
   const tF=DIFFS[S.diff].tolerance/range;
   let sRaw=0;const sPer={};
-  S.events.forEach(ev=>{
-    const d=Math.abs((eP[ev.id]??0.5)-iP[ev.id]);
-    const p=Math.max(0,1-d/tF);
-    sPer[ev.id]=Math.round(p*10);sRaw+=p;
-  });
+  S.events.forEach(ev=>{const d=Math.abs((eP[ev.id]??0.5)-iP[ev.id]);const p=Math.max(0,1-d/tF);sPer[ev.id]=Math.round(p*10);sRaw+=p;});
   const sPct=Math.round((sRaw/5)*50);
-  const tot=oPct+sPct;
-  S.totalPct+=tot;S.roundsPlayed++;updSc();
+  const tot=oPct+sPct;S.totalPct+=tot;S.roundsPlayed++;updSc();
 
   const ld=document.getElementById('dl');const rd=document.getElementById('dr');
-  const lOk=S.aLeft&&sorted[0].id===S.aLeft.id;
-  const rOk=S.aRight&&sorted[4].id===S.aRight.id;
-  if(ld)ld.classList.add(lOk?'anchor-ok':'anchor-bad');
-  if(rd)rd.classList.add(rOk?'anchor-ok':'anchor-bad');
+  if(ld)ld.classList.add(S.aLeft&&sorted[0].id===S.aLeft.id?'anchor-ok':'anchor-bad');
+  if(rd)rd.classList.add(S.aRight&&sorted[4].id===S.aRight.id?'anchor-ok':'anchor-bad');
 
   const layer=document.getElementById('pl');
   if(layer){
     const pos=sorted.map(e=>iP[e.id]);
-    const stemHeights=computeStemHeights(pos);
+    const sh=stemH(pos);
     sorted.forEach((ev,i)=>{
       const el=document.createElement('div');
-      el.className='answer-pin';
-      el.style.left=(iP[ev.id]*100)+'%';
-      el.style.top='6px';
-      el.innerHTML=`<div class="answer-dot"></div><div class="answer-stem" style="height:${stemHeights[i]}px"></div><div class="answer-label">${yr(ev.year)}<br><span style="font-weight:400;font-size:9px">${ev.name}</span></div>`;
+      el.className='answer-pin';el.style.left=(iP[ev.id]*100)+'%';el.style.top='6px';
+      el.innerHTML=`<div class="answer-dot"></div><div class="answer-stem" style="height:${sh[i]}px"></div><div class="answer-label">${yr(ev.year)}<br><span style="font-weight:400;font-size:9px">${ev.name}</span></div>`;
       layer.appendChild(el);
     });
   }
 
   const rows=sorted.map((ev,i)=>{
-    const pR=pOrd.findIndex(x=>x.id===ev.id);
-    const oOk=pR===i;const sp=sPer[ev.id];
-    return `<div class="res-row"><div class="dot ${oOk?'ok':'bad'}">${oOk?'&#10003;':'&#10007;'}</div><div><span style="font-weight:600;color:#e8d9b0">${yr(ev.year)} &#8212; ${ev.name}</span><br><span style="color:#5a4e28;font-size:12px">${ev.desc}</span><br><span style="font-size:12px;color:#4a4020">Spacing: ${sp}/10</span></div></div>`;
+    const pR=pOrd.findIndex(x=>x.id===ev.id);const oOk=pR===i;const sp=sPer[ev.id];
+    return `<div class="res-row"><div class="dot ${oOk?'ok':'bad'}">${oOk?'&#10003;':'&#10007;'}</div><div><span style="font-weight:600;color:#ffffff">${yr(ev.year)} &#8212; ${ev.name}</span><br><span style="color:#5a4e28;font-size:12px">${ev.desc}</span><br><span style="font-size:12px;color:#4a4020">${t('spacing')}: ${sp}/10</span></div></div>`;
   }).join('');
 
   const isLast=S.round+1>=S.rounds;
-  const nBtn=isLast
-    ?`<button class="btn btn-p" onclick="showFinal()">Final score &#8594;</button>`
-    :`<button class="btn btn-p" onclick="nextRound()">Next round &#8594;</button>`;
-
+  const nBtn=isLast?`<button class="btn btn-p" onclick="showFinal()">${t('finalScore')}</button>`:`<button class="btn btn-p" onclick="nextRound()">${t('nextRound')}</button>`;
   document.getElementById('res-area').innerHTML=`
     <div class="res">
       <div class="score-big">${tot}%</div>
       <div class="score-bar-wrap"><div class="score-bar-fill" style="width:${tot}%"></div></div>
-      <div class="res-sub">${oPct}/50 order &#183; ${sPct}/50 spacing &#183; Green = correct positions</div>
+      <div class="res-sub">${oPct}/50 ${t('orderSpacing')}</div>
       ${rows}
-      <div style="margin-top:1rem;display:flex;gap:10px;flex-wrap:wrap">${nBtn}<button class="btn" onclick="restartSetup()">&#8592; Menu</button></div>
+      <div style="margin-top:1rem;display:flex;gap:10px;flex-wrap:wrap">${nBtn}<button class="btn" onclick="restartSetup()">${t('menuBtn')}</button></div>
     </div>`;
 }
 
-function computeStemHeights(positions){
-  const n=positions.length;
-  const h=new Array(n).fill(20);
-  for(let i=1;i<n;i++){
-    if(positions[i]-positions[i-1]<0.1)h[i]=h[i-1]+38;
-  }
+function stemH(positions){
+  const n=positions.length;const h=new Array(n).fill(20);
+  for(let i=1;i<n;i++){if(positions[i]-positions[i-1]<0.1)h[i]=h[i-1]+38;}
   return h;
 }
-
 function nextRound(){S.round++;startRound();}
 
 function showFinal(){
   const avg=Math.round(S.totalPct/S.roundsPlayed);
-  const medal=avg>=90?'&#127881; Grand Master':avg>=70?'&#9733; Scholar':avg>=50?'&#128218; Student':'&#128640; Preschooler';
   document.getElementById('body').innerHTML=`
     <div class="res" style="text-align:center">
-      <div style="font-size:13px;color:#5a4e28;margin-bottom:.5rem;font-family:-apple-system,sans-serif">${S.rounds} rounds &#183; ${DIFFS[S.diff].label} &#183; ${activeLabel()}</div>
+      <div style="font-size:13px;color:#5a4e28;margin-bottom:.5rem;font-family:-apple-system,sans-serif">${S.rounds} ${t('round')} · ${td(S.diff,'label')} · ${activeLabel()}</div>
       <div class="score-big">${avg}%</div>
       <div class="score-bar-wrap"><div class="score-bar-fill" style="width:${avg}%"></div></div>
-      <div style="font-size:20px;font-weight:700;color:#f0dfa0;margin:.75rem 0;font-family:Georgia,serif">${medal}</div>
+      <div style="font-size:22px;font-weight:700;color:#ffffff;margin:.75rem 0;font-family:Georgia,serif">${medal(avg)}</div>
       <div style="display:flex;gap:10px;justify-content:center;margin-top:1rem;flex-wrap:wrap">
-        <button class="btn btn-p" onclick="beginGame()">Play again</button>
-        <button class="btn" onclick="restartSetup()">&#8592; Menu</button>
+        <button class="btn btn-p" onclick="beginGame()">${t('playAgain')}</button>
+        <button class="btn" onclick="restartSetup()">${t('menuBtn')}</button>
       </div>
     </div>`;
   document.getElementById('sc').textContent=avg+'%';
-  document.getElementById('rn').textContent='Done';
+  document.getElementById('rn').textContent=t('round');
 }
 
 function beginGame(){S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';startRound();}
