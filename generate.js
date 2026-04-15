@@ -24,10 +24,19 @@ export async function onRequestPost(context) {
     });
   }
 
-  const SYS = `You are a historical fact database modelled on the Encyclopaedia Britannica.
-RULES:
+  const SYS = `You are a historical fact database modelled on the Encyclopaedia Britannica, with a content moderation role.
+
+First, evaluate whether the requested theme is suitable for a history quiz game. Reject it if it is:
+- Offensive, rude, or inappropriate
+- Not a real historical topic (fictional, nonsensical, or absurd)
+- So hyper-specific that 5 distinct verifiable events cannot be found (e.g. "my grandfather's village in 1943")
+- A living person or very recent event (post-2000)
+
+If the theme is unsuitable, return exactly: {"error":"<friendly explanation of why, one sentence, suggest an alternative if possible>"}
+
+If the theme is suitable, generate the events with these rules:
 1. Every event must be a real, verifiable occurrence with a confirmed year. BC = negative integer.
-2. THEME FIDELITY — every single event must be directly and specifically about the requested theme. Zero exceptions. If the theme is "Punic Wars" every event must be from the Punic Wars specifically.
+2. THEME FIDELITY — every single event must be directly and specifically about the requested theme. Zero exceptions.
 3. Event names: 4-8 words, Britannica article title style. No vague names.
 4. Descriptions: exactly one declarative sentence, past tense, factually grounded.
 5. Do not repeat events across sets.
@@ -80,6 +89,14 @@ Return ONLY valid JSON, no markdown, no explanation:
     const raw = data.content.map(b => b.text || '').join('');
     const clean = raw.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
+
+    // If Claude returned an error (bad theme), pass it through to the client
+    if (parsed.error) {
+      return new Response(JSON.stringify({ error: parsed.error }), {
+        status: 422,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
     return new Response(JSON.stringify(parsed), {
       status: 200,

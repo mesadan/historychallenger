@@ -160,7 +160,7 @@ function renderSetup(){
     <div class="custom-row">
       <input class="ci" id="ci" type="text" placeholder="Or type a custom theme..." value="${S.customTheme}" oninput="onCI(this.value)">
       <button class="btn" onclick="clearTheme()">Clear</button>
-      ${themeQ&&S.diff?`<button class="btn btn-p" id="gen-btn" onclick="doGenerate()">Generate events &#8594;</button>`:''}
+      <button class="btn btn-p" id="gen-btn" onclick="doGenerate()" style="${(S.customTheme||S.theme)&&S.diff?'':'display:none'">Generate events &#8594;</button>
     </div>
     ${themeQ&&!S.diff?'<div style="font-size:12px;color:#b03020;font-family:-apple-system,sans-serif;margin-bottom:.75rem">Select a difficulty first, then generate.</div>':''}
     <div class="gen-box ${themeQ&&S.diff?'show':''}" id="gen-box">
@@ -182,24 +182,67 @@ function selDiff(k){S.diff=k;S.previewSets=[];S.generatedSets=[];renderSetup();}
 function selRounds(n){S.rounds=n;renderSetup();}
 function selTheme(q){S.theme=q;S.customTheme='';S.previewSets=[];S.generatedSets=[];renderSetup();}
 function clearTheme(){S.theme=null;S.customTheme='';S.previewSets=[];S.generatedSets=[];renderSetup();}
-function onCI(v){S.customTheme=v.trim();if(S.customTheme)S.theme=null;S.previewSets=[];S.generatedSets=[];renderSetup();}
+function onCI(v){
+  // Update state silently — do NOT call renderSetup() here, that's what caused the focus bug
+  S.customTheme=v.trim();
+  if(S.customTheme)S.theme=null;
+  S.previewSets=[];S.generatedSets=[];
+  // Just update the generate button visibility without rebuilding the whole page
+  const genBtn=document.getElementById('gen-btn');
+  const genBox=document.getElementById('gen-box');
+  if(genBtn){
+    if(S.customTheme&&S.diff){genBtn.style.display='inline-block';}
+    else{genBtn.style.display='none';}
+  }
+  if(genBox&&!S.customTheme){genBox.classList.remove('show');}
+  // Deselect any era chip visually
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
+}
+
 function acceptAndStart(){S.generatedSets=[...S.previewSets];beginGame();}
 
 async function doGenerate(){
-  const themeQ=S.customTheme||S.theme;if(!themeQ||!S.diff)return;
-  const btn=document.getElementById('gen-btn');const box=document.getElementById('gen-box');const st=document.getElementById('gen-status');const pv=document.getElementById('gen-preview');
-  if(btn)btn.disabled=true;if(box)box.classList.add('show');
-  if(st)st.innerHTML='<span class="spin"></span>Sourcing '+activeLabel()+' events to Britannica standard...';
+  // Read directly from the input in case onCI hasn't fired yet
+  const inputEl=document.getElementById('ci');
+  if(inputEl&&inputEl.value.trim())S.customTheme=inputEl.value.trim();
+  const themeQ=S.customTheme||S.theme;
+  if(!themeQ||!S.diff)return;
+  const btn=document.getElementById('gen-btn');
+  const box=document.getElementById('gen-box');
+  const st=document.getElementById('gen-status');
+  const pv=document.getElementById('gen-preview');
+  if(btn)btn.disabled=true;
+  if(box)box.classList.add('show');
+  if(st)st.innerHTML='<span class="spin"></span>Checking theme and sourcing events...';
   if(pv)pv.classList.remove('show');
   try{
     const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({theme:themeQ,diff:S.diff,rounds:Math.min(S.rounds,8)})});
-    if(!res.ok)throw new Error('Server error '+res.status);
     const data=await res.json();
-    const sets=[];if(data.sets&&Array.isArray(data.sets)){data.sets.forEach(s=>{if(Array.isArray(s)&&s.length===5)sets.push(s);});}
+    if(!res.ok||data.error){
+      // Show user-friendly error from the server
+      if(st)st.innerHTML='<span style="color:#b03020">'+( data.error||'Something went wrong — try a different theme.')+'</span>';
+      if(btn)btn.disabled=false;
+      return;
+    }
+    const sets=[];
+    if(data.sets&&Array.isArray(data.sets)){data.sets.forEach(s=>{if(Array.isArray(s)&&s.length===5)sets.push(s);});}
     S.previewSets=sets;
-    if(sets.length){if(st)st.textContent=sets.length+' rounds generated. Review below then start.';renderSetup();}
-    else{if(st)st.textContent='No valid sets returned — try rephrasing your theme.';}
-  }catch(e){if(st)st.textContent='Error: '+e.message;}
+    if(sets.length){
+      if(st)st.textContent=sets.length+' rounds generated. Review below then start.';
+      // Render preview without rebuilding the input area
+      if(pv){
+        pv.classList.add('show');
+        pv.innerHTML=`<div class="gen-preview-title">Preview &#8212; ${activeLabel()}</div>
+          ${S.previewSets.slice(0,3).map((set,si)=>`<div class="preview-set"><div class="preview-set-label">Round ${si+1}</div>${set.map(e=>`<div class="preview-evt">&#183; ${e.name} (${yr(e.year)})</div>`).join('')}</div>`).join('')}
+          ${S.previewSets.length>3?`<div style="font-size:10px;color:#8a6f3a;margin-top:4px">+ ${S.previewSets.length-3} more rounds ready</div>`:''}
+          <div class="gen-actions"><button class="btn btn-p" onclick="acceptAndStart()">Use these events &#8594;</button><button class="btn" onclick="doGenerate()">Regenerate</button></div>`;
+      }
+    } else {
+      if(st)st.innerHTML='<span style="color:#b03020">No events could be generated for this theme — try something broader.</span>';
+    }
+  }catch(e){
+    if(st)st.innerHTML='<span style="color:#b03020">Connection error: '+e.message+'</span>';
+  }
   if(btn)btn.disabled=false;
 }
 
