@@ -76,7 +76,17 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
 .path-section{margin-top:1.25rem}
 .disclaimer{font-size:11px;color:#555;font-family:-apple-system,sans-serif;font-style:italic;margin-top:.5rem;line-height:1.5}
 
-/* OVERLAY */
+/* TOOLTIP */
+.tl-tooltip{position:fixed;background:#1a1000;border:1px solid #c8903a;color:#c8903a;font-family:-apple-system,sans-serif;font-size:12px;font-weight:700;padding:4px 10px;border-radius:6px;pointer-events:none;z-index:200;display:none;white-space:nowrap;transform:translate(-50%,-120%)}
+
+/* STEP INDICATOR */
+.step-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-family:-apple-system,sans-serif;color:#c8903a;border:1px solid #c8903a;border-radius:4px;padding:2px 7px;margin-bottom:.6rem}
+.step-instr{font-size:13px;color:#aaa;line-height:1.6;margin-bottom:1rem;padding:10px 13px;background:#111;border-radius:8px;border-left:3px solid #c8903a;font-family:-apple-system,sans-serif}
+
+/* ANCHOR LOCKED STATE (step 2) */
+.anchor-drop.locked{border-style:solid;border-color:#555;cursor:default;opacity:.85}
+.anchor-drop.locked-ok{border-color:#2a8a4a !important;background:#051209 !important;cursor:default}
+.anchor-drop.locked-bad{border-color:#8a2a1a !important;background:#120502 !important;cursor:default}
 .overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.94);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100}
 .overlay-card{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:14px;padding:2rem 2.5rem;text-align:center;max-width:320px}
 .overlay-title{font-size:18px;font-weight:700;color:#ffffff;font-family:Georgia,serif;margin-bottom:.5rem}
@@ -172,6 +182,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
     <div id="body"></div>
   </div>
 </div>
+<div class="tl-tooltip" id="tl-tooltip"></div>
 
 <script>
 const WORKER='https://histroychallenger-api.maletethan.workers.dev';
@@ -201,6 +212,11 @@ const T={
     tapEarliest:'Tap a card then tap here',tapRecent:'Tap a card then tap here',
     barInstr:'Select a card above, then tap the bar to place it',
     placeEvents:'Events to place',allPlaced:'All placed',
+    step1:'Step 1 of 2',step2:'Step 2 of 2',
+    step1Instr:'Find the <strong style="color:#c8903a">Earliest</strong> and <strong style="color:#c8903a">Most Recent</strong> events — drag or tap them into the anchor boxes. These two events will define the time scale for the round.',
+    step2Instr:'The timeline is now set. Place the remaining 3 events proportionally along the bar. <em>Hover or hold your finger on the bar to see the year at that position.</em> Scoring: ±50 years = full marks.',
+    confirmAnchors:'Confirm Anchors →',
+    anchorScore:'Anchor score',pts:'pts',
     submitBtn:'Submit',clearAll:'Clear all',menuBtn:'← Menu',
     orderSpacing:'order · spacing · Green = correct positions',
     spacing:'Spacing',
@@ -255,6 +271,11 @@ const T={
     tapEarliest:'Appuyez sur une carte puis ici',tapRecent:'Appuyez sur une carte puis ici',
     barInstr:'Sélectionnez une carte, puis appuyez sur la barre',
     placeEvents:'Événements à placer',allPlaced:'Tout placé',
+    step1:'Étape 1 sur 2',step2:'Étape 2 sur 2',
+    step1Instr:'Trouvez l\'événement le plus <strong style="color:#c8903a">ancien</strong> et le plus <strong style="color:#c8903a">récent</strong> — faites-les glisser ou appuyez pour les placer dans les cases. Ces deux événements définiront l\'échelle de temps de la manche.',
+    step2Instr:'La ligne du temps est maintenant définie. Placez les 3 événements restants de manière proportionnelle. <em>Survolez ou maintenez votre doigt sur la barre pour voir l\'année à cette position.</em> Score : ±50 ans = points complets.',
+    confirmAnchors:'Confirmer les ancres →',
+    anchorScore:'Score des ancres',pts:'pts',
     submitBtn:'Valider',clearAll:'Tout effacer',menuBtn:'← Menu',
     orderSpacing:'ordre · espacement · Vert = positions correctes',
     spacing:'Espacement',
@@ -309,6 +330,11 @@ const T={
     tapEarliest:'Karte antippen dann hier',tapRecent:'Karte antippen dann hier',
     barInstr:'Karte auswählen, dann auf die Leiste tippen',
     placeEvents:'Zu platzierende Ereignisse',allPlaced:'Alle platziert',
+    step1:'Schritt 1 von 2',step2:'Schritt 2 von 2',
+    step1Instr:'Finden Sie das <strong style="color:#c8903a">früheste</strong> und das <strong style="color:#c8903a">neueste</strong> Ereignis — ziehen oder tippen Sie sie in die Ankerboxen. Diese zwei Ereignisse definieren den Zeitmaßstab der Runde.',
+    step2Instr:'Die Zeitlinie ist jetzt festgelegt. Platzieren Sie die verbleibenden 3 Ereignisse proportional. <em>Fahren Sie mit der Maus oder halten Sie den Finger auf der Leiste, um das Jahr an dieser Position zu sehen.</em> Wertung: ±50 Jahre = volle Punkte.',
+    confirmAnchors:'Anker bestätigen →',
+    anchorScore:'Ankerpunkte',pts:'Pkt',
     submitBtn:'Einreichen',clearAll:'Alles löschen',menuBtn:'← Menü',
     orderSpacing:'Reihenfolge · Abstände · Grün = korrekte Positionen',
     spacing:'Abstand',
@@ -363,6 +389,11 @@ const T={
     tapEarliest:'Toca una carta y luego aquí',tapRecent:'Toca una carta y luego aquí',
     barInstr:'Selecciona una carta, luego toca la barra para colocarla',
     placeEvents:'Eventos a colocar',allPlaced:'Todo colocado',
+    step1:'Paso 1 de 2',step2:'Paso 2 de 2',
+    step1Instr:'Encuentra el evento más <strong style="color:#c8903a">antiguo</strong> y el más <strong style="color:#c8903a">reciente</strong> — arrástralos o tócalos para colocarlos en las casillas. Estos dos eventos definirán la escala de tiempo de la ronda.',
+    step2Instr:'La línea de tiempo está establecida. Coloca los 3 eventos restantes de forma proporcional. <em>Pasa el cursor o mantén el dedo en la barra para ver el año en esa posición.</em> Puntuación: ±50 años = puntos completos.',
+    confirmAnchors:'Confirmar anclajes →',
+    anchorScore:'Puntuación de anclajes',pts:'pts',
     submitBtn:'Enviar',clearAll:'Borrar todo',menuBtn:'← Menú',
     orderSpacing:'orden · espaciado · Verde = posiciones correctas',
     spacing:'Espaciado',
@@ -442,6 +473,7 @@ let S={
   theme:null,customTheme:'',generatedSets:[],
   totalPct:0,roundsPlayed:0,
   events:[],midP:{},aLeft:null,aRight:null,
+  step:1,anchorPts:0,
   submitted:false,dragId:null,dragFrom:null,ghostName:'',
   selectedCard:null
 };
@@ -578,7 +610,8 @@ async function generateEvents(themeQ,diffOverride){
 }
 
 function startRound(){
-  S.submitted=false;S.midP={};S.aLeft=null;S.aRight=null;
+  S.submitted=false;S.step=1;S.anchorPts=0;
+  S.midP={};S.aLeft=null;S.aRight=null;
   S.dragId=null;S.dragFrom=null;S.ghostName='';S.selectedCard=null;
   let raw;
   if(S.generatedSets.length>0){raw=S.generatedSets[S.round%S.generatedSets.length];}
@@ -586,29 +619,105 @@ function startRound(){
   S.events=raw.map((e,i)=>({...e,id:'e'+i}));
   shuffle(S.events);
   document.getElementById('rn').textContent=(S.round+1)+'/'+S.rounds;
-  updSc();renderGame();
+  updSc();renderStep1();
 }
 
 function updSc(){document.getElementById('sc').textContent=S.roundsPlayed>0?Math.round(S.totalPct/S.roundsPlayed)+'%':'—';}
-function pIds(){const s=new Set(Object.keys(S.midP));if(S.aLeft)s.add(S.aLeft.id);if(S.aRight)s.add(S.aRight.id);return s;}
-function allP(){return pIds().size===5;}
+function isMobile(){return window.innerWidth<600;}
 
-function renderGame(){
-  const placed=pIds();
-  const pool=S.events.filter(e=>!placed.has(e.id));
-  const tTag=activeLabel()!==t('curatedSets')?` <span style="color:#c8903a;font-weight:600">${activeLabel()}</span>`:'';
-  const dis=(!allP()||S.submitted)?'disabled':'';
+/* ── STEP 1: ANCHOR PHASE ── */
+function renderStep1(){
   const mobile=isMobile();
+  const tTag=activeLabel()!==t('curatedSets')?` <span style="color:#c8903a;font-weight:600">${activeLabel()}</span>`:'';
+  // Only show events not yet anchored in pool
+  const anchored=new Set();
+  if(S.aLeft)anchored.add(S.aLeft.id);
+  if(S.aRight)anchored.add(S.aRight.id);
+  const pool=S.events.filter(e=>!anchored.has(e.id));
 
-  const pH=pool.length
-    ?pool.map(e=>`<div class="ecard${S.selectedCard===e.id?' selected-card':''}" onclick="tapCard('${e.id}')"${!mobile?` draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()"`:''} >${e.name}</div>`).join('')
-    :`<span style="font-size:12px;color:#444;font-family:-apple-system,sans-serif">${t('allPlaced')}</span>`;
+  const pH=pool.map(e=>`<div class="ecard${S.selectedCard===e.id?' selected-card':''}" onclick="tapCard1('${e.id}')"${!mobile?` draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()"`:''} >${e.name}</div>`).join('');
 
   const lP=`<span style="font-size:10px;color:#333;font-family:-apple-system,sans-serif">${mobile?t('tapEarliest'):t('dropEarliest')}</span>`;
   const rP=`<span style="font-size:10px;color:#333;font-family:-apple-system,sans-serif">${mobile?t('tapRecent'):t('dropRecent')}</span>`;
-  const lC=S.aLeft?`<div class="anchor-card" onclick="tapAnchor('left')"${!mobile?` draggable="true" ondragstart="ds(event,'${S.aLeft.id}','left')" ondragend="de()"`:''} >${S.aLeft.name}</div>`:lP;
-  const rC=S.aRight?`<div class="anchor-card" onclick="tapAnchor('right')"${!mobile?` draggable="true" ondragstart="ds(event,'${S.aRight.id}','right')" ondragend="de()"`:''} >${S.aRight.name}</div>`:rP;
+  const lC=S.aLeft?`<div class="anchor-card" onclick="unanchor('left')"${!mobile?` draggable="true" ondragstart="ds(event,'${S.aLeft.id}','left')" ondragend="de()"`:''} >${S.aLeft.name}</div>`:lP;
+  const rC=S.aRight?`<div class="anchor-card" onclick="unanchor('right')"${!mobile?` draggable="true" ondragstart="ds(event,'${S.aRight.id}','right')" ondragend="de()"`:''} >${S.aRight.name}</div>`:rP;
 
+  const bothFilled=S.aLeft&&S.aRight;
+
+  document.getElementById('body').innerHTML=`
+    <div class="step-badge">${t('step1')}</div>
+    <div class="step-instr">${t('step1Instr')}${tTag?'<br>'+tTag:''}</div>
+    ${mobile?`<span class="tap-hint">${t('tapHint')}</span>`:''}
+    <div class="plbl">${t('placeEvents')}</div>
+    <div class="pool" id="pool">${pH||`<span style="font-size:12px;color:#444;font-family:-apple-system,sans-serif">${t('allPlaced')}</span>`}</div>
+    <div class="tl-section"><div class="tl-outer">
+      <div class="tl-anchors">
+        <div class="anchor-zone">
+          <div class="anchor-label">${t('earliest')}</div>
+          <div class="anchor-drop ${S.aLeft?'filled':''}" id="dl"
+            onclick="tapAnchor1('left')" ondragover="aOv(event,'left')" ondragleave="aLv('left')" ondrop="aDr1(event,'left')">${lC}</div>
+        </div>
+        <div class="anchor-zone">
+          <div class="anchor-label">${t('mostRecent')}</div>
+          <div class="anchor-drop ${S.aRight?'filled':''}" id="dr"
+            onclick="tapAnchor1('right')" ondragover="aOv(event,'right')" ondragleave="aLv('right')" ondrop="aDr1(event,'right')">${rC}</div>
+        </div>
+      </div>
+    </div></div>
+    <div class="actions">
+      <button class="btn btn-p" onclick="confirmAnchors()" ${!bothFilled?'disabled':''}>${t('confirmAnchors')}</button>
+      <button class="btn" onclick="restartSetup()" style="margin-left:auto">${t('menuBtn')}</button>
+    </div>`;
+}
+
+function tapCard1(id){
+  if(S.selectedCard===id){S.selectedCard=null;renderStep1();return;}
+  S.selectedCard=id;renderStep1();
+}
+function tapAnchor1(side){
+  if(!S.selectedCard)return;
+  const evt=S.events.find(x=>x.id===S.selectedCard);if(!evt)return;
+  if(side==='left')S.aLeft=evt;else S.aRight=evt;
+  S.selectedCard=null;renderStep1();
+}
+function unanchor(side){
+  if(side==='left')S.aLeft=null;else S.aRight=null;
+  renderStep1();
+}
+function aDr1(e,side){
+  e.preventDefault();document.getElementById('d'+side[0])?.classList.remove('over');
+  if(!S.dragId)return;
+  const ev=S.events.find(x=>x.id===S.dragId);if(!ev)return;
+  if(side==='left')S.aLeft=ev;else S.aRight=ev;
+  renderStep1();
+}
+
+function confirmAnchors(){
+  if(!S.aLeft||!S.aRight)return;
+  const sorted=[...S.events].sort((a,b)=>a.year-b.year);
+  const correctLeft=sorted[0];const correctRight=sorted[4];
+  const lOk=S.aLeft.id===correctLeft.id;
+  const rOk=S.aRight.id===correctRight.id;
+  S.anchorPts=(lOk?20:0)+(rOk?20:0);
+  // Correct the anchors for step 2 regardless
+  S.aLeft=correctLeft;S.aRight=correctRight;
+  S.step=2;
+  renderStep2(lOk,rOk);
+}
+
+/* ── STEP 2: PLACEMENT PHASE ── */
+function renderStep2(lOk,rOk){
+  const mobile=isMobile();
+  const sorted=[...S.events].sort((a,b)=>a.year-b.year);
+  const minY=sorted[0].year,maxY=sorted[4].year;
+  // Middle 3 events for placement
+  const middle=sorted.slice(1,4);
+  const placed=new Set(Object.keys(S.midP));
+  const pool=middle.filter(e=>!placed.has(e.id));
+
+  const pH=pool.map(e=>`<div class="ecard${S.selectedCard===e.id?' selected-card':''}" onclick="tapCard2('${e.id}')"${!mobile?` draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()"`:''} >${e.name}</div>`).join('');
+
+  // Build desktop pins
   let pins='';
   for(const [id,pct] of Object.entries(S.midP)){
     const evt=S.events.find(e=>e.id===id);if(!evt)continue;
@@ -616,6 +725,7 @@ function renderGame(){
   }
   const ghost=`<div class="ghost-pin" id="ghost" style="left:-999px;display:none"><div class="ghost-dot"></div><div class="ghost-stem"></div><div class="ghost-label" id="ghost-lbl"></div></div>`;
 
+  // Build mobile pins
   let mobilePins='';
   for(const [id,pct] of Object.entries(S.midP)){
     const evt=S.events.find(e=>e.id===id);if(!evt)continue;
@@ -623,28 +733,38 @@ function renderGame(){
   }
   const mobileHint=Object.keys(S.midP).length===0?`<div class="tl-mobile-hint">${t('tapEarliest')}</div>`:'';
 
+  const allMiddlePlaced=Object.keys(S.midP).length===3;
+  const lClass=lOk===undefined?'filled':(lOk?'locked-ok':'locked-bad');
+  const rClass=rOk===undefined?'filled':(rOk?'locked-ok':'locked-bad');
+
   document.getElementById('body').innerHTML=`
-    <div class="instr">${t('howToPlay')}</div>
+    <div class="step-badge">${t('step2')}</div>
+    <div class="step-instr">${t('step2Instr')}</div>
+    <div style="font-size:12px;color:#666;font-family:-apple-system,sans-serif;margin-bottom:.9rem">
+      ${t('anchorScore')}: <strong style="color:${S.anchorPts===40?'#5acc8a':S.anchorPts===20?'#c8903a':'#e06040'}">${S.anchorPts} ${t('pts')}</strong>
+      &nbsp;·&nbsp; ${yr(minY)} → ${yr(maxY)}
+    </div>
     ${mobile?`<span class="tap-hint">${t('tapHint')}</span>`:''}
     <div class="plbl">${t('placeEvents')}</div>
-    <div class="pool" id="pool">${pH}</div>
+    <div class="pool" id="pool">${pH||`<span style="font-size:12px;color:#444;font-family:-apple-system,sans-serif">${t('allPlaced')}</span>`}</div>
     <div class="tl-section"><div class="tl-outer">
       <div class="tl-anchors">
-        <div class="anchor-zone" id="zl">
+        <div class="anchor-zone">
           <div class="anchor-label">${t('earliest')}</div>
-          <div class="anchor-drop ${S.aLeft?'filled':''}" id="dl"
-            onclick="tapAnchor('left')" ondragover="aOv(event,'left')" ondragleave="aLv('left')" ondrop="aDr(event,'left')">${lC}</div>
+          <div class="anchor-drop ${lClass}" id="dl"><div class="anchor-card">${S.aLeft.name}<br><span style="font-size:10px;color:#666;font-weight:400">${yr(S.aLeft.year)}</span></div></div>
         </div>
-        <div class="anchor-zone" id="zr">
+        <div class="anchor-zone">
           <div class="anchor-label">${t('mostRecent')}</div>
-          <div class="anchor-drop ${S.aRight?'filled':''}" id="dr"
-            onclick="tapAnchor('right')" ondragover="aOv(event,'right')" ondragleave="aLv('right')" ondrop="aDr(event,'right')">${rC}</div>
+          <div class="anchor-drop ${rClass}" id="dr"><div class="anchor-card">${S.aRight.name}<br><span style="font-size:10px;color:#666;font-weight:400">${yr(S.aRight.year)}</span></div></div>
         </div>
       </div>
       <div class="tl-bar-row">
         <div class="tl-anchor-line"></div>
         <div class="tl-bar-wrap">
-          <div class="tl-bar" id="tl-bar" ondragover="bOv(event)" ondragleave="bLv()" ondrop="bDr(event)" onmousemove="bMv(event)" onmouseleave="hG()">
+          <div class="tl-bar" id="tl-bar"
+            ondragover="bOv(event)" ondragleave="bLv()" ondrop="bDr(event)"
+            onmousemove="barMove(event)" onmouseleave="barLeave()"
+            data-miny="${minY}" data-maxy="${maxY}">
             <div class="tl-track" id="tl-track"></div>
           </div>
           <div class="pins-layer" id="pl">${pins}${ghost}</div>
@@ -652,99 +772,140 @@ function renderGame(){
         <div class="tl-anchor-line"></div>
       </div>
       ${mobile?`<div class="mobile-bar-instr">${t('barInstr')}</div>`:''}
-      <div class="tl-mobile-bar" id="mobile-bar" onclick="tapBar(event)">
+      <div class="tl-mobile-bar" id="mobile-bar"
+        onclick="tapBar2(event)"
+        ontouchstart="barTouchStart(event)"
+        ontouchend="barTouchEnd()"
+        ontouchmove="barTouchMove(event)"
+        data-miny="${minY}" data-maxy="${maxY}">
         <div class="tl-mobile-track"></div>
         ${mobileHint}${mobilePins}
       </div>
     </div></div>
     <div class="actions">
-      <button class="btn btn-p" onclick="doSubmit()" ${dis}>${t('submitBtn')}</button>
-      <button class="btn" onclick="clearAll()">${t('clearAll')}</button>
+      <button class="btn btn-p" onclick="doSubmit()" ${!allMiddlePlaced?'disabled':''}>${t('submitBtn')}</button>
+      <button class="btn" onclick="clearMiddle()">${t('clearAll')}</button>
       <button class="btn" onclick="restartSetup()" style="margin-left:auto">${t('menuBtn')}</button>
     </div>
     <div id="res-area"></div>`;
+
+  // Attach touch tooltip
+  initBarTooltip();
 }
 
-function tapCard(id){
-  if(S.submitted)return;
-  if(S.midP[id]){delete S.midP[id];S.selectedCard=null;renderGame();return;}
-  if(S.aLeft&&S.aLeft.id===id){S.aLeft=null;S.selectedCard=null;renderGame();return;}
-  if(S.aRight&&S.aRight.id===id){S.aRight=null;S.selectedCard=null;renderGame();return;}
-  S.selectedCard=S.selectedCard===id?null:id;renderGame();
+function tapCard2(id){
+  if(S.midP[id]){delete S.midP[id];S.selectedCard=null;renderStep2();return;}
+  S.selectedCard=S.selectedCard===id?null:id;renderStep2();
 }
-function tapAnchor(side){
-  if(S.submitted)return;
-  if(!S.selectedCard){
-    if(side==='left'&&S.aLeft){S.aLeft=null;renderGame();return;}
-    if(side==='right'&&S.aRight){S.aRight=null;renderGame();return;}
-    return;
-  }
-  const evt=S.events.find(x=>x.id===S.selectedCard);if(!evt)return;
-  rtp(S.selectedCard,null);
-  if(side==='left')S.aLeft=evt;else S.aRight=evt;
-  S.selectedCard=null;renderGame();
-}
-function tapBar(e){
-  if(S.submitted||!S.selectedCard)return;
+function tapBar2(e){
+  if(!S.selectedCard)return;
   const bar=document.getElementById('mobile-bar');if(!bar)return;
   const r=bar.getBoundingClientRect();
   const pct=Math.max(0.02,Math.min(0.98,(e.clientX-r.left)/r.width));
   const evt=S.events.find(x=>x.id===S.selectedCard);if(!evt)return;
-  rtp(S.selectedCard,'pool');
-  S.midP[S.selectedCard]=pct;S.selectedCard=null;renderGame();
+  S.midP[S.selectedCard]=pct;S.selectedCard=null;renderStep2();
 }
-function tapMobilePin(id){if(S.submitted)return;delete S.midP[id];renderGame();}
+function tapMobilePin(id){delete S.midP[id];renderStep2();}
+function clearMiddle(){S.midP={};S.selectedCard=null;renderStep2();}
 
+/* ── TOOLTIP ── */
+let _touchTimer=null;
+function pctToYear(pct,minY,maxY){return Math.round(minY+pct*(maxY-minY));}
+
+function showTooltip(x,y,year){
+  const tip=document.getElementById('tl-tooltip');if(!tip)return;
+  tip.textContent='~ '+yr(year);
+  tip.style.left=x+'px';tip.style.top=y+'px';tip.style.display='block';
+}
+function hideTooltip(){const tip=document.getElementById('tl-tooltip');if(tip)tip.style.display='none';}
+
+function barMove(e){
+  uG(e); // ghost for drag
+  const bar=e.currentTarget;
+  const r=bar.getBoundingClientRect();
+  const pct=(e.clientX-r.left)/r.width;
+  const minY=parseInt(bar.dataset.miny);const maxY=parseInt(bar.dataset.maxy);
+  showTooltip(e.clientX,r.top,pctToYear(Math.max(0,Math.min(1,pct)),minY,maxY));
+}
+function barLeave(){hideTooltip();hG();}
+
+function initBarTooltip(){
+  // Mobile: long-press on mobile bar shows tooltip, move shows it
+  const mb=document.getElementById('mobile-bar');if(!mb)return;
+}
+let _touchY=0;
+function barTouchStart(e){
+  const mb=e.currentTarget;
+  const r=mb.getBoundingClientRect();
+  const touch=e.touches[0];
+  const pct=(touch.clientX-r.left)/r.width;
+  const minY=parseInt(mb.dataset.miny);const maxY=parseInt(mb.dataset.maxy);
+  _touchY=r.top-60;
+  _touchTimer=setTimeout(()=>{
+    showTooltip(touch.clientX,_touchY,pctToYear(Math.max(0,Math.min(1,pct)),minY,maxY));
+  },300);
+}
+function barTouchMove(e){
+  clearTimeout(_touchTimer);
+  const mb=e.currentTarget;
+  const r=mb.getBoundingClientRect();
+  const touch=e.touches[0];
+  const pct=(touch.clientX-r.left)/r.width;
+  const minY=parseInt(mb.dataset.miny);const maxY=parseInt(mb.dataset.maxy);
+  showTooltip(touch.clientX,r.top-60,pctToYear(Math.max(0,Math.min(1,pct)),minY,maxY));
+  e.preventDefault();
+}
+function barTouchEnd(){clearTimeout(_touchTimer);hideTooltip();}
+
+/* ── DRAG (shared) ── */
 function ds(e,id,from){S.dragId=id;S.dragFrom=from;const ev=S.events.find(x=>x.id===id);S.ghostName=ev?ev.name:'';}
-function de(){S.dragId=null;S.dragFrom=null;S.ghostName='';hG();}
+function de(){S.dragId=null;S.dragFrom=null;S.ghostName='';hG();hideTooltip();}
 function aOv(e,s){e.preventDefault();document.getElementById('d'+s[0])?.classList.add('over');}
 function aLv(s){document.getElementById('d'+s[0])?.classList.remove('over');}
-function aDr(e,side){
-  e.preventDefault();document.getElementById('d'+side[0])?.classList.remove('over');
-  if(!S.dragId)return;const ev=S.events.find(x=>x.id===S.dragId);if(!ev)return;
-  rtp(S.dragId,S.dragFrom);
-  if(side==='left')S.aLeft=ev;else S.aRight=ev;renderGame();
-}
-function rtp(id,from){
-  if(from==='bar')delete S.midP[id];
-  else if(from==='left')S.aLeft=null;
-  else if(from==='right')S.aRight=null;
-}
+function rtp(id,from){if(from==='bar')delete S.midP[id];}
 function gPct(e){const b=document.getElementById('tl-bar');if(!b)return.5;const r=b.getBoundingClientRect();return Math.max(.01,Math.min(.99,(e.clientX-r.left)/r.width));}
-function bOv(e){e.preventDefault();document.getElementById('tl-track')?.style.setProperty('background','#c8903a');document.getElementById('tl-bar')?.classList.add('active');uG(e);}
-function bLv(){document.getElementById('tl-track')?.style.setProperty('background','#2a2a2a');document.getElementById('tl-bar')?.classList.remove('active');hG();}
+function bOv(e){e.preventDefault();document.getElementById('tl-track')?.style.setProperty('background','#c8903a');uG(e);}
+function bLv(){document.getElementById('tl-track')?.style.setProperty('background','#2a2a2a');hG();}
 function bMv(e){if(S.dragId)uG(e);}
 function uG(e){const g=document.getElementById('ghost');const gl=document.getElementById('ghost-lbl');if(!g||!S.dragId)return;g.style.left=(gPct(e)*100)+'%';g.style.display='flex';if(gl)gl.textContent=S.ghostName;}
 function hG(){const g=document.getElementById('ghost');if(g)g.style.display='none';}
-function bDr(e){e.preventDefault();bLv();hG();if(!S.dragId)return;const ev=S.events.find(x=>x.id===S.dragId);if(!ev)return;rtp(S.dragId,S.dragFrom);S.midP[S.dragId]=gPct(e);renderGame();}
-function clearAll(){S.midP={};S.aLeft=null;S.aRight=null;S.selectedCard=null;renderGame();}
+function bDr(e){
+  e.preventDefault();bLv();hG();hideTooltip();
+  if(!S.dragId)return;
+  const ev=S.events.find(x=>x.id===S.dragId);if(!ev)return;
+  rtp(S.dragId,S.dragFrom);
+  S.midP[S.dragId]=gPct(e);renderStep2();
+}
 
+/* ── SUBMIT (Step 2) ── */
 function doSubmit(){
-  if(!allP()||S.submitted)return;S.submitted=true;
+  if(Object.keys(S.midP).length<3||S.submitted)return;
+  S.submitted=true;
   const sorted=[...S.events].sort((a,b)=>a.year-b.year);
   const minY=sorted[0].year,maxY=sorted[4].year,range=maxY-minY||1;
-  const iP={};sorted.forEach(e=>{iP[e.id]=(e.year-minY)/range;});
-  const eP={};
-  if(S.aLeft)eP[S.aLeft.id]=0;
-  if(S.aRight)eP[S.aRight.id]=1;
-  for(const [id,pct] of Object.entries(S.midP))eP[id]=pct;
-  const pOrd=[...S.events].sort((a,b)=>(eP[a.id]??0.5)-(eP[b.id]??0.5));
-  let oc=0;pOrd.forEach((ev,i)=>{if(sorted[i]&&sorted[i].id===ev.id)oc++;});
-  const oPct=Math.round((oc/5)*50);
-  const tF=DIFFS[S.diff].tolerance/range;
-  let sRaw=0;const sPer={};
-  S.events.forEach(ev=>{const d=Math.abs((eP[ev.id]??0.5)-iP[ev.id]);const p=Math.max(0,1-d/tF);sPer[ev.id]=Math.round(p*10);sRaw+=p;});
-  const sPct=Math.round((sRaw/5)*50);
-  const tot=oPct+sPct;S.totalPct+=tot;S.roundsPlayed++;updSc();
+  // True proportional positions for middle 3
+  const middle=sorted.slice(1,4);
+  const iP={};middle.forEach(e=>{iP[e.id]=(e.year-minY)/range;});
 
-  const ld=document.getElementById('dl');const rd=document.getElementById('dr');
-  if(ld)ld.classList.add(S.aLeft&&sorted[0].id===S.aLeft.id?'anchor-ok':'anchor-bad');
-  if(rd)rd.classList.add(S.aRight&&sorted[4].id===S.aRight.id?'anchor-ok':'anchor-bad');
+  // Score middle 3 — 20pts each, full if within ±50 years
+  const tol=50/range; // 50 years as fraction of span
+  let spacingPts=0;const sPer={};
+  middle.forEach(ev=>{
+    const placed=S.midP[ev.id]??0.5;
+    const diff=Math.abs(placed-iP[ev.id]);
+    const score=Math.max(0,Math.round(20*(1-diff/tol)));
+    sPer[ev.id]=score;spacingPts+=score;
+  });
 
+  const tot=Math.min(100,S.anchorPts+spacingPts);
+  S.totalPct+=tot;S.roundsPlayed++;updSc();
+
+  // Show answer pins on the bar
   const layer=document.getElementById('pl');
   if(layer){
-    const pos=sorted.map(e=>iP[e.id]);const sh=stemH(pos);
-    sorted.forEach((ev,i)=>{
+    const pos=middle.map(e=>iP[e.id]);
+    const sh=stemH(pos);
+    middle.forEach((ev,i)=>{
       const el=document.createElement('div');el.className='answer-pin';
       el.style.left=(iP[ev.id]*100)+'%';el.style.top='5px';
       el.innerHTML=`<div class="answer-dot"></div><div class="answer-stem" style="height:${sh[i]}px"></div><div class="answer-label">${yr(ev.year)}<br><span style="font-weight:400;font-size:9px">${ev.name}</span></div>`;
@@ -752,19 +913,29 @@ function doSubmit(){
     });
   }
 
-  const rows=sorted.map((ev,i)=>{
-    const pR=pOrd.findIndex(x=>x.id===ev.id);const oOk=pR===i;const sp=sPer[ev.id];
-    return `<div class="res-row"><div class="dot ${oOk?'ok':'bad'}">${oOk?'✓':'✗'}</div><div><span style="font-weight:700;color:#ffffff">${yr(ev.year)} — ${ev.name}</span><br><span style="color:#666;font-size:12px">${ev.desc}</span><br><span style="font-size:12px;color:#444">${t('spacing')}: ${sp}/10</span></div></div>`;
+  // Results rows — anchors first, then middle 3
+  const anchorRows=sorted.filter((_,i)=>i===0||i===4).map(ev=>{
+    const isLeft=ev.id===sorted[0].id;
+    const wasCorrect=isLeft?(S.anchorPts>=20&&sorted[0].id===ev.id):(S.anchorPts===40||S.anchorPts===20&&sorted[4].id===ev.id);
+    // Simplify: anchors correct if anchorPts reflects
+    const ok=isLeft?S.anchorPts>=20:S.anchorPts===40;
+    return `<div class="res-row"><div class="dot ${ok?'ok':'bad'}">${ok?'✓':'✗'}</div><div><span style="font-weight:700;color:#ffffff">${yr(ev.year)} — ${ev.name}</span><br><span style="color:#666;font-size:12px">${ev.desc}</span><br><span style="font-size:12px;color:#444">${isLeft?t('earliest'):t('mostRecent')} · 20 ${t('pts')}</span></div></div>`;
+  }).join('');
+
+  const middleRows=middle.map(ev=>{
+    const sp=sPer[ev.id];
+    return `<div class="res-row"><div class="dot ${sp>=14?'ok':'bad'}">${sp>=14?'✓':'✗'}</div><div><span style="font-weight:700;color:#ffffff">${yr(ev.year)} — ${ev.name}</span><br><span style="color:#666;font-size:12px">${ev.desc}</span><br><span style="font-size:12px;color:#444">${t('spacing')}: ${sp}/20 ${t('pts')}</span></div></div>`;
   }).join('');
 
   const isLast=S.round+1>=S.rounds;
   const nBtn=isLast?`<button class="btn btn-p" onclick="showFinal()">${t('finalScore')}</button>`:`<button class="btn btn-p" onclick="nextRound()">${t('nextRound')}</button>`;
+
   document.getElementById('res-area').innerHTML=`
     <div class="res">
       <div class="score-big">${tot}%</div>
       <div class="score-bar-wrap"><div class="score-bar-fill" style="width:${tot}%"></div></div>
-      <div class="res-sub">${oPct}/50 ${t('orderSpacing')}</div>
-      ${rows}
+      <div class="res-sub">${t('anchorScore')}: ${S.anchorPts}/40 · ${t('spacing')}: ${spacingPts}/60</div>
+      ${anchorRows}${middleRows}
       <div style="margin-top:1rem;display:flex;gap:10px;flex-wrap:wrap">${nBtn}<button class="btn" onclick="restartSetup()">${t('menuBtn')}</button></div>
     </div>`;
 }
