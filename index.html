@@ -684,15 +684,43 @@ function startRound(){
     raw=S.generatedSets[S.round%S.generatedSets.length];
   } else {
     raw=pickSet(S.diff);
-    if(!raw){// fallback if diff invalid
-      const keys=Object.keys(POOLS);
-      raw=POOLS[keys[0]][0];
-    }
+    if(!raw){const keys=Object.keys(POOLS);raw=POOLS[keys[0]][0];}
   }
-  S.events=raw.map((e,i)=>({...e,id:'e'+i}));
-  shuffle(S.events);
   document.getElementById('rn').textContent=(S.round+1)+'/'+S.rounds;
-  updSc();renderStep1();
+  updSc();
+  // Translate curated sets if non-English (AI-generated sets are already in the right language)
+  const needsTranslation=LANG!=='en'&&S.generatedSets.length===0;
+  if(needsTranslation){
+    // Show brief overlay while translating
+    showOverlay(t('generatingWait'));
+    translateEvents(raw).then(translated=>{
+      hideOverlay();
+      S.events=translated.map((e,i)=>({...e,id:'e'+i}));
+      shuffle(S.events);
+      renderStep1();
+    });
+  } else {
+    S.events=raw.map((e,i)=>({...e,id:'e'+i}));
+    shuffle(S.events);
+    renderStep1();
+  }
+}
+
+async function translateEvents(events){
+  try{
+    const res=await fetch(WORKER,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'translate',events,lang:LANG})
+    });
+    const data=await res.json();
+    if(data.events&&Array.isArray(data.events)&&data.events.length===events.length){
+      return data.events;
+    }
+    return events; // fallback to English on any issue
+  }catch(e){
+    return events; // silent fallback
+  }
 }
 
 function updSc(){document.getElementById('sc').textContent=S.roundsPlayed>0?Math.round(S.totalPct/S.roundsPlayed)+'%':'—';}
