@@ -171,12 +171,6 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
           <div class="met"><div class="mv" id="sc">—</div><div class="ml" id="lbl-avg">Avg</div></div>
           <div class="met"><div class="mv" id="rn">—</div><div class="ml" id="lbl-round">Round</div></div>
         </div>
-        <div class="lang-row">
-          <button class="lang-btn active" onclick="setLang('en')">EN</button>
-          <button class="lang-btn" onclick="setLang('fr')">FR</button>
-          <button class="lang-btn" onclick="setLang('de')">DE</button>
-          <button class="lang-btn" onclick="setLang('es')">ES</button>
-        </div>
       </div>
     </div>
     <div id="body"></div>
@@ -213,8 +207,8 @@ const T={
     barInstr:'Select a card above, then tap the bar to place it',
     placeEvents:'Events to place',allPlaced:'All placed',
     step1:'Step 1 of 2',step2:'Step 2 of 2',
-    step1Instr:'Find the <strong style="color:#c8903a">Earliest</strong> and <strong style="color:#c8903a">Most Recent</strong> events — drag or tap them into the anchor boxes. These two events will define the time scale for the round.',
-    step2Instr:'The timeline is now set. Place the remaining 3 events proportionally along the bar. <em>While dragging, a bracket like "1450 – 1499" shows the 50-year window at your cursor — drop the event in the right bracket for full marks.</em>',
+    step1Instr:'Find the <strong style="color:#c8903a">Earliest</strong> and <strong style="color:#c8903a">Most Recent</strong> events — drag them into the anchor boxes. These two events define the time scale for the round.',
+    step2Instr:'The timeline is now set. Drag the remaining 3 events onto the bar. <em>While dragging, a bracket like "1450 – 1499" shows the 50-year window at your cursor — drop the event in the right bracket for full marks.</em>',
     confirmAnchors:'Confirm Anchors →',
     anchorScore:'Anchor score',pts:'pts',
     submitBtn:'Submit',clearAll:'Clear all',menuBtn:'← Menu',
@@ -272,8 +266,8 @@ const T={
     barInstr:'Sélectionnez une carte, puis appuyez sur la barre',
     placeEvents:'Événements à placer',allPlaced:'Tout placé',
     step1:'Étape 1 sur 2',step2:'Étape 2 sur 2',
-    step1Instr:'Trouvez l\'événement le plus <strong style="color:#c8903a">ancien</strong> et le plus <strong style="color:#c8903a">récent</strong> — faites-les glisser ou appuyez pour les placer dans les cases. Ces deux événements définiront l\'échelle de temps de la manche.',
-    step2Instr:'La ligne du temps est définie. Placez les 3 événements restants proportionnellement. <em>En faisant glisser, un intervalle comme "1450 – 1499" indique la fenêtre de 50 ans — déposez l\'événement dans le bon intervalle pour les points complets.</em>',
+    step1Instr:'Trouvez l\'événement le plus <strong style="color:#c8903a">ancien</strong> et le plus <strong style="color:#c8903a">récent</strong> — faites-les glisser dans les cases. Ces deux événements définissent l\'échelle de temps de la manche.',
+    step2Instr:'La ligne du temps est définie. Faites glisser les 3 événements restants sur la barre. <em>En faisant glisser, un intervalle comme "1450 – 1499" indique la fenêtre de 50 ans — déposez l\'événement dans le bon intervalle pour les points complets.</em>',
     confirmAnchors:'Confirmer les ancres →',
     anchorScore:'Score des ancres',pts:'pts',
     submitBtn:'Valider',clearAll:'Tout effacer',menuBtn:'← Menu',
@@ -331,8 +325,8 @@ const T={
     barInstr:'Karte auswählen, dann auf die Leiste tippen',
     placeEvents:'Zu platzierende Ereignisse',allPlaced:'Alle platziert',
     step1:'Schritt 1 von 2',step2:'Schritt 2 von 2',
-    step1Instr:'Finden Sie das <strong style="color:#c8903a">früheste</strong> und das <strong style="color:#c8903a">neueste</strong> Ereignis — ziehen oder tippen Sie sie in die Ankerboxen. Diese zwei Ereignisse definieren den Zeitmaßstab der Runde.',
-    step2Instr:'Die Zeitlinie ist festgelegt. Platzieren Sie die verbleibenden 3 Ereignisse proportional. <em>Beim Ziehen zeigt ein Intervall wie "1450 – 1499" das 50-Jahres-Fenster — lassen Sie das Ereignis im richtigen Intervall los für volle Punkte.</em>',
+    step1Instr:'Finden Sie das <strong style="color:#c8903a">früheste</strong> und das <strong style="color:#c8903a">neueste</strong> Ereignis — ziehen Sie sie in die Ankerboxen. Diese zwei Ereignisse legen den Zeitmaßstab der Runde fest.',
+    step2Instr:'Die Zeitlinie ist festgelegt. Ziehen Sie die verbleibenden 3 Ereignisse auf die Leiste. <em>Beim Ziehen zeigt ein Intervall wie "1450 – 1499" das 50-Jahres-Fenster — lassen Sie das Ereignis im richtigen Intervall los für volle Punkte.</em>',
     confirmAnchors:'Anker bestätigen →',
     anchorScore:'Ankerpunkte',pts:'Pkt',
     submitBtn:'Einreichen',clearAll:'Alles löschen',menuBtn:'← Menü',
@@ -390,8 +384,8 @@ const T={
     barInstr:'Selecciona una carta, luego toca la barra para colocarla',
     placeEvents:'Eventos a colocar',allPlaced:'Todo colocado',
     step1:'Paso 1 de 2',step2:'Paso 2 de 2',
-    step1Instr:'Encuentra el evento más <strong style="color:#c8903a">antiguo</strong> y el más <strong style="color:#c8903a">reciente</strong> — arrástralos o tócalos para colocarlos en las casillas. Estos dos eventos definirán la escala de tiempo de la ronda.',
-    step2Instr:'La línea de tiempo está establecida. Coloca los 3 eventos restantes proporcionalmente. <em>Al arrastrar, un intervalo como "1450 – 1499" muestra la ventana de 50 años — suelta el evento en el intervalo correcto para los puntos completos.</em>',
+    step1Instr:'Encuentra el evento más <strong style="color:#c8903a">antiguo</strong> y el más <strong style="color:#c8903a">reciente</strong> — arrástralos a las casillas. Estos dos eventos definen la escala de tiempo de la ronda.',
+    step2Instr:'La línea de tiempo está establecida. Arrastra los 3 eventos restantes a la barra. <em>Al arrastrar, un intervalo como "1450 – 1499" muestra la ventana de 50 años — suelta el evento en el intervalo correcto para los puntos completos.</em>',
     confirmAnchors:'Confirmar anclajes →',
     anchorScore:'Puntuación de anclajes',pts:'pts',
     submitBtn:'Enviar',clearAll:'Borrar todo',menuBtn:'← Menú',
@@ -436,14 +430,12 @@ function medal(pct){const m=T[LANG].medals;if(pct>=90)return m[90];if(pct>=70)re
 function setLang(l){
   LANG=l;
   document.documentElement.lang=l;
-  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));
   document.getElementById('ttl-sub').textContent=t('subtitle');
   document.getElementById('lbl-avg').textContent=t('avg');
   document.getElementById('lbl-round').textContent=t('round');
-  // Reset theme selection since theme chips change
-  S.path=null;S.theme=null;S.customTheme='';S.generatedSets=[];
-  if(S.phase==='setup')renderSetup();
-  else renderStep1();
+  // Reset everything when language changes — events must be regenerated in new language
+  S.path=null;S.theme=null;S.customTheme='';S.generatedSets=[];S.diff=null;
+  renderSetup();
 }
 
 /* ── GAME DATA ── */
@@ -481,8 +473,7 @@ let S={
   totalPct:0,roundsPlayed:0,
   events:[],midP:{},aLeft:null,aRight:null,
   step:1,anchorPts:0,
-  submitted:false,dragId:null,dragFrom:null,ghostName:'',
-  selectedCard:null
+  submitted:false,dragId:null,dragFrom:null,ghostName:''
 };
 
 function yr(y){return y<0?Math.abs(y)+' BC':y+' AD';}
@@ -538,7 +529,15 @@ function renderSetup(){
   const btnLabel=isThemePath?t('genStart'):t('startBtn');
 
   document.getElementById('body').innerHTML=`<div class="sf">
-    <div class="setup-title" style="margin-bottom:.75rem">${t('pathTitle')}</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+      <div class="setup-title" style="margin-bottom:0">${t('pathTitle')}</div>
+      <div class="lang-row">
+        <button class="lang-btn ${LANG==='en'?'active':''}" onclick="setLang('en')">EN</button>
+        <button class="lang-btn ${LANG==='fr'?'active':''}" onclick="setLang('fr')">FR</button>
+        <button class="lang-btn ${LANG==='de'?'active':''}" onclick="setLang('de')">DE</button>
+        <button class="lang-btn ${LANG==='es'?'active':''}" onclick="setLang('es')">ES</button>
+      </div>
+    </div>
     <div class="path-grid">
       <div class="path-card ${isRandomPath?'active':''}" onclick="selPath('random')">
         <div class="path-icon">🎲</div>
@@ -640,7 +639,7 @@ async function callGenerate(payload){
 function startRound(){
   S.submitted=false;S.step=1;S.anchorPts=0;
   S.midP={};S.aLeft=null;S.aRight=null;
-  S.dragId=null;S.dragFrom=null;S.ghostName='';S.selectedCard=null;
+  S.dragId=null;S.dragFrom=null;S.ghostName='';
   // Pick next set from generated queue (no repeats within a session)
   if(!S._genQueue||S._genQueue.length===0){
     const gi=Array.from({length:S.generatedSets.length},(_,i)=>i);
@@ -660,27 +659,21 @@ function isMobile(){return window.innerWidth<600;}
 
 /* ── STEP 1: ANCHOR PHASE ── */
 function renderStep1(){
-  const mobile=isMobile();
   const tTag=activeLabel()!==t('curatedSets')?` <span style="color:#c8903a;font-weight:600">${activeLabel()}</span>`:'';
-  // Only show events not yet anchored in pool
   const anchored=new Set();
   if(S.aLeft)anchored.add(S.aLeft.id);
   if(S.aRight)anchored.add(S.aRight.id);
   const pool=S.events.filter(e=>!anchored.has(e.id));
 
-  const pH=pool.map(e=>`<div class="ecard${S.selectedCard===e.id?' selected-card':''}" onclick="tapCard1('${e.id}')"${!mobile?` draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()"`:''} >${e.name}</div>`).join('');
-
-  const lP=`<span style="font-size:10px;color:#333;font-family:-apple-system,sans-serif">${mobile?t('tapEarliest'):t('dropEarliest')}</span>`;
-  const rP=`<span style="font-size:10px;color:#333;font-family:-apple-system,sans-serif">${mobile?t('tapRecent'):t('dropRecent')}</span>`;
-  const lC=S.aLeft?`<div class="anchor-card" onclick="unanchor('left')"${!mobile?` draggable="true" ondragstart="ds(event,'${S.aLeft.id}','left')" ondragend="de()"`:''} >${S.aLeft.name}</div>`:lP;
-  const rC=S.aRight?`<div class="anchor-card" onclick="unanchor('right')"${!mobile?` draggable="true" ondragstart="ds(event,'${S.aRight.id}','right')" ondragend="de()"`:''} >${S.aRight.name}</div>`:rP;
-
-  const bothFilled=S.aLeft&&S.aRight;
+  const pH=pool.map(e=>`<div class="ecard" draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()">${e.name}</div>`).join('');
+  const lP=`<span style="font-size:10px;color:#333;font-family:-apple-system,sans-serif">${t('dropEarliest')}</span>`;
+  const rP=`<span style="font-size:10px;color:#333;font-family:-apple-system,sans-serif">${t('dropRecent')}</span>`;
+  const lC=S.aLeft?`<div class="anchor-card" draggable="true" ondragstart="ds(event,'${S.aLeft.id}','left')" ondragend="de()">${S.aLeft.name}</div>`:lP;
+  const rC=S.aRight?`<div class="anchor-card" draggable="true" ondragstart="ds(event,'${S.aRight.id}','right')" ondragend="de()">${S.aRight.name}</div>`:rP;
 
   document.getElementById('body').innerHTML=`
     <div class="step-badge">${t('step1')}</div>
     <div class="step-instr">${t('step1Instr')}${tTag?'<br>'+tTag:''}</div>
-    ${mobile?`<span class="tap-hint">${t('tapHint')}</span>`:''}
     <div class="plbl">${t('placeEvents')}</div>
     <div class="pool" id="pool">${pH||`<span style="font-size:12px;color:#444;font-family:-apple-system,sans-serif">${t('allPlaced')}</span>`}</div>
     <div class="tl-section"><div class="tl-outer">
@@ -688,35 +681,21 @@ function renderStep1(){
         <div class="anchor-zone">
           <div class="anchor-label">${t('earliest')}</div>
           <div class="anchor-drop ${S.aLeft?'filled':''}" id="dl"
-            onclick="tapAnchor1('left')" ondragover="aOv(event,'left')" ondragleave="aLv('left')" ondrop="aDr1(event,'left')">${lC}</div>
+            ondragover="aOv(event,'left')" ondragleave="aLv('left')" ondrop="aDr1(event,'left')">${lC}</div>
         </div>
         <div class="anchor-zone">
           <div class="anchor-label">${t('mostRecent')}</div>
           <div class="anchor-drop ${S.aRight?'filled':''}" id="dr"
-            onclick="tapAnchor1('right')" ondragover="aOv(event,'right')" ondragleave="aLv('right')" ondrop="aDr1(event,'right')">${rC}</div>
+            ondragover="aOv(event,'right')" ondragleave="aLv('right')" ondrop="aDr1(event,'right')">${rC}</div>
         </div>
       </div>
     </div></div>
     <div class="actions">
-      <button class="btn btn-p" onclick="confirmAnchors()" ${!bothFilled?'disabled':''}>${t('confirmAnchors')}</button>
+      <button class="btn btn-p" onclick="confirmAnchors()" ${!S.aLeft||!S.aRight?'disabled':''}>${t('confirmAnchors')}</button>
       <button class="btn" onclick="restartSetup()" style="margin-left:auto">${t('menuBtn')}</button>
     </div>`;
 }
 
-function tapCard1(id){
-  if(S.selectedCard===id){S.selectedCard=null;renderStep1();return;}
-  S.selectedCard=id;renderStep1();
-}
-function tapAnchor1(side){
-  if(!S.selectedCard)return;
-  const evt=S.events.find(x=>x.id===S.selectedCard);if(!evt)return;
-  if(side==='left')S.aLeft=evt;else S.aRight=evt;
-  S.selectedCard=null;renderStep1();
-}
-function unanchor(side){
-  if(side==='left')S.aLeft=null;else S.aRight=null;
-  renderStep1();
-}
 function aDr1(e,side){
   e.preventDefault();document.getElementById('d'+side[0])?.classList.remove('over');
   if(!S.dragId)return;
@@ -740,37 +719,20 @@ function confirmAnchors(){
 
 /* ── STEP 2: PLACEMENT PHASE ── */
 function renderStep2(lOk,rOk){
-  const mobile=isMobile();
   const sorted=[...S.events].sort((a,b)=>a.year-b.year);
   const minY=sorted[0].year,maxY=sorted[4].year;
-  // Middle 3 events for placement
   const middle=sorted.slice(1,4);
   const placed=new Set(Object.keys(S.midP));
   const pool=middle.filter(e=>!placed.has(e.id));
 
-  const pH=pool.map(e=>`<div class="ecard${S.selectedCard===e.id?' selected-card':''}" 
-    onclick="tapCard2('${e.id}')"
-    ontouchstart="cardTouchStart(event,'${e.id}')" 
-    ontouchmove="cardTouchMove(event)" 
-    ontouchend="cardTouchEnd(event)"
-    ${!mobile?`draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()"`:''} 
-    >${e.name}</div>`).join('');
+  const pH=pool.map(e=>`<div class="ecard" draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()">${e.name}</div>`).join('');
 
-  // Build desktop pins
   let pins='';
   for(const [id,pct] of Object.entries(S.midP)){
     const evt=S.events.find(e=>e.id===id);if(!evt)continue;
     pins+=`<div class="pin" id="pin-${id}" style="left:${pct*100}%" draggable="true" ondragstart="ds(event,'${id}','bar')" ondragend="de()"><div class="pin-dot"></div><div class="pin-stem"></div><div class="pin-label">${evt.name}</div></div>`;
   }
   const ghost=`<div class="ghost-pin" id="ghost" style="left:-999px;display:none"><div class="ghost-dot"></div><div class="ghost-stem"></div><div class="ghost-label" id="ghost-lbl"></div></div>`;
-
-  // Build mobile pins
-  let mobilePins='';
-  for(const [id,pct] of Object.entries(S.midP)){
-    const evt=S.events.find(e=>e.id===id);if(!evt)continue;
-    mobilePins+=`<div class="mobile-pin" style="left:${pct*100}%" onclick="tapMobilePin('${id}')"><div class="mobile-pin-dot"></div><div class="mobile-pin-lbl">${evt.name}</div></div>`;
-  }
-  const mobileHint=Object.keys(S.midP).length===0?`<div class="tl-mobile-hint">${t('tapEarliest')}</div>`:'';
 
   const allMiddlePlaced=Object.keys(S.midP).length===3;
   const lClass=lOk===undefined?'filled':(lOk?'locked-ok':'locked-bad');
@@ -783,7 +745,6 @@ function renderStep2(lOk,rOk){
       ${t('anchorScore')}: <strong style="color:${S.anchorPts===40?'#5acc8a':S.anchorPts===20?'#c8903a':'#e06040'}">${S.anchorPts} ${t('pts')}</strong>
       &nbsp;·&nbsp; ${yr(minY)} → ${yr(maxY)}
     </div>
-    ${mobile?`<span class="tap-hint">${t('tapHint')}</span>`:''}
     <div class="plbl">${t('placeEvents')}</div>
     <div class="pool" id="pool">${pH||`<span style="font-size:12px;color:#444;font-family:-apple-system,sans-serif">${t('allPlaced')}</span>`}</div>
     <div class="tl-section"><div class="tl-outer">
@@ -810,16 +771,6 @@ function renderStep2(lOk,rOk){
         </div>
         <div class="tl-anchor-line"></div>
       </div>
-      ${mobile?`<div class="mobile-bar-instr">${t('barInstr')}</div>`:''}
-      <div class="tl-mobile-bar" id="mobile-bar"
-        onclick="tapBar2(event)"
-        ontouchstart="barTouchStart(event)"
-        ontouchend="barTouchEnd()"
-        ontouchmove="barTouchMove(event)"
-        data-miny="${minY}" data-maxy="${maxY}">
-        <div class="tl-mobile-track"></div>
-        ${mobileHint}${mobilePins}
-      </div>
     </div></div>
     <div class="actions">
       <button class="btn btn-p" onclick="doSubmit()" ${!allMiddlePlaced?'disabled':''}>${t('submitBtn')}</button>
@@ -827,82 +778,9 @@ function renderStep2(lOk,rOk){
       <button class="btn" onclick="restartSetup()" style="margin-left:auto">${t('menuBtn')}</button>
     </div>
     <div id="res-area"></div>`;
-
-  // Attach touch tooltip
-  initBarTooltip();
 }
 
-function tapCard2(id){
-  if(S.midP[id]){delete S.midP[id];S.selectedCard=null;renderStep2();return;}
-  S.selectedCard=S.selectedCard===id?null:id;renderStep2();
-}
-function tapBar2(e){
-  if(!S.selectedCard)return;
-  const bar=document.getElementById('mobile-bar');if(!bar)return;
-  const r=bar.getBoundingClientRect();
-  const pct=Math.max(0.02,Math.min(0.98,(e.clientX-r.left)/r.width));
-  const evt=S.events.find(x=>x.id===S.selectedCard);if(!evt)return;
-  S.midP[S.selectedCard]=pct;S.selectedCard=null;renderStep2();
-}
-function tapMobilePin(id){delete S.midP[id];renderStep2();}
-function clearMiddle(){S.midP={};S.selectedCard=null;renderStep2();}
-
-/* ── TOUCH DRAG (mobile card → bar) ── */
-let _touchDragId=null;
-let _touchDragging=false;
-
-function cardTouchStart(e,id){
-  _touchDragId=id;_touchDragging=false;
-  // Don't prevent default yet — wait to see if it's a drag or a tap
-}
-
-function cardTouchMove(e){
-  if(!_touchDragId)return;
-  _touchDragging=true;
-  e.preventDefault(); // prevent scroll once dragging
-  const touch=e.touches[0];
-  // Show bracket tooltip if over the bar area
-  const bar=document.getElementById('mobile-bar');
-  if(!bar)return;
-  const r=bar.getBoundingClientRect();
-  if(touch.clientY>=r.top-20&&touch.clientY<=r.bottom+20){
-    const pct=Math.max(0,Math.min(1,(touch.clientX-r.left)/r.width));
-    const minY=parseInt(bar.dataset.miny);const maxY=parseInt(bar.dataset.maxy);
-    showTooltip(touch.clientX,r.top-50,bracketAtPct(pct,minY,maxY));
-  } else {
-    hideTooltip();
-  }
-}
-
-function cardTouchEnd(e){
-  hideTooltip();
-  if(!_touchDragId){return;}
-  if(!_touchDragging){
-    // It was a tap — handle as normal tap
-    _touchDragId=null;return;
-  }
-  // It was a drag — check if finger is over the mobile bar
-  const touch=e.changedTouches[0];
-  const bar=document.getElementById('mobile-bar');
-  if(bar){
-    const r=bar.getBoundingClientRect();
-    if(touch.clientY>=r.top-20&&touch.clientY<=r.bottom+20){
-      const pct=Math.max(0.02,Math.min(0.98,(touch.clientX-r.left)/r.width));
-      const evt=S.events.find(x=>x.id===_touchDragId);
-      if(evt){
-        delete S.midP[_touchDragId]; // remove if already placed
-        S.midP[_touchDragId]=pct;
-        S.selectedCard=null;
-        _touchDragId=null;_touchDragging=false;
-        renderStep2();return;
-      }
-    }
-  }
-  // Dropped outside bar — just select the card
-  S.selectedCard=_touchDragId;
-  _touchDragId=null;_touchDragging=false;
-  renderStep2();
-}
+function clearMiddle(){S.midP={};renderStep2();}
 
 /* ── TOOLTIP ── */
 let _touchTimer=null;
@@ -925,31 +803,6 @@ function barMove(e){
   showTooltip(e.clientX,r.top-8,bracketAtPct(pct,minY,maxY));
 }
 function barLeave(){hideTooltip();hG();}
-
-function initBarTooltip(){/* touch handled via ontouchstart/move/end attrs */}
-let _touchY=0;
-function barTouchStart(e){
-  if(!S.selectedCard){return;} // only show tooltip when a card is selected
-  const mb=e.currentTarget;
-  const r=mb.getBoundingClientRect();
-  const touch=e.touches[0];
-  const pct=(touch.clientX-r.left)/r.width;
-  const minY=parseInt(mb.dataset.miny);const maxY=parseInt(mb.dataset.maxy);
-  _touchY=r.top;
-  // Show immediately on touch when card is selected
-  showTooltip(touch.clientX,_touchY-50,bracketAtPct(Math.max(0,Math.min(1,pct)),minY,maxY));
-}
-function barTouchMove(e){
-  if(!S.selectedCard){hideTooltip();return;}
-  const mb=e.currentTarget;
-  const r=mb.getBoundingClientRect();
-  const touch=e.touches[0];
-  const pct=(touch.clientX-r.left)/r.width;
-  const minY=parseInt(mb.dataset.miny);const maxY=parseInt(mb.dataset.maxy);
-  showTooltip(touch.clientX,r.top-50,bracketAtPct(Math.max(0,Math.min(1,pct)),minY,maxY));
-  e.preventDefault();
-}
-function barTouchEnd(){hideTooltip();}
 
 /* ── DRAG (shared) ── */
 function ds(e,id,from){S.dragId=id;S.dragFrom=from;const ev=S.events.find(x=>x.id===id);S.ghostName=ev?ev.name:'';}
