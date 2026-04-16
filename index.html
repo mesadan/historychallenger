@@ -213,7 +213,7 @@ const T={
     placeEvents:'Events to place',allPlaced:'All placed',
     step1:'Step 1 of 2',step2:'Step 2 of 2',
     step1Instr:'Find the <strong style="color:#c8903a">Earliest</strong> and <strong style="color:#c8903a">Most Recent</strong> events — drag them into the anchor boxes. These two events define the time scale for the round.',
-    step2Instr:'The timeline is now set. Drag the remaining 3 events onto the bar. <em>While dragging, a bracket like "1450 – 1499" shows the 50-year window at your cursor — drop the event in the right bracket for full marks.</em>',
+    step2Instr:'The timeline is now set. Drag the remaining 3 events onto the bar. <em>While dragging, the bracket at your cursor updates live — drop in the right bracket for full marks.</em>',
     confirmAnchors:'Confirm Anchors →',
     anchorScore:'Anchor score',pts:'pts',
     submitBtn:'Submit',clearAll:'Clear all',menuBtn:'← Menu',
@@ -272,7 +272,7 @@ const T={
     placeEvents:'Événements à placer',allPlaced:'Tout placé',
     step1:'Étape 1 sur 2',step2:'Étape 2 sur 2',
     step1Instr:'Trouvez l\'événement le plus <strong style="color:#c8903a">ancien</strong> et le plus <strong style="color:#c8903a">récent</strong> — faites-les glisser dans les cases. Ces deux événements définissent l\'échelle de temps de la manche.',
-    step2Instr:'La ligne du temps est définie. Faites glisser les 3 événements restants sur la barre. <em>En faisant glisser, un intervalle comme "1450 – 1499" indique la fenêtre de 50 ans — déposez l\'événement dans le bon intervalle pour les points complets.</em>',
+    step2Instr:'La ligne du temps est définie. Faites glisser les 3 événements restants sur la barre. <em>En faisant glisser, l\'intervalle se met à jour en direct — déposez dans le bon intervalle pour les points complets.</em>',
     confirmAnchors:'Confirmer les ancres →',
     anchorScore:'Score des ancres',pts:'pts',
     submitBtn:'Valider',clearAll:'Tout effacer',menuBtn:'← Menu',
@@ -331,7 +331,7 @@ const T={
     placeEvents:'Zu platzierende Ereignisse',allPlaced:'Alle platziert',
     step1:'Schritt 1 von 2',step2:'Schritt 2 von 2',
     step1Instr:'Finden Sie das <strong style="color:#c8903a">früheste</strong> und das <strong style="color:#c8903a">neueste</strong> Ereignis — ziehen Sie sie in die Ankerboxen. Diese zwei Ereignisse legen den Zeitmaßstab der Runde fest.',
-    step2Instr:'Die Zeitlinie ist festgelegt. Ziehen Sie die verbleibenden 3 Ereignisse auf die Leiste. <em>Beim Ziehen zeigt ein Intervall wie "1450 – 1499" das 50-Jahres-Fenster — lassen Sie das Ereignis im richtigen Intervall los für volle Punkte.</em>',
+    step2Instr:'Die Zeitlinie ist festgelegt. Ziehen Sie die verbleibenden 3 Ereignisse auf die Leiste. <em>Beim Ziehen aktualisiert sich das Intervall live — lassen Sie im richtigen Intervall los für volle Punkte.</em>',
     confirmAnchors:'Anker bestätigen →',
     anchorScore:'Ankerpunkte',pts:'Pkt',
     submitBtn:'Einreichen',clearAll:'Alles löschen',menuBtn:'← Menü',
@@ -390,7 +390,7 @@ const T={
     placeEvents:'Eventos a colocar',allPlaced:'Todo colocado',
     step1:'Paso 1 de 2',step2:'Paso 2 de 2',
     step1Instr:'Encuentra el evento más <strong style="color:#c8903a">antiguo</strong> y el más <strong style="color:#c8903a">reciente</strong> — arrástralos a las casillas. Estos dos eventos definen la escala de tiempo de la ronda.',
-    step2Instr:'La línea de tiempo está establecida. Arrastra los 3 eventos restantes a la barra. <em>Al arrastrar, un intervalo como "1450 – 1499" muestra la ventana de 50 años — suelta el evento en el intervalo correcto para los puntos completos.</em>',
+    step2Instr:'La línea de tiempo está establecida. Arrastra los 3 eventos restantes a la barra. <em>Al arrastrar, el intervalo en tu cursor se actualiza en vivo — suelta en el intervalo correcto para los puntos completos.</em>',
     confirmAnchors:'Confirmar anclajes →',
     anchorScore:'Puntuación de anclajes',pts:'pts',
     submitBtn:'Enviar',clearAll:'Borrar todo',menuBtn:'← Menú',
@@ -447,29 +447,36 @@ function setLang(l){
 // All events generated fresh by AI — no preset data
 
 // Returns the 50-year grid bucket a year falls into
-function yearBracket(year){
-  const bucketSize=50;
-  const bucket=Math.floor(year/bucketSize)*bucketSize;
-  const lo=bucket,hi=bucket+bucketSize-1;
-  // Format: "1450 – 1499" or "50 BC – 1 BC"
+// Dynamic bracket size based on timeline span
+function bracketSize(span){
+  if(span>2000)return 100;
+  if(span>500)return 50;
+  if(span>100)return 20;
+  if(span>20)return 5;
+  return 1;
+}
+// Max error before score hits zero — 25% of span, min 2 years
+function maxErr(span){return Math.max(2,Math.round(span*0.25));}
+
+function yearBracket(year,span){
+  const bs=bracketSize(span);
+  const bucket=Math.floor(year/bs)*bs;
+  const lo=bucket,hi=bucket+bs-1;
   function fmt(y){return y<0?Math.abs(y)+' BC':y+' AD';}
   if(lo<0&&hi>=0)return fmt(lo)+' – 1 AD';
+  if(bs===1)return fmt(lo); // exact year — just show the year
   return fmt(lo)+' – '+fmt(hi);
 }
-// Check if a placed position falls within the correct bracket for an event
 function inCorrectBracket(placedPct,eventYear,minY,maxY){
-  const range=maxY-minY||1;
-  const placedYear=Math.round(minY+placedPct*range);
-  const bucketSize=50;
-  const correctBucket=Math.floor(eventYear/bucketSize)*bucketSize;
-  const placedBucket=Math.floor(placedYear/bucketSize)*bucketSize;
-  return correctBucket===placedBucket;
+  const span=maxY-minY||1;
+  const bs=bracketSize(span);
+  const placedYear=Math.round(minY+placedPct*span);
+  return Math.floor(eventYear/bs)*bs===Math.floor(placedYear/bs)*bs;
 }
-// Show bracket for a position on the bar
 function bracketAtPct(pct,minY,maxY){
-  const range=maxY-minY||1;
-  const year=Math.round(minY+pct*range);
-  return yearBracket(year);
+  const span=maxY-minY||1;
+  const year=Math.round(minY+pct*span);
+  return yearBracket(year,span);
 }
 
 let S={
@@ -810,6 +817,7 @@ function renderStep2(lOk,rOk){
     <div style="font-size:12px;color:#666;font-family:-apple-system,sans-serif;margin-bottom:.9rem">
       ${t('anchorScore')}: <strong style="color:${S.anchorPts===40?'#5acc8a':S.anchorPts===20?'#c8903a':'#e06040'}">${S.anchorPts} ${t('pts')}</strong>
       &nbsp;·&nbsp; ${yr(minY)} → ${yr(maxY)}
+      &nbsp;·&nbsp; <span style="color:#c8903a">±${bracketSize(maxY-minY||1)} yr brackets</span>
     </div>
     <div class="plbl">${t('placeEvents')}</div>
     <div class="pool">${pH||`<span style="font-size:12px;color:#444;font-family:-apple-system,sans-serif">${t('allPlaced')}</span>`}</div>
@@ -960,20 +968,16 @@ function doSubmit(){
   const middle=sorted.slice(1,4);
   const iP={};middle.forEach(e=>{iP[e.id]=(e.year-minY)/range;});
 
-  // Graduated scoring — 20pts in correct bracket, decays linearly to 0 at 500yr error
-  const MAX_ERR=500; // years beyond which score is 0
+  // Dynamic scoring — bracket and max error scale with timeline span
+  const ME=maxErr(range);
+  const bs=bracketSize(range);
   let spacingPts=0;const sPer={};const bracketOk={};
   middle.forEach(ev=>{
     const placed=S.midP[ev.id]??0.5;
     const placedYear=Math.round(minY+placed*range);
     const errYears=Math.abs(placedYear-ev.year);
     const inBracket=inCorrectBracket(placed,ev.year,minY,maxY);
-    let score;
-    if(inBracket){
-      score=20; // full marks for correct bracket
-    } else {
-      score=Math.max(0,Math.round(20*(1-errYears/MAX_ERR)));
-    }
+    const score=inBracket?20:Math.max(0,Math.round(20*(1-errYears/ME)));
     sPer[ev.id]=score;spacingPts+=score;bracketOk[ev.id]=inBracket;
   });
 
@@ -993,7 +997,7 @@ function doSubmit(){
     });
   }
 
-  // Anchor rows — work out which was correct
+  // Anchor rows
   const lCorrect=S.anchorPts>=20;
   const rCorrect=S.anchorPts===40;
   const anchorRows=sorted.filter((_,i)=>i===0||i===4).map((ev,i)=>{
@@ -1004,11 +1008,13 @@ function doSubmit(){
 
   const middleRows=middle.map(ev=>{
     const ok=bracketOk[ev.id];const sp=sPer[ev.id];
-    const bracket=yearBracket(ev.year);
+    const bracket=yearBracket(ev.year,range);
     const placed=S.midP[ev.id]??0.5;
     const placedYear=Math.round(minY+placed*range);
     const errYears=Math.abs(placedYear-ev.year);
-    const errStr=errYears===0?'Spot on':(errYears<=50?'Within bracket ✓':`~${errYears} yr error`);
+    const unitLabel=bs===1?'yr':(bs<20?'yrs':'yr');
+    const bracketLabel=bs===1?`±1 ${unitLabel}`:`±${bs} ${unitLabel} brackets`;
+    const errStr=errYears===0?'Spot on':(ok?`Within ${bracketLabel} ✓`:`~${errYears} yr off`);
     return `<div class="res-row"><div class="dot ${ok?'ok':sp>0?'ok':'bad'}">${sp===20?'✓':sp>0?'~':'✗'}</div><div><span style="font-weight:700;color:#ffffff">${yr(ev.year)} — ${ev.name}</span><br><span style="color:#666;font-size:12px">${ev.desc}</span><br><span style="font-size:12px;color:#444">${sp}/20 ${t('pts')} · ${ok?'Correct bracket ('+bracket+')':errStr+' · Correct: '+bracket}</span></div></div>`;
   }).join('');
 
