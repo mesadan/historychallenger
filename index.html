@@ -447,75 +447,8 @@ function setLang(l){
 }
 
 /* ── GAME DATA ── */
-// Each diff has a large POOL of sets — startRound picks randomly without repeating
-const POOLS={
-  disciple:[
-    [{name:"Great Pyramid of Giza completed",year:-2560,desc:"Pharaoh Khufu's pyramid at Giza is completed, the largest ever built."},{name:"Battle of Hastings",year:1066,desc:"William the Conqueror defeats Harold II, transforming England."},{name:"Columbus reaches the Americas",year:1492,desc:"Columbus lands in the Caribbean, opening the Age of Exploration."},{name:"American Declaration of Independence",year:1776,desc:"The thirteen colonies declare independence from Britain."},{name:"First Moon landing",year:1969,desc:"Apollo 11 astronauts become the first humans to walk on the Moon."}],
-    [{name:"Julius Caesar assassinated",year:-44,desc:"Caesar is stabbed to death in the Roman Senate."},{name:"Magna Carta signed",year:1215,desc:"English barons force King John to limit royal power."},{name:"Gutenberg's printing press",year:1440,desc:"Movable type revolutionises the spread of knowledge across Europe."},{name:"French Revolution begins",year:1789,desc:"Storming of the Bastille ignites revolution reshaping Europe."},{name:"Berlin Wall falls",year:1989,desc:"East Germany opens its borders; Germany begins reunification."}],
-    [{name:"Homer composes the Iliad",year:-750,desc:"Homer's epic about the Trojan War is composed in ancient Greece."},{name:"Fall of Rome in the West",year:476,desc:"Romulus Augustulus is deposed, ending Western Roman rule."},{name:"Black Death arrives in Europe",year:1347,desc:"The bubonic plague reaches Sicily, spreading rapidly westward."},{name:"Newton publishes Principia",year:1687,desc:"Isaac Newton sets out his laws of motion and universal gravitation."},{name:"World War II ends",year:1945,desc:"Germany surrenders in May and Japan in September, ending the deadliest war in history."}],
-    [{name:"Alexander the Great dies",year:-323,desc:"Alexander dies in Babylon after conquering an empire from Greece to India."},{name:"First Crusade launched",year:1096,desc:"Pope Urban II calls for a military expedition to reclaim Jerusalem."},{name:"Magellan's fleet circumnavigates the globe",year:1522,desc:"Elcano completes the first circumnavigation after Magellan's death in the Philippines."},{name:"Napoleon crowned Emperor",year:1804,desc:"Napoleon crowns himself Emperor of the French in Notre-Dame Cathedral."},{name:"Human genome sequenced",year:2003,desc:"The Human Genome Project announces the complete sequencing of human DNA."}],
-    [{name:"Hammurabi's Code inscribed",year:-1754,desc:"Babylonian king Hammurabi publishes one of the earliest written legal codes."},{name:"Mongols sack Baghdad",year:1258,desc:"Hulagu Khan destroys the Abbasid capital, ending its golden age."},{name:"Martin Luther posts his 95 Theses",year:1517,desc:"Luther's challenge to papal authority ignites the Protestant Reformation."},{name:"First powered aeroplane flight",year:1903,desc:"The Wright Brothers achieve the first sustained powered flight at Kitty Hawk."},{name:"Hiroshima atomic bomb dropped",year:1945,desc:"The United States drops the first atomic bomb used in warfare on Hiroshima."}],
-    [{name:"Socrates executed",year:-399,desc:"The Athenian philosopher is put to death for impiety and corrupting the youth."},{name:"Battle of Agincourt",year:1415,desc:"Henry V's English forces defeat a much larger French army."},{name:"American Civil War ends",year:1865,desc:"Confederate General Lee surrenders at Appomattox, ending the Civil War."},{name:"First World War armistice",year:1918,desc:"Fighting ceases on the Western Front at 11am on 11 November."},{name:"Nelson Mandela freed",year:1990,desc:"Mandela is released from Victor Verster Prison after 27 years of imprisonment."}],
-    [{name:"Persian Wars begin",year:-499,desc:"Greek city-states in Ionia revolt against Persian rule, starting decades of conflict."},{name:"Norman Conquest of England",year:1066,desc:"William the Conqueror defeats Harold II at Hastings, reshaping English culture."},{name:"American Revolution begins",year:1775,desc:"Armed conflict breaks out between British forces and American colonists at Lexington."},{name:"Wright Brothers first flight",year:1903,desc:"Orville Wright achieves the first powered, controlled aeroplane flight."},{name:"Berlin Wall constructed",year:1961,desc:"East Germany erects a wall dividing Berlin, symbolising the Iron Curtain."}],
-    [{name:"Library of Alexandria founded",year:-285,desc:"Ptolemy II establishes the greatest library of the ancient world in Egypt."},{name:"Gunpowder invented in China",year:850,desc:"Chinese alchemists discover the formula for gunpowder during the Tang Dynasty."},{name:"Spanish Armada defeated",year:1588,desc:"England repels the Spanish Armada, altering the balance of naval power."},{name:"Russian Revolution",year:1917,desc:"Bolsheviks seize power in Russia, ending the Tsarist era."},{name:"Internet goes public",year:1991,desc:"Tim Berners-Lee launches the World Wide Web, transforming global communication."}]
-  ],
-  master:[
-    [{name:"Napoleon crowned Emperor",year:1804,desc:"Napoleon crowns himself Emperor in Notre-Dame Cathedral."},{name:"Battle of Trafalgar",year:1805,desc:"Nelson defeats the Franco-Spanish fleet, establishing British naval supremacy."},{name:"Battle of Waterloo",year:1815,desc:"Napoleon is decisively defeated by Wellington and Blucher."},{name:"Julius Caesar crosses the Rubicon",year:-49,desc:"Caesar marches into Italy, triggering civil war against the Senate."},{name:"World War I begins",year:1914,desc:"The assassination of Franz Ferdinand triggers global war."}],
-    [{name:"Mongols sack Baghdad",year:1258,desc:"Hulagu Khan destroys the Abbasid capital, ending its golden age."},{name:"Black Death arrives in Europe",year:1347,desc:"The bubonic plague reaches Sicily, spreading rapidly westward."},{name:"Fall of Constantinople",year:1453,desc:"Ottoman forces capture the Byzantine capital, ending the Eastern Roman Empire."},{name:"Roman Republic founded",year:-509,desc:"Romans expel their last king and establish a republic."},{name:"Berlin Wall falls",year:1989,desc:"East Germany opens its borders; Germany begins reunification."}],
-    [{name:"American Declaration of Independence",year:1776,desc:"The thirteen colonies formally break from British rule."},{name:"French Revolution begins",year:1789,desc:"The storming of the Bastille opens a decade of revolutionary upheaval."},{name:"Napoleon crowned Emperor",year:1804,desc:"Napoleon crowns himself Emperor in Notre-Dame Cathedral."},{name:"Battle of Marathon",year:-490,desc:"Athens defeats Persia, saving Greek democracy."},{name:"First Moon landing",year:1969,desc:"Apollo 11 astronauts become the first humans to walk on the Moon."}],
-    [{name:"Battle of Crécy",year:1346,desc:"English longbowmen devastate the French cavalry in the Hundred Years War."},{name:"Black Death reaches England",year:1348,desc:"The bubonic plague arrives in England, killing a third of the population."},{name:"Battle of Poitiers",year:1356,desc:"Edward the Black Prince defeats and captures the French king John II."},{name:"Julius Caesar born",year:-100,desc:"Gaius Julius Caesar is born into a patrician family in Rome."},{name:"Space Shuttle first launch",year:1981,desc:"Columbia lifts off, beginning the Space Shuttle programme."}],
-    [{name:"First Crusade launched",year:1096,desc:"Pope Urban II calls for a military expedition to reclaim Jerusalem."},{name:"Jerusalem captured by Crusaders",year:1099,desc:"Crusaders storm Jerusalem after a five-week siege, massacring its inhabitants."},{name:"Second Crusade begins",year:1147,desc:"Kings of France and Germany lead a major crusade following the fall of Edessa."},{name:"Alexander the Great born",year:-356,desc:"Alexander is born in Macedon, destined to conquer much of the known world."},{name:"Moon landing",year:1969,desc:"Apollo 11 lands on the Moon; Neil Armstrong takes the first steps."}],
-    [{name:"Battle of Cannae",year:-216,desc:"Hannibal annihilates a Roman army of over 50,000 at Cannae."},{name:"Battle of Zama",year:-202,desc:"Scipio Africanus defeats Hannibal, ending the Second Punic War."},{name:"Carthage destroyed",year:-146,desc:"Rome razes Carthage, salting the earth after the Third Punic War."},{name:"Battle of Waterloo",year:1815,desc:"Napoleon is decisively defeated by Wellington and Blucher."},{name:"Cold War begins",year:1947,desc:"The Truman Doctrine marks the formal start of the Cold War."}],
-    [{name:"Russian Revolution — February",year:1917,desc:"Mass protests force Nicholas II to abdicate; a provisional government forms."},{name:"October Revolution",year:1917,desc:"The Bolsheviks storm the Winter Palace and seize control of Russia."},{name:"Russian Civil War ends",year:1922,desc:"The Bolsheviks defeat the White Army; the Soviet Union is established."},{name:"Battle of Marathon",year:-490,desc:"Athens defeats the Persian invasion at Marathon."},{name:"Moon landings end",year:1972,desc:"Apollo 17 returns from the Moon; no humans have returned since."}],
-    [{name:"Peloponnesian War begins",year:-431,desc:"Athens and Sparta enter a devastating war that will last 27 years."},{name:"Athenian plague",year:-430,desc:"A devastating epidemic strikes Athens, killing up to a quarter of its population."},{name:"Sicilian Expedition",year:-415,desc:"Athens launches a disastrous military expedition against Syracuse."},{name:"Berlin Wall built",year:1961,desc:"East Germany erects the wall dividing Berlin overnight."},{name:"Berlin Wall falls",year:1989,desc:"East Germany opens its borders; the wall is demolished by jubilant crowds."}]
-  ],
-  keeper:[
-    [{name:"American Declaration of Independence",year:1776,desc:"The thirteen colonies formally break from British rule."},{name:"US Constitution drafted",year:1787,desc:"Delegates draft a new constitution at Philadelphia."},{name:"French Revolution begins",year:1789,desc:"The storming of the Bastille opens a decade of upheaval."},{name:"US Bill of Rights ratified",year:1791,desc:"The first ten amendments protect fundamental civil liberties."},{name:"Execution of Louis XVI",year:1793,desc:"King Louis XVI is guillotined during the Terror."}],
-    [{name:"World War I begins",year:1914,desc:"The assassination of Franz Ferdinand triggers global war."},{name:"Gallipoli campaign begins",year:1915,desc:"Allied forces land at Gallipoli in a failed Ottoman campaign."},{name:"Battle of the Somme",year:1916,desc:"The bloodiest battle in British history; over one million casualties."},{name:"US enters World War I",year:1917,desc:"America declares war after the Zimmermann Telegram is revealed."},{name:"Armistice ends World War I",year:1918,desc:"Fighting ceases on the Western Front at 11am on 11 November."}],
-    [{name:"Caesar crosses the Rubicon",year:-49,desc:"Caesar marches into Italy, triggering civil war against the Senate."},{name:"Caesar defeats Pompey at Pharsalus",year:-48,desc:"Caesar crushes Pompey's army in Greece; Pompey flees to Egypt."},{name:"Caesar assassinated on Ides of March",year:-44,desc:"A group of senators stab Caesar 23 times in the Theatre of Pompey."},{name:"Second Triumvirate formed",year:-43,desc:"Octavian, Antony, and Lepidus form an official ruling coalition."},{name:"Battle of Actium",year:-31,desc:"Octavian defeats Antony and Cleopatra's fleet off the Greek coast."}],
-    [{name:"Hitler becomes Chancellor",year:1933,desc:"Adolf Hitler is appointed Chancellor of Germany by President Hindenburg."},{name:"Night of the Long Knives",year:1934,desc:"Hitler orders the purge of the SA leadership and political rivals."},{name:"Nuremberg Laws enacted",year:1935,desc:"Nazi Germany enacts racial laws stripping Jews of citizenship."},{name:"Anschluss — Austria annexed",year:1938,desc:"Nazi Germany annexes Austria without military resistance."},{name:"World War II begins",year:1939,desc:"Germany invades Poland; Britain and France declare war."}],
-    [{name:"Norman Conquest of England",year:1066,desc:"William the Conqueror defeats Harold II at Hastings."},{name:"Domesday Book compiled",year:1086,desc:"William I orders a comprehensive survey of England's landholdings."},{name:"First Crusade launched",year:1096,desc:"Pope Urban II calls for an expedition to reclaim Jerusalem."},{name:"Jerusalem falls to Crusaders",year:1099,desc:"Crusaders storm Jerusalem after a five-week siege."},{name:"Henry I crowned King of England",year:1100,desc:"Henry I takes the English throne following the death of William II."}],
-    [{name:"Russian Revolution February",year:1917,desc:"Mass protests force Tsar Nicholas II to abdicate."},{name:"Lenin's April Theses published",year:1917,desc:"Lenin returns to Russia and demands immediate socialist revolution."},{name:"October Revolution",year:1917,desc:"The Bolsheviks storm the Winter Palace and take control of Russia."},{name:"Treaty of Brest-Litovsk",year:1918,desc:"Russia exits WWI, ceding vast territory to Germany."},{name:"Russian Civil War ends",year:1922,desc:"The Bolsheviks defeat the White Army; the Soviet Union is established."}],
-    [{name:"D-Day landings",year:1944,desc:"Allied forces storm the beaches of Normandy in the largest seaborne invasion in history."},{name:"Liberation of Paris",year:1944,desc:"Allied forces and French Resistance liberate Paris from German occupation."},{name:"Battle of the Bulge",year:1944,desc:"Germany launches its last major offensive on the Western Front."},{name:"V-E Day — Germany surrenders",year:1945,desc:"Nazi Germany surrenders unconditionally, ending the war in Europe."},{name:"Atomic bomb dropped on Hiroshima",year:1945,desc:"The United States drops the first atomic bomb used in warfare."}],
-    [{name:"Charles Darwin publishes Origin of Species",year:1859,desc:"Darwin sets out the theory of evolution by natural selection."},{name:"American Civil War begins",year:1861,desc:"Confederate forces fire on Fort Sumter, starting the Civil War."},{name:"Emancipation Proclamation",year:1863,desc:"Lincoln declares enslaved people in Confederate states to be free."},{name:"American Civil War ends",year:1865,desc:"Lee surrenders at Appomattox; the Union is preserved."},{name:"Lincoln assassinated",year:1865,desc:"President Lincoln is shot by John Wilkes Booth at Ford's Theatre."}]
-  ]
-};
-// Keep DIFFS for tolerance values only
-const DIFFS={disciple:{tolerance:180},master:{tolerance:60},keeper:{tolerance:20}};
+// All events generated fresh by AI — no preset data
 
-// Track which sets have been used this game
-// Shuffled queues — each diff gets a shuffled order that fully cycles before repeating
-let _queues={disciple:[],master:[],keeper:[]};
-let _lastPicked={disciple:-1,master:-1,keeper:-1};
-
-function resetQueues(){
-  _queues={disciple:[],master:[],keeper:[]};
-  _lastPicked={disciple:-1,master:-1,keeper:-1};
-}
-
-function pickSet(diff){
-  const pool=POOLS[diff];if(!pool||!pool.length)return null;
-  // Refill queue with a fresh shuffle when empty
-  if(!_queues[diff]||_queues[diff].length===0){
-    const indices=Array.from({length:pool.length},(_,i)=>i);
-    // Fisher-Yates shuffle
-    for(let i=indices.length-1;i>0;i--){
-      const j=Math.floor(Math.random()*(i+1));
-      [indices[i],indices[j]]=[indices[j],indices[i]];
-    }
-    // Avoid the last picked index being first in the new queue (prevents cross-cycle repeats)
-    if(indices.length>1&&indices[indices.length-1]===_lastPicked[diff]){
-      const swap=Math.floor(Math.random()*(indices.length-1));
-      [indices[indices.length-1],indices[swap]]=[indices[swap],indices[indices.length-1]];
-    }
-    _queues[diff]=indices;
-  }
-  const idx=_queues[diff].pop();
-  _lastPicked[diff]=idx;
-  return pool[idx];
-}
-
-/* ── BRACKET HELPERS ── */
 // Returns the 50-year grid bucket a year falls into
 function yearBracket(year){
   const bucketSize=50;
@@ -572,7 +505,7 @@ function hideOverlay(){const ov=document.getElementById('loading-overlay');if(ov
 function renderSetup(){
   document.getElementById('rn').textContent='—';
   document.getElementById('sc').textContent='—';
-  const diffKeys=Object.keys(DIFFS);
+  const diffKeys=['disciple','master','keeper'];
   const roundOpts=[3,5,10,15,20];
   const themeList=themes();
   const isThemePath=S.path==='theme';
@@ -650,38 +583,54 @@ function onCI(v){
 }
 
 async function startSeries(){
-  resetQueues();
-  S._genQueue=[];
-  S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';
+  S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';S.generatedSets=[];S._genQueue=[];
   const themeObj=S.theme!==null?themes()[S.theme]:null;
   const themeQ=S.customTheme||(themeObj?themeObj.q:null);
-  // Theme path — always generate, pass 'disciple' as default diff for the Worker spec rules
-  if(S.path==='theme'&&themeQ){
-    showOverlay(t('generatingMsg')+' <strong style="color:#fff">'+activeLabel()+'</strong><br><br>'+t('generatingWait'));
-    const ok=await generateEvents(themeQ,S.diff||'disciple');
+  const diff=S.diff||'disciple';
+
+  if(S.path==='random'){
+    // Random — AI picks everything, no theme
+    showOverlay(t('generatingWait'));
+    const ok=await callGenerate({random:true,diff,rounds:S.rounds,lang:LANG});
     hideOverlay();
     if(!ok)return;
-    // Theme path uses disciple tolerance for scoring since difficulty is variable
+    if(!S.diff)S.diff='disciple';
+  } else {
+    // Theme path
+    showOverlay(t('generatingMsg')+' <strong style="color:#fff">'+activeLabel()+'</strong><br><br>'+t('generatingWait'));
+    const ok=await callGenerate({theme:themeQ,diff,rounds:S.rounds,lang:LANG});
+    hideOverlay();
+    if(!ok)return;
     if(!S.diff)S.diff='disciple';
   }
   startRound();
 }
 
-async function generateEvents(themeQ,diffOverride){
+async function callGenerate(payload){
   try{
-    const res=await fetch(WORKER,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({theme:themeQ,diff:diffOverride||S.diff||'disciple',rounds:Math.min(S.rounds,8),lang:LANG})
-    });
+    const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const data=await res.json();
-    if(data.error){renderSetup();const el=document.getElementById('theme-err');if(el){el.textContent=data.error;el.style.display='block';}return false;}
+    if(data.error){
+      renderSetup();
+      const el=document.getElementById('theme-err');
+      if(el){el.textContent=data.error;el.style.display='block';}
+      return false;
+    }
     const sets=[];
     if(data.sets&&Array.isArray(data.sets)){data.sets.forEach(s=>{if(Array.isArray(s)&&s.length===5)sets.push(s);});}
-    if(!sets.length){renderSetup();const el=document.getElementById('theme-err');if(el){el.textContent=t('noSets');el.style.display='block';}return false;}
-    S.generatedSets=sets;return true;
+    if(!sets.length){
+      renderSetup();
+      const el=document.getElementById('theme-err');
+      if(el){el.textContent=t('noSets');el.style.display='block';}
+      return false;
+    }
+    S.generatedSets=sets;
+    return true;
   }catch(e){
-    renderSetup();const el=document.getElementById('theme-err');if(el){el.textContent=t('connError');el.style.display='block';}return false;
+    renderSetup();
+    const el=document.getElementById('theme-err');
+    if(el){el.textContent=t('connError');el.style.display='block';}
+    return false;
   }
 }
 
@@ -689,54 +638,18 @@ function startRound(){
   S.submitted=false;S.step=1;S.anchorPts=0;
   S.midP={};S.aLeft=null;S.aRight=null;
   S.dragId=null;S.dragFrom=null;S.ghostName='';S.selectedCard=null;
-  let raw;
-  if(S.generatedSets.length>0){
-    // Pick from generated sets without repeating — use a separate queue
-    if(!S._genQueue||S._genQueue.length===0){
-      const gi=Array.from({length:S.generatedSets.length},(_,i)=>i);
-      for(let i=gi.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[gi[i],gi[j]]=[gi[j],gi[i]];}
-      S._genQueue=gi;
-    }
-    raw=S.generatedSets[S._genQueue.pop()];
-  } else {
-    raw=pickSet(S.diff);
-    if(!raw){const keys=Object.keys(POOLS);raw=POOLS[keys[0]][0];}
+  // Pick next set from generated queue (no repeats within a session)
+  if(!S._genQueue||S._genQueue.length===0){
+    const gi=Array.from({length:S.generatedSets.length},(_,i)=>i);
+    for(let i=gi.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[gi[i],gi[j]]=[gi[j],gi[i]];}
+    S._genQueue=gi;
   }
+  const raw=S.generatedSets[S._genQueue.pop()];
+  S.events=raw.map((e,i)=>({...e,id:'e'+i}));
+  shuffle(S.events);
   document.getElementById('rn').textContent=(S.round+1)+'/'+S.rounds;
   updSc();
-  // Translate curated sets if non-English (AI-generated sets are already in the right language)
-  const needsTranslation=LANG!=='en'&&S.generatedSets.length===0;
-  if(needsTranslation){
-    // Show brief overlay while translating
-    showOverlay(t('generatingWait'));
-    translateEvents(raw).then(translated=>{
-      hideOverlay();
-      S.events=translated.map((e,i)=>({...e,id:'e'+i}));
-      shuffle(S.events);
-      renderStep1();
-    });
-  } else {
-    S.events=raw.map((e,i)=>({...e,id:'e'+i}));
-    shuffle(S.events);
-    renderStep1();
-  }
-}
-
-async function translateEvents(events){
-  try{
-    const res=await fetch(WORKER,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'translate',events,lang:LANG})
-    });
-    const data=await res.json();
-    if(data.events&&Array.isArray(data.events)&&data.events.length===events.length){
-      return data.events;
-    }
-    return events; // fallback to English on any issue
-  }catch(e){
-    return events; // silent fallback
-  }
+  renderStep1();
 }
 
 function updSc(){document.getElementById('sc').textContent=S.roundsPlayed>0?Math.round(S.totalPct/S.roundsPlayed)+'%':'—';}
@@ -1164,7 +1077,7 @@ function showFinal(){
   document.getElementById('rn').textContent=t('round');
 }
 
-function beginGame(){S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';resetQueues();S._genQueue=[];startRound();}
+function beginGame(){S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';S.generatedSets=[];S._genQueue=[];startRound();}
 function restartSetup(){S.phase='setup';S.path=null;S.diff=null;S.rounds=5;S.generatedSets=[];S.theme=null;S.customTheme='';renderSetup();}
 renderSetup();
 </script>

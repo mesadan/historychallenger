@@ -27,9 +27,7 @@ export default {
     // ── ROUTE: translate ──────────────────────────────────────────────
     if (body.action === 'translate') {
       const { events, lang } = body;
-      if (!events || !lang || lang === 'en') {
-        return json({ events }, 200); // no-op for English
-      }
+      if (!events || !lang || lang === 'en') return json({ events }, 200);
       const outputLang = langNames[lang] || 'English';
 
       const prompt = `Translate the following historical event names and descriptions into ${outputLang}.
@@ -42,50 +40,73 @@ Events to translate:
 ${JSON.stringify(events)}`;
 
       try {
-        const res = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey,
-            'anthropic-version': '2023-06-01'
-          },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-5',
-            max_tokens: 1000,
-            messages: [{ role: 'user', content: prompt }]
-          })
-        });
-
-        const data = await res.json();
-        if (data.error || !data.content) {
-          // On translation failure, return original English events
-          return json({ events }, 200);
-        }
-
-        const raw = data.content.map(b => b.text || '').join('');
-        const clean = raw.replace(/```json|```/g, '').trim();
-        const parsed = JSON.parse(clean);
+        const res = await callClaude(apiKey, prompt, 1000);
+        const parsed = JSON.parse(res);
         return json({ events: parsed.events }, 200);
-
-      } catch (err) {
-        // On any error, fall back to English silently
-        return json({ events }, 200);
+      } catch {
+        return json({ events }, 200); // silent fallback to English
       }
     }
 
-    // ── ROUTE: generate ───────────────────────────────────────────────
-    const { theme, diff, rounds, lang } = body;
-    if (!theme || !diff) return json({ error: 'Missing theme or difficulty.' }, 400);
+    // ── ROUTE: generate (theme or random) ────────────────────────────
+    const { theme, diff, rounds, lang, random } = body;
+    if (!diff) return json({ error: 'Missing difficulty.' }, 400);
 
     const outputLang = langNames[lang] || 'English';
+    const needed = Math.min(rounds || 5, 20); // support up to 20 rounds
 
-    const themeRules = {
-      disciple: `DIFFICULTY — DISCIPLE (theme mode): Select the 5 most famous, universally recognised events within this theme. Events should be as spread out in time as possible.`,
-      master: `DIFFICULTY — MASTER (theme mode): Select notable but non-obvious events requiring real knowledge. Events should have moderate time gaps.`,
-      keeper: `DIFFICULTY — KEEPER OF TIME (theme mode): Select specific, obscure events close together in time — same decade, campaign, or year.`
-    };
+    let SYS, prompt;
 
-    const SYS = `You are a historical fact database modelled on the Encyclopaedia Britannica, with a content moderation role.
+    if (random) {
+      // Random mode — AI picks the theme and era mix itself
+      const randomRules = {
+        disciple: `You are generating events for a history quiz at DISCIPLE level.
+Rules for random mode:
+- Choose ${needed} completely different historical themes or eras — one per set. Do not repeat themes across sets.
+- Each set must span at least 3 distinct historical eras (ancient, medieval, early modern, modern, contemporary).
+- Events should be famous, widely recognised milestones that anyone with basic education would know.
+- Events within each set should be as far apart in time as possible to make spacing forgiving.
+- No event should appear in more than one set.`,
+        master: `You are generating events for a history quiz at MASTER level.
+Rules for random mode:
+- Choose ${needed} different historical themes or eras — one per set. Do not repeat themes.
+- Each set: 3 events from one era or topic, 2 outlier events from very different periods.
+- Events should require real historical knowledge beyond just headlines.
+- No event should appear in more than one set.`,
+        keeper: `You are generating events for a history quiz at KEEPER OF TIME level.
+Rules for random mode:
+- Choose ${needed} different tight historical periods — one per set. Do not repeat periods.
+- Each set: all 5 events within the same era, campaign, or conflict. Events may be years or months apart.
+- Events should be specific and require expert knowledge.
+- No event should appear in more than one set.`
+      };
+
+      SYS = `You are a historical fact database modelled on the Encyclopaedia Britannica.
+${randomRules[diff] || randomRules.disciple}
+
+For all events:
+1. Every event must be real and verifiable with a confirmed year. BC = negative integer.
+2. Event names: 4-8 words, Britannica article title style.
+3. Descriptions: one declarative sentence, past tense, factually grounded.
+4. Write all event names and descriptions in ${outputLang}.`;
+
+      prompt = `Generate ${needed} sets of exactly 5 historical events for a history quiz game.
+Each set must have a different theme or era. No event may appear in more than one set.
+
+Return ONLY valid JSON, no markdown:
+{"sets":[[{"name":"Event name","year":1234,"desc":"One factual sentence."}]]}`;
+
+    } else {
+      // Theme mode — focus on the chosen theme
+      if (!theme) return json({ error: 'Missing theme.' }, 400);
+
+      const themeRules = {
+        disciple: `Select the most famous, universally recognised events within this theme. Events should be as spread out in time as possible within the theme.`,
+        master: `Select notable but non-obvious events requiring real knowledge beyond headlines. Moderate time gaps between events.`,
+        keeper: `Select specific, obscure events close together in time — same decade, campaign, or year. Expert knowledge required.`
+      };
+
+      SYS = `You are a historical fact database modelled on the Encyclopaedia Britannica, with a content moderation role.
 
 First, evaluate whether the requested theme is suitable for a history quiz game. Reject it if it is:
 - Offensive, rude, or inappropriate
@@ -93,60 +114,60 @@ First, evaluate whether the requested theme is suitable for a history quiz game.
 - So hyper-specific that 5 distinct verifiable events cannot be found
 - A living person or very recent event (post-2000)
 
-If the theme is unsuitable, return exactly: {"error":"<friendly explanation in ${outputLang}, one sentence, suggest an alternative if possible>"}
+If unsuitable, return exactly: {"error":"<friendly explanation in ${outputLang}, one sentence>"}
 
-If suitable, generate the events following ALL of these rules:
+If suitable:
 1. Every event must be real and verifiable with a confirmed year. BC = negative integer.
-2. THEME FIDELITY — every event must be directly and specifically about the requested theme.
+2. THEME FIDELITY — every event must be directly about the requested theme. Zero exceptions.
 3. Event names: 4-8 words, Britannica article title style.
 4. Descriptions: one declarative sentence, past tense, factually grounded.
 5. Do not repeat events across sets.
 6. Vary event types within each set.
-7. LANGUAGE: Write all event names and descriptions in ${outputLang}.
+7. Write all event names and descriptions in ${outputLang}.
 8. ${themeRules[diff] || themeRules.disciple}`;
 
-    const needed = Math.min(rounds || 5, 8);
-    const prompt = `Generate ${needed} sets of exactly 5 historical events, ALL specifically about: "${theme}".
+      prompt = `Generate ${needed} sets of exactly 5 historical events, ALL specifically about: "${theme}".
 
 DIFFICULTY: ${diff.toUpperCase()}
 OUTPUT LANGUAGE: ${outputLang}
 
 Return ONLY valid JSON, no markdown:
 {"sets":[[{"name":"Event name","year":1234,"desc":"One factual sentence."}]]}`;
+    }
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-5',
-          max_tokens: 3000,
-          system: SYS,
-          messages: [{ role: 'user', content: prompt }]
-        })
-      });
-
-      const data = await res.json();
-      if (data.error || !data.content) {
-        return json({ error: 'API error: ' + (data.error?.message || JSON.stringify(data)) }, 500);
-      }
-
-      const raw = data.content.map(b => b.text || '').join('');
-      const clean = raw.replace(/```json|```/g, '').trim();
-      const parsed = JSON.parse(clean);
-
+      const raw = await callClaude(apiKey, prompt, 4000, SYS);
+      const parsed = JSON.parse(raw);
       if (parsed.error) return json({ error: parsed.error }, 422);
       return json(parsed, 200);
-
     } catch (err) {
       return json({ error: 'Generation failed: ' + err.message }, 500);
     }
   }
 };
+
+async function callClaude(apiKey, prompt, maxTokens, system) {
+  const messages = [{ role: 'user', content: prompt }];
+  const body = { model: 'claude-sonnet-4-5', max_tokens: maxTokens, messages };
+  if (system) body.system = system;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify(body)
+  });
+
+  const data = await res.json();
+  if (data.error || !data.content) {
+    throw new Error(data.error?.message || 'API error');
+  }
+  const raw = data.content.map(b => b.text || '').join('');
+  return raw.replace(/```json|```/g, '').trim();
+}
 
 function json(data, status) {
   return new Response(JSON.stringify(data), {
