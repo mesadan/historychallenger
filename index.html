@@ -486,9 +486,11 @@ const DIFFS={disciple:{tolerance:180},master:{tolerance:60},keeper:{tolerance:20
 // Track which sets have been used this game
 // Shuffled queues — each diff gets a shuffled order that fully cycles before repeating
 let _queues={disciple:[],master:[],keeper:[]};
+let _lastPicked={disciple:-1,master:-1,keeper:-1};
 
 function resetQueues(){
   _queues={disciple:[],master:[],keeper:[]};
+  _lastPicked={disciple:-1,master:-1,keeper:-1};
 }
 
 function pickSet(diff){
@@ -501,9 +503,16 @@ function pickSet(diff){
       const j=Math.floor(Math.random()*(i+1));
       [indices[i],indices[j]]=[indices[j],indices[i]];
     }
+    // Avoid the last picked index being first in the new queue (prevents cross-cycle repeats)
+    if(indices.length>1&&indices[indices.length-1]===_lastPicked[diff]){
+      const swap=Math.floor(Math.random()*(indices.length-1));
+      [indices[indices.length-1],indices[swap]]=[indices[swap],indices[indices.length-1]];
+    }
     _queues[diff]=indices;
   }
-  return pool[_queues[diff].pop()];
+  const idx=_queues[diff].pop();
+  _lastPicked[diff]=idx;
+  return pool[idx];
 }
 
 /* ── BRACKET HELPERS ── */
@@ -535,7 +544,7 @@ function bracketAtPct(pct,minY,maxY){
 
 let S={
   phase:'setup',path:null,diff:null,rounds:5,round:0,
-  theme:null,customTheme:'',generatedSets:[],
+  theme:null,customTheme:'',generatedSets:[],_genQueue:[],
   totalPct:0,roundsPlayed:0,
   events:[],midP:{},aLeft:null,aRight:null,
   step:1,anchorPts:0,
@@ -641,7 +650,8 @@ function onCI(v){
 }
 
 async function startSeries(){
-  resetQueues(); // fresh shuffle every time a new game starts
+  resetQueues();
+  S._genQueue=[];
   S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';
   const themeObj=S.theme!==null?themes()[S.theme]:null;
   const themeQ=S.customTheme||(themeObj?themeObj.q:null);
@@ -681,7 +691,13 @@ function startRound(){
   S.dragId=null;S.dragFrom=null;S.ghostName='';S.selectedCard=null;
   let raw;
   if(S.generatedSets.length>0){
-    raw=S.generatedSets[S.round%S.generatedSets.length];
+    // Pick from generated sets without repeating — use a separate queue
+    if(!S._genQueue||S._genQueue.length===0){
+      const gi=Array.from({length:S.generatedSets.length},(_,i)=>i);
+      for(let i=gi.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[gi[i],gi[j]]=[gi[j],gi[i]];}
+      S._genQueue=gi;
+    }
+    raw=S.generatedSets[S._genQueue.pop()];
   } else {
     raw=pickSet(S.diff);
     if(!raw){const keys=Object.keys(POOLS);raw=POOLS[keys[0]][0];}
@@ -1148,7 +1164,7 @@ function showFinal(){
   document.getElementById('rn').textContent=t('round');
 }
 
-function beginGame(){S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';resetQueues();startRound();}
+function beginGame(){S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';resetQueues();S._genQueue=[];startRound();}
 function restartSetup(){S.phase='setup';S.path=null;S.diff=null;S.rounds=5;S.generatedSets=[];S.theme=null;S.customTheme='';renderSetup();}
 renderSetup();
 </script>
