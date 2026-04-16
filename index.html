@@ -98,11 +98,13 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
 .instr{font-size:13px;color:#aaa;line-height:1.6;margin-bottom:1rem;padding:10px 13px;background:#111;border-radius:8px;border-left:3px solid #c8903a;font-family:-apple-system,sans-serif}
 .plbl{font-size:10px;color:#444;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-family:-apple-system,sans-serif}
 .pool{display:flex;flex-wrap:wrap;gap:7px;min-height:44px;padding:7px;border:1px solid #1e1e1e;border-radius:8px;margin-bottom:1.25rem;align-items:flex-start;background:#080808}
-.ecard{background:#111;border:1px solid #2a2a2a;border-radius:7px;padding:8px 12px;font-size:12px;cursor:grab;user-select:none;color:#ffffff;line-height:1.4;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent}
+.ecard{background:#111;border:1px solid #2a2a2a;border-radius:7px;padding:8px 12px;font-size:12px;cursor:grab;user-select:none;-webkit-user-select:none;color:#ffffff;line-height:1.4;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent;touch-action:none}
 .ecard:hover{border-color:#555;background:#181818}
 .ecard:active{cursor:grabbing}
 .ecard-sel{border-color:#c8903a!important;background:#1a1000!important;color:#c8903a!important;font-weight:600}
 .ecard.selected-card{border-color:#c8903a;background:#1a1000;color:#c8903a;font-weight:600}
+/* Floating ghost that follows finger during touch drag */
+#touch-ghost{position:fixed;pointer-events:none;z-index:999;background:#c8903a;color:#000;font-family:-apple-system,sans-serif;font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;white-space:nowrap;display:none;transform:translate(-50%,-130%);max-width:200px;text-align:center}
 
 /* TIMELINE */
 .tl-section{margin-bottom:1.25rem}
@@ -179,6 +181,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
   </div>
 </div>
 <div class="tl-tooltip" id="tl-tooltip"></div>
+<div id="touch-ghost"></div>
 
 <script>
 const WORKER='https://histroychallenger-api.maletethan.workers.dev';
@@ -666,9 +669,10 @@ function renderStep1(){
   const anchored=new Set([S.aLeft?.id,S.aRight?.id].filter(Boolean));
   const pool=S.events.filter(e=>!anchored.has(e.id));
 
-  const pH=pool.map(e=>`<div class="ecard${S.sel===e.id?' ecard-sel':''}"
+  const pH=pool.map(e=>`<div class="ecard"
     draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()"
-    onclick="tapCard1('${e.id}')">${e.name}</div>`).join('');
+    ontouchstart="tdStart(event,'${e.id}')" ontouchmove="tdMove(event)" ontouchend="tdEnd1(event)"
+    >${e.name}</div>`).join('');
 
   const lP=`<span style="font-size:10px;color:#555;font-family:-apple-system,sans-serif">${mob?t('tapEarliest'):t('dropEarliest')}</span>`;
   const rP=`<span style="font-size:10px;color:#555;font-family:-apple-system,sans-serif">${mob?t('tapRecent'):t('dropRecent')}</span>`;
@@ -678,7 +682,6 @@ function renderStep1(){
   document.getElementById('body').innerHTML=`
     <div class="step-badge">${t('step1')}</div>
     <div class="step-instr">${t('step1Instr')}${tTag?'<br>'+tTag:''}</div>
-    ${mob?`<p style="font-size:11px;color:#555;font-family:-apple-system,sans-serif;margin-bottom:6px;font-style:italic">Tap a card to select it, then tap an anchor box to place it.</p>`:''}
     <div class="plbl">${t('placeEvents')}</div>
     <div class="pool">${pH||`<span style="font-size:12px;color:#444;font-family:-apple-system,sans-serif">${t('allPlaced')}</span>`}</div>
     <div class="tl-section"><div class="tl-outer">
@@ -733,9 +736,10 @@ function renderStep2(lOk,rOk){
   const placed=new Set(Object.keys(S.midP));
   const pool=middle.filter(e=>!placed.has(e.id));
 
-  const pH=pool.map(e=>`<div class="ecard${S.sel===e.id?' ecard-sel':''}"
+  const pH=pool.map(e=>`<div class="ecard"
     draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()"
-    onclick="tapCard2('${e.id}')">${e.name}</div>`).join('');
+    ontouchstart="tdStart(event,'${e.id}')" ontouchmove="tdMove(event)" ontouchend="tdEnd2(event)"
+    >${e.name}</div>`).join('');
 
   let pins='';
   for(const [id,pct] of Object.entries(S.midP)){
@@ -762,7 +766,6 @@ function renderStep2(lOk,rOk){
       ${t('anchorScore')}: <strong style="color:${S.anchorPts===40?'#5acc8a':S.anchorPts===20?'#c8903a':'#e06040'}">${S.anchorPts} ${t('pts')}</strong>
       &nbsp;·&nbsp; ${yr(minY)} → ${yr(maxY)}
     </div>
-    ${mob?`<p style="font-size:11px;color:#555;font-family:-apple-system,sans-serif;margin-bottom:6px;font-style:italic">Tap a card to select it, then tap the bar to place it. Tap a placed card to remove it.</p>`:''}
     <div class="plbl">${t('placeEvents')}</div>
     <div class="pool">${pH||`<span style="font-size:12px;color:#444;font-family:-apple-system,sans-serif">${t('allPlaced')}</span>`}</div>
     <div class="tl-section"><div class="tl-outer">
@@ -789,9 +792,9 @@ function renderStep2(lOk,rOk){
         </div>
         <div class="tl-anchor-line"></div>
       </div>
-      <div class="tl-mobile-bar" id="mobile-bar" onclick="tapBar2(event)" data-miny="${minY}" data-maxy="${maxY}">
+      <div class="tl-mobile-bar" id="mobile-bar" data-miny="${minY}" data-maxy="${maxY}">
         <div class="tl-mobile-track"></div>
-        ${Object.keys(S.midP).length===0?`<div class="tl-mobile-hint">Tap a card above, then tap here</div>`:''}
+        ${Object.keys(S.midP).length===0?`<div class="tl-mobile-hint">Hold & drag a card onto this bar</div>`:''}
         ${mobPins}
       </div>
     </div></div>
@@ -836,31 +839,74 @@ function bDr(e){
   S.midP[S.dragId]=gPct(e);renderStep2();
 }
 
-/* ── TAP (mobile) ── */
-function tapCard1(id){S.sel=S.sel===id?null:id;renderStep1();}
+/* ── TOUCH DRAG ── */
+let _td={id:null,name:''};
+
+function tdStart(e,id){
+  e.preventDefault();
+  _td.id=id;
+  const ev=S.events.find(x=>x.id===id);_td.name=ev?ev.name:'';
+  const g=document.getElementById('touch-ghost');
+  if(g){g.textContent=_td.name;g.style.display='block';}
+  const t0=e.touches[0];_tdMoveXY(t0.clientX,t0.clientY);
+}
+function tdMove(e){
+  if(!_td.id)return;e.preventDefault();
+  const t0=e.touches[0];_tdMoveXY(t0.clientX,t0.clientY);
+}
+function _tdMoveXY(x,y){
+  const g=document.getElementById('touch-ghost');
+  if(g){g.style.left=x+'px';g.style.top=y+'px';}
+  // Show bracket tooltip if over mobile bar
+  const bar=document.getElementById('mobile-bar');
+  if(bar){
+    const r=bar.getBoundingClientRect();
+    if(y>=r.top-40&&y<=r.bottom+40){
+      const pct=Math.max(0,Math.min(1,(x-r.left)/r.width));
+      const minY=parseInt(bar.dataset.miny);const maxY=parseInt(bar.dataset.maxy);
+      if(!isNaN(minY))showTooltip(x,r.top-8,bracketAtPct(pct,minY,maxY));
+      return;
+    }
+  }
+  hideTooltip();
+}
+function tdEnd1(e){
+  hideTooltip();
+  const g=document.getElementById('touch-ghost');if(g)g.style.display='none';
+  if(!_td.id)return;
+  const ev=S.events.find(v=>v.id===_td.id);
+  if(ev){
+    const t0=e.changedTouches[0];const x=t0.clientX,y=t0.clientY;
+    const dl=document.getElementById('dl');
+    if(dl){const r=dl.getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top-20&&y<=r.bottom+20){S.aLeft=ev;_td={id:null,name:''};renderStep1();return;}}
+    const dr=document.getElementById('dr');
+    if(dr){const r=dr.getBoundingClientRect();if(x>=r.left&&x<=r.right&&y>=r.top-20&&y<=r.bottom+20){S.aRight=ev;_td={id:null,name:''};renderStep1();return;}}
+  }
+  _td={id:null,name:''};
+}
+function tdEnd2(e){
+  hideTooltip();
+  const g=document.getElementById('touch-ghost');if(g)g.style.display='none';
+  if(!_td.id)return;
+  const t0=e.changedTouches[0];const x=t0.clientX,y=t0.clientY;
+  const bar=document.getElementById('mobile-bar');
+  if(bar){
+    const r=bar.getBoundingClientRect();
+    if(y>=r.top-50&&y<=r.bottom+50){
+      const pct=Math.max(0.02,Math.min(0.98,(x-r.left)/r.width));
+      S.midP[_td.id]=pct;_td={id:null,name:''};renderStep2();return;
+    }
+  }
+  _td={id:null,name:''};
+}
+// Keep tapAnchor1 for desktop click-to-remove anchors
 function tapAnchor1(side){
-  if(side==='unset-left'){S.aLeft=null;S.sel=null;renderStep1();return;}
-  if(side==='unset-right'){S.aRight=null;S.sel=null;renderStep1();return;}
-  if(!S.sel)return;
-  const ev=S.events.find(x=>x.id===S.sel);if(!ev)return;
-  if(side==='left')S.aLeft=ev;else S.aRight=ev;
-  S.sel=null;renderStep1();
+  if(side==='unset-left'){S.aLeft=null;renderStep1();}
+  else if(side==='unset-right'){S.aRight=null;renderStep1();}
 }
-// Step 2 taps
-function tapCard2(id){
-  if(S.midP[id]){delete S.midP[id];S.sel=null;renderStep2();return;}
-  S.sel=S.sel===id?null:id;renderStep2();
-}
-function tapBar2(e){
-  if(!S.sel)return;
-  const bar=document.getElementById('mobile-bar');if(!bar)return;
-  const r=bar.getBoundingClientRect();
-  const pct=Math.max(0.02,Math.min(0.98,(e.clientX-r.left)/r.width));
-  const ev=S.events.find(x=>x.id===S.sel);if(!ev)return;
-  S.midP[S.sel]=pct;S.sel=null;renderStep2();
-}
-function tapPin2(id){delete S.midP[id];S.sel=null;renderStep2();}
-function clearMiddle(){S.midP={};S.sel=null;renderStep2();}
+function tapPin2(id){delete S.midP[id];renderStep2();}
+function clearMiddle(){S.midP={};renderStep2();}
+
 function doSubmit(){
   if(Object.keys(S.midP).length<3||S.submitted)return;
   S.submitted=true;
