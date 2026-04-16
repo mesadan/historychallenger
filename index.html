@@ -586,23 +586,67 @@ function onCI(v){
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
 }
 
+// ── ERA + GEOGRAPHY ROTATION ──
+// Each session gets a shuffled sequence of era/region combos
+const ERA_GEO=[
+  {era:'Bronze Age (3000–1200 BC)',geo:'Middle East and Mediterranean'},
+  {era:'Iron Age (1200–500 BC)',geo:'Greece, Persia, and the Near East'},
+  {era:'Classical Antiquity (500 BC–500 AD)',geo:'Rome and the Mediterranean world'},
+  {era:'Classical Antiquity (500 BC–500 AD)',geo:'China, India, and Central Asia'},
+  {era:'Early Medieval (500–1000 AD)',geo:'Europe and Byzantium'},
+  {era:'Early Medieval (500–1000 AD)',geo:'Islamic world and North Africa'},
+  {era:'High Medieval (1000–1300 AD)',geo:'Europe, the Crusader states, and the Mongol empire'},
+  {era:'Late Medieval (1300–1500 AD)',geo:'Europe, Ottoman Empire, and East Asia'},
+  {era:'Renaissance and Reformation (1400–1600)',geo:'Western Europe'},
+  {era:'Age of Exploration (1450–1700)',geo:'The Americas, Africa, and the new global trade routes'},
+  {era:'Early Modern (1600–1750)',geo:'Europe, Mughal India, and Qing China'},
+  {era:'Enlightenment and Revolution (1700–1830)',geo:'Europe and the Americas'},
+  {era:'19th Century (1800–1900)',geo:'Europe, the Ottoman Empire, and the colonial world'},
+  {era:'19th Century (1800–1900)',geo:'Asia, Africa, and the Americas'},
+  {era:'World War I era (1910–1925)',geo:'Europe and the Middle East'},
+  {era:'Interwar and Depression (1919–1939)',geo:'Global'},
+  {era:'World War II (1939–1945)',geo:'Europe and North Africa'},
+  {era:'World War II (1939–1945)',geo:'Asia and the Pacific'},
+  {era:'Early Cold War (1945–1965)',geo:'Global superpower rivalry'},
+  {era:'Late Cold War (1965–1991)',geo:'Vietnam, Latin America, and the Middle East'},
+  {era:'History of Science and Technology (any era)',geo:'Global'},
+  {era:'History of Medicine and Public Health (any era)',geo:'Global'},
+  {era:'History of Aviation and Space Exploration',geo:'Global'},
+  {era:'Ancient Asian Civilisations',geo:'China, Japan, India, and Southeast Asia'},
+];
+let _eraQueue=[];
+function nextEraGeo(){
+  if(_eraQueue.length===0){
+    _eraQueue=[...ERA_GEO];
+    for(let i=_eraQueue.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[_eraQueue[i],_eraQueue[j]]=[_eraQueue[j],_eraQueue[i]];}
+  }
+  return _eraQueue.pop();
+}
+
+// ── SESSION EXCLUSION LIST ──
+let _seenEvents=new Set(); // event names seen this browser session
+function recordSeenEvents(sets){
+  sets.forEach(set=>set.forEach(ev=>{if(ev.name)_seenEvents.add(ev.name);}));
+}
+
 async function startSeries(){
   S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';S.generatedSets=[];S._genQueue=[];
   const themeObj=S.theme!==null?themes()[S.theme]:null;
   const themeQ=S.customTheme||(themeObj?themeObj.q:null);
   const diff=S.diff||'disciple';
+  const excluded=Array.from(_seenEvents).slice(-60); // send up to 60 recently seen events
 
   if(S.path==='random'){
-    // Random — AI picks everything, no theme
     showOverlay(t('generatingWait'));
-    const ok=await callGenerate({random:true,diff,rounds:Math.min(S.rounds,10),lang:LANG});
+    // Assign era/geo combos per round for structural variety
+    const eraGeos=Array.from({length:Math.min(S.rounds,10)},()=>nextEraGeo());
+    const ok=await callGenerate({random:true,diff,rounds:Math.min(S.rounds,10),lang:LANG,excluded,eraGeos});
     hideOverlay();
     if(!ok)return;
     if(!S.diff)S.diff='disciple';
   } else {
-    // Theme path
     showOverlay(t('generatingMsg')+' <strong style="color:#fff">'+activeLabel()+'</strong><br><br>'+t('generatingWait'));
-    const ok=await callGenerate({theme:themeQ,diff,rounds:Math.min(S.rounds,10),lang:LANG});
+    const ok=await callGenerate({theme:themeQ,diff,rounds:Math.min(S.rounds,10),lang:LANG,excluded});
     hideOverlay();
     if(!ok)return;
     if(!S.diff)S.diff='disciple';
@@ -631,6 +675,7 @@ async function callGenerate(payload){
       return false;
     }
     S.generatedSets=sets;
+    recordSeenEvents(sets);
     return true;
   }catch(e){
     hideOverlay();
