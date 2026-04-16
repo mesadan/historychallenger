@@ -591,14 +591,14 @@ async function startSeries(){
   if(S.path==='random'){
     // Random — AI picks everything, no theme
     showOverlay(t('generatingWait'));
-    const ok=await callGenerate({random:true,diff,rounds:S.rounds,lang:LANG});
+    const ok=await callGenerate({random:true,diff,rounds:Math.min(S.rounds,10),lang:LANG});
     hideOverlay();
     if(!ok)return;
     if(!S.diff)S.diff='disciple';
   } else {
     // Theme path
     showOverlay(t('generatingMsg')+' <strong style="color:#fff">'+activeLabel()+'</strong><br><br>'+t('generatingWait'));
-    const ok=await callGenerate({theme:themeQ,diff,rounds:S.rounds,lang:LANG});
+    const ok=await callGenerate({theme:themeQ,diff,rounds:Math.min(S.rounds,10),lang:LANG});
     hideOverlay();
     if(!ok)return;
     if(!S.diff)S.diff='disciple';
@@ -611,6 +611,7 @@ async function callGenerate(payload){
     const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const data=await res.json();
     if(data.error){
+      hideOverlay();
       renderSetup();
       const el=document.getElementById('theme-err');
       if(el){el.textContent=data.error;el.style.display='block';}
@@ -619,6 +620,7 @@ async function callGenerate(payload){
     const sets=[];
     if(data.sets&&Array.isArray(data.sets)){data.sets.forEach(s=>{if(Array.isArray(s)&&s.length===5)sets.push(s);});}
     if(!sets.length){
+      hideOverlay();
       renderSetup();
       const el=document.getElementById('theme-err');
       if(el){el.textContent=t('noSets');el.style.display='block';}
@@ -627,9 +629,10 @@ async function callGenerate(payload){
     S.generatedSets=sets;
     return true;
   }catch(e){
+    hideOverlay();
     renderSetup();
     const el=document.getElementById('theme-err');
-    if(el){el.textContent=t('connError');el.style.display='block';}
+    if(el){el.textContent=t('connError')+' ('+e.message+')';el.style.display='block';}
     return false;
   }
 }

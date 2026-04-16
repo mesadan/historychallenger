@@ -53,7 +53,7 @@ ${JSON.stringify(events)}`;
     if (!diff) return json({ error: 'Missing difficulty.' }, 400);
 
     const outputLang = langNames[lang] || 'English';
-    const needed = Math.min(rounds || 5, 20); // support up to 20 rounds
+    const needed = Math.min(rounds || 5, 10); // cap at 10 to avoid timeout
 
     let SYS, prompt;
 
@@ -136,7 +136,7 @@ Return ONLY valid JSON, no markdown:
     }
 
     try {
-      const raw = await callClaude(apiKey, prompt, 4000, SYS);
+      const raw = await callClaude(apiKey, prompt, 8000, SYS);
       const parsed = JSON.parse(raw);
       if (parsed.error) return json({ error: parsed.error }, 422);
       return json(parsed, 200);
