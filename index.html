@@ -101,6 +101,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
 .ecard{background:#111;border:1px solid #2a2a2a;border-radius:7px;padding:8px 12px;font-size:12px;cursor:grab;user-select:none;color:#ffffff;line-height:1.4;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent}
 .ecard:hover{border-color:#555;background:#181818}
 .ecard:active{cursor:grabbing}
+.ecard-sel{border-color:#c8903a!important;background:#1a1000!important;color:#c8903a!important;font-weight:600}
 .ecard.selected-card{border-color:#c8903a;background:#1a1000;color:#c8903a;font-weight:600}
 
 /* TIMELINE */
@@ -473,7 +474,7 @@ let S={
   theme:null,customTheme:'',generatedSets:[],_genQueue:[],
   totalPct:0,roundsPlayed:0,
   events:[],midP:{},aLeft:null,aRight:null,
-  step:1,anchorPts:0,
+  step:1,anchorPts:0,sel:null,
   submitted:false,dragId:null,dragFrom:null,ghostName:''
 };
 
@@ -638,7 +639,7 @@ async function callGenerate(payload){
 }
 
 function startRound(){
-  S.submitted=false;S.step=1;S.anchorPts=0;
+  S.submitted=false;S.step=1;S.anchorPts=0;S.sel=null;
   S.midP={};S.aLeft=null;S.aRight=null;
   S.dragId=null;S.dragFrom=null;S.ghostName='';
   // Pick next set from generated queue (no repeats within a session)
@@ -660,33 +661,38 @@ function isMobile(){return window.innerWidth<600;}
 
 /* ── STEP 1: ANCHOR PHASE ── */
 function renderStep1(){
+  const mob=window.innerWidth<600;
   const tTag=activeLabel()!==t('curatedSets')?` <span style="color:#c8903a;font-weight:600">${activeLabel()}</span>`:'';
-  const anchored=new Set();
-  if(S.aLeft)anchored.add(S.aLeft.id);
-  if(S.aRight)anchored.add(S.aRight.id);
+  const anchored=new Set([S.aLeft?.id,S.aRight?.id].filter(Boolean));
   const pool=S.events.filter(e=>!anchored.has(e.id));
 
-  const pH=pool.map(e=>`<div class="ecard" draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()">${e.name}</div>`).join('');
-  const lP=`<span style="font-size:10px;color:#333;font-family:-apple-system,sans-serif">${t('dropEarliest')}</span>`;
-  const rP=`<span style="font-size:10px;color:#333;font-family:-apple-system,sans-serif">${t('dropRecent')}</span>`;
-  const lC=S.aLeft?`<div class="anchor-card" draggable="true" ondragstart="ds(event,'${S.aLeft.id}','left')" ondragend="de()">${S.aLeft.name}</div>`:lP;
-  const rC=S.aRight?`<div class="anchor-card" draggable="true" ondragstart="ds(event,'${S.aRight.id}','right')" ondragend="de()">${S.aRight.name}</div>`:rP;
+  const pH=pool.map(e=>`<div class="ecard${S.sel===e.id?' ecard-sel':''}"
+    draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()"
+    onclick="tapCard1('${e.id}')">${e.name}</div>`).join('');
+
+  const lP=`<span style="font-size:10px;color:#555;font-family:-apple-system,sans-serif">${mob?t('tapEarliest'):t('dropEarliest')}</span>`;
+  const rP=`<span style="font-size:10px;color:#555;font-family:-apple-system,sans-serif">${mob?t('tapRecent'):t('dropRecent')}</span>`;
+  const lC=S.aLeft?`<div class="anchor-card" draggable="true" ondragstart="ds(event,'${S.aLeft.id}','left')" ondragend="de()" onclick="tapAnchor1('unset-left')">${S.aLeft.name}</div>`:lP;
+  const rC=S.aRight?`<div class="anchor-card" draggable="true" ondragstart="ds(event,'${S.aRight.id}','right')" ondragend="de()" onclick="tapAnchor1('unset-right')">${S.aRight.name}</div>`:rP;
 
   document.getElementById('body').innerHTML=`
     <div class="step-badge">${t('step1')}</div>
     <div class="step-instr">${t('step1Instr')}${tTag?'<br>'+tTag:''}</div>
+    ${mob?`<p style="font-size:11px;color:#555;font-family:-apple-system,sans-serif;margin-bottom:6px;font-style:italic">Tap a card to select it, then tap an anchor box to place it.</p>`:''}
     <div class="plbl">${t('placeEvents')}</div>
-    <div class="pool" id="pool">${pH||`<span style="font-size:12px;color:#444;font-family:-apple-system,sans-serif">${t('allPlaced')}</span>`}</div>
+    <div class="pool">${pH||`<span style="font-size:12px;color:#444;font-family:-apple-system,sans-serif">${t('allPlaced')}</span>`}</div>
     <div class="tl-section"><div class="tl-outer">
       <div class="tl-anchors">
         <div class="anchor-zone">
           <div class="anchor-label">${t('earliest')}</div>
           <div class="anchor-drop ${S.aLeft?'filled':''}" id="dl"
+            onclick="tapAnchor1('left')"
             ondragover="aOv(event,'left')" ondragleave="aLv('left')" ondrop="aDr1(event,'left')">${lC}</div>
         </div>
         <div class="anchor-zone">
           <div class="anchor-label">${t('mostRecent')}</div>
           <div class="anchor-drop ${S.aRight?'filled':''}" id="dr"
+            onclick="tapAnchor1('right')"
             ondragover="aOv(event,'right')" ondragleave="aLv('right')" ondrop="aDr1(event,'right')">${rC}</div>
         </div>
       </div>
@@ -720,22 +726,32 @@ function confirmAnchors(){
 
 /* ── STEP 2: PLACEMENT PHASE ── */
 function renderStep2(lOk,rOk){
+  const mob=window.innerWidth<600;
   const sorted=[...S.events].sort((a,b)=>a.year-b.year);
   const minY=sorted[0].year,maxY=sorted[4].year;
   const middle=sorted.slice(1,4);
   const placed=new Set(Object.keys(S.midP));
   const pool=middle.filter(e=>!placed.has(e.id));
 
-  const pH=pool.map(e=>`<div class="ecard" draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()">${e.name}</div>`).join('');
+  const pH=pool.map(e=>`<div class="ecard${S.sel===e.id?' ecard-sel':''}"
+    draggable="true" ondragstart="ds(event,'${e.id}','pool')" ondragend="de()"
+    onclick="tapCard2('${e.id}')">${e.name}</div>`).join('');
 
   let pins='';
   for(const [id,pct] of Object.entries(S.midP)){
     const evt=S.events.find(e=>e.id===id);if(!evt)continue;
-    pins+=`<div class="pin" id="pin-${id}" style="left:${pct*100}%" draggable="true" ondragstart="ds(event,'${id}','bar')" ondragend="de()"><div class="pin-dot"></div><div class="pin-stem"></div><div class="pin-label">${evt.name}</div></div>`;
+    pins+=`<div class="pin" style="left:${pct*100}%" draggable="true" ondragstart="ds(event,'${id}','bar')" ondragend="de()"><div class="pin-dot"></div><div class="pin-stem"></div><div class="pin-label">${evt.name}</div></div>`;
   }
   const ghost=`<div class="ghost-pin" id="ghost" style="left:-999px;display:none"><div class="ghost-dot"></div><div class="ghost-stem"></div><div class="ghost-label" id="ghost-lbl"></div></div>`;
 
-  const allMiddlePlaced=Object.keys(S.midP).length===3;
+  // Mobile pins on the strip
+  let mobPins='';
+  for(const [id,pct] of Object.entries(S.midP)){
+    const evt=S.events.find(e=>e.id===id);if(!evt)continue;
+    mobPins+=`<div class="mobile-pin" style="left:${pct*100}%" onclick="tapPin2('${id}')"><div class="mobile-pin-dot"></div><div class="mobile-pin-lbl">${evt.name}</div></div>`;
+  }
+
+  const allPlaced=Object.keys(S.midP).length===3;
   const lClass=lOk===undefined?'filled':(lOk?'locked-ok':'locked-bad');
   const rClass=rOk===undefined?'filled':(rOk?'locked-ok':'locked-bad');
 
@@ -746,8 +762,9 @@ function renderStep2(lOk,rOk){
       ${t('anchorScore')}: <strong style="color:${S.anchorPts===40?'#5acc8a':S.anchorPts===20?'#c8903a':'#e06040'}">${S.anchorPts} ${t('pts')}</strong>
       &nbsp;·&nbsp; ${yr(minY)} → ${yr(maxY)}
     </div>
+    ${mob?`<p style="font-size:11px;color:#555;font-family:-apple-system,sans-serif;margin-bottom:6px;font-style:italic">Tap a card to select it, then tap the bar to place it. Tap a placed card to remove it.</p>`:''}
     <div class="plbl">${t('placeEvents')}</div>
-    <div class="pool" id="pool">${pH||`<span style="font-size:12px;color:#444;font-family:-apple-system,sans-serif">${t('allPlaced')}</span>`}</div>
+    <div class="pool">${pH||`<span style="font-size:12px;color:#444;font-family:-apple-system,sans-serif">${t('allPlaced')}</span>`}</div>
     <div class="tl-section"><div class="tl-outer">
       <div class="tl-anchors">
         <div class="anchor-zone">
@@ -764,7 +781,7 @@ function renderStep2(lOk,rOk){
         <div class="tl-bar-wrap">
           <div class="tl-bar" id="tl-bar"
             ondragover="bOv(event)" ondragleave="bLv()" ondrop="bDr(event)"
-            onmousemove="barMove(event)" onmouseleave="barLeave()"
+            onmousemove="bOv(event)" onmouseleave="barLeave()"
             data-miny="${minY}" data-maxy="${maxY}">
             <div class="tl-track" id="tl-track"></div>
           </div>
@@ -772,40 +789,25 @@ function renderStep2(lOk,rOk){
         </div>
         <div class="tl-anchor-line"></div>
       </div>
+      <div class="tl-mobile-bar" id="mobile-bar" onclick="tapBar2(event)" data-miny="${minY}" data-maxy="${maxY}">
+        <div class="tl-mobile-track"></div>
+        ${Object.keys(S.midP).length===0?`<div class="tl-mobile-hint">Tap a card above, then tap here</div>`:''}
+        ${mobPins}
+      </div>
     </div></div>
     <div class="actions">
-      <button class="btn btn-p" onclick="doSubmit()" ${!allMiddlePlaced?'disabled':''}>${t('submitBtn')}</button>
+      <button class="btn btn-p" onclick="doSubmit()" ${!allPlaced?'disabled':''}>${t('submitBtn')}</button>
       <button class="btn" onclick="clearMiddle()">${t('clearAll')}</button>
       <button class="btn" onclick="restartSetup()" style="margin-left:auto">${t('menuBtn')}</button>
     </div>
     <div id="res-area"></div>`;
 }
 
-function clearMiddle(){S.midP={};renderStep2();}
-
 /* ── TOOLTIP ── */
-let _touchTimer=null;
-
-function showTooltip(x,y,bracketStr){
-  const tip=document.getElementById('tl-tooltip');if(!tip)return;
-  tip.textContent=bracketStr;
-  tip.style.left=x+'px';tip.style.top=y+'px';tip.style.display='block';
-}
+function showTooltip(x,y,str){const tip=document.getElementById('tl-tooltip');if(!tip)return;tip.textContent=str;tip.style.left=x+'px';tip.style.top=y+'px';tip.style.display='block';}
 function hideTooltip(){const tip=document.getElementById('tl-tooltip');if(tip)tip.style.display='none';}
 
-function barMove(e){
-  uG(e); // ghost for drag
-  // Only show tooltip while actively dragging a card
-  if(!S.dragId){hideTooltip();return;}
-  const bar=e.currentTarget;
-  const r=bar.getBoundingClientRect();
-  const pct=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
-  const minY=parseInt(bar.dataset.miny);const maxY=parseInt(bar.dataset.maxy);
-  showTooltip(e.clientX,r.top-8,bracketAtPct(pct,minY,maxY));
-}
-function barLeave(){hideTooltip();hG();}
-
-/* ── DRAG (shared) ── */
+/* ── DRAG (desktop) ── */
 function ds(e,id,from){S.dragId=id;S.dragFrom=from;const ev=S.events.find(x=>x.id===id);S.ghostName=ev?ev.name:'';}
 function de(){S.dragId=null;S.dragFrom=null;S.ghostName='';hG();hideTooltip();}
 function aOv(e,s){e.preventDefault();document.getElementById('d'+s[0])?.classList.add('over');}
@@ -816,15 +818,13 @@ function bOv(e){
   e.preventDefault();
   document.getElementById('tl-track')?.style.setProperty('background','#c8903a');
   uG(e);
-  // Show bracket tooltip during drag
   const bar=document.getElementById('tl-bar');if(!bar)return;
   const r=bar.getBoundingClientRect();
   const pct=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));
   const minY=parseInt(bar.dataset.miny);const maxY=parseInt(bar.dataset.maxy);
-  if(minY!==undefined&&!isNaN(minY))showTooltip(e.clientX,r.top-8,bracketAtPct(pct,minY,maxY));
+  if(!isNaN(minY))showTooltip(e.clientX,r.top-8,bracketAtPct(pct,minY,maxY));
 }
 function bLv(){document.getElementById('tl-track')?.style.setProperty('background','#2a2a2a');hG();hideTooltip();}
-function barMove(e){uG(e);}
 function barLeave(){hideTooltip();hG();}
 function uG(e){const g=document.getElementById('ghost');const gl=document.getElementById('ghost-lbl');if(!g||!S.dragId)return;g.style.left=(gPct(e)*100)+'%';g.style.display='flex';if(gl)gl.textContent=S.ghostName;}
 function hG(){const g=document.getElementById('ghost');if(g)g.style.display='none';}
@@ -836,7 +836,31 @@ function bDr(e){
   S.midP[S.dragId]=gPct(e);renderStep2();
 }
 
-/* ── SUBMIT (Step 2) ── */
+/* ── TAP (mobile) ── */
+function tapCard1(id){S.sel=S.sel===id?null:id;renderStep1();}
+function tapAnchor1(side){
+  if(side==='unset-left'){S.aLeft=null;S.sel=null;renderStep1();return;}
+  if(side==='unset-right'){S.aRight=null;S.sel=null;renderStep1();return;}
+  if(!S.sel)return;
+  const ev=S.events.find(x=>x.id===S.sel);if(!ev)return;
+  if(side==='left')S.aLeft=ev;else S.aRight=ev;
+  S.sel=null;renderStep1();
+}
+// Step 2 taps
+function tapCard2(id){
+  if(S.midP[id]){delete S.midP[id];S.sel=null;renderStep2();return;}
+  S.sel=S.sel===id?null:id;renderStep2();
+}
+function tapBar2(e){
+  if(!S.sel)return;
+  const bar=document.getElementById('mobile-bar');if(!bar)return;
+  const r=bar.getBoundingClientRect();
+  const pct=Math.max(0.02,Math.min(0.98,(e.clientX-r.left)/r.width));
+  const ev=S.events.find(x=>x.id===S.sel);if(!ev)return;
+  S.midP[S.sel]=pct;S.sel=null;renderStep2();
+}
+function tapPin2(id){delete S.midP[id];S.sel=null;renderStep2();}
+function clearMiddle(){S.midP={};S.sel=null;renderStep2();}
 function doSubmit(){
   if(Object.keys(S.midP).length<3||S.submitted)return;
   S.submitted=true;
