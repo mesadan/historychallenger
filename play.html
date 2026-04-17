@@ -10,9 +10,12 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{min-height:100vh}
 body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#ffffff;display:flex;justify-content:center;padding:1.25rem 0.75rem}
-.wrap{width:100%;max-width:820px}
+@media(min-width:900px){body{padding:2rem 1.5rem;align-items:flex-start}}
+.wrap{width:100%;max-width:860px}
+@media(min-width:900px){.wrap{max-width:980px}}
 .card{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:14px;padding:1.25rem}
 @media(min-width:600px){.card{padding:1.75rem}}
+@media(min-width:900px){.card{padding:2.25rem 2.5rem}}
 
 /* HEADER */
 .hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.1rem;border-bottom:1px solid #2a2a2a;padding-bottom:.9rem;flex-wrap:wrap;gap:8px}
@@ -199,7 +202,12 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
   <div class="card">
     <div class="hdr">
       <div class="hdr-left">
-        <a href="/" style="text-decoration:none"><div class="ttl">History Challenger</div></a>
+        <a href="/" style="text-decoration:none;display:flex;align-items:center;gap:10px">
+          <div style="width:34px;height:34px;border-radius:50%;border:1.5px solid #c8903a;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#0a0800">
+            <span style="font-family:Georgia,serif;font-size:13px;font-weight:700;color:#c8903a;letter-spacing:-.5px">HC</span>
+          </div>
+          <div class="ttl">History Challenger</div>
+        </a>
         <div class="ttl-sub" id="ttl-sub">Prove your historical mastery</div>
       </div>
       <div class="hdr-right">
@@ -607,7 +615,7 @@ const T={
   }
 };
 
-let LANG='en';
+let LANG=localStorage.getItem('hc_lang')||'en';
 function t(key){return T[LANG][key]??T.en[key]??key;}
 function td(diff,key){return T[LANG].diffs?.[diff]?.[key]??T.en.diffs[diff]?.[key]??'';}
 function themes(){return T[LANG].themes||T.en.themes;}
@@ -615,6 +623,7 @@ function medal(pct){const m=T[LANG].medals;if(pct>=90)return m[90];if(pct>=70)re
 
 function setLang(l){
   LANG=l;
+  localStorage.setItem('hc_lang',l);
   document.documentElement.lang=l;
   document.getElementById('ttl-sub').textContent=t('subtitle');
   document.getElementById('lbl-avg').textContent=t('avg');
@@ -892,19 +901,42 @@ async function startSeries(){
   startRound();
 }
 
+// Translate sets if language is non-English and sets came from pool (stored in English)
+async function translateSetsIfNeeded(sets){
+  if(LANG==='en')return sets;
+  try{
+    const allEvents=sets.flat();
+    const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'translate',events:allEvents,lang:LANG})});
+    const data=await res.json();
+    if(!data.events||data.events.length!==allEvents.length)return sets;
+    // Rebuild sets with translated events
+    let i=0;
+    return sets.map(set=>set.map(()=>data.events[i++]));
+  }catch(e){
+    return sets; // Fall back to English silently
+  }
+}
+
 async function loadFromPool(diff, needed, themeSlug, themeQ){
   try{
     const token=getToken();
     const seenIds=[..._seenSetIds];
+    // Pool is always stored in English — request English sets then translate
     const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'get_sets',diff,lang:LANG,needed,token,seen_ids:seenIds,theme_slug:themeSlug||null})});
+      body:JSON.stringify({action:'get_sets',diff,lang:'en',needed,token,seen_ids:seenIds,theme_slug:themeSlug||null})});
     const data=await res.json();
     if(data.error)throw new Error(data.error);
 
-    const sets=data.sets||[];
+    let sets=data.sets||[];
     const ids=data.set_ids||[];
     ids.forEach(id=>_seenSetIds.add(id));
     saveSeenSets();
+
+    // Translate if needed
+    if(sets.length>0&&LANG!=='en'){
+      sets=await translateSetsIfNeeded(sets);
+    }
 
     // If pool had enough, done
     if(!data.needs_more||data.needs_more===0){
@@ -912,16 +944,14 @@ async function loadFromPool(diff, needed, themeSlug, themeQ){
       return true;
     }
 
-    // Need more — generate the rest live
+    // Need more — generate the rest live (in correct language)
     const stillNeeded=data.needs_more;
     if(themeSlug&&themeQ){
-      // Theme fallback — live generation
       const liveRes=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({theme:themeQ,diff,rounds:stillNeeded,lang:LANG})});
       const liveData=await liveRes.json();
       if(liveData.sets){sets.push(...liveData.sets.filter(s=>Array.isArray(s)&&s.length===5));}
     } else {
-      // Random fallback
       const eraGeos=Array.from({length:stillNeeded},()=>nextEraGeo());
       const liveRes=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({action:'generate_random',diff,rounds:stillNeeded,lang:LANG,eraGeos})});

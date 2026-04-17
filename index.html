@@ -52,6 +52,9 @@ nav{position:sticky;top:0;z-index:100;background:rgba(0,0,0,0.92);backdrop-filte
 .nav-links a:hover{color:#fff;text-decoration:none}
 .nav-play{background:#c8903a;color:#000!important;border-radius:8px;padding:7px 18px;font-weight:700;font-size:14px}
 .nav-play:hover{background:#e0a84a!important;text-decoration:none!important}
+.lang-select{background:#111;border:1px solid #2a2a2a;border-radius:7px;padding:5px 8px;font-size:13px;color:#888;cursor:pointer;font-family:-apple-system,sans-serif;outline:none;appearance:none;-webkit-appearance:none;padding-right:22px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center}
+.lang-select:hover{border-color:#444;color:#ccc}
+.lang-select option{background:#111}
 .hero{min-height:92vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 1.5rem}
 .hero-eyebrow{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#c8903a;margin-bottom:1.25rem;font-weight:600}
 .hero-title{font-family:Georgia,serif;font-size:clamp(2.4rem,7vw,5rem);font-weight:700;line-height:1.1;margin-bottom:1.25rem;max-width:800px}
@@ -126,6 +129,12 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
   <div class="nav-inner">
     <a href="/" class="nav-logo">History <span>Challenger</span></a>
     <div class="nav-links">
+      <select class="lang-select" id="site-lang" onchange="setLang(this.value)" title="Language">
+        <option value="en">🇬🇧 EN</option>
+        <option value="fr">🇫🇷 FR</option>
+        <option value="de">🇩🇪 DE</option>
+        <option value="es">🇪🇸 ES</option>
+      </select>
       <a href="#how-it-works">How it works</a>
       <a href="#about">About</a>
       <a href="/blog.html">Blog</a>
@@ -137,17 +146,17 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
 <div id="main">
 
 <section class="hero">
-  <div class="hero-eyebrow">Free · No account required · AI-powered</div>
-  <h1 class="hero-title">How well do you <span>know history?</span></h1>
-  <p class="hero-sub">Place historical events on a timeline. Score points for getting the right order and the right era. From the Bronze Age to the Cold War — across every civilization.</p>
+  <div id="hero-eyebrow" class="hero-eyebrow">Free · No account required · AI-powered</div>
+  <h1 class="hero-title" id="hero-title">How well do you <span>know history?</span></h1>
+  <p class="hero-sub" id="hero-sub">Place historical events on a timeline. Score points for getting the right order and the right era. From the Bronze Age to the Cold War — across every civilization.</p>
   <div class="hero-cta">
-    <a href="/play.html" class="btn-primary">Play now — it's free</a>
-    <a href="#how-it-works" class="btn-secondary">How it works</a>
+    <a href="/play.html" class="btn-primary" id="hero-cta1">Play now — it's free</a>
+    <a href="#how-it-works" class="btn-secondary" id="hero-cta2">How it works</a>
   </div>
-  <p class="hero-note">No download · Plays in your browser · Mobile friendly</p>
+  <p class="hero-note" id="hero-note">No download · Plays in your browser · Mobile friendly</p>
   <div style="margin-top:1.5rem;padding:1rem 1.5rem;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:10px;font-family:-apple-system,sans-serif;font-size:14px;color:#888;max-width:520px;text-align:left">
     <span style="color:#c8903a;font-weight:600">📜 From the blog: </span>
-    <a href="/blog.html" style="color:#ddd">There is more time between Cleopatra and the pyramids than between Cleopatra and us →</a>
+    <a href="/blog.html" id="hero-blog-teaser" style="color:#ddd">There is more time between Cleopatra and the pyramids than between Cleopatra and us →</a>
   </div>
   <div class="preview">
     <div class="preview-badge">📜 Drag events onto the timeline</div>
@@ -167,12 +176,12 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
 <section id="how-it-works" style="background:#080808;border-top:1px solid #111;border-bottom:1px solid #111">
   <div class="section-inner">
     <div class="section-label">How it works</div>
-    <h2 class="section-title">Simple to learn, hard to master</h2>
-    <p class="section-sub">Each round gives you 5 historical events. Place them on a timeline as accurately as possible.</p>
+    <h2 class="section-title" id="how-title">Simple to learn, hard to master</h2>
+    <p class="section-sub" id="how-sub">Each round gives you 5 historical events. Place them on a timeline as accurately as possible.</p>
     <div class="steps">
-      <div class="step"><div class="step-num">1</div><div class="step-title">Find the anchors</div><div class="step-desc">Identify which event came first and which came last. These define the scale of your timeline for the round.</div></div>
-      <div class="step"><div class="step-num">2</div><div class="step-title">Place the rest</div><div class="step-desc">Drag the remaining 3 events onto the bar. A bracket tooltip shows the time window at your cursor as you drag.</div></div>
-      <div class="step"><div class="step-num">3</div><div class="step-title">Score points</div><div class="step-desc">Full marks for the right bracket. Partial credit for being close. The precision required scales with the time span.</div></div>
+      <div class="step"><div class="step-num">1</div><div class="step-title" id="step1-title">Find the anchors</div><div class="step-desc" id="step1-desc">Identify which event came first and which came last. These define the scale of your timeline for the round.</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-title" id="step2-title">Place the rest</div><div class="step-desc" id="step2-desc">Drag the remaining 3 events onto the bar. A bracket tooltip shows the time window at your cursor as you drag.</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-title" id="step3-title">Score points</div><div class="step-desc" id="step3-desc">Full marks for the right bracket. Partial credit for being close. The precision required scales with the time span.</div></div>
     </div>
   </div>
 </section>
@@ -180,8 +189,8 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
 <section>
   <div class="section-inner">
     <div class="section-label">Difficulty</div>
-    <h2 class="section-title">Choose your challenge</h2>
-    <p class="section-sub">Three levels from broadly famous events spanning millennia to expert events packed into the same decade.</p>
+    <h2 class="section-title" id="diff-title">Choose your challenge</h2>
+    <p class="section-sub" id="diff-sub">Three levels from broadly famous events spanning millennia to expert events packed into the same decade.</p>
     <div class="diffs">
       <div class="diff-card"><div class="diff-name">🕯 Disciple</div><div class="diff-tag">Famous events · Wide spans</div><div class="diff-desc">Events any educated adult would recognize. Spans thousands of years. Generous scoring. Perfect for beginners.</div></div>
       <div class="diff-card"><div class="diff-name">⚔️ Master</div><div class="diff-tag">Mixed eras · Real knowledge</div><div class="diff-desc">A mix of clustered and outlier events. You'll need genuine knowledge beyond headlines and Wikipedia summaries.</div></div>
@@ -193,7 +202,7 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
 <section id="about" style="background:#080808;border-top:1px solid #111;border-bottom:1px solid #111">
   <div class="section-inner">
     <div class="section-label">About</div>
-    <h2 class="section-title">Built for curious minds</h2>
+    <h2 class="section-title" id="about-title">Built for curious minds</h2>
     <div class="about-grid">
       <div class="about-text">
         <p>History Challenger was built out of a simple frustration: most history quizzes are multiple choice, and multiple choice lets you guess. We wanted something that tested genuine temporal reasoning — not just "did you recognize the name" but "do you actually know when things happened?"</p>
@@ -214,7 +223,7 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
 <section>
   <div class="section-inner">
     <div class="section-label">FAQ</div>
-    <h2 class="section-title">Questions</h2>
+    <h2 class="section-title" id="faq-title">Questions</h2>
     <div class="faqs">
       <div class="faq" onclick="this.classList.toggle('open')"><div class="faq-q">Is it really free?</div><div class="faq-a">Yes. You can play without creating an account. Sign in with Google to save your scores, track streaks, and play unlimited games.</div></div>
       <div class="faq" onclick="this.classList.toggle('open')"><div class="faq-q">How are events generated?</div><div class="faq-a">Every game is generated fresh by Claude (Anthropic's AI), drawing on historical knowledge spanning all eras and civilizations. Each session gets unique events you haven't seen before.</div></div>
@@ -237,13 +246,13 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
         <a href="/blog.html" style="color:#c8903a;font-size:13px;font-weight:600">Read →</a>
       </div>
       <div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:1.5rem">
-        <div style="font-size:11px;color:#c8903a;font-weight:600;margin-bottom:.5rem">⚔️ HISTORY MYTHS</div>
+        <div style="font-size:11px;color:#c8903a;font-weight:600;margin-bottom:.5rem">🔍 HISTORY MYTHS</div>
         <div style="font-family:Georgia,serif;font-size:1.1rem;font-weight:700;margin-bottom:.75rem;line-height:1.3">9 Historical Myths Most People Still Believe</div>
         <div style="font-size:13px;color:#666;margin-bottom:1rem">Napoleon wasn't short. Medieval people knew the Earth was round.</div>
         <a href="/misconceptions.html" style="color:#c8903a;font-size:13px;font-weight:600">Read →</a>
       </div>
       <div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:1.5rem">
-        <div style="font-size:11px;color:#c8903a;font-weight:600;margin-bottom:.5rem">🏛 MILITARY HISTORY</div>
+        <div style="font-size:11px;color:#c8903a;font-weight:600;margin-bottom:.5rem">⚔️ MILITARY HISTORY</div>
         <div style="font-family:Georgia,serif;font-size:1.1rem;font-weight:700;margin-bottom:.75rem;line-height:1.3">Battles That Changed History But Nobody Talks About</div>
         <div style="font-size:13px;color:#666;margin-bottom:1rem">Cape Ecnomus. Ain Jalut. Khalkhyn Gol. The battles that shaped the world.</div>
         <a href="/battles.html" style="color:#c8903a;font-size:13px;font-weight:600">Read →</a>
@@ -254,9 +263,9 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
 
 <section style="text-align:center">
   <div class="section-inner">
-    <h2 class="section-title" style="margin-bottom:1rem">Ready to test yourself?</h2>
-    <p style="color:#666;margin-bottom:2rem;font-size:16px">No signup required. Pick a difficulty and go.</p>
-    <a href="/play.html" class="btn-primary" style="font-size:18px;padding:16px 40px">Start playing →</a>
+    <h2 class="section-title" id="cta-title" style="margin-bottom:1rem">Ready to test yourself?</h2>
+    <p id="cta-sub" style="color:#666;margin-bottom:2rem;font-size:16px">No signup required. Pick a difficulty and go.</p>
+    <a href="/play.html" class="btn-primary nav-play" id="cta-btn" style="font-size:18px;padding:16px 40px">Start playing →</a>
   </div>
 </section>
 
@@ -371,6 +380,131 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
 }
 </script>
 <script>
+const LANDING_T = {
+  en: {
+    eyebrow: 'Free · No account required · AI-powered',
+    title: 'How well do you <span>know history?</span>',
+    sub: 'Place historical events on a timeline. Score points for getting the right order and the right era. From the Bronze Age to the Cold War — across every civilization.',
+    cta1: 'Play now — it\'s free', cta2: 'How it works',
+    note: 'No download · Plays in your browser · Mobile friendly',
+    blogTeaser: 'There is more time between Cleopatra and the pyramids than between Cleopatra and us →',
+    howTitle: 'Simple to learn, hard to master',
+    howSub: 'Each round gives you 5 historical events. Place them on a timeline as accurately as possible.',
+    s1t: 'Find the anchors', s1d: 'Identify which event came first and which came last. These define the scale of your timeline for the round.',
+    s2t: 'Place the rest', s2d: 'Drag the remaining 3 events onto the bar. A bracket tooltip shows the time window at your cursor as you drag.',
+    s3t: 'Score points', s3d: 'Full marks for the right bracket. Partial credit for being close. The precision required scales with the time span.',
+    diffTitle: 'Choose your challenge',
+    diffSub: 'Three levels from broadly famous events spanning millennia to expert events packed into the same decade.',
+    aboutTitle: 'Built for curious minds',
+    ctaTitle: 'Ready to test yourself?',
+    ctaSub: 'No signup required. Pick a difficulty and go.',
+    ctaBtn: 'Start playing →',
+    faqTitle: 'Questions',
+    play: 'Play free →'
+  },
+  fr: {
+    eyebrow: 'Gratuit · Sans inscription · Propulsé par IA',
+    title: 'Connaissez-vous bien <span>l\'histoire ?</span>',
+    sub: 'Placez des événements historiques sur une frise. Marquez des points en trouvant le bon ordre et la bonne époque. De l\'Âge du Bronze à la Guerre Froide.',
+    cta1: 'Jouer — c\'est gratuit', cta2: 'Comment ça marche',
+    note: 'Sans téléchargement · Dans le navigateur · Compatible mobile',
+    blogTeaser: 'Il y a plus de temps entre Cléopâtre et les pyramides qu\'entre Cléopâtre et nous →',
+    howTitle: 'Simple à apprendre, difficile à maîtriser',
+    howSub: 'Chaque manche vous donne 5 événements historiques. Placez-les sur la frise le plus précisément possible.',
+    s1t: 'Trouvez les ancres', s1d: 'Identifiez quel événement est arrivé en premier et lequel en dernier. Ils définissent l\'échelle de votre frise.',
+    s2t: 'Placez le reste', s2d: 'Faites glisser les 3 événements restants sur la barre. Une infobulle montre la fenêtre temporelle en direct.',
+    s3t: 'Marquez des points', s3d: 'Points complets pour la bonne tranche. Points partiels si vous êtes proche. La précision requise s\'adapte à la période.',
+    diffTitle: 'Choisissez votre défi',
+    diffSub: 'Trois niveaux, des événements les plus célèbres aux événements d\'expert dans la même décennie.',
+    aboutTitle: 'Conçu pour les esprits curieux',
+    ctaTitle: 'Prêt à vous tester ?',
+    ctaSub: 'Sans inscription. Choisissez une difficulté et commencez.',
+    ctaBtn: 'Commencer →',
+    faqTitle: 'Questions',
+    play: 'Jouer →'
+  },
+  de: {
+    eyebrow: 'Kostenlos · Keine Anmeldung · KI-gestützt',
+    title: 'Wie gut kennen Sie <span>die Geschichte?</span>',
+    sub: 'Ordnen Sie historische Ereignisse auf einem Zeitstrahl. Sammeln Sie Punkte für die richtige Reihenfolge und Epoche. Von der Bronzezeit bis zum Kalten Krieg.',
+    cta1: 'Jetzt spielen — kostenlos', cta2: 'So funktioniert es',
+    note: 'Kein Download · Im Browser · Mobilfreundlich',
+    blogTeaser: 'Zwischen Kleopatra und den Pyramiden liegt mehr Zeit als zwischen Kleopatra und uns →',
+    howTitle: 'Leicht zu lernen, schwer zu meistern',
+    howSub: 'Jede Runde gibt Ihnen 5 historische Ereignisse. Platzieren Sie sie so genau wie möglich auf dem Zeitstrahl.',
+    s1t: 'Anker finden', s1d: 'Welches Ereignis kam zuerst, welches zuletzt? Diese bestimmen die Skala Ihres Zeitstrahls.',
+    s2t: 'Den Rest platzieren', s2d: 'Ziehen Sie die 3 verbleibenden Ereignisse auf den Balken. Ein Tooltip zeigt das Zeitfenster live an.',
+    s3t: 'Punkte sammeln', s3d: 'Volle Punkte für die richtige Position. Teilpunkte für Näherungen. Die Genauigkeit skaliert mit dem Zeitraum.',
+    diffTitle: 'Wählen Sie Ihre Herausforderung',
+    diffSub: 'Drei Schwierigkeitsgrade, von weltbekannten Ereignissen bis zu Expertenwissen.',
+    aboutTitle: 'Für neugierige Köpfe',
+    ctaTitle: 'Bereit, sich zu testen?',
+    ctaSub: 'Keine Anmeldung. Schwierigkeit wählen und loslegen.',
+    ctaBtn: 'Jetzt starten →',
+    faqTitle: 'Häufige Fragen',
+    play: 'Spielen →'
+  },
+  es: {
+    eyebrow: 'Gratis · Sin registro · Con IA',
+    title: '¿Cuánto sabes de <span>historia?</span>',
+    sub: 'Coloca eventos históricos en una línea de tiempo. Gana puntos por el orden correcto y la época correcta. Del Bronce a la Guerra Fría.',
+    cta1: 'Jugar — es gratis', cta2: 'Cómo funciona',
+    note: 'Sin descarga · En el navegador · Compatible con móvil',
+    blogTeaser: 'Hay más tiempo entre Cleopatra y las pirámides que entre Cleopatra y nosotros →',
+    howTitle: 'Fácil de aprender, difícil de dominar',
+    howSub: 'Cada ronda te da 5 eventos históricos. Colócalos en la línea de tiempo con la mayor precisión posible.',
+    s1t: 'Encuentra los anclajes', s1d: 'Identifica qué evento ocurrió primero y cuál último. Definen la escala de tu línea de tiempo.',
+    s2t: 'Coloca el resto', s2d: 'Arrastra los 3 eventos restantes a la barra. Un tooltip muestra el período en tiempo real.',
+    s3t: 'Gana puntos', s3d: 'Puntos completos por la posición correcta. Puntos parciales si estás cerca. La precisión escala con el período.',
+    diffTitle: 'Elige tu desafío',
+    diffSub: 'Tres niveles, desde eventos mundialmente famosos hasta conocimiento experto.',
+    aboutTitle: 'Para mentes curiosas',
+    ctaTitle: '¿Listo para ponerte a prueba?',
+    ctaSub: 'Sin registro. Elige dificultad y empieza.',
+    ctaBtn: 'Empezar →',
+    faqTitle: 'Preguntas',
+    play: 'Jugar →'
+  }
+};
+
+let _lang = localStorage.getItem('hc_lang') || 'en';
+
+function setLang(l) {
+  _lang = l;
+  localStorage.setItem('hc_lang', l);
+  document.getElementById('site-lang').value = l;
+  applyLang();
+}
+
+function applyLang() {
+  const t = LANDING_T[_lang] || LANDING_T.en;
+  const set = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
+  const setText = (id, text) => { const el = document.getElementById(id); if(el) el.textContent = text; };
+  set('hero-eyebrow', t.eyebrow);
+  set('hero-title', t.title);
+  set('hero-sub', t.sub);
+  set('hero-cta1', t.cta1);
+  set('hero-cta2', t.cta2);
+  set('hero-note', t.note);
+  set('hero-blog-teaser', t.blogTeaser);
+  set('how-title', t.howTitle);
+  set('how-sub', t.howSub);
+  set('step1-title', t.s1t); set('step1-desc', t.s1d);
+  set('step2-title', t.s2t); set('step2-desc', t.s2d);
+  set('step3-title', t.s3t); set('step3-desc', t.s3d);
+  set('diff-title', t.diffTitle); set('diff-sub', t.diffSub);
+  set('about-title', t.aboutTitle);
+  set('cta-title', t.ctaTitle); set('cta-sub', t.ctaSub); set('cta-btn', t.ctaBtn);
+  set('faq-title', t.faqTitle);
+  document.querySelectorAll('.nav-play').forEach(el => el.textContent = t.play);
+}
+
+// Init lang
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('site-lang').value = _lang;
+  applyLang();
+});
+
 function showLegal(page){
   document.getElementById('main').style.display=page?'none':'block';
   document.getElementById('privacy').className='legal-wrap'+(page==='privacy'?' active':'');
