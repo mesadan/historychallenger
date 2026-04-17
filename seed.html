@@ -12,10 +12,30 @@ button:disabled{opacity:.5;cursor:default}
 .ok{color:#0f0}.err{color:#f44}.info{color:#c8903a}
 select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;border-radius:4px;font-family:monospace}
 .row{margin-bottom:1rem}
+#gate{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;z-index:999}
+#gate input{font-size:16px;padding:10px 16px;width:260px;text-align:center}
+#gate button{font-size:15px;padding:10px 28px}
+#gate .err{color:#f44;font-size:13px;display:none}
 </style>
 </head>
 <body>
+
+<div id="gate">
+  <div style="color:#c8903a;font-size:20px;font-weight:700;font-family:monospace">🌱 Admin Access</div>
+  <input type="password" id="pw" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')checkPw()">
+  <button onclick="checkPw()">Enter</button>
+  <div class="err" id="pw-err">Wrong password</div>
+</div>
+
 <h1>🌱 Event Pool Seeder</h1>
+<div class="row">
+  <label>Mode: 
+    <select id="mode" onchange="toggleMode()">
+      <option value="random">Random pool</option>
+      <option value="theme">Theme pool</option>
+    </select>
+  </label>
+</div>
 <div class="row">
   <label>Difficulty: 
     <select id="diff"><option value="disciple">Disciple</option><option value="master">Master</option><option value="keeper">Keeper</option></select>
@@ -29,6 +49,26 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
     <input type="number" id="batches" value="10" min="1" max="50" style="width:60px">
   </label>
 </div>
+<div class="row" id="theme-row" style="display:none">
+  <label>Theme: 
+    <select id="theme-select">
+      <option value="bronze-age|the Bronze Age civilisations: Mesopotamia, Egypt, Mycenae, Hittites, Indus Valley">Bronze Age</option>
+      <option value="iron-age|the Iron Age: early Greece, Assyria, Persia, Celtic Europe, early Rome">Iron Age</option>
+      <option value="ancient-world|the ancient world: Classical Greece, Republican and Imperial Rome, Egypt, Persia">Ancient World</option>
+      <option value="medieval|medieval history: feudalism, crusades, plague, the Mongols, Byzantine Empire">Medieval</option>
+      <option value="early-modern|early modern history: Renaissance, Reformation, Age of Exploration, 1400-1700">Early Modern</option>
+      <option value="revolutions|the age of revolutions: American, French, Haitian, Latin American, 1776-1830">Revolutions</option>
+      <option value="19th-century|19th century: industrialisation, nationalism, imperialism">19th Century</option>
+      <option value="world-wars|World War I and World War II: key battles, turning points, political events">World Wars</option>
+      <option value="cold-war|the Cold War 1945-1991: space race, proxy wars, nuclear standoff, detente">Cold War</option>
+      <option value="aviation|the history of aviation: from the Wright Brothers to the jet age and space flight">Aviation</option>
+      <option value="medicine|the history of medicine: discoveries, vaccines, surgery, anatomy, public health breakthroughs">Medicine</option>
+      <option value="technology|landmark moments in technology history: inventions, computers, communications, engineering">Technology</option>
+      <option value="ancient-asia|ancient Asian history: Han Dynasty China, Maurya India, classical Japan, Southeast Asia">Ancient Asia</option>
+      <option value="science|landmark moments in science: physics, chemistry, biology, astronomy, mathematics">Science</option>
+    </select>
+  </label>
+</div>
 <div class="row">
   <button onclick="startSeeding()" id="btn-start">▶ Start Seeding (5 sets per batch)</button>
   <button onclick="stopSeeding()" id="btn-stop" disabled>⏹ Stop</button>
@@ -39,6 +79,20 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
 <script>
 const WORKER='https://histroychallenger-api.maletethan.workers.dev';
 let running=false;
+let ADMIN_KEY='';
+
+function checkPw(){
+  const pw=document.getElementById('pw').value;
+  if(pw.length>=8){
+    ADMIN_KEY=pw;
+    document.getElementById('gate').style.display='none';
+  } else {
+    document.getElementById('pw-err').style.display='block';
+    document.getElementById('pw-err').textContent='Key must be at least 8 characters';
+    document.getElementById('pw').value='';
+    document.getElementById('pw').focus();
+  }
+}
 
 function log(msg,cls=''){
   const el=document.getElementById('log');
@@ -46,21 +100,19 @@ function log(msg,cls=''){
   el.scrollTop=el.scrollHeight;
 }
 
+async function toggleMode(){
+  const isTheme=document.getElementById('mode').value==='theme';
+  document.getElementById('theme-row').style.display=isTheme?'block':'none';
+}
+
 async function checkCount(){
-  const diffs=['disciple','master','keeper'];
-  const langs=['en','fr','de','es'];
   log('Checking pool counts...','info');
+  const diffs=['disciple','master','keeper'];
   for(const d of diffs){
-    for(const l of langs){
-      try{
-        const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({action:'get_sets',diff:d,lang:l,needed:0,seen_ids:[]})});
-        const data=await res.json();
-        log(`${d} / ${l}: pool available`,'ok');
-      }catch(e){
-        log(`${d} / ${l}: error - ${e.message}`,'err');
-      }
-    }
+    const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'get_sets',diff:d,lang:'en',needed:0,seen_ids:[]})});
+    const data=await res.json();
+    log(`${d}/en random: available`,'ok');
   }
 }
 
@@ -71,22 +123,31 @@ async function startSeeding(){
   const diff=document.getElementById('diff').value;
   const lang=document.getElementById('lang').value;
   const batches=parseInt(document.getElementById('batches').value)||10;
-  log(`Starting: ${batches} batches × 5 sets = ${batches*5} sets for ${diff}/${lang}`,'info');
+  const mode=document.getElementById('mode').value;
+
+  let themeSlug=null,themeQ=null;
+  if(mode==='theme'){
+    const val=document.getElementById('theme-select').value;
+    [themeSlug,themeQ]=val.split('|');
+    themeSlug=diff+'_theme_'+themeSlug;
+    log(`Starting theme seeding: ${themeSlug} — ${batches} batches × 5 = ${batches*5} sets`,'info');
+  } else {
+    log(`Starting random seeding: ${diff}/${lang} — ${batches} batches × 5 = ${batches*5} sets`,'info');
+  }
 
   for(let i=0;i<batches;i++){
     if(!running)break;
     try{
       log(`Batch ${i+1}/${batches}...`);
-      const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({action:'seed_pool',diff,lang,batch:5})});
+      const payload={action:'seed_pool',diff,lang,batch:5,admin_key:ADMIN_KEY};
+      if(mode==='theme'){payload.theme_slug=themeSlug;payload.theme_q=themeQ;}
+      const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
       const data=await res.json();
       if(data.error){log(`Error: ${data.error}`,'err');break;}
-      log(`✓ Saved ${data.saved} sets. Total in pool: ${data.total}`,'ok');
-      // Small delay between batches
+      log(`✓ Saved ${data.saved} sets. Total: ${data.total}`,'ok');
       await new Promise(r=>setTimeout(r,1500));
     }catch(e){
-      log(`Error: ${e.message}`,'err');
-      break;
+      log(`Error: ${e.message}`,'err');break;
     }
   }
   log('Done.','info');

@@ -867,46 +867,61 @@ async function startSeries(){
   const diff=S.diff||'disciple';
 
   if(S.path==='random'){
-    // Use pool — instant if pool has sets, falls back to live generation
     showOverlay(t('generatingWait'));
-    const ok=await loadFromPool(diff,Math.min(S.rounds,10));
+    const ok=await loadFromPool(diff,Math.min(S.rounds,10),null,null);
     hideOverlay();
     if(!ok)return;
     if(!S.diff)S.diff='disciple';
   } else {
-    // Theme mode — always generate live
+    const isPreset=S.theme!==null&&!S.customTheme;
     showOverlay(t('generatingMsg')+' <strong style="color:#fff">'+activeLabel()+'</strong><br><br>'+t('generatingWait'));
-    const ok=await callGenerate({theme:themeQ,diff,rounds:Math.min(S.rounds,10),lang:LANG});
-    hideOverlay();
-    if(!ok)return;
+    if(isPreset){
+      // Preset theme chip — try pool first, fall back to live
+      const themeSlug=diff+'_theme_'+S.theme;
+      const ok=await loadFromPool(diff,Math.min(S.rounds,10),themeSlug,themeQ);
+      hideOverlay();
+      if(!ok)return;
+    } else {
+      // Custom text theme — always live
+      const ok=await callGenerate({theme:themeQ,diff,rounds:Math.min(S.rounds,10),lang:LANG});
+      hideOverlay();
+      if(!ok)return;
+    }
     if(!S.diff)S.diff='disciple';
   }
   startRound();
 }
 
-async function loadFromPool(diff, needed){
+async function loadFromPool(diff, needed, themeSlug, themeQ){
   try{
     const token=getToken();
-    const seenIds=_seenSetIds;
+    const seenIds=[..._seenSetIds];
     const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'get_sets',diff,lang:LANG,needed,token,seen_ids:seenIds})});
+      body:JSON.stringify({action:'get_sets',diff,lang:LANG,needed,token,seen_ids:seenIds,theme_slug:themeSlug||null})});
     const data=await res.json();
     if(data.error)throw new Error(data.error);
 
     const sets=data.sets||[];
     const ids=data.set_ids||[];
-
-    // Track seen set IDs locally
     ids.forEach(id=>_seenSetIds.add(id));
+    saveSeenSets();
 
-    if(sets.length>=needed){
+    // If pool had enough, done
+    if(!data.needs_more||data.needs_more===0){
       S.generatedSets=sets;
       return true;
     }
 
-    // Pool didn't have enough — generate the rest live
-    const stillNeeded=needed-sets.length;
-    if(stillNeeded>0){
+    // Need more — generate the rest live
+    const stillNeeded=data.needs_more;
+    if(themeSlug&&themeQ){
+      // Theme fallback — live generation
+      const liveRes=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({theme:themeQ,diff,rounds:stillNeeded,lang:LANG})});
+      const liveData=await liveRes.json();
+      if(liveData.sets){sets.push(...liveData.sets.filter(s=>Array.isArray(s)&&s.length===5));}
+    } else {
+      // Random fallback
       const eraGeos=Array.from({length:stillNeeded},()=>nextEraGeo());
       const liveRes=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({action:'generate_random',diff,rounds:stillNeeded,lang:LANG,eraGeos})});
@@ -914,17 +929,14 @@ async function loadFromPool(diff, needed){
       if(liveData.sets){sets.push(...liveData.sets.filter(s=>Array.isArray(s)&&s.length===5));}
     }
 
-    if(!sets.length){
-      renderSetup();
-      const el=document.getElementById('theme-err');
-      if(el){el.textContent=t('noSets');el.style.display='block';}
-      return false;
-    }
+    if(!sets.length){renderSetup();return false;}
     S.generatedSets=sets;
     return true;
   }catch(e){
-    // Full fallback to live generation
     console.warn('Pool failed, falling back to live:',e.message);
+    if(themeSlug&&themeQ){
+      return callGenerate({theme:themeQ,diff,rounds:needed,lang:LANG});
+    }
     return callGenerateRandom(diff, needed);
   }
 }
