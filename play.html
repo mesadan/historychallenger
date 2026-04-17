@@ -10,12 +10,13 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{min-height:100vh}
 body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#ffffff;display:flex;justify-content:center;padding:1.25rem 0.75rem}
-@media(min-width:900px){body{padding:2rem 1.5rem;align-items:flex-start}}
+@media(min-width:768px){body{padding:2rem 1.5rem}}
+@media(min-width:1100px){body{padding:2.5rem 2rem}}
 .wrap{width:100%;max-width:860px}
-@media(min-width:900px){.wrap{max-width:980px}}
+@media(min-width:1100px){.wrap{max-width:1040px}}
 .card{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:14px;padding:1.25rem}
-@media(min-width:600px){.card{padding:1.75rem}}
-@media(min-width:900px){.card{padding:2.25rem 2.5rem}}
+@media(min-width:600px){.card{padding:1.75rem 2rem}}
+@media(min-width:1100px){.card{padding:2rem 2.5rem}}
 
 /* HEADER */
 .hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.1rem;border-bottom:1px solid #2a2a2a;padding-bottom:.9rem;flex-wrap:wrap;gap:8px}
@@ -202,13 +203,17 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
   <div class="card">
     <div class="hdr">
       <div class="hdr-left">
-        <a href="/" style="text-decoration:none;display:flex;align-items:center;gap:10px">
-          <div style="width:34px;height:34px;border-radius:50%;border:1.5px solid #c8903a;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#0a0800">
-            <span style="font-family:Georgia,serif;font-size:13px;font-weight:700;color:#c8903a;letter-spacing:-.5px">HC</span>
+        <a href="/" style="text-decoration:none;display:flex;align-items:center;gap:11px">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="18" r="17" stroke="#c8903a" stroke-width="1.2"/>
+            <circle cx="18" cy="18" r="14" stroke="#c8903a" stroke-width="0.4" stroke-dasharray="2 2"/>
+            <text x="18" y="23" text-anchor="middle" font-family="Georgia,serif" font-size="12" font-weight="700" fill="#c8903a" letter-spacing="-0.5">HC</text>
+          </svg>
+          <div>
+            <div class="ttl">History Challenger</div>
+            <div class="ttl-sub" id="ttl-sub">Prove your historical mastery</div>
           </div>
-          <div class="ttl">History Challenger</div>
         </a>
-        <div class="ttl-sub" id="ttl-sub">Prove your historical mastery</div>
       </div>
       <div class="hdr-right">
         <div class="mets" id="mets" style="display:none">

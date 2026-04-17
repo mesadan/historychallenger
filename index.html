@@ -11,32 +11,14 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://historychallenger.com">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="History Challenger — Free Online History Quiz">
-<meta name="twitter:description" content="Place historical events on a timeline. Free history quiz game covering every era and civilization.">
 <meta name="theme-color" content="#000000">
 <link rel="canonical" href="https://historychallenger.com">
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "History Challenger",
-  "description": "A free online history quiz game where players place historical events on a timeline. Tests knowledge across all eras and civilizations.",
-  "url": "https://historychallenger.com",
-  "applicationCategory": "GameApplication",
-  "genre": "Educational Game",
-  "operatingSystem": "Any",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
-  },
-  "keywords": "history quiz, history challenge, history test, history game, timeline quiz",
-  "inLanguage": ["en", "fr", "de", "es"]
-}
+{"@context":"https://schema.org","@type":"WebApplication","name":"History Challenger","description":"A free online history quiz game where players place historical events on a timeline.","url":"https://historychallenger.com","applicationCategory":"GameApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
 </script>
-<meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#000000">
-<link rel="canonical" href="https://historychallenger.com">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is History Challenger?","acceptedAnswer":{"@type":"Answer","text":"A free online history quiz game where you place historical events on a timeline. No account required."}},{"@type":"Question","name":"Is History Challenger free?","acceptedAnswer":{"@type":"Answer","text":"Yes, completely free. Sign in with Google to save scores and track progress."}}]}
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -47,13 +29,13 @@ nav{position:sticky;top:0;z-index:100;background:rgba(0,0,0,0.92);backdrop-filte
 .nav-inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
 .nav-logo{font-family:Georgia,serif;font-size:18px;font-weight:700;color:#fff;text-decoration:none}
 .nav-logo span{color:#c8903a}
-.nav-links{display:flex;align-items:center;gap:24px}
+.nav-links{display:flex;align-items:center;gap:20px}
 .nav-links a{color:#888;font-size:14px;transition:color .15s}
 .nav-links a:hover{color:#fff;text-decoration:none}
 .nav-play{background:#c8903a;color:#000!important;border-radius:8px;padding:7px 18px;font-weight:700;font-size:14px}
 .nav-play:hover{background:#e0a84a!important;text-decoration:none!important}
-.lang-select{background:#111;border:1px solid #2a2a2a;border-radius:7px;padding:5px 8px;font-size:13px;color:#888;cursor:pointer;font-family:-apple-system,sans-serif;outline:none;appearance:none;-webkit-appearance:none;padding-right:22px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center}
-.lang-select:hover{border-color:#444;color:#ccc}
+.lang-select{background:#111;border:1px solid #2a2a2a;border-radius:7px;padding:5px 28px 5px 8px;font-size:13px;color:#aaa;cursor:pointer;font-family:-apple-system,sans-serif;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.lang-select:hover{border-color:#444}
 .lang-select option{background:#111}
 .hero{min-height:92vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 1.5rem}
 .hero-eyebrow{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#c8903a;margin-bottom:1.25rem;font-weight:600}
@@ -87,7 +69,7 @@ section{padding:5rem 1.5rem}
 .diffs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.25rem;margin-top:2.5rem}
 .diff-card{border:1px solid #2a2a2a;border-radius:12px;padding:1.5rem;background:#0d0d0d}
 .diff-name{font-size:16px;font-weight:700;margin-bottom:.3rem}
-.diff-tag{font-size:11px;color:#c8903a;background:#1a1000;border:1px solid #c8903a33;border-radius:3px;padding:2px 8px;display:inline-block;margin-bottom:.75rem;letter-spacing:.03em}
+.diff-tag{font-size:11px;color:#c8903a;background:#1a1000;border:1px solid #c8903a33;border-radius:3px;padding:2px 8px;display:inline-block;margin-bottom:.75rem}
 .diff-desc{font-size:13px;color:#777;line-height:1.5}
 .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;margin-top:2rem}
 @media(max-width:640px){.about-grid{grid-template-columns:1fr}}
@@ -135,10 +117,10 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
         <option value="de">🇩🇪 DE</option>
         <option value="es">🇪🇸 ES</option>
       </select>
-      <a href="#how-it-works">How it works</a>
-      <a href="#about">About</a>
-      <a href="/blog.html">Blog</a>
-      <a href="/play.html" class="nav-play">Play free →</a>
+      <a href="#how-it-works" id="nav-how">How it works</a>
+      <a href="#about" id="nav-about">About</a>
+      <a href="/blog.html" id="nav-blog">Blog</a>
+      <a href="/play.html" class="nav-play" id="nav-play">Play free →</a>
     </div>
   </div>
 </nav>
@@ -146,75 +128,82 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
 <div id="main">
 
 <section class="hero">
-  <div id="hero-eyebrow" class="hero-eyebrow">Free · No account required · AI-powered</div>
-  <h1 class="hero-title" id="hero-title">How well do you <span>know history?</span></h1>
-  <p class="hero-sub" id="hero-sub">Place historical events on a timeline. Score points for getting the right order and the right era. From the Bronze Age to the Cold War — across every civilization.</p>
+  <div id="t-eyebrow" class="hero-eyebrow"></div>
+  <h1 class="hero-title" id="t-title"></h1>
+  <p class="hero-sub" id="t-sub"></p>
   <div class="hero-cta">
-    <a href="/play.html" class="btn-primary" id="hero-cta1">Play now — it's free</a>
-    <a href="#how-it-works" class="btn-secondary" id="hero-cta2">How it works</a>
+    <a href="/play.html" class="btn-primary" id="t-cta1"></a>
+    <a href="#how-it-works" class="btn-secondary" id="t-cta2"></a>
   </div>
-  <p class="hero-note" id="hero-note">No download · Plays in your browser · Mobile friendly</p>
+  <p class="hero-note" id="t-note"></p>
   <div style="margin-top:1.5rem;padding:1rem 1.5rem;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:10px;font-family:-apple-system,sans-serif;font-size:14px;color:#888;max-width:520px;text-align:left">
-    <span style="color:#c8903a;font-weight:600">📜 From the blog: </span>
-    <a href="/blog.html" id="hero-blog-teaser" style="color:#ddd">There is more time between Cleopatra and the pyramids than between Cleopatra and us →</a>
+    <span style="color:#c8903a;font-weight:600">📜 </span>
+    <a href="/blog.html" id="t-blog-link" style="color:#ddd"></a>
   </div>
   <div class="preview">
-    <div class="preview-badge">📜 Drag events onto the timeline</div>
+    <div class="preview-badge" id="t-preview-badge"></div>
     <div class="preview-cards">
-      <div class="preview-card">Battle of Hastings</div>
-      <div class="preview-card">Fall of Constantinople</div>
-      <div class="preview-card">Black Death reaches Europe</div>
+      <div class="preview-card" id="t-pc1">Battle of Hastings</div>
+      <div class="preview-card" id="t-pc2">Fall of Constantinople</div>
+      <div class="preview-card" id="t-pc3">Black Death reaches Europe</div>
     </div>
     <div class="preview-bar"><div class="preview-bar-inner"></div></div>
     <div class="preview-anchors">
-      <span>Julius Caesar <strong style="color:#c8903a">44 BC</strong></span>
-      <span><strong style="color:#c8903a">1687 AD</strong> Newton's Principia</span>
+      <span id="t-anc1">Julius Caesar <strong style="color:#c8903a">44 BC</strong></span>
+      <span id="t-anc2"><strong style="color:#c8903a">1687 AD</strong> Newton's Principia</span>
     </div>
   </div>
 </section>
 
 <section id="how-it-works" style="background:#080808;border-top:1px solid #111;border-bottom:1px solid #111">
   <div class="section-inner">
-    <div class="section-label">How it works</div>
-    <h2 class="section-title" id="how-title">Simple to learn, hard to master</h2>
-    <p class="section-sub" id="how-sub">Each round gives you 5 historical events. Place them on a timeline as accurately as possible.</p>
+    <div class="section-label" id="t-lbl-how"></div>
+    <h2 class="section-title" id="t-how-title"></h2>
+    <p class="section-sub" id="t-how-sub"></p>
     <div class="steps">
-      <div class="step"><div class="step-num">1</div><div class="step-title" id="step1-title">Find the anchors</div><div class="step-desc" id="step1-desc">Identify which event came first and which came last. These define the scale of your timeline for the round.</div></div>
-      <div class="step"><div class="step-num">2</div><div class="step-title" id="step2-title">Place the rest</div><div class="step-desc" id="step2-desc">Drag the remaining 3 events onto the bar. A bracket tooltip shows the time window at your cursor as you drag.</div></div>
-      <div class="step"><div class="step-num">3</div><div class="step-title" id="step3-title">Score points</div><div class="step-desc" id="step3-desc">Full marks for the right bracket. Partial credit for being close. The precision required scales with the time span.</div></div>
+      <div class="step"><div class="step-num">1</div><div class="step-title" id="t-s1t"></div><div class="step-desc" id="t-s1d"></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-title" id="t-s2t"></div><div class="step-desc" id="t-s2d"></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-title" id="t-s3t"></div><div class="step-desc" id="t-s3d"></div></div>
     </div>
   </div>
 </section>
 
 <section>
   <div class="section-inner">
-    <div class="section-label">Difficulty</div>
-    <h2 class="section-title" id="diff-title">Choose your challenge</h2>
-    <p class="section-sub" id="diff-sub">Three levels from broadly famous events spanning millennia to expert events packed into the same decade.</p>
+    <div class="section-label" id="t-lbl-diff"></div>
+    <h2 class="section-title" id="t-diff-title"></h2>
+    <p class="section-sub" id="t-diff-sub"></p>
     <div class="diffs">
-      <div class="diff-card"><div class="diff-name">🕯 Disciple</div><div class="diff-tag">Famous events · Wide spans</div><div class="diff-desc">Events any educated adult would recognize. Spans thousands of years. Generous scoring. Perfect for beginners.</div></div>
-      <div class="diff-card"><div class="diff-name">⚔️ Master</div><div class="diff-tag">Mixed eras · Real knowledge</div><div class="diff-desc">A mix of clustered and outlier events. You'll need genuine knowledge beyond headlines and Wikipedia summaries.</div></div>
-      <div class="diff-card"><div class="diff-name">🏆 Keeper of Time</div><div class="diff-tag">Same era · Expert precision</div><div class="diff-desc">All 5 events from the same tight period — same war, same reign, same decade. Specialist knowledge only.</div></div>
+      <div class="diff-card">
+        <div class="diff-name">🕯 <span id="t-d1name"></span></div>
+        <div class="diff-tag" id="t-d1tag"></div>
+        <div class="diff-desc" id="t-d1desc"></div>
+      </div>
+      <div class="diff-card">
+        <div class="diff-name">⚔️ <span id="t-d2name"></span></div>
+        <div class="diff-tag" id="t-d2tag"></div>
+        <div class="diff-desc" id="t-d2desc"></div>
+      </div>
+      <div class="diff-card">
+        <div class="diff-name">🏆 <span id="t-d3name"></span></div>
+        <div class="diff-tag" id="t-d3tag"></div>
+        <div class="diff-desc" id="t-d3desc"></div>
+      </div>
     </div>
   </div>
 </section>
 
 <section id="about" style="background:#080808;border-top:1px solid #111;border-bottom:1px solid #111">
   <div class="section-inner">
-    <div class="section-label">About</div>
-    <h2 class="section-title" id="about-title">Built for curious minds</h2>
+    <div class="section-label" id="t-lbl-about"></div>
+    <h2 class="section-title" id="t-about-title"></h2>
     <div class="about-grid">
-      <div class="about-text">
-        <p>History Challenger was built out of a simple frustration: most history quizzes are multiple choice, and multiple choice lets you guess. We wanted something that tested genuine temporal reasoning — not just "did you recognize the name" but "do you actually know when things happened?"</p>
-        <p>Every game is generated fresh by AI, drawing on the full breadth of human history — from Bronze Age Mesopotamia to the Cold War, from European kingdoms to Asian dynasties, from battles to scientific discoveries to cultural milestones.</p>
-        <p>The game adapts its scoring to the timeline you're given. Playing events from a single decade? Brackets are 1 year wide. Spanning 3000 years? They're 100 years wide.</p>
-        <p>Free to play. No account required to start. Sign in to track your scores and streaks over time.</p>
-      </div>
+      <div class="about-text" id="t-about-text"></div>
       <div class="about-stats">
-        <div class="about-stat"><div class="about-stat-val">∞</div><div class="about-stat-lbl">Unique games</div></div>
-        <div class="about-stat"><div class="about-stat-val">5000+</div><div class="about-stat-lbl">Years of history</div></div>
-        <div class="about-stat"><div class="about-stat-val">3</div><div class="about-stat-lbl">Difficulty levels</div></div>
-        <div class="about-stat"><div class="about-stat-val">4</div><div class="about-stat-lbl">Languages</div></div>
+        <div class="about-stat"><div class="about-stat-val">∞</div><div class="about-stat-lbl" id="t-stat1"></div></div>
+        <div class="about-stat"><div class="about-stat-val">5000+</div><div class="about-stat-lbl" id="t-stat2"></div></div>
+        <div class="about-stat"><div class="about-stat-val">3</div><div class="about-stat-lbl" id="t-stat3"></div></div>
+        <div class="about-stat"><div class="about-stat-val">4</div><div class="about-stat-lbl" id="t-stat4"></div></div>
       </div>
     </div>
   </div>
@@ -222,40 +211,34 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
 
 <section>
   <div class="section-inner">
-    <div class="section-label">FAQ</div>
-    <h2 class="section-title" id="faq-title">Questions</h2>
-    <div class="faqs">
-      <div class="faq" onclick="this.classList.toggle('open')"><div class="faq-q">Is it really free?</div><div class="faq-a">Yes. You can play without creating an account. Sign in with Google to save your scores, track streaks, and play unlimited games.</div></div>
-      <div class="faq" onclick="this.classList.toggle('open')"><div class="faq-q">How are events generated?</div><div class="faq-a">Every game is generated fresh by Claude (Anthropic's AI), drawing on historical knowledge spanning all eras and civilizations. Each session gets unique events you haven't seen before.</div></div>
-      <div class="faq" onclick="this.classList.toggle('open')"><div class="faq-q">Can I choose a historical theme?</div><div class="faq-a">Yes — the Theme Challenge mode lets you pick a specific era, region, or topic. Choose from presets like "World War II" or type any custom theme.</div></div>
-      <div class="faq" onclick="this.classList.toggle('open')"><div class="faq-q">What languages are supported?</div><div class="faq-a">English, French, German, and Spanish. Select your language on the game screen — all events are generated directly in your chosen language.</div></div>
-      <div class="faq" onclick="this.classList.toggle('open')"><div class="faq-q">How is scoring calculated?</div><div class="faq-a">40 points for correctly identifying the earliest and most recent events. 60 points for placing the remaining 3 events accurately. Bracket size and tolerance scale dynamically with your round's time span.</div></div>
-    </div>
+    <div class="section-label" id="t-lbl-faq"></div>
+    <h2 class="section-title" id="t-faq-title"></h2>
+    <div class="faqs" id="t-faqs"></div>
   </div>
 </section>
 
 <section style="background:#080808;border-top:1px solid #111;border-bottom:1px solid #111">
   <div class="section-inner">
-    <div class="section-label">From the blog</div>
-    <h2 class="section-title">History worth reading</h2>
+    <div class="section-label" id="t-lbl-blog"></div>
+    <h2 class="section-title" id="t-blog-title"></h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem;margin-top:2rem">
       <div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:1.5rem">
-        <div style="font-size:11px;color:#c8903a;font-weight:600;margin-bottom:.5rem">📜 TIMELINE FACTS</div>
-        <div style="font-family:Georgia,serif;font-size:1.1rem;font-weight:700;margin-bottom:.75rem;line-height:1.3">10 Facts That Will Break Your Sense of Time</div>
-        <div style="font-size:13px;color:#666;margin-bottom:1rem">Cleopatra lived closer to the Moon landing than to the pyramids.</div>
-        <a href="/blog.html" style="color:#c8903a;font-size:13px;font-weight:600">Read →</a>
+        <div style="font-size:11px;color:#c8903a;font-weight:600;margin-bottom:.5rem">📜 <span id="t-bl1cat"></span></div>
+        <div style="font-family:Georgia,serif;font-size:1.1rem;font-weight:700;margin-bottom:.75rem;line-height:1.3" id="t-bl1title"></div>
+        <div style="font-size:13px;color:#666;margin-bottom:1rem" id="t-bl1desc"></div>
+        <a href="/blog.html" style="color:#c8903a;font-size:13px;font-weight:600" id="t-read">Read →</a>
       </div>
       <div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:1.5rem">
-        <div style="font-size:11px;color:#c8903a;font-weight:600;margin-bottom:.5rem">🔍 HISTORY MYTHS</div>
-        <div style="font-family:Georgia,serif;font-size:1.1rem;font-weight:700;margin-bottom:.75rem;line-height:1.3">9 Historical Myths Most People Still Believe</div>
-        <div style="font-size:13px;color:#666;margin-bottom:1rem">Napoleon wasn't short. Medieval people knew the Earth was round.</div>
-        <a href="/misconceptions.html" style="color:#c8903a;font-size:13px;font-weight:600">Read →</a>
+        <div style="font-size:11px;color:#c8903a;font-weight:600;margin-bottom:.5rem">🔍 <span id="t-bl2cat"></span></div>
+        <div style="font-family:Georgia,serif;font-size:1.1rem;font-weight:700;margin-bottom:.75rem;line-height:1.3" id="t-bl2title"></div>
+        <div style="font-size:13px;color:#666;margin-bottom:1rem" id="t-bl2desc"></div>
+        <a href="/misconceptions.html" style="color:#c8903a;font-size:13px;font-weight:600" id="t-read2">Read →</a>
       </div>
       <div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:12px;padding:1.5rem">
-        <div style="font-size:11px;color:#c8903a;font-weight:600;margin-bottom:.5rem">⚔️ MILITARY HISTORY</div>
-        <div style="font-family:Georgia,serif;font-size:1.1rem;font-weight:700;margin-bottom:.75rem;line-height:1.3">Battles That Changed History But Nobody Talks About</div>
-        <div style="font-size:13px;color:#666;margin-bottom:1rem">Cape Ecnomus. Ain Jalut. Khalkhyn Gol. The battles that shaped the world.</div>
-        <a href="/battles.html" style="color:#c8903a;font-size:13px;font-weight:600">Read →</a>
+        <div style="font-size:11px;color:#c8903a;font-weight:600;margin-bottom:.5rem">⚔️ <span id="t-bl3cat"></span></div>
+        <div style="font-family:Georgia,serif;font-size:1.1rem;font-weight:700;margin-bottom:.75rem;line-height:1.3" id="t-bl3title"></div>
+        <div style="font-size:13px;color:#666;margin-bottom:1rem" id="t-bl3desc"></div>
+        <a href="/battles.html" style="color:#c8903a;font-size:13px;font-weight:600" id="t-read3">Read →</a>
       </div>
     </div>
   </div>
@@ -263,254 +246,288 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
 
 <section style="text-align:center">
   <div class="section-inner">
-    <h2 class="section-title" id="cta-title" style="margin-bottom:1rem">Ready to test yourself?</h2>
-    <p id="cta-sub" style="color:#666;margin-bottom:2rem;font-size:16px">No signup required. Pick a difficulty and go.</p>
-    <a href="/play.html" class="btn-primary nav-play" id="cta-btn" style="font-size:18px;padding:16px 40px">Start playing →</a>
+    <h2 class="section-title" id="t-cta-title" style="margin-bottom:1rem"></h2>
+    <p id="t-cta-sub" style="color:#666;margin-bottom:2rem;font-size:16px"></p>
+    <a href="/play.html" class="btn-primary" id="t-cta-btn" style="font-size:18px;padding:16px 40px"></a>
   </div>
 </section>
 
-</div><!-- #main -->
+</div>
 
 <!-- PRIVACY -->
 <div id="privacy" class="legal-wrap">
   <button class="legal-back" onclick="showLegal(null)">← Back</button>
-  <h1>Privacy Policy</h1>
-  <div class="legal-date">Last updated: April 2026</div>
-  <h2>Who we are</h2>
-  <p>History Challenger is operated as an independent project. Contact: <a href="mailto:info@historychallenger.com">info@historychallenger.com</a></p>
-  <h2>What data we collect</h2>
-  <p>Guests: nothing stored on our servers. We use browser local storage to count guest games — this stays on your device only.</p>
-  <p>Signed-in users: email address, display name, profile picture URL, game scores and session history, play streak and statistics.</p>
-  <h2>How we use your data</h2>
-  <p>Solely to provide the game experience. We do not sell your data. We do not use your data for advertising.</p>
-  <h2>Data storage and security</h2>
-  <p>Data is stored in Cloudflare's D1 database infrastructure. We use encrypted connections and secure token-based authentication.</p>
-  <h2>Your rights (GDPR)</h2>
-  <p>EEA users have the right to access, correct, or delete personal data at any time. Contact <a href="mailto:info@historychallenger.com">info@historychallenger.com</a> — we'll respond within 30 days.</p>
-  <h2>Cookies</h2>
-  <p>We use a single authentication token in browser local storage to keep you signed in. No advertising cookies or third-party tracking.</p>
-  <h2>Third-party services</h2>
-  <p>Google OAuth for sign-in and Anthropic's Claude API for event generation. Neither receives personal data beyond what is necessary for their function.</p>
-  <h2>Children</h2>
-  <p>Not directed at children under 13. We do not knowingly collect data from children under 13.</p>
-  <h2>Contact</h2>
-  <p><a href="mailto:info@historychallenger.com">info@historychallenger.com</a></p>
+  <h1>Privacy Policy</h1><div class="legal-date">Last updated: April 2026</div>
+  <h2>Who we are</h2><p>History Challenger is operated as an independent project. Contact: <a href="mailto:info@historychallenger.com">info@historychallenger.com</a></p>
+  <h2>What data we collect</h2><p>Guests: nothing stored on our servers. We use browser local storage to count guest games.</p><p>Signed-in users: email address, display name, profile picture URL, game scores and session history, play streak and statistics.</p>
+  <h2>How we use your data</h2><p>Solely to provide the game experience. We do not sell your data. We do not use your data for advertising.</p>
+  <h2>Data storage and security</h2><p>Data is stored in Cloudflare's D1 database infrastructure. We use encrypted connections and secure token-based authentication.</p>
+  <h2>Your rights (GDPR)</h2><p>EEA users have the right to access, correct, or delete personal data at any time. Contact <a href="mailto:info@historychallenger.com">info@historychallenger.com</a> — we'll respond within 30 days.</p>
+  <h2>Cookies</h2><p>We use a single authentication token in browser local storage to keep you signed in. No advertising cookies or third-party tracking.</p>
+  <h2>Third-party services</h2><p>Google OAuth for sign-in and Anthropic's Claude API for event generation.</p>
+  <h2>Children</h2><p>Not directed at children under 13.</p>
+  <h2>Contact</h2><p><a href="mailto:info@historychallenger.com">info@historychallenger.com</a></p>
 </div>
 
 <!-- TERMS -->
 <div id="terms" class="legal-wrap">
   <button class="legal-back" onclick="showLegal(null)">← Back</button>
-  <h1>Terms of Service</h1>
-  <div class="legal-date">Last updated: April 2026</div>
-  <h2>Acceptance</h2>
-  <p>By using History Challenger, you agree to these Terms. If you do not agree, please do not use the service.</p>
-  <h2>The service</h2>
-  <p>History Challenger is a free online history quiz game. We reserve the right to modify, suspend, or discontinue any part of the service at any time.</p>
-  <h2>Accounts</h2>
-  <p>You may play as a guest without an account. If you sign in, you are responsible for the security of your account.</p>
-  <h2>Acceptable use</h2>
-  <p>You agree not to: manipulate scores through technical means; use automated tools; reverse-engineer our AI prompts or systems; use the service for any unlawful purpose.</p>
-  <h2>Content accuracy</h2>
-  <p>Historical events are AI-generated and intended to be accurate, but we do not guarantee accuracy. Report errors to <a href="mailto:info@historychallenger.com">info@historychallenger.com</a>.</p>
-  <h2>Intellectual property</h2>
-  <p>The History Challenger name, design, and code are our intellectual property. You may not reproduce or redistribute them without permission.</p>
-  <h2>Disclaimer</h2>
-  <p>The service is provided "as is" without warranties of any kind.</p>
-  <h2>Limitation of liability</h2>
-  <p>To the maximum extent permitted by law, we are not liable for any indirect, incidental, or consequential damages.</p>
-  <h2>Governing law</h2>
-  <p>These terms are governed by the laws of France.</p>
-  <h2>Contact</h2>
-  <p><a href="mailto:info@historychallenger.com">info@historychallenger.com</a></p>
+  <h1>Terms of Service</h1><div class="legal-date">Last updated: April 2026</div>
+  <h2>Acceptance</h2><p>By using History Challenger, you agree to these Terms.</p>
+  <h2>The service</h2><p>History Challenger is a free online history quiz game. We reserve the right to modify, suspend, or discontinue any part of the service at any time.</p>
+  <h2>Accounts</h2><p>You may play as a guest without an account. If you sign in, you are responsible for the security of your account.</p>
+  <h2>Acceptable use</h2><p>You agree not to: manipulate scores through technical means; use automated tools; reverse-engineer our AI prompts or systems; use the service for any unlawful purpose.</p>
+  <h2>Content accuracy</h2><p>Historical events are AI-generated and intended to be accurate, but we do not guarantee accuracy.</p>
+  <h2>Intellectual property</h2><p>The History Challenger name, design, and code are our intellectual property.</p>
+  <h2>Disclaimer</h2><p>The service is provided "as is" without warranties of any kind.</p>
+  <h2>Limitation of liability</h2><p>To the maximum extent permitted by law, we are not liable for any indirect, incidental, or consequential damages.</p>
+  <h2>Governing law</h2><p>These terms are governed by the laws of France.</p>
+  <h2>Contact</h2><p><a href="mailto:info@historychallenger.com">info@historychallenger.com</a></p>
 </div>
 
 <footer>
   <div class="footer-inner">
     <div class="footer-logo">History <span>Challenger</span></div>
     <div class="footer-links">
-      <a href="#about">About</a>
-      <a href="#how-it-works">How it works</a>
+      <a href="#about" id="f-about">About</a>
+      <a href="#how-it-works" id="f-how">How it works</a>
       <a href="/blog.html">Blog</a>
-      <a href="#" onclick="showLegal('privacy');return false">Privacy Policy</a>
-      <a href="#" onclick="showLegal('terms');return false">Terms of Service</a>
-      <a href="mailto:info@historychallenger.com">Contact</a>
+      <a href="#" onclick="showLegal('privacy');return false" id="f-privacy">Privacy Policy</a>
+      <a href="#" onclick="showLegal('terms');return false" id="f-terms">Terms of Service</a>
+      <a href="mailto:info@historychallenger.com" id="f-contact">Contact</a>
     </div>
     <div class="footer-copy">© 2026 History Challenger · All rights reserved</div>
   </div>
 </footer>
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "What is History Challenger?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "History Challenger is a free online history quiz game where you place historical events on a timeline. Score points for getting the right order and the right era. No account required to play."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Is History Challenger free?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes, History Challenger is completely free to play. You can play without creating an account. Sign in with Google to save your scores and track your progress."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How does the history quiz work?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Each round gives you 5 historical events. First identify the earliest and most recent events to set the timeline scale. Then place the remaining 3 events on the timeline bar as accurately as possible. Score points for correct placement."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What history topics does the quiz cover?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "History Challenger covers all eras and civilizations — from the Bronze Age to the Cold War, from European kingdoms to Asian dynasties, from battles to scientific discoveries. You can also choose specific themes like World Wars, Ancient Rome, or the Cold War."
-      }
-    }
-  ]
-}
-</script>
 <script>
-const LANDING_T = {
+const T = {
   en: {
-    eyebrow: 'Free · No account required · AI-powered',
-    title: 'How well do you <span>know history?</span>',
-    sub: 'Place historical events on a timeline. Score points for getting the right order and the right era. From the Bronze Age to the Cold War — across every civilization.',
-    cta1: 'Play now — it\'s free', cta2: 'How it works',
-    note: 'No download · Plays in your browser · Mobile friendly',
-    blogTeaser: 'There is more time between Cleopatra and the pyramids than between Cleopatra and us →',
-    howTitle: 'Simple to learn, hard to master',
-    howSub: 'Each round gives you 5 historical events. Place them on a timeline as accurately as possible.',
-    s1t: 'Find the anchors', s1d: 'Identify which event came first and which came last. These define the scale of your timeline for the round.',
-    s2t: 'Place the rest', s2d: 'Drag the remaining 3 events onto the bar. A bracket tooltip shows the time window at your cursor as you drag.',
-    s3t: 'Score points', s3d: 'Full marks for the right bracket. Partial credit for being close. The precision required scales with the time span.',
-    diffTitle: 'Choose your challenge',
-    diffSub: 'Three levels from broadly famous events spanning millennia to expert events packed into the same decade.',
-    aboutTitle: 'Built for curious minds',
-    ctaTitle: 'Ready to test yourself?',
-    ctaSub: 'No signup required. Pick a difficulty and go.',
-    ctaBtn: 'Start playing →',
-    faqTitle: 'Questions',
-    play: 'Play free →'
+    eyebrow:'Free · No account required · AI-powered',
+    title:'How well do you <span>know history?</span>',
+    sub:'Place historical events on a timeline. Score points for getting the right order and the right era. From the Bronze Age to the Cold War — across every civilization.',
+    cta1:"Play now — it's free", cta2:'How it works',
+    note:'No download · Plays in your browser · Mobile friendly',
+    blogLink:'There is more time between Cleopatra and the pyramids than between Cleopatra and us →',
+    previewBadge:'📜 Drag events onto the timeline',
+    pc1:'Battle of Hastings', pc2:'Fall of Constantinople', pc3:'Black Death reaches Europe',
+    anc1:'Julius Caesar <strong style="color:#c8903a">44 BC</strong>',
+    anc2:'<strong style="color:#c8903a">1687 AD</strong> Newton\'s Principia',
+    lblHow:'How it works', howTitle:'Simple to learn, hard to master',
+    howSub:'Each round gives you 5 historical events. Place them on a timeline as accurately as possible.',
+    s1t:'Find the anchors', s1d:'Identify which event came first and which came last. These define the scale of your timeline for the round.',
+    s2t:'Place the rest', s2d:'Drag the remaining 3 events onto the bar. A bracket tooltip shows the time window at your cursor as you drag.',
+    s3t:'Score points', s3d:'Full marks for the right bracket. Partial credit for being close. The precision required scales with the time span.',
+    lblDiff:'Difficulty', diffTitle:'Choose your challenge',
+    diffSub:'Three levels from broadly famous events spanning millennia to expert events packed into the same decade.',
+    d1name:'Disciple', d1tag:'Famous events · Wide spans', d1desc:'Events any educated adult would recognize. Spans thousands of years. Generous scoring. Perfect for beginners.',
+    d2name:'Master', d2tag:'Mixed eras · Real knowledge', d2desc:"A mix of clustered and outlier events. You'll need genuine knowledge beyond headlines and Wikipedia summaries.",
+    d3name:'Keeper of Time', d3tag:'Same era · Expert precision', d3desc:'All 5 events from the same tight period — same war, same reign, same decade. Specialist knowledge only.',
+    lblAbout:'About', aboutTitle:'Built for curious minds',
+    aboutText:'<p>History Challenger was built out of a simple frustration: most history quizzes are multiple choice, and multiple choice lets you guess. We wanted something that tested genuine temporal reasoning — not just "did you recognize the name" but "do you actually know when things happened?"</p><p>Every game is generated fresh by AI, drawing on the full breadth of human history — from Bronze Age Mesopotamia to the Cold War, from European kingdoms to Asian dynasties, from battles to scientific discoveries.</p><p>The game adapts its scoring to the timeline you\'re given. Playing events from a single decade? Brackets are 1 year wide. Spanning 3000 years? They\'re 100 years wide.</p><p>Free to play. No account required to start. Sign in to track your scores and streaks over time.</p>',
+    stat1:'Unique games', stat2:'Years of history', stat3:'Difficulty levels', stat4:'Languages',
+    lblFaq:'FAQ', faqTitle:'Questions',
+    faqs:[
+      {q:'Is it really free?', a:'Yes. You can play without creating an account. Sign in with Google to save your scores, track streaks, and play unlimited games.'},
+      {q:'How are events generated?', a:"Every game is generated fresh by Claude (Anthropic's AI), drawing on historical knowledge spanning all eras and civilizations."},
+      {q:'Can I choose a historical theme?', a:'Yes — the Theme Challenge mode lets you pick a specific era, region, or topic. Choose from presets like "World War II" or type any custom theme.'},
+      {q:'What languages are supported?', a:'English, French, German, and Spanish. Select your language on the game screen.'},
+      {q:'How is scoring calculated?', a:'40 points for correctly identifying the earliest and most recent events. 60 points for placing the remaining 3 events accurately.'}
+    ],
+    lblBlog:'From the blog', blogTitle:'History worth reading',
+    bl1cat:'TIMELINE FACTS', bl1title:'10 Facts That Will Break Your Sense of Time', bl1desc:'Cleopatra lived closer to the Moon landing than to the pyramids.',
+    bl2cat:'HISTORY MYTHS', bl2title:'9 Historical Myths Most People Still Believe', bl2desc:"Napoleon wasn't short. Medieval people knew the Earth was round.",
+    bl3cat:'MILITARY HISTORY', bl3title:'Battles That Changed History But Nobody Talks About', bl3desc:'Cape Ecnomus. Ain Jalut. Khalkhyn Gol. The battles that shaped the world.',
+    read:'Read →',
+    ctaTitle:'Ready to test yourself?', ctaSub:'No signup required. Pick a difficulty and go.', ctaBtn:'Start playing →',
+    navHow:'How it works', navAbout:'About', navBlog:'Blog', navPlay:'Play free →',
+    fAbout:'About', fHow:'How it works', fPrivacy:'Privacy Policy', fTerms:'Terms of Service', fContact:'Contact'
   },
   fr: {
-    eyebrow: 'Gratuit · Sans inscription · Propulsé par IA',
-    title: 'Connaissez-vous bien <span>l\'histoire ?</span>',
-    sub: 'Placez des événements historiques sur une frise. Marquez des points en trouvant le bon ordre et la bonne époque. De l\'Âge du Bronze à la Guerre Froide.',
-    cta1: 'Jouer — c\'est gratuit', cta2: 'Comment ça marche',
-    note: 'Sans téléchargement · Dans le navigateur · Compatible mobile',
-    blogTeaser: 'Il y a plus de temps entre Cléopâtre et les pyramides qu\'entre Cléopâtre et nous →',
-    howTitle: 'Simple à apprendre, difficile à maîtriser',
-    howSub: 'Chaque manche vous donne 5 événements historiques. Placez-les sur la frise le plus précisément possible.',
-    s1t: 'Trouvez les ancres', s1d: 'Identifiez quel événement est arrivé en premier et lequel en dernier. Ils définissent l\'échelle de votre frise.',
-    s2t: 'Placez le reste', s2d: 'Faites glisser les 3 événements restants sur la barre. Une infobulle montre la fenêtre temporelle en direct.',
-    s3t: 'Marquez des points', s3d: 'Points complets pour la bonne tranche. Points partiels si vous êtes proche. La précision requise s\'adapte à la période.',
-    diffTitle: 'Choisissez votre défi',
-    diffSub: 'Trois niveaux, des événements les plus célèbres aux événements d\'expert dans la même décennie.',
-    aboutTitle: 'Conçu pour les esprits curieux',
-    ctaTitle: 'Prêt à vous tester ?',
-    ctaSub: 'Sans inscription. Choisissez une difficulté et commencez.',
-    ctaBtn: 'Commencer →',
-    faqTitle: 'Questions',
-    play: 'Jouer →'
+    eyebrow:'Gratuit · Sans inscription · Propulsé par IA',
+    title:'Connaissez-vous bien <span>l\'histoire ?</span>',
+    sub:"Placez des événements historiques sur une frise chronologique. Marquez des points en trouvant le bon ordre et la bonne époque. De l'Âge du Bronze à la Guerre Froide.",
+    cta1:"Jouer — c'est gratuit", cta2:'Comment ça marche',
+    note:'Sans téléchargement · Dans le navigateur · Compatible mobile',
+    blogLink:"Il y a plus de temps entre Cléopâtre et les pyramides qu'entre Cléopâtre et nous →",
+    previewBadge:'📜 Faites glisser les événements',
+    pc1:'Bataille de Hastings', pc2:'Chute de Constantinople', pc3:'La Peste Noire en Europe',
+    anc1:'Jules César <strong style="color:#c8903a">44 av. J.-C.</strong>',
+    anc2:'<strong style="color:#c8903a">1687 ap. J.-C.</strong> Principia de Newton',
+    lblHow:'Comment jouer', howTitle:'Simple à apprendre, difficile à maîtriser',
+    howSub:'Chaque manche vous donne 5 événements historiques. Placez-les sur la frise le plus précisément possible.',
+    s1t:'Trouvez les ancres', s1d:'Identifiez quel événement est arrivé en premier et lequel en dernier. Ils définissent l\'échelle de votre frise.',
+    s2t:'Placez le reste', s2d:'Faites glisser les 3 événements restants sur la barre. Une infobulle indique la fenêtre temporelle en direct.',
+    s3t:'Marquez des points', s3d:'Points complets pour la bonne position. Points partiels si vous êtes proche.',
+    lblDiff:'Difficulté', diffTitle:'Choisissez votre défi',
+    diffSub:"Trois niveaux : des événements les plus célèbres aux événements d'expert dans la même décennie.",
+    d1name:'Disciple', d1tag:'Événements célèbres · Grandes époques', d1desc:'Des événements que tout adulte cultivé reconnaît. Des millénaires d\'écart. Scoring généreux. Parfait pour débuter.',
+    d2name:'Maître', d2tag:'Époques mixtes · Vraies connaissances', d2desc:"Un mélange d'événements groupés et isolés. Il faut de vraies connaissances au-delà des titres Wikipedia.",
+    d3name:'Gardien du Temps', d3tag:'Même époque · Précision experte', d3desc:'Les 5 événements de la même période étroite — même guerre, même règne, même décennie. Expertise uniquement.',
+    lblAbout:'À propos', aboutTitle:'Conçu pour les esprits curieux',
+    aboutText:"<p>History Challenger est né d'une frustration simple : la plupart des quiz d'histoire sont à choix multiples, et le choix multiple permet de deviner. Nous voulions quelque chose qui teste le raisonnement temporel — pas seulement \"reconnaître le nom\" mais \"savoir vraiment quand les choses se sont passées\".</p><p>Chaque partie est générée par IA, couvrant toute l'histoire humaine — de la Mésopotamie à la Guerre Froide, des royaumes européens aux dynasties asiatiques.</p><p>Le jeu adapte son scoring à la période jouée. Des événements sur une décennie ? Les brackets font 1 an de large. Sur 3000 ans ? 100 ans de large.</p><p>Gratuit. Sans inscription pour commencer. Connectez-vous pour suivre vos scores et vos séries.</p>",
+    stat1:'Parties uniques', stat2:"Années d'histoire", stat3:'Niveaux de difficulté', stat4:'Langues',
+    lblFaq:'FAQ', faqTitle:'Questions',
+    faqs:[
+      {q:'Est-ce vraiment gratuit ?', a:"Oui. Vous pouvez jouer sans créer de compte. Connectez-vous avec Google pour sauvegarder vos scores et suivre vos séries."},
+      {q:'Comment les événements sont-ils générés ?', a:"Chaque partie est générée par Claude (l'IA d'Anthropic), couvrant toutes les époques et civilisations."},
+      {q:'Puis-je choisir un thème historique ?', a:'Oui — le mode Thème vous permet de choisir une époque, une région ou un sujet spécifique.'},
+      {q:'Quelles langues sont supportées ?', a:'Anglais, français, allemand et espagnol. Sélectionnez votre langue sur l\'écran de jeu.'},
+      {q:'Comment le score est-il calculé ?', a:'40 points pour identifier les événements les plus anciens et les plus récents. 60 points pour placer les 3 événements restants avec précision.'}
+    ],
+    lblBlog:'Du blog', blogTitle:"Histoire qui vaut la lecture",
+    bl1cat:'FAITS CHRONOLOGIQUES', bl1title:'10 faits qui vont briser votre sens du temps', bl1desc:"Cléopâtre vivait plus près du débarquement sur la Lune que des pyramides.",
+    bl2cat:'MYTHES HISTORIQUES', bl2title:'9 mythes historiques que la plupart croient encore', bl2desc:"Napoléon n'était pas petit. Les médiévaux savaient que la Terre était ronde.",
+    bl3cat:'HISTOIRE MILITAIRE', bl3title:'Des batailles qui ont changé l\'histoire dont personne ne parle', bl3desc:'Cap Ecnome. Aïn Jalut. Khalkhyn Gol. Les batailles qui ont façonné le monde.',
+    read:'Lire →',
+    ctaTitle:'Prêt à vous tester ?', ctaSub:'Sans inscription. Choisissez une difficulté et commencez.', ctaBtn:'Commencer →',
+    navHow:'Comment jouer', navAbout:'À propos', navBlog:'Blog', navPlay:'Jouer →',
+    fAbout:'À propos', fHow:'Comment jouer', fPrivacy:'Politique de confidentialité', fTerms:"Conditions d'utilisation", fContact:'Contact'
   },
   de: {
-    eyebrow: 'Kostenlos · Keine Anmeldung · KI-gestützt',
-    title: 'Wie gut kennen Sie <span>die Geschichte?</span>',
-    sub: 'Ordnen Sie historische Ereignisse auf einem Zeitstrahl. Sammeln Sie Punkte für die richtige Reihenfolge und Epoche. Von der Bronzezeit bis zum Kalten Krieg.',
-    cta1: 'Jetzt spielen — kostenlos', cta2: 'So funktioniert es',
-    note: 'Kein Download · Im Browser · Mobilfreundlich',
-    blogTeaser: 'Zwischen Kleopatra und den Pyramiden liegt mehr Zeit als zwischen Kleopatra und uns →',
-    howTitle: 'Leicht zu lernen, schwer zu meistern',
-    howSub: 'Jede Runde gibt Ihnen 5 historische Ereignisse. Platzieren Sie sie so genau wie möglich auf dem Zeitstrahl.',
-    s1t: 'Anker finden', s1d: 'Welches Ereignis kam zuerst, welches zuletzt? Diese bestimmen die Skala Ihres Zeitstrahls.',
-    s2t: 'Den Rest platzieren', s2d: 'Ziehen Sie die 3 verbleibenden Ereignisse auf den Balken. Ein Tooltip zeigt das Zeitfenster live an.',
-    s3t: 'Punkte sammeln', s3d: 'Volle Punkte für die richtige Position. Teilpunkte für Näherungen. Die Genauigkeit skaliert mit dem Zeitraum.',
-    diffTitle: 'Wählen Sie Ihre Herausforderung',
-    diffSub: 'Drei Schwierigkeitsgrade, von weltbekannten Ereignissen bis zu Expertenwissen.',
-    aboutTitle: 'Für neugierige Köpfe',
-    ctaTitle: 'Bereit, sich zu testen?',
-    ctaSub: 'Keine Anmeldung. Schwierigkeit wählen und loslegen.',
-    ctaBtn: 'Jetzt starten →',
-    faqTitle: 'Häufige Fragen',
-    play: 'Spielen →'
+    eyebrow:'Kostenlos · Keine Anmeldung · KI-gestützt',
+    title:'Wie gut kennen Sie <span>die Geschichte?</span>',
+    sub:'Ordnen Sie historische Ereignisse auf einem Zeitstrahl. Punkte für die richtige Reihenfolge und Epoche. Von der Bronzezeit bis zum Kalten Krieg.',
+    cta1:'Jetzt spielen — kostenlos', cta2:'So funktioniert es',
+    note:'Kein Download · Im Browser · Mobilfreundlich',
+    blogLink:'Zwischen Kleopatra und den Pyramiden liegt mehr Zeit als zwischen Kleopatra und uns →',
+    previewBadge:'📜 Ereignisse auf den Zeitstrahl ziehen',
+    pc1:'Schlacht bei Hastings', pc2:'Fall von Konstantinopel', pc3:'Schwarzer Tod in Europa',
+    anc1:'Julius Caesar <strong style="color:#c8903a">44 v. Chr.</strong>',
+    anc2:'<strong style="color:#c8903a">1687 n. Chr.</strong> Newtons Principia',
+    lblHow:'So funktioniert es', howTitle:'Leicht zu lernen, schwer zu meistern',
+    howSub:'Jede Runde gibt Ihnen 5 historische Ereignisse. Platzieren Sie sie so genau wie möglich.',
+    s1t:'Anker finden', s1d:'Welches Ereignis kam zuerst, welches zuletzt? Diese bestimmen die Skala Ihres Zeitstrahls.',
+    s2t:'Den Rest platzieren', s2d:'Ziehen Sie die 3 verbleibenden Ereignisse auf den Balken. Ein Tooltip zeigt das Zeitfenster live an.',
+    s3t:'Punkte sammeln', s3d:'Volle Punkte für die richtige Position. Teilpunkte für Näherungen.',
+    lblDiff:'Schwierigkeit', diffTitle:'Wählen Sie Ihre Herausforderung',
+    diffSub:'Drei Schwierigkeitsgrade, von weltbekannten Ereignissen bis zu Expertenwissen in derselben Dekade.',
+    d1name:'Jünger', d1tag:'Bekannte Ereignisse · Große Zeiträume', d1desc:'Ereignisse, die jeder gebildete Erwachsene kennt. Jahrtausende auseinander. Großzügige Wertung.',
+    d2name:'Meister', d2tag:'Gemischte Epochen · Echtes Wissen', d2desc:'Eine Mischung aus gruppierten und abgelegenen Ereignissen. Echtes historisches Wissen erforderlich.',
+    d3name:'Hüter der Zeit', d3tag:'Gleiche Epoche · Expertengenauigkeit', d3desc:'Alle 5 Ereignisse aus derselben engen Periode — gleicher Krieg, gleiche Herrschaft, gleiche Dekade.',
+    lblAbout:'Über uns', aboutTitle:'Für neugierige Köpfe',
+    aboutText:'<p>History Challenger entstand aus einer einfachen Frustration: Die meisten Geschichtsquizze sind Multiple-Choice, und Multiple-Choice erlaubt Raten. Wir wollten etwas, das echtes zeitliches Denkvermögen testet.</p><p>Jedes Spiel wird frisch von KI generiert und deckt die gesamte Menschheitsgeschichte ab — von der Bronzezeit bis zum Kalten Krieg.</p><p>Das Spiel passt seine Wertung an den gegebenen Zeitraum an. Ereignisse innerhalb einer Dekade? Brackets 1 Jahr breit. Über 3000 Jahre? 100 Jahre breit.</p><p>Kostenlos spielen. Keine Anmeldung erforderlich. Anmelden um Scores zu speichern.</p>',
+    stat1:'Einzigartige Spiele', stat2:'Jahre Geschichte', stat3:'Schwierigkeitsgrade', stat4:'Sprachen',
+    lblFaq:'FAQ', faqTitle:'Häufige Fragen',
+    faqs:[
+      {q:'Ist es wirklich kostenlos?', a:'Ja. Sie können ohne Konto spielen. Mit Google anmelden um Scores zu speichern.'},
+      {q:'Wie werden Ereignisse generiert?', a:'Jedes Spiel wird frisch von Claude (Anthropics KI) generiert.'},
+      {q:'Kann ich ein historisches Thema wählen?', a:'Ja — der Themen-Modus ermöglicht die Wahl einer Epoche, Region oder eines Themas.'},
+      {q:'Welche Sprachen werden unterstützt?', a:'Englisch, Französisch, Deutsch und Spanisch.'},
+      {q:'Wie wird der Score berechnet?', a:'40 Punkte für die ältesten und neuesten Ereignisse. 60 Punkte für die genaue Platzierung der restlichen 3.'}
+    ],
+    lblBlog:'Aus dem Blog', blogTitle:'Geschichte, die es wert ist zu lesen',
+    bl1cat:'ZEITLEISTEN-FAKTEN', bl1title:'10 Fakten, die Ihr Zeitgefühl brechen', bl1desc:'Kleopatra lebte der Mondlandung näher als den Pyramiden.',
+    bl2cat:'HISTORISCHE MYTHEN', bl2title:'9 Historische Mythen, die die meisten noch glauben', bl2desc:'Napoleon war nicht klein. Mittelalterliche Menschen wussten, dass die Erde rund ist.',
+    bl3cat:'MILITÄRGESCHICHTE', bl3title:'Schlachten, die Geschichte veränderten, über die niemand spricht', bl3desc:'Kap Eknomos. Ain Jalut. Chalchin Gol. Die Schlachten, die die Welt geprägt haben.',
+    read:'Lesen →',
+    ctaTitle:'Bereit, sich zu testen?', ctaSub:'Keine Anmeldung. Schwierigkeit wählen und loslegen.', ctaBtn:'Jetzt starten →',
+    navHow:'So funktioniert es', navAbout:'Über uns', navBlog:'Blog', navPlay:'Spielen →',
+    fAbout:'Über uns', fHow:'So funktioniert es', fPrivacy:'Datenschutz', fTerms:'Nutzungsbedingungen', fContact:'Kontakt'
   },
   es: {
-    eyebrow: 'Gratis · Sin registro · Con IA',
-    title: '¿Cuánto sabes de <span>historia?</span>',
-    sub: 'Coloca eventos históricos en una línea de tiempo. Gana puntos por el orden correcto y la época correcta. Del Bronce a la Guerra Fría.',
-    cta1: 'Jugar — es gratis', cta2: 'Cómo funciona',
-    note: 'Sin descarga · En el navegador · Compatible con móvil',
-    blogTeaser: 'Hay más tiempo entre Cleopatra y las pirámides que entre Cleopatra y nosotros →',
-    howTitle: 'Fácil de aprender, difícil de dominar',
-    howSub: 'Cada ronda te da 5 eventos históricos. Colócalos en la línea de tiempo con la mayor precisión posible.',
-    s1t: 'Encuentra los anclajes', s1d: 'Identifica qué evento ocurrió primero y cuál último. Definen la escala de tu línea de tiempo.',
-    s2t: 'Coloca el resto', s2d: 'Arrastra los 3 eventos restantes a la barra. Un tooltip muestra el período en tiempo real.',
-    s3t: 'Gana puntos', s3d: 'Puntos completos por la posición correcta. Puntos parciales si estás cerca. La precisión escala con el período.',
-    diffTitle: 'Elige tu desafío',
-    diffSub: 'Tres niveles, desde eventos mundialmente famosos hasta conocimiento experto.',
-    aboutTitle: 'Para mentes curiosas',
-    ctaTitle: '¿Listo para ponerte a prueba?',
-    ctaSub: 'Sin registro. Elige dificultad y empieza.',
-    ctaBtn: 'Empezar →',
-    faqTitle: 'Preguntas',
-    play: 'Jugar →'
+    eyebrow:'Gratis · Sin registro · Con IA',
+    title:'¿Cuánto sabes de <span>historia?</span>',
+    sub:'Coloca eventos históricos en una línea del tiempo. Gana puntos por el orden correcto y la época correcta. Del Bronce a la Guerra Fría.',
+    cta1:'Jugar — es gratis', cta2:'Cómo funciona',
+    note:'Sin descarga · En el navegador · Compatible con móvil',
+    blogLink:'Hay más tiempo entre Cleopatra y las pirámides que entre Cleopatra y nosotros →',
+    previewBadge:'📜 Arrastra eventos a la línea del tiempo',
+    pc1:'Batalla de Hastings', pc2:'Caída de Constantinopla', pc3:'La Peste Negra en Europa',
+    anc1:'Julio César <strong style="color:#c8903a">44 a.C.</strong>',
+    anc2:'<strong style="color:#c8903a">1687 d.C.</strong> Principia de Newton',
+    lblHow:'Cómo funciona', howTitle:'Fácil de aprender, difícil de dominar',
+    howSub:'Cada ronda te da 5 eventos históricos. Colócalos en la línea del tiempo con la mayor precisión posible.',
+    s1t:'Encuentra los anclajes', s1d:'Identifica qué evento ocurrió primero y cuál último. Definen la escala de tu línea del tiempo.',
+    s2t:'Coloca el resto', s2d:'Arrastra los 3 eventos restantes a la barra. Un tooltip muestra el período en tiempo real.',
+    s3t:'Gana puntos', s3d:'Puntos completos por la posición correcta. Puntos parciales si estás cerca.',
+    lblDiff:'Dificultad', diffTitle:'Elige tu desafío',
+    diffSub:'Tres niveles, desde eventos mundialmente famosos hasta conocimiento experto en la misma década.',
+    d1name:'Discípulo', d1tag:'Eventos famosos · Grandes períodos', d1desc:'Eventos que cualquier adulto educado reconocería. Abarca miles de años. Puntuación generosa.',
+    d2name:'Maestro', d2tag:'Épocas mixtas · Conocimiento real', d2desc:'Una mezcla de eventos agrupados y aislados. Necesitarás conocimiento genuino más allá de los titulares.',
+    d3name:'Guardián del Tiempo', d3tag:'Misma época · Precisión experta', d3desc:'Los 5 eventos del mismo período — misma guerra, mismo reinado, misma década. Solo expertos.',
+    lblAbout:'Acerca de', aboutTitle:'Construido para mentes curiosas',
+    aboutText:'<p>History Challenger nació de una frustración simple: la mayoría de los cuestionarios de historia son de opción múltiple, y la opción múltiple permite adivinar. Queríamos algo que probara el razonamiento temporal genuino.</p><p>Cada partida es generada por IA, cubriendo toda la historia humana — desde la Mesopotamia de la Edad del Bronce hasta la Guerra Fría.</p><p>El juego adapta su puntuación al período dado. ¿Eventos en una sola década? Los brackets miden 1 año. ¿3000 años? Miden 100 años.</p><p>Gratis. Sin registro para empezar. Inicia sesión para seguir tus puntuaciones.</p>',
+    stat1:'Partidas únicas', stat2:'Años de historia', stat3:'Niveles de dificultad', stat4:'Idiomas',
+    lblFaq:'FAQ', faqTitle:'Preguntas',
+    faqs:[
+      {q:'¿Es realmente gratis?', a:'Sí. Puedes jugar sin crear una cuenta. Inicia sesión con Google para guardar tus puntuaciones.'},
+      {q:'¿Cómo se generan los eventos?', a:'Cada partida es generada por Claude (la IA de Anthropic), cubriendo todas las épocas y civilizaciones.'},
+      {q:'¿Puedo elegir un tema histórico?', a:'Sí — el modo Tema te permite elegir una época, región o tema específico.'},
+      {q:'¿Qué idiomas están disponibles?', a:'Inglés, francés, alemán y español.'},
+      {q:'¿Cómo se calcula la puntuación?', a:'40 puntos por identificar los eventos más antiguos y recientes. 60 puntos por colocar los 3 eventos restantes con precisión.'}
+    ],
+    lblBlog:'Del blog', blogTitle:'Historia que vale la pena leer',
+    bl1cat:'HECHOS CRONOLÓGICOS', bl1title:'10 hechos que romperán tu sentido del tiempo', bl1desc:'Cleopatra vivió más cerca del alunizaje que de las pirámides.',
+    bl2cat:'MITOS HISTÓRICOS', bl2title:'9 mitos históricos que la mayoría aún cree', bl2desc:'Napoleón no era bajo. La gente medieval sabía que la Tierra era redonda.',
+    bl3cat:'HISTORIA MILITAR', bl3title:'Batallas que cambiaron la historia de las que nadie habla', bl3desc:'Cabo Ecnomo. Ain Yalut. Jaljin Gol. Las batallas que moldearon el mundo.',
+    read:'Leer →',
+    ctaTitle:'¿Listo para ponerte a prueba?', ctaSub:'Sin registro. Elige dificultad y empieza.', ctaBtn:'Empezar →',
+    navHow:'Cómo funciona', navAbout:'Acerca de', navBlog:'Blog', navPlay:'Jugar →',
+    fAbout:'Acerca de', fHow:'Cómo funciona', fPrivacy:'Privacidad', fTerms:'Términos de uso', fContact:'Contacto'
   }
 };
 
 let _lang = localStorage.getItem('hc_lang') || 'en';
 
-function setLang(l) {
+function s(id, html){ const el=document.getElementById(id); if(el) el.innerHTML=html; }
+function st(id, txt){ const el=document.getElementById(id); if(el) el.textContent=txt; }
+
+function applyLang(){
+  const t = T[_lang] || T.en;
+  s('t-eyebrow', t.eyebrow);
+  s('t-title', t.title);
+  s('t-sub', t.sub);
+  st('t-cta1', t.cta1);
+  st('t-cta2', t.cta2);
+  st('t-note', t.note);
+  s('t-blog-link', t.blogLink);
+  st('t-preview-badge', t.previewBadge);
+  s('t-pc1', t.pc1); s('t-pc2', t.pc2); s('t-pc3', t.pc3);
+  s('t-anc1', t.anc1); s('t-anc2', t.anc2);
+  st('t-lbl-how', t.lblHow); s('t-how-title', t.howTitle); s('t-how-sub', t.howSub);
+  st('t-s1t', t.s1t); st('t-s1d', t.s1d);
+  st('t-s2t', t.s2t); st('t-s2d', t.s2d);
+  st('t-s3t', t.s3t); st('t-s3d', t.s3d);
+  st('t-lbl-diff', t.lblDiff); s('t-diff-title', t.diffTitle); s('t-diff-sub', t.diffSub);
+  st('t-d1name', t.d1name); st('t-d1tag', t.d1tag); st('t-d1desc', t.d1desc);
+  st('t-d2name', t.d2name); st('t-d2tag', t.d2tag); st('t-d2desc', t.d2desc);
+  st('t-d3name', t.d3name); st('t-d3tag', t.d3tag); st('t-d3desc', t.d3desc);
+  st('t-lbl-about', t.lblAbout); st('t-about-title', t.aboutTitle);
+  s('t-about-text', t.aboutText);
+  st('t-stat1', t.stat1); st('t-stat2', t.stat2); st('t-stat3', t.stat3); st('t-stat4', t.stat4);
+  st('t-lbl-faq', t.lblFaq); st('t-faq-title', t.faqTitle);
+  document.getElementById('t-faqs').innerHTML = t.faqs.map(f=>`
+    <div class="faq" onclick="this.classList.toggle('open')">
+      <div class="faq-q">${f.q}</div>
+      <div class="faq-a">${f.a}</div>
+    </div>`).join('');
+  st('t-lbl-blog', t.lblBlog); st('t-blog-title', t.blogTitle);
+  st('t-bl1cat', t.bl1cat); st('t-bl1title', t.bl1title); st('t-bl1desc', t.bl1desc);
+  st('t-bl2cat', t.bl2cat); st('t-bl2title', t.bl2title); st('t-bl2desc', t.bl2desc);
+  st('t-bl3cat', t.bl3cat); st('t-bl3title', t.bl3title); st('t-bl3desc', t.bl3desc);
+  st('t-read', t.read); st('t-read2', t.read); st('t-read3', t.read);
+  st('t-cta-title', t.ctaTitle); st('t-cta-sub', t.ctaSub); st('t-cta-btn', t.ctaBtn);
+  st('nav-how', t.navHow); st('nav-about', t.navAbout); st('nav-blog', t.navBlog); st('nav-play', t.navPlay);
+  st('f-about', t.fAbout); st('f-how', t.fHow); st('f-privacy', t.fPrivacy); st('f-terms', t.fTerms); st('f-contact', t.fContact);
+  document.getElementById('site-lang').value = _lang;
+  document.documentElement.lang = _lang;
+}
+
+function setLang(l){
   _lang = l;
   localStorage.setItem('hc_lang', l);
-  document.getElementById('site-lang').value = l;
   applyLang();
 }
-
-function applyLang() {
-  const t = LANDING_T[_lang] || LANDING_T.en;
-  const set = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
-  const setText = (id, text) => { const el = document.getElementById(id); if(el) el.textContent = text; };
-  set('hero-eyebrow', t.eyebrow);
-  set('hero-title', t.title);
-  set('hero-sub', t.sub);
-  set('hero-cta1', t.cta1);
-  set('hero-cta2', t.cta2);
-  set('hero-note', t.note);
-  set('hero-blog-teaser', t.blogTeaser);
-  set('how-title', t.howTitle);
-  set('how-sub', t.howSub);
-  set('step1-title', t.s1t); set('step1-desc', t.s1d);
-  set('step2-title', t.s2t); set('step2-desc', t.s2d);
-  set('step3-title', t.s3t); set('step3-desc', t.s3d);
-  set('diff-title', t.diffTitle); set('diff-sub', t.diffSub);
-  set('about-title', t.aboutTitle);
-  set('cta-title', t.ctaTitle); set('cta-sub', t.ctaSub); set('cta-btn', t.ctaBtn);
-  set('faq-title', t.faqTitle);
-  document.querySelectorAll('.nav-play').forEach(el => el.textContent = t.play);
-}
-
-// Init lang
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('site-lang').value = _lang;
-  applyLang();
-});
 
 function showLegal(page){
-  document.getElementById('main').style.display=page?'none':'block';
-  document.getElementById('privacy').className='legal-wrap'+(page==='privacy'?' active':'');
-  document.getElementById('terms').className='legal-wrap'+(page==='terms'?' active':'');
+  document.getElementById('main').style.display = page ? 'none' : 'block';
+  document.getElementById('privacy').className = 'legal-wrap' + (page==='privacy' ? ' active' : '');
+  document.getElementById('terms').className = 'legal-wrap' + (page==='terms' ? ' active' : '');
   window.scrollTo(0,0);
 }
+
+applyLang();
 </script>
 </body>
 </html>
