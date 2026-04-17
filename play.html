@@ -261,13 +261,15 @@ async function initAuth(){
   const params=new URLSearchParams(window.location.search);
   const code=params.get('code');
   if(code){
-    history.replaceState({},'','/play');
+    history.replaceState({},'','/play.html');
     try{
       const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({action:'google_callback',code,redirect:'https://historychallenger.com/play'})});
+        body:JSON.stringify({action:'google_callback',code,redirect:'https://historychallenger.com/play.html'})});
       const data=await res.json();
+      console.log('Auth response:',data);
       if(data.token){setToken(data.token);_user=data.user;renderUserUI();return;}
-    }catch(e){}
+      else if(data.error){console.error('Auth error:',data.error);}
+    }catch(e){console.error('Auth fetch error:',e);}
   }
   renderUserUI();
 }
@@ -314,7 +316,7 @@ function renderGuestBanner(){
 function signIn(){
   const params=new URLSearchParams({
     client_id:GOOGLE_CLIENT_ID,
-    redirect_uri:'https://historychallenger.com/play',
+    redirect_uri:'https://historychallenger.com/play.html',
     response_type:'code',
     scope:'openid email profile',
     access_type:'offline',
