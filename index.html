@@ -88,11 +88,22 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
 .anchor-drop.locked-ok{border-color:#2a8a4a !important;background:#051209 !important;cursor:default}
 .anchor-drop.locked-bad{border-color:#8a2a1a !important;background:#120502 !important;cursor:default}
 .overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.94);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100}
-.overlay-card{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:14px;padding:2rem 2.5rem;text-align:center;max-width:320px}
+.overlay-card{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:14px;padding:2rem 2.5rem;text-align:center;max-width:340px}
 .overlay-title{font-size:18px;font-weight:700;color:#ffffff;font-family:Georgia,serif;margin-bottom:.5rem}
-.overlay-sub{font-size:13px;color:#666;margin-bottom:1.25rem;line-height:1.6;font-family:-apple-system,sans-serif}
-.spin{display:inline-block;width:28px;height:28px;border:3px solid #2a2a2a;border-top-color:#c8903a;border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+.overlay-sub{font-size:13px;color:#888;margin-bottom:1.5rem;line-height:1.6;font-family:-apple-system,sans-serif}
+.book-wrap{display:flex;justify-content:center;margin-bottom:1rem}
+.book{position:relative;width:60px;height:48px}
+.book-cover{position:absolute;bottom:0;left:0;width:60px;height:44px;background:#1a1000;border:2px solid #c8903a;border-radius:2px 6px 6px 2px}
+.book-spine{position:absolute;bottom:0;left:0;width:10px;height:44px;background:#c8903a;border-radius:2px 0 0 2px}
+.book-page{position:absolute;bottom:2px;left:10px;width:44px;height:38px;background:#f5f0e0;border-radius:0 3px 3px 0;transform-origin:left center;animation:flip .35s ease-in-out infinite alternate}
+.book-page:nth-child(3){animation-delay:.1s;background:#e8e0cc}
+.book-page:nth-child(4){animation-delay:.2s;background:#ddd5bb}
+@keyframes flip{0%{transform:rotateY(0deg) skewY(0deg)}100%{transform:rotateY(-40deg) skewY(-2deg)}}
+.overlay-dots{display:flex;gap:5px;justify-content:center;margin-top:.5rem}
+.overlay-dots span{width:6px;height:6px;border-radius:50%;background:#c8903a;animation:dotpulse 1.2s ease-in-out infinite}
+.overlay-dots span:nth-child(2){animation-delay:.2s}
+.overlay-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dotpulse{0%,80%,100%{opacity:.2}40%{opacity:1}}
 
 /* GAME */
 .instr{font-size:13px;color:#aaa;line-height:1.6;margin-bottom:1rem;padding:10px 13px;background:#111;border-radius:8px;border-left:3px solid #c8903a;font-family:-apple-system,sans-serif}
@@ -447,40 +458,48 @@ function setLang(l){
 // All events generated fresh by AI — no preset data
 
 // Returns the 50-year grid bucket a year falls into
-// Dynamic bracket size based on timeline span
-function bracketSize(span){
-  if(span>2000)return 100;
-  if(span>500)return 50;
-  if(span>100)return 20;
-  if(span>20)return 5;
-  return 1;
-}
-// Max error before score hits zero — 25% of span, min 2 years
-function maxErr(span){return Math.max(2,Math.round(span*0.25));}
+// Difficulty multipliers — Disciple is more forgiving, Keeper is strict
+function diffMult(diff){return diff==='disciple'?2:diff==='master'?1.5:1;}
 
-function yearBracket(year,span){
-  const bs=bracketSize(span);
+// Dynamic bracket size based on timeline span and difficulty
+function bracketSize(span,diff){
+  const m=diffMult(diff||S.diff||'keeper');
+  const s=span/m; // scale span down so we land in a more forgiving bucket
+  if(s>2000)return 100*m;
+  if(s>500)return 50*m;
+  if(s>100)return 20*m;
+  if(s>20)return 5*m;
+  return Math.max(1,m);
+}
+// Max error before score hits zero — scales with difficulty
+function maxErr(span,diff){
+  const m=diffMult(diff||S.diff||'keeper');
+  return Math.max(2,Math.round(span*0.25*m));
+}
+
+function yearBracket(year,span,diff){
+  const bs=Math.round(bracketSize(span,diff));
   const bucket=Math.floor(year/bs)*bs;
   const lo=bucket,hi=bucket+bs-1;
   function fmt(y){return y<0?Math.abs(y)+' BC':y+' AD';}
   if(lo<0&&hi>=0)return fmt(lo)+' – 1 AD';
-  if(bs===1)return fmt(lo); // exact year — just show the year
+  if(bs===1)return fmt(lo);
   return fmt(lo)+' – '+fmt(hi);
 }
-function inCorrectBracket(placedPct,eventYear,minY,maxY){
+function inCorrectBracket(placedPct,eventYear,minY,maxY,diff){
   const span=maxY-minY||1;
-  const bs=bracketSize(span);
+  const bs=Math.round(bracketSize(span,diff));
   const placedYear=Math.round(minY+placedPct*span);
   return Math.floor(eventYear/bs)*bs===Math.floor(placedYear/bs)*bs;
 }
 function bracketAtPct(pct,minY,maxY){
   const span=maxY-minY||1;
   const year=Math.round(minY+pct*span);
-  return yearBracket(year,span);
+  return yearBracket(year,span,S.diff);
 }
 
 let S={
-  phase:'setup',path:null,diff:null,rounds:5,round:0,
+  phase:'setup',path:null,diff:null,rounds:3,round:0,
   theme:null,customTheme:'',generatedSets:[],_genQueue:[],
   totalPct:0,roundsPlayed:0,
   events:[],midP:{},aLeft:null,aRight:null,
@@ -497,19 +516,54 @@ function activeLabel(){
   return t('curatedSets');
 }
 
-function showOverlay(msg){
+const LOADING_MSGS=[
+  "Our scribes are combing through millions of ancient scrolls…",
+  "Consulting dusty tomes in the library of history…",
+  "Dispatching a time-travelling researcher… back soon.",
+  "Deciphering cuneiform tablets and medieval manuscripts…",
+  "Rummaging through the archives of civilisation…",
+  "Our historians are arguing about dates. Almost ready.",
+  "Cross-referencing chronicles from three continents…",
+  "The oracle is consulting the annals of time…",
+  "Unearthing forgotten events from the depths of history…",
+  "Translating dispatches from across the centuries…",
+];
+let _overlayTimer=null;
+function showOverlay(customMsg){
   let ov=document.getElementById('loading-overlay');
   if(!ov){ov=document.createElement('div');ov.id='loading-overlay';ov.className='overlay';document.body.appendChild(ov);}
-  ov.innerHTML=`<div class="overlay-card"><div class="overlay-title">History Challenger</div><div class="overlay-sub">${msg}</div><div class="spin"></div></div>`;
+  const msg=customMsg||LOADING_MSGS[Math.floor(Math.random()*LOADING_MSGS.length)];
+  ov.innerHTML=`<div class="overlay-card">
+    <div class="overlay-title">History Challenger</div>
+    <div class="book-wrap"><div class="book">
+      <div class="book-cover"></div>
+      <div class="book-spine"></div>
+      <div class="book-page"></div>
+      <div class="book-page"></div>
+      <div class="book-page"></div>
+    </div></div>
+    <div class="overlay-sub" id="overlay-msg">${msg}</div>
+    <div class="overlay-dots"><span></span><span></span><span></span></div>
+  </div>`;
   ov.style.display='flex';
+  // Cycle through messages every 4 seconds
+  let mi=0;
+  const msgs=[...LOADING_MSGS].sort(()=>Math.random()-.5);
+  _overlayTimer=setInterval(()=>{
+    const el=document.getElementById('overlay-msg');
+    if(el){mi=(mi+1)%msgs.length;el.textContent=msgs[mi];}
+  },4000);
 }
-function hideOverlay(){const ov=document.getElementById('loading-overlay');if(ov)ov.style.display='none';}
+function hideOverlay(){
+  clearInterval(_overlayTimer);
+  const ov=document.getElementById('loading-overlay');if(ov)ov.style.display='none';
+}
 
 function renderSetup(){
   document.getElementById('rn').textContent='—';
   document.getElementById('sc').textContent='—';
   const diffKeys=['disciple','master','keeper'];
-  const roundOpts=[3,5,10,15,20];
+  const roundOpts=[1,3,5,8];
   const themeList=themes();
   const isThemePath=S.path==='theme';
   const isRandomPath=S.path==='random';
@@ -817,7 +871,7 @@ function renderStep2(lOk,rOk){
     <div style="font-size:12px;color:#666;font-family:-apple-system,sans-serif;margin-bottom:.9rem">
       ${t('anchorScore')}: <strong style="color:${S.anchorPts===40?'#5acc8a':S.anchorPts===20?'#c8903a':'#e06040'}">${S.anchorPts} ${t('pts')}</strong>
       &nbsp;·&nbsp; ${yr(minY)} → ${yr(maxY)}
-      &nbsp;·&nbsp; <span style="color:#c8903a">±${bracketSize(maxY-minY||1)} yr brackets</span>
+      &nbsp;·&nbsp; <span style="color:#c8903a">±${Math.round(bracketSize(maxY-minY||1,S.diff))} yr brackets</span>
     </div>
     <div class="plbl">${t('placeEvents')}</div>
     <div class="pool">${pH||`<span style="font-size:12px;color:#444;font-family:-apple-system,sans-serif">${t('allPlaced')}</span>`}</div>
@@ -968,15 +1022,15 @@ function doSubmit(){
   const middle=sorted.slice(1,4);
   const iP={};middle.forEach(e=>{iP[e.id]=(e.year-minY)/range;});
 
-  // Dynamic scoring — bracket and max error scale with timeline span
-  const ME=maxErr(range);
-  const bs=bracketSize(range);
+  // Dynamic scoring — bracket and max error scale with timeline span and difficulty
+  const ME=maxErr(range,S.diff);
+  const bs=Math.round(bracketSize(range,S.diff));
   let spacingPts=0;const sPer={};const bracketOk={};
   middle.forEach(ev=>{
     const placed=S.midP[ev.id]??0.5;
     const placedYear=Math.round(minY+placed*range);
     const errYears=Math.abs(placedYear-ev.year);
-    const inBracket=inCorrectBracket(placed,ev.year,minY,maxY);
+    const inBracket=inCorrectBracket(placed,ev.year,minY,maxY,S.diff);
     const score=inBracket?20:Math.max(0,Math.round(20*(1-errYears/ME)));
     sPer[ev.id]=score;spacingPts+=score;bracketOk[ev.id]=inBracket;
   });
@@ -1008,7 +1062,7 @@ function doSubmit(){
 
   const middleRows=middle.map(ev=>{
     const ok=bracketOk[ev.id];const sp=sPer[ev.id];
-    const bracket=yearBracket(ev.year,range);
+    const bracket=yearBracket(ev.year,range,S.diff);
     const placed=S.midP[ev.id]??0.5;
     const placedYear=Math.round(minY+placed*range);
     const errYears=Math.abs(placedYear-ev.year);
