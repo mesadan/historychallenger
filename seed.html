@@ -74,6 +74,9 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
   <button onclick="stopSeeding()" id="btn-stop" disabled>⏹ Stop</button>
   <button onclick="checkCount()">📊 Check counts</button>
 </div>
+<div class="row" id="all-themes-row">
+  <button onclick="seedAllThemes()" id="btn-all" style="background:#1a6a1a">🌍 Seed ALL themes (current diff/lang)</button>
+</div>
 <div class="log" id="log"></div>
 
 <script>
@@ -159,6 +162,59 @@ async function startSeeding(){
 function stopSeeding(){
   running=false;
   log('Stopping after current batch...','info');
+  document.getElementById('btn-stop').disabled=true;
+}
+
+const ALL_THEMES=[
+  {slug:'bronze-age',q:'the Bronze Age civilisations: Mesopotamia, Egypt, Mycenae, Hittites, Indus Valley'},
+  {slug:'iron-age',q:'the Iron Age: early Greece, Assyria, Persia, Celtic Europe, early Rome'},
+  {slug:'ancient-world',q:'the ancient world: Classical Greece, Republican and Imperial Rome, Egypt, Persia'},
+  {slug:'medieval',q:'medieval history: feudalism, crusades, plague, the Mongols, Byzantine Empire'},
+  {slug:'early-modern',q:'early modern history: Renaissance, Reformation, Age of Exploration, 1400-1700'},
+  {slug:'revolutions',q:'the age of revolutions: American, French, Haitian, Latin American, 1776-1830'},
+  {slug:'19th-century',q:'19th century: industrialisation, nationalism, imperialism'},
+  {slug:'world-wars',q:'World War I and World War II: key battles, turning points, political events'},
+  {slug:'cold-war',q:'the Cold War 1945-1991: space race, proxy wars, nuclear standoff, detente'},
+  {slug:'aviation',q:'the history of aviation: from the Wright Brothers to the jet age and space flight'},
+  {slug:'medicine',q:'the history of medicine: discoveries, vaccines, surgery, anatomy, public health breakthroughs'},
+  {slug:'technology',q:'landmark moments in technology history: inventions, computers, communications, engineering'},
+  {slug:'ancient-asia',q:'ancient Asian history: Han Dynasty China, Maurya India, classical Japan, Southeast Asia'},
+  {slug:'science',q:'landmark moments in science: physics, chemistry, biology, astronomy, mathematics'},
+];
+
+async function seedAllThemes(){
+  const diff=document.getElementById('diff').value;
+  const lang=document.getElementById('lang').value;
+  const batches=parseInt(document.getElementById('batches').value)||10;
+  running=true;
+  document.getElementById('btn-all').disabled=true;
+  document.getElementById('btn-start').disabled=true;
+  document.getElementById('btn-stop').disabled=false;
+  log(`🌍 Seeding ALL ${ALL_THEMES.length} themes × ${batches} batches for ${diff}/${lang}`,'info');
+
+  for(const theme of ALL_THEMES){
+    if(!running)break;
+    const themeSlug=diff+'_theme_'+theme.slug;
+    log(`\n── Theme: ${theme.slug} ──`,'info');
+    for(let i=0;i<batches;i++){
+      if(!running)break;
+      try{
+        log(`  Batch ${i+1}/${batches}...`);
+        const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({action:'seed_pool',diff,lang,batch:5,admin_key:ADMIN_KEY,theme_slug:themeSlug,theme_q:theme.q})});
+        const data=await res.json();
+        if(data.error){log(`  Error: ${data.error}`,'err');break;}
+        log(`  ✓ Saved ${data.saved}. Total: ${data.total}`,'ok');
+        await new Promise(r=>setTimeout(r,1500));
+      }catch(e){
+        log(`  Error: ${e.message}`,'err');break;
+      }
+    }
+  }
+  log('\n🌍 All themes done.','info');
+  running=false;
+  document.getElementById('btn-all').disabled=false;
+  document.getElementById('btn-start').disabled=false;
   document.getElementById('btn-stop').disabled=true;
 }
 </script>
