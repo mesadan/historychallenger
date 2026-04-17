@@ -221,6 +221,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
               <div class="user-stat"><div class="user-stat-val" id="um-streak">0</div><div class="user-stat-lbl">Streak</div></div>
             </div>
             <hr class="user-menu-divider">
+            <button class="user-menu-item" onclick="window.location.href='/profile.html'">📊 My profile</button>
             <button class="user-menu-item danger" onclick="signOut()">Sign out</button>
           </div>
         </div>
@@ -299,15 +300,9 @@ function renderUserUI(){
 function renderGuestBanner(){
   const area=document.getElementById('guest-banner-area');
   if(!area||_user)return;
-  const remaining=Math.max(0,FREE_GAMES-_guestGames);
-  if(_guestGames>=FREE_GAMES){
+  if(_guestGames>=2){
     area.innerHTML=`<div class="guest-banner">
-      <span>🏛 Sign in to keep playing and track your progress</span>
-      <button class="guest-banner-cta" onclick="signIn()">Sign in free</button>
-    </div>`;
-  } else if(_guestGames>0){
-    area.innerHTML=`<div class="guest-banner">
-      <span>Playing as guest · ${remaining} free game${remaining!==1?'s':''} left</span>
+      <span>📊 Sign in to track your scores, streaks and history</span>
       <button class="guest-banner-cta" onclick="signIn()">Sign in free</button>
     </div>`;
   }
@@ -345,13 +340,7 @@ document.addEventListener('click',e=>{
 });
 
 function checkGuestLimit(){
-  if(_user)return true; // logged in, always allowed
-  if(_guestGames>=FREE_GAMES){
-    // Show hard nudge but allow one more with warning
-    const go=confirm('You\'ve used your free games! Sign in to keep your progress and play unlimited. Press OK to sign in, Cancel to play one more as guest.');
-    if(go){signIn();return false;}
-  }
-  return true;
+  return true; // never block — always allow play
 }
 
 function recordGuestGame(){
@@ -779,12 +768,6 @@ function renderSetup(){
   document.getElementById('body').innerHTML=`<div class="sf">
     <div class="setup-header">
       <div class="setup-title">${t('pathTitle')}</div>
-      <div class="lang-row">
-        <button class="lang-btn ${LANG==='en'?'active':''}" onclick="setLang('en')">EN</button>
-        <button class="lang-btn ${LANG==='fr'?'active':''}" onclick="setLang('fr')">FR</button>
-        <button class="lang-btn ${LANG==='de'?'active':''}" onclick="setLang('de')">DE</button>
-        <button class="lang-btn ${LANG==='es'?'active':''}" onclick="setLang('es')">ES</button>
-      </div>
     </div>
     <div class="path-grid">
       <div class="path-card ${isRandomPath?'active':''}" onclick="selPath('random')">

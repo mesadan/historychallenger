@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile — History Challenger</title>
+<meta name="robots" content="noindex">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#000;color:#fff;min-height:100vh}
+a{color:#c8903a;text-decoration:none}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);border-bottom:1px solid #1a1a1a;padding:0 1.5rem}
+.nav-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.nav-logo{font-family:Georgia,serif;font-size:18px;font-weight:700;color:#fff}
+.nav-logo span{color:#c8903a}
+.nav-links{display:flex;gap:16px;align-items:center}
+.nav-links a{color:#888;font-size:14px}
+.nav-links a:hover{color:#fff}
+.nav-play{background:#c8903a;color:#000!important;border-radius:8px;padding:6px 16px;font-weight:700;font-size:13px}
+
+/* LAYOUT */
+.page{max-width:900px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
+
+/* PROFILE HEADER */
+.profile-hero{display:flex;align-items:center;gap:1.5rem;margin-bottom:2.5rem;flex-wrap:wrap}
+.avatar-wrap{position:relative}
+.profile-avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid #c8903a;display:block}
+.avatar-placeholder{width:72px;height:72px;border-radius:50%;background:#1a1000;border:2px solid #c8903a;display:flex;align-items:center;justify-content:center;font-size:28px}
+.profile-info h1{font-family:Georgia,serif;font-size:1.75rem;font-weight:700;margin-bottom:.2rem}
+.profile-info .email{font-size:13px;color:#555;margin-bottom:.4rem}
+.profile-info .joined{font-size:12px;color:#444}
+.sign-out-btn{background:none;border:1px solid #2a2a2a;color:#666;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:-apple-system,sans-serif}
+.sign-out-btn:hover{border-color:#555;color:#aaa}
+
+/* STAT CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1rem;margin-bottom:2.5rem}
+.stat-card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:12px;padding:1.25rem;text-align:center}
+.stat-val{font-family:Georgia,serif;font-size:2rem;font-weight:700;color:#c8903a;line-height:1}
+.stat-lbl{font-size:12px;color:#555;margin-top:.4rem;font-family:-apple-system,sans-serif}
+.stat-card.highlight{border-color:#c8903a33;background:#0a0800}
+
+/* CHART */
+.chart-section{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:14px;padding:1.5rem;margin-bottom:2rem}
+.section-title{font-size:13px;color:#666;letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:1.25rem;font-family:-apple-system,sans-serif}
+.chart-wrap{height:140px;position:relative;display:flex;align-items:flex-end;gap:4px}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
+.chart-bar{width:100%;border-radius:3px 3px 0 0;min-height:2px;transition:height .6s ease;position:relative}
+.chart-bar:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #333;color:#fff;font-size:11px;padding:3px 8px;border-radius:5px;white-space:nowrap;font-family:-apple-system,sans-serif}
+.chart-label{font-size:9px;color:#444;text-align:center;font-family:-apple-system,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.chart-empty{display:flex;align-items:center;justify-content:center;height:100%;color:#333;font-size:14px;font-family:-apple-system,sans-serif}
+
+/* BREAKDOWN */
+.breakdown-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+.breakdown-card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:12px;padding:1.25rem}
+.breakdown-name{font-size:15px;font-weight:700;margin-bottom:.75rem}
+.breakdown-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:.4rem}
+.breakdown-key{color:#555}
+.breakdown-val{color:#ddd;font-weight:600}
+.breakdown-bar{height:4px;background:#1a1a1a;border-radius:2px;margin-top:.75rem;overflow:hidden}
+.breakdown-fill{height:100%;border-radius:2px;background:#c8903a;transition:width .8s ease}
+
+/* SESSIONS */
+.sessions-list{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:14px;overflow:hidden;margin-bottom:2rem}
+.session-row{display:flex;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid #111;gap:1rem}
+.session-row:last-child{border-bottom:none}
+.session-row:hover{background:#111}
+.session-score{font-family:Georgia,serif;font-size:1.5rem;font-weight:700;min-width:54px;text-align:center}
+.session-score.great{color:#5acc8a}
+.session-score.good{color:#c8903a}
+.session-score.ok{color:#888}
+.session-meta{flex:1}
+.session-diff{font-size:13px;font-weight:600;color:#ddd;margin-bottom:.2rem}
+.session-date{font-size:12px;color:#444}
+.session-rounds{font-size:12px;color:#555;margin-left:auto}
+
+/* MEDAL */
+.medal-section{text-align:center;margin-bottom:2.5rem}
+.medal-big{font-size:56px;margin-bottom:.5rem}
+.medal-title{font-family:Georgia,serif;font-size:1.25rem;font-weight:700;margin-bottom:.25rem}
+.medal-sub{font-size:13px;color:#555}
+
+/* STREAK */
+.streak-display{display:flex;align-items:center;justify-content:center;gap:1.5rem;background:#0a0800;border:1px solid #c8903a33;border-radius:14px;padding:1.5rem;margin-bottom:2rem}
+.streak-num{font-family:Georgia,serif;font-size:3rem;font-weight:700;color:#c8903a;line-height:1}
+.streak-info{text-align:left}
+.streak-label{font-size:14px;font-weight:600;color:#ddd}
+.streak-sub{font-size:12px;color:#555;margin-top:.2rem}
+
+/* EMPTY / LOADING */
+.loading{text-align:center;padding:4rem;color:#444;font-size:15px}
+.empty-state{text-align:center;padding:3rem;color:#444;font-size:14px;line-height:1.8}
+.empty-state a{color:#c8903a}
+.not-signed-in{text-align:center;padding:5rem 1.5rem}
+.not-signed-in h2{font-family:Georgia,serif;font-size:1.5rem;margin-bottom:.75rem}
+.not-signed-in p{color:#666;margin-bottom:1.5rem;font-size:15px}
+.sign-in-btn{background:#c8903a;color:#000;border:none;border-radius:10px;padding:12px 28px;font-size:16px;font-weight:700;cursor:pointer}
+
+@media(max-width:600px){
+  .profile-hero{flex-direction:column;align-items:flex-start;gap:1rem}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .nav-links a:not(.nav-play){display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">History <span>Challenger</span></a>
+    <div class="nav-links">
+      <a href="/play.html">Play</a>
+      <a href="/play.html" class="nav-play">Play now →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page" id="page">
+  <div class="loading">Loading your profile…</div>
+</div>
+
+<script>
+const WORKER='https://histroychallenger-api.maletethan.workers.dev';
+const GOOGLE_CLIENT_ID='413171729958-s5kimtsskjsfsu45ao1ah0gob8f4ghn9.apps.googleusercontent.com';
+
+function getToken(){return localStorage.getItem('hc_token');}
+function clearToken(){localStorage.removeItem('hc_token');}
+
+function signOut(){
+  clearToken();
+  window.location.href='/';
+}
+
+function signIn(){
+  const params=new URLSearchParams({
+    client_id:GOOGLE_CLIENT_ID,
+    redirect_uri:'https://historychallenger.com/profile.html',
+    response_type:'code',
+    scope:'openid email profile',
+    access_type:'offline',
+    prompt:'select_account'
+  });
+  window.location.href='https://accounts.google.com/o/oauth2/v2/auth?'+params;
+}
+
+function diffLabel(d){return{disciple:'🕯 Disciple',master:'⚔️ Master',keeper:'🏆 Keeper'}[d]||d;}
+function diffColor(d){return{disciple:'#5acc8a',master:'#c8903a',keeper:'#e0a84a'}[d]||'#888';}
+function scoreColor(s){return s>=80?'great':s>=50?'good':'ok';}
+function medal(avg){
+  if(avg>=90)return{icon:'🏆',title:'Keeper of Time',sub:'Exceptional historical mastery'};
+  if(avg>=70)return{icon:'⚔️',title:'Master',sub:'Strong command of history'};
+  if(avg>=50)return{icon:'🕯',title:'Disciple',sub:'Building your historical knowledge'};
+  return{icon:'📜',title:'Initiate',sub:'Keep playing to improve'};
+}
+function formatDate(ts){
+  const d=new Date(ts*1000);
+  return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+}
+function formatJoined(ts){
+  const d=new Date(ts*1000);
+  return 'Member since '+d.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+}
+
+function renderNotSignedIn(){
+  document.getElementById('page').innerHTML=`
+    <div class="not-signed-in">
+      <div style="font-size:48px;margin-bottom:1rem">📜</div>
+      <h2>Sign in to see your profile</h2>
+      <p>Your scores, streaks and history are saved when you play signed in.</p>
+      <button class="sign-in-btn" onclick="signIn()">Sign in with Google</button>
+      <div style="margin-top:1.5rem"><a href="/play.html">← Back to game</a></div>
+    </div>`;
+}
+
+function renderProfile(data){
+  const {user, sessions, history, breakdown} = data;
+  const avg = user.avg_score || 0;
+  const m = medal(avg);
+
+  // Build chart
+  const chartItems = [...(history||[])].reverse();
+  let chartHTML = '';
+  if(chartItems.length===0){
+    chartHTML = `<div class="chart-empty">Play some games to see your score history</div>`;
+  } else {
+    const maxScore = Math.max(...chartItems.map(h=>h.avg_score||0), 1);
+    chartHTML = chartItems.map(h=>{
+      const pct = Math.round(((h.avg_score||0)/100)*100);
+      const heightPct = Math.max(4, Math.round(((h.avg_score||0)/maxScore)*100));
+      const color = diffColor(h.diff);
+      const dateStr = formatDate(h.completed_at);
+      return `<div class="chart-bar-wrap">
+        <div class="chart-bar" style="height:${heightPct}%;background:${color}" data-tip="${Math.round(h.avg_score||0)}% · ${dateStr}"></div>
+        <div class="chart-label">${Math.round(h.avg_score||0)}%</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Build breakdown
+  const diffs = ['disciple','master','keeper'];
+  const bMap = {};
+  (breakdown||[]).forEach(b=>bMap[b.diff]=b);
+  const breakdownHTML = diffs.map(d=>{
+    const b = bMap[d];
+    if(!b) return `<div class="breakdown-card">
+      <div class="breakdown-name">${diffLabel(d)}</div>
+      <div style="font-size:13px;color:#333">No games yet</div>
+    </div>`;
+    return `<div class="breakdown-card">
+      <div class="breakdown-name">${diffLabel(d)}</div>
+      <div class="breakdown-row"><span class="breakdown-key">Games</span><span class="breakdown-val">${b.games}</span></div>
+      <div class="breakdown-row"><span class="breakdown-key">Average</span><span class="breakdown-val">${Math.round(b.avg||0)}%</span></div>
+      <div class="breakdown-row"><span class="breakdown-key">Best</span><span class="breakdown-val">${Math.round(b.best||0)}%</span></div>
+      <div class="breakdown-bar"><div class="breakdown-fill" style="width:${Math.round(b.avg||0)}%"></div></div>
+    </div>`;
+  }).join('');
+
+  // Build sessions list
+  const sessionsHTML = (sessions||[]).length===0
+    ? `<div class="empty-state">No games yet. <a href="/play.html">Play your first game →</a></div>`
+    : (sessions||[]).map(s=>`
+      <div class="session-row">
+        <div class="session-score ${scoreColor(s.avg_score||0)}">${Math.round(s.avg_score||0)}%</div>
+        <div class="session-meta">
+          <div class="session-diff">${diffLabel(s.diff)}</div>
+          <div class="session-date">${formatDate(s.completed_at)}</div>
+        </div>
+        <div class="session-rounds">${s.rounds} round${s.rounds!==1?'s':''}</div>
+      </div>`).join('');
+
+  document.getElementById('page').innerHTML=`
+    <!-- HEADER -->
+    <div class="profile-hero">
+      <div class="avatar-wrap">
+        ${user.avatar
+          ? `<img class="profile-avatar" src="${user.avatar}" alt="${user.name||''}">`
+          : `<div class="avatar-placeholder">👤</div>`}
+      </div>
+      <div class="profile-info">
+        <h1>${user.name||'History Player'}</h1>
+        <div class="email">${user.email}</div>
+        <div class="joined">${formatJoined(user.created_at)}</div>
+      </div>
+      <button class="sign-out-btn" onclick="signOut()">Sign out</button>
+    </div>
+
+    <!-- MEDAL -->
+    <div class="medal-section">
+      <div class="medal-big">${m.icon}</div>
+      <div class="medal-title">${m.title}</div>
+      <div class="medal-sub">${m.sub}</div>
+    </div>
+
+    <!-- STREAK -->
+    ${(user.current_streak||0)>0?`
+    <div class="streak-display">
+      <div>
+        <div class="streak-num">🔥 ${user.current_streak}</div>
+      </div>
+      <div class="streak-info">
+        <div class="streak-label">Day streak</div>
+        <div class="streak-sub">Longest ever: ${user.longest_streak||0} days</div>
+      </div>
+    </div>`:''}
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card highlight">
+        <div class="stat-val">${Math.round(avg)}%</div>
+        <div class="stat-lbl">Average score</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">${user.total_games||0}</div>
+        <div class="stat-lbl">Games played</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">${user.total_rounds||0}</div>
+        <div class="stat-lbl">Total rounds</div>
+      </div>
+      <div class="stat-card highlight">
+        <div class="stat-val">${Math.round(user.best_score||0)}%</div>
+        <div class="stat-lbl">Best game</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">${user.current_streak||0}</div>
+        <div class="stat-lbl">Current streak</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val">${user.longest_streak||0}</div>
+        <div class="stat-lbl">Longest streak</div>
+      </div>
+    </div>
+
+    <!-- CHART -->
+    <div class="chart-section">
+      <div class="section-title">Score history — last ${Math.min(chartItems.length,30)} games</div>
+      <div class="chart-wrap">${chartHTML}</div>
+    </div>
+
+    <!-- BREAKDOWN -->
+    <div class="section-title" style="margin-bottom:1rem">Performance by difficulty</div>
+    <div class="breakdown-grid">${breakdownHTML}</div>
+
+    <!-- SESSIONS -->
+    <div class="section-title" style="margin-bottom:1rem">Recent games</div>
+    <div class="sessions-list">${sessionsHTML}</div>
+
+    <div style="text-align:center;margin-top:2rem">
+      <a href="/play.html" style="color:#c8903a;font-size:15px;font-weight:600">Play another game →</a>
+    </div>`;
+}
+
+async function init(){
+  // Handle OAuth callback on profile page
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if(code){
+    history.replaceState({},'','/profile.html');
+    try{
+      const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'google_callback',code,redirect:'https://historychallenger.com/profile.html'})});
+      const data = await res.json();
+      if(data.token){localStorage.setItem('hc_token',data.token);}
+    }catch(e){}
+  }
+
+  const token = getToken();
+  if(!token){renderNotSignedIn();return;}
+
+  try{
+    const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'get_profile',token})});
+    const data = await res.json();
+    if(data.error){renderNotSignedIn();return;}
+    renderProfile(data);
+  }catch(e){
+    document.getElementById('page').innerHTML=`<div class="loading">Failed to load profile. <a href="/play.html">Go back to game</a></div>`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
