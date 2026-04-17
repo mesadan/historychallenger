@@ -9,14 +9,16 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{min-height:100vh}
-body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#ffffff;display:flex;justify-content:center;padding:1.25rem 0.75rem}
-@media(min-width:768px){body{padding:2rem 1.5rem}}
-@media(min-width:1100px){body{padding:2.5rem 2rem}}
-.wrap{width:100%;max-width:860px}
-@media(min-width:1100px){.wrap{max-width:1040px}}
+body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#ffffff;display:flex;justify-content:center;padding:1rem 0.75rem}
+@media(min-width:768px){body{padding:1.5rem}}
+@media(min-width:1200px){body{padding:2rem}}
+.wrap{width:100%;max-width:900px}
+@media(min-width:1024px){.wrap{max-width:1100px}}
+@media(min-width:1400px){.wrap{max-width:1280px}}
 .card{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:14px;padding:1.25rem}
 @media(min-width:600px){.card{padding:1.75rem 2rem}}
-@media(min-width:1100px){.card{padding:2rem 2.5rem}}
+@media(min-width:1024px){.card{padding:2rem 2.5rem}}
+@media(min-width:1400px){.card{padding:2.25rem 3rem}}
 
 /* HEADER */
 .hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.1rem;border-bottom:1px solid #2a2a2a;padding-bottom:.9rem;flex-wrap:wrap;gap:8px}
@@ -388,7 +390,7 @@ const T={
     secI:'I — Difficulty',chooseLevel:'Choose your level',
     levelSub:'Three levels based on how events are mixed across historical eras.',
     pathTitle:'How do you want to play?',
-    pathRandomTitle:'Random Challenge',pathRandomDesc:'Events are curated and era-mixed. Choose your difficulty level — it controls how events are spread across history.',
+    pathRandomTitle:'Random Challenge',pathRandomDesc:'Events are curated and mixed across eras. Your difficulty level controls how they are spread across history.',
     pathThemeTitle:'Choose a Theme',pathThemeDesc:'Pick an era or type your own theme. AI generates focused events. Difficulty is variable — determined by how much history that theme spans.',
     pathDisclaimer:'When playing with a theme, difficulty reflects the nature of the topic rather than a fixed setting.',
     secRounds:'Rounds',
@@ -420,9 +422,9 @@ const T={
     curatedSets:'Curated sets',
     medals:{90:'🏆 Keeper of Time',70:'⚔️ Master',50:'🕯️ Disciple',0:'📜 Initiate'},
     diffs:{
-      disciple:{label:'Disciple',tag:'Era-mixing · Famous events',desc:'No theme: 3+ events from distinct eras spanning millennia. With a theme: the most famous moments — widely spaced, forgiving.'},
-      master:{label:'Master',tag:'Mixed challenge · Real knowledge required',desc:'No theme: 3 events clustered in one era, 2 outliers elsewhere. With a theme: notable but non-obvious events, moderate spacing.'},
-      keeper:{label:'Keeper of Time',tag:'Precision · Expert level',desc:'No theme: all 5 within the same tight era. With a theme: obscure events packed close together — same decade or campaign.'}
+      disciple:{label:'Disciple',tag:'Famous events · Wide spans',desc:'Events that any educated adult would recognize, drawn from across all of history. Forgiving scoring — perfect for beginners.'},
+      master:{label:'Master',tag:'Mixed eras · Real knowledge required',desc:'3 events clustered in one era mixed with 2 from very different times. Requires genuine historical knowledge beyond headlines.'},
+      keeper:{label:'Keeper of Time',tag:'Precision · Expert level',desc:'All 5 events from the same tight era — same war, same reign, same decade. Expert precision required.'}
     },
     themes:[
       {label:'Bronze Age',q:'the Bronze Age civilizations: Mesopotamia, Egypt, Mycenae, Hittites, Indus Valley'},
@@ -479,9 +481,9 @@ const T={
     curatedSets:'Séries présélectionnées',
     medals:{90:'🏆 Gardien du Temps',70:'⚔️ Maître',50:'🕯️ Disciple',0:'📜 Initié'},
     diffs:{
-      disciple:{label:'Disciple',tag:'Époques mixtes · Événements célèbres',desc:'Sans thème : 3+ événements d\'époques distinctes sur des millénaires. Avec un thème : les moments les plus célèbres, largement espacés, indulgent.'},
-      master:{label:'Maître',tag:'Défi mixte · Vraie connaissance requise',desc:'Sans thème : 3 événements groupés dans une époque, 2 ailleurs. Avec un thème : événements notables mais non évidents, espacement modéré.'},
-      keeper:{label:'Gardien du Temps',tag:'Précision · Niveau expert',desc:'Sans thème : les 5 dans la même époque serrée. Avec un thème : événements obscurs très proches — même décennie ou campagne.'}
+      disciple:{label:'Disciple',tag:'Époques mixtes · Événements célèbres',desc:"Événements que tout adulte cultivé reconnaîtrait, tirés de toute l'histoire. Scoring généreux — parfait pour les débutants."},
+      master:{label:'Maître',tag:'Défi mixte · Vraie connaissance requise',desc:"3 événements groupés dans une même époque, mélangés à 2 d'époques très différentes. Vraies connaissances historiques requises."},
+      keeper:{label:'Gardien du Temps',tag:'Précision · Niveau expert',desc:"Les 5 événements de la même période étroite — même guerre, même règne, même décennie. Précision d'expert requise."}
     },
     themes:[
       {label:'Âge du Bronze',q:'les civilizations de l\'Âge du Bronze: Mésopotamie, Égypte, Mycènes, Hittites, Vallée de l\'Indus'},
@@ -538,9 +540,9 @@ const T={
     curatedSets:'Kuratierte Sets',
     medals:{90:'🏆 Hüter der Zeit',70:'⚔️ Meister',50:'🕯️ Schüler',0:'📜 Novize'},
     diffs:{
-      disciple:{label:'Schüler',tag:'Epochenmix · Bekannte Ereignisse',desc:'Ohne Thema: 3+ Ereignisse aus verschiedenen Epochen über Jahrtausende. Mit Thema: die bekanntesten Momente — weit gespreizt, vergebend.'},
-      master:{label:'Meister',tag:'Gemischte Herausforderung · Echtes Wissen nötig',desc:'Ohne Thema: 3 Ereignisse in einer Epoche, 2 Ausreißer. Mit Thema: bedeutende aber nicht offensichtliche Ereignisse, moderater Abstand.'},
-      keeper:{label:'Hüter der Zeit',tag:'Präzision · Expertenniveau',desc:'Ohne Thema: alle 5 in derselben engen Epoche. Mit Thema: obskure Ereignisse dicht beieinander — gleiche Dekade oder Kampagne.'}
+      disciple:{label:'Schüler',tag:'Epochenmix · Bekannte Ereignisse',desc:'Ereignisse, die jeder gebildete Erwachsene kennt, aus der gesamten Geschichte. Großzügige Wertung — perfekt für Einsteiger.'},
+      master:{label:'Meister',tag:'Gemischte Herausforderung · Echtes Wissen nötig',desc:'3 Ereignisse aus einer Epoche gemischt mit 2 aus sehr unterschiedlichen Zeiten. Echtes historisches Wissen erforderlich.'},
+      keeper:{label:'Hüter der Zeit',tag:'Präzision · Expertenniveau',desc:'Alle 5 Ereignisse aus derselben engen Periode — gleicher Krieg, gleiche Herrschaft, gleiche Dekade. Nur für Experten.'}
     },
     themes:[
       {label:'Bronzezeit',q:'die Bronzezeit-Zivilisationen: Mesopotamien, Ägypten, Mykene, Hethiter, Indus-Tal'},
@@ -597,9 +599,9 @@ const T={
     curatedSets:'Conjuntos seleccionados',
     medals:{90:'🏆 Guardián del Tiempo',70:'⚔️ Maestro',50:'🕯️ Discípulo',0:'📜 Iniciado'},
     diffs:{
-      disciple:{label:'Discípulo',tag:'Épocas mixtas · Eventos famosos',desc:'Sin tema: 3+ eventos de épocas distintas a lo largo de milenios. Con tema: los momentos más famosos — ampliamente espaciados, indulgente.'},
-      master:{label:'Maestro',tag:'Desafío mixto · Conocimiento real requerido',desc:'Sin tema: 3 eventos agrupados en una época, 2 atípicos. Con tema: eventos notables pero no obvios, espaciado moderado.'},
-      keeper:{label:'Guardián del Tiempo',tag:'Precisión · Nivel experto',desc:'Sin tema: los 5 dentro de la misma época estrecha. Con tema: eventos oscuros muy juntos — misma década o campaña.'}
+      disciple:{label:'Discípulo',tag:'Épocas mixtas · Eventos famosos',desc:'Eventos que cualquier adulto educado reconocería, de toda la historia. Puntuación generosa — perfecto para principiantes.'},
+      master:{label:'Maestro',tag:'Desafío mixto · Conocimiento real requerido',desc:'3 eventos agrupados en una época mezclados con 2 de tiempos muy diferentes. Se requiere conocimiento histórico genuino.'},
+      keeper:{label:'Guardián del Tiempo',tag:'Precisión · Nivel experto',desc:'Los 5 eventos del mismo período estrecho — misma guerra, mismo reinado, misma década. Solo para expertos.'}
     },
     themes:[
       {label:'Edad del Bronce',q:'las civilizaciones de la Edad del Bronce: Mesopotamia, Egipto, Micenas, Hititas, Valle del Indo'},
@@ -785,7 +787,7 @@ function renderSetup(){
     </div>
     <div class="path-grid">
       <div class="path-card ${isRandomPath?'active':''}" onclick="selPath('random')">
-        <div class="path-icon">🎲</div>
+        <div class="path-icon">🧭</div>
         <div class="path-title">${t('pathRandomTitle')}</div>
         <div class="path-desc">${t('pathRandomDesc')}</div>
       </div>
