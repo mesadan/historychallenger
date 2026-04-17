@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Pool Seeder — Admin</title>
+<style>
+body{font-family:monospace;background:#000;color:#0f0;padding:2rem;max-width:700px}
+h1{color:#c8903a;margin-bottom:1rem}
+button{background:#c8903a;color:#000;border:none;padding:8px 20px;font-size:14px;cursor:pointer;border-radius:6px;margin:4px;font-weight:700}
+button:disabled{opacity:.5;cursor:default}
+.log{background:#0a0a0a;border:1px solid #1a1a1a;padding:1rem;margin-top:1rem;height:400px;overflow-y:auto;font-size:13px;line-height:1.6}
+.ok{color:#0f0}.err{color:#f44}.info{color:#c8903a}
+select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;border-radius:4px;font-family:monospace}
+.row{margin-bottom:1rem}
+</style>
+</head>
+<body>
+<h1>🌱 Event Pool Seeder</h1>
+<div class="row">
+  <label>Difficulty: 
+    <select id="diff"><option value="disciple">Disciple</option><option value="master">Master</option><option value="keeper">Keeper</option></select>
+  </label>
+  &nbsp;
+  <label>Language: 
+    <select id="lang"><option value="en">English</option><option value="fr">French</option><option value="de">German</option><option value="es">Spanish</option></select>
+  </label>
+  &nbsp;
+  <label>Batches: 
+    <input type="number" id="batches" value="10" min="1" max="50" style="width:60px">
+  </label>
+</div>
+<div class="row">
+  <button onclick="startSeeding()" id="btn-start">▶ Start Seeding (5 sets per batch)</button>
+  <button onclick="stopSeeding()" id="btn-stop" disabled>⏹ Stop</button>
+  <button onclick="checkCount()">📊 Check counts</button>
+</div>
+<div class="log" id="log"></div>
+
+<script>
+const WORKER='https://histroychallenger-api.maletethan.workers.dev';
+let running=false;
+
+function log(msg,cls=''){
+  const el=document.getElementById('log');
+  el.innerHTML+=`<div class="${cls}">${new Date().toLocaleTimeString()} — ${msg}</div>`;
+  el.scrollTop=el.scrollHeight;
+}
+
+async function checkCount(){
+  const diffs=['disciple','master','keeper'];
+  const langs=['en','fr','de','es'];
+  log('Checking pool counts...','info');
+  for(const d of diffs){
+    for(const l of langs){
+      try{
+        const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({action:'get_sets',diff:d,lang:l,needed:0,seen_ids:[]})});
+        const data=await res.json();
+        log(`${d} / ${l}: pool available`,'ok');
+      }catch(e){
+        log(`${d} / ${l}: error - ${e.message}`,'err');
+      }
+    }
+  }
+}
+
+async function startSeeding(){
+  running=true;
+  document.getElementById('btn-start').disabled=true;
+  document.getElementById('btn-stop').disabled=false;
+  const diff=document.getElementById('diff').value;
+  const lang=document.getElementById('lang').value;
+  const batches=parseInt(document.getElementById('batches').value)||10;
+  log(`Starting: ${batches} batches × 5 sets = ${batches*5} sets for ${diff}/${lang}`,'info');
+
+  for(let i=0;i<batches;i++){
+    if(!running)break;
+    try{
+      log(`Batch ${i+1}/${batches}...`);
+      const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'seed_pool',diff,lang,batch:5})});
+      const data=await res.json();
+      if(data.error){log(`Error: ${data.error}`,'err');break;}
+      log(`✓ Saved ${data.saved} sets. Total in pool: ${data.total}`,'ok');
+      // Small delay between batches
+      await new Promise(r=>setTimeout(r,1500));
+    }catch(e){
+      log(`Error: ${e.message}`,'err');
+      break;
+    }
+  }
+  log('Done.','info');
+  running=false;
+  document.getElementById('btn-start').disabled=false;
+  document.getElementById('btn-stop').disabled=true;
+}
+
+function stopSeeding(){
+  running=false;
+  log('Stopping after current batch...','info');
+  document.getElementById('btn-stop').disabled=true;
+}
+</script>
+</body>
+</html>

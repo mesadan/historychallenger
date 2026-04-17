@@ -850,9 +850,12 @@ function nextEraGeo(){
 }
 
 // ── SESSION EXCLUSION LIST ──
-let _seenEvents=new Set(); // event names seen this browser session
-function recordSeenEvents(sets){
-  sets.forEach(set=>set.forEach(ev=>{if(ev.name)_seenEvents.add(ev.name);}));
+// Track seen set IDs across sessions (persisted in localStorage)
+let _seenSetIds=new Set(JSON.parse(localStorage.getItem('hc_seen_sets')||'[]'));
+function saveSeenSets(){
+  // Keep last 200 IDs
+  const arr=[..._seenSetIds].slice(-200);
+  localStorage.setItem('hc_seen_sets',JSON.stringify(arr));
 }
 
 async function startSeries(){
@@ -862,19 +865,18 @@ async function startSeries(){
   const themeObj=S.theme!==null?themes()[S.theme]:null;
   const themeQ=S.customTheme||(themeObj?themeObj.q:null);
   const diff=S.diff||'disciple';
-  const excluded=Array.from(_seenEvents).slice(-60); // send up to 60 recently seen events
 
   if(S.path==='random'){
+    // Use pool — instant if pool has sets, falls back to live generation
     showOverlay(t('generatingWait'));
-    // Assign era/geo combos per round for structural variety
-    const eraGeos=Array.from({length:Math.min(S.rounds,10)},()=>nextEraGeo());
-    const ok=await callGenerate({random:true,diff,rounds:Math.min(S.rounds,10),lang:LANG,excluded,eraGeos});
+    const ok=await loadFromPool(diff,Math.min(S.rounds,10));
     hideOverlay();
     if(!ok)return;
     if(!S.diff)S.diff='disciple';
   } else {
+    // Theme mode — always generate live
     showOverlay(t('generatingMsg')+' <strong style="color:#fff">'+activeLabel()+'</strong><br><br>'+t('generatingWait'));
-    const ok=await callGenerate({theme:themeQ,diff,rounds:Math.min(S.rounds,10),lang:LANG,excluded});
+    const ok=await callGenerate({theme:themeQ,diff,rounds:Math.min(S.rounds,10),lang:LANG});
     hideOverlay();
     if(!ok)return;
     if(!S.diff)S.diff='disciple';
@@ -882,13 +884,73 @@ async function startSeries(){
   startRound();
 }
 
+async function loadFromPool(diff, needed){
+  try{
+    const token=getToken();
+    const seenIds=_seenSetIds;
+    const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'get_sets',diff,lang:LANG,needed,token,seen_ids:seenIds})});
+    const data=await res.json();
+    if(data.error)throw new Error(data.error);
+
+    const sets=data.sets||[];
+    const ids=data.set_ids||[];
+
+    // Track seen set IDs locally
+    ids.forEach(id=>_seenSetIds.add(id));
+
+    if(sets.length>=needed){
+      S.generatedSets=sets;
+      return true;
+    }
+
+    // Pool didn't have enough — generate the rest live
+    const stillNeeded=needed-sets.length;
+    if(stillNeeded>0){
+      const eraGeos=Array.from({length:stillNeeded},()=>nextEraGeo());
+      const liveRes=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'generate_random',diff,rounds:stillNeeded,lang:LANG,eraGeos})});
+      const liveData=await liveRes.json();
+      if(liveData.sets){sets.push(...liveData.sets.filter(s=>Array.isArray(s)&&s.length===5));}
+    }
+
+    if(!sets.length){
+      renderSetup();
+      const el=document.getElementById('theme-err');
+      if(el){el.textContent=t('noSets');el.style.display='block';}
+      return false;
+    }
+    S.generatedSets=sets;
+    return true;
+  }catch(e){
+    // Full fallback to live generation
+    console.warn('Pool failed, falling back to live:',e.message);
+    return callGenerateRandom(diff, needed);
+  }
+}
+
+async function callGenerateRandom(diff, needed){
+  try{
+    const eraGeos=Array.from({length:needed},()=>nextEraGeo());
+    const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'generate_random',diff,rounds:needed,lang:LANG,eraGeos})});
+    const data=await res.json();
+    if(data.error){renderSetup();return false;}
+    const sets=(data.sets||[]).filter(s=>Array.isArray(s)&&s.length===5);
+    if(!sets.length){renderSetup();return false;}
+    S.generatedSets=sets;
+    return true;
+  }catch(e){
+    renderSetup();return false;
+  }
+}
+
 async function callGenerate(payload){
   try{
     const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const data=await res.json();
     if(data.error){
-      hideOverlay();
-      renderSetup();
+      hideOverlay();renderSetup();
       const el=document.getElementById('theme-err');
       if(el){el.textContent=data.error;el.style.display='block';}
       return false;
@@ -896,18 +958,15 @@ async function callGenerate(payload){
     const sets=[];
     if(data.sets&&Array.isArray(data.sets)){data.sets.forEach(s=>{if(Array.isArray(s)&&s.length===5)sets.push(s);});}
     if(!sets.length){
-      hideOverlay();
-      renderSetup();
+      hideOverlay();renderSetup();
       const el=document.getElementById('theme-err');
       if(el){el.textContent=t('noSets');el.style.display='block';}
       return false;
     }
     S.generatedSets=sets;
-    recordSeenEvents(sets);
     return true;
   }catch(e){
-    hideOverlay();
-    renderSetup();
+    hideOverlay();renderSetup();
     const el=document.getElementById('theme-err');
     if(el){el.textContent=t('connError')+' ('+e.message+')';el.style.display='block';}
     return false;
