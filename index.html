@@ -161,6 +161,8 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
 @media(min-width:600px){.mobile-bar-instr{display:none}}
 .tap-hint{font-size:11px;color:#444;font-family:-apple-system,sans-serif;font-style:italic;margin-bottom:6px;display:block}
 @media(min-width:600px){.tap-hint{display:none}}
+.setup-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem;gap:12px;flex-wrap:wrap}
+.setup-header .setup-title{margin-bottom:0}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:.5rem;align-items:center}
 .res{margin-top:1.25rem;padding:1.2rem;border:1px solid #2a2a2a;border-radius:12px;background:#080808}
 .score-big{font-size:48px;font-weight:700;color:#c8903a;font-family:Georgia,serif}
@@ -182,7 +184,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
         <div class="ttl-sub" id="ttl-sub">Prove your historical mastery</div>
       </div>
       <div class="hdr-right">
-        <div class="mets">
+        <div class="mets" id="mets" style="display:none">
           <div class="met"><div class="mv" id="sc">—</div><div class="ml" id="lbl-avg">Avg</div></div>
           <div class="met"><div class="mv" id="rn">—</div><div class="ml" id="lbl-round">Round</div></div>
         </div>
@@ -562,6 +564,7 @@ function hideOverlay(){
 function renderSetup(){
   document.getElementById('rn').textContent='—';
   document.getElementById('sc').textContent='—';
+  const m=document.getElementById('mets');if(m)m.style.display='none';
   const diffKeys=['disciple','master','keeper'];
   const roundOpts=[1,3,5,8];
   const themeList=themes();
@@ -595,8 +598,8 @@ function renderSetup(){
   const btnLabel=isThemePath?t('genStart'):t('startBtn');
 
   document.getElementById('body').innerHTML=`<div class="sf">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
-      <div class="setup-title" style="margin-bottom:0">${t('pathTitle')}</div>
+    <div class="setup-header">
+      <div class="setup-title">${t('pathTitle')}</div>
       <div class="lang-row">
         <button class="lang-btn ${LANG==='en'?'active':''}" onclick="setLang('en')">EN</button>
         <button class="lang-btn ${LANG==='fr'?'active':''}" onclick="setLang('fr')">FR</button>
@@ -761,6 +764,7 @@ function startRound(){
   S.events=raw.map((e,i)=>({...e,id:'e'+i}));
   shuffle(S.events);
   document.getElementById('rn').textContent=(S.round+1)+'/'+S.rounds;
+  const m=document.getElementById('mets');if(m)m.style.display='flex';
   updSc();
   renderStep1();
 }
