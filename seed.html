@@ -156,10 +156,15 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
     <label>Show: 
       <select id="qc-filter">
         <option value="errors">Errors only</option>
+        <option value="unknowns">Unknowns only</option>
         <option value="all">All sets</option>
       </select>
     </label>
     <button onclick="runQC()">🔍 Run QC</button>
+    <button onclick="fixAllErrors()" id="btn-fix-all" style="background:#1a1a6a;display:none">🔧 Fix all errors</button>
+    <button onclick="qcStopFix()" id="btn-fix-stop" style="display:none;background:#6a1a1a">⏹ Stop fixing</button>
+    <button onclick="deleteAllErrors()" id="btn-del-errors" style="background:#1a0000;border:1px solid #f44;color:#f44;display:none">🗑 Delete all errors</button>
+    <button onclick="deleteAllUnknowns()" id="btn-del-unknowns" style="background:#1a1a00;border:1px solid #c8903a;color:#c8903a;display:none">🗑 Delete unknowns</button>
     <span id="qc-summary" style="color:#c8903a;font-size:12px"></span>
   </div>
   <div id="qc-content" style="color:#555;font-size:13px">Run QC to check database accuracy...</div>
@@ -442,6 +447,7 @@ async function runQC(){
     if(d.error){ el.innerHTML=`<span class="err">Error: ${d.error}</span>`; return; }
 
     const sets = d.sets || [];
+    window._qcAllSets = sets; // store for fix lookups
     let errors = 0, warnings = 0;
     const html = [];
 
@@ -491,17 +497,93 @@ async function runQC(){
           </span>
         </div>`).join('')}
         ${s.explanation?`<div style="color:#444;font-size:11px;margin-top:6px;font-style:italic">${s.explanation}</div>`:''}
-        ${hasError?`<button class="qc-del" onclick="deleteSet('${s.id}','overlap')">🗑 Delete this set</button>`:''}
+        ${hasError?`
+          <button class="qc-del" onclick="fixSet('${s.id}', this)">🔧 Fix dates</button>
+          <button class="qc-del" onclick="deleteSet('${s.id}','overlap')" style="margin-left:4px">🗑 Delete</button>
+        `:''}
       </div>`);
     }
 
-    el.innerHTML = html.join('') || '<span style="color:#0f0">No issues found!</span>';
-    summary.textContent = `${sets.length} sets checked — ${errors} errors, ${warnings} unknowns`;
-    if(errors>0) summary.style.color='#f44';
-    else summary.style.color='#0f0';
+    // Store error sets for bulk fix
+    window._qcErrorSets = sets.filter(s => {
+      const wrongs = [
+        {start:s.wrong_1_start,end:s.wrong_1_end},
+        {start:s.wrong_2_start,end:s.wrong_2_end},
+        {start:s.wrong_3_start,end:s.wrong_3_end},
+      ];
+      return !overlaps(s.correct_start,s.correct_end,s.anchor_start,s.anchor_end) ||
+             wrongs.some(w=>overlaps(w.start,w.end,s.anchor_start,s.anchor_end));
+    });
+
+    el.innerHTML = html.join('') || '<span style="color:#0f0">✓ No errors found!</span>';
+    summary.textContent = `${sets.length} sets checked — ${errors} errors`;
+    summary.style.color = errors>0?'#f44':'#0f0';
+    document.getElementById('btn-fix-all').style.display = errors>0?'inline-block':'none';
+    document.getElementById('btn-del-errors').style.display = errors>0?'inline-block':'none';
+    document.getElementById('btn-del-unknowns').style.display = warnings>0?'inline-block':'none';
   }catch(e){
     el.innerHTML=`<span class="err">Failed: ${e.message}</span>`;
   }
+}
+
+let _fixRunning = false;
+function qcStopFix(){ _fixRunning = false; }
+
+async function fixSet(id, btnEl){
+  const cardEl = document.getElementById('qc-'+id);
+  if(btnEl) btnEl.textContent = '⏳ Fixing...';
+
+  // Find the set data from our stored list
+  const allSets = window._qcAllSets || [];
+  const set = allSets.find(s => s.id === id);
+  if(!set){ if(btnEl) btnEl.textContent = '⚠ Reload QC first'; return; }
+
+  try{
+    const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'fix_set', set, admin_key:ADMIN_KEY})});
+    const d = await res.json();
+    if(d.ok){
+      if(cardEl){ cardEl.style.borderColor='#0f0'; cardEl.style.opacity='0.6'; }
+      if(btnEl){ btnEl.textContent='✓ Fixed'; btnEl.style.background='#0a3a0a'; btnEl.style.color='#0f0'; btnEl.style.borderColor='#0f0'; }
+    } else {
+      if(btnEl) btnEl.textContent = '✗ ' + (d.error||'Failed');
+    }
+  }catch(e){
+    if(btnEl) btnEl.textContent = '✗ ' + e.message;
+  }
+}
+
+async function fixAllErrors(){
+  if(!window._qcErrorSets || !window._qcErrorSets.length){ alert('Run QC first'); return; }
+  _fixRunning = true;
+  document.getElementById('btn-fix-all').style.display='none';
+  document.getElementById('btn-fix-stop').style.display='inline-block';
+  const summary = document.getElementById('qc-summary');
+  let fixed=0, failed=0;
+
+  for(const set of window._qcErrorSets){
+    if(!_fixRunning) break;
+    summary.textContent = `Fixing... ${fixed+failed}/${window._qcErrorSets.length} (${fixed} fixed, ${failed} failed)`;
+    const cardEl = document.getElementById('qc-'+set.id);
+    try{
+      const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'fix_set', set, admin_key:ADMIN_KEY})});
+      const d = await res.json();
+      if(d.ok){
+        fixed++;
+        if(cardEl){ cardEl.style.borderColor='#0f0'; cardEl.style.opacity='0.5'; }
+      } else {
+        failed++;
+        if(cardEl) cardEl.style.borderColor='#c8903a';
+      }
+    }catch(e){ failed++; }
+    await new Promise(r=>setTimeout(r,1200));
+  }
+
+  _fixRunning = false;
+  document.getElementById('btn-fix-stop').style.display='none';
+  summary.textContent = `Done — ${fixed} fixed, ${failed} failed. Run QC again to verify.`;
+  summary.style.color = failed>0?'#c8903a':'#0f0';
 }
 
 async function deleteSet(id, table){
