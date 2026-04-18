@@ -155,7 +155,8 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000;color:#fff;disp
             </div>
             <hr class="user-menu-divider">
             <button class="user-menu-item" onclick="window.location.href='/profile.html'">📊 My profile</button>
-            <button class="user-menu-item" onclick="window.location.href='/play.html'">🕹 History Challenger</button>
+            <button class="user-menu-item" onclick="window.location.href='/games.html'">🎮 All games</button>
+            <button class="user-menu-item" onclick="window.location.href='/play.html'">🧭 History Challenger</button>
             <button class="user-menu-item danger" onclick="signOut()">Sign out</button>
           </div>
         </div>
@@ -310,7 +311,7 @@ function renderSetup(){
       <div class="divider"></div>
       <button class="btn btn-p" onclick="startGame()" style="width:100%;font-size:16px;padding:14px">Start →</button>
       <div style="text-align:center;margin-top:1rem">
-        <a href="/play.html" style="font-size:13px;color:#555;font-family:-apple-system,sans-serif">← Back to History Challenger</a>
+        <a href="/games.html" style="font-size:13px;color:#555;font-family:-apple-system,sans-serif">← All games</a>
       </div>
     </div>`;
 }
@@ -467,7 +468,16 @@ function nextRound(){
   renderRound();
 }
 
-function showFinal(){
+async function showFinal(){
+  // Save session
+  if(_user){
+    const total = S.sets.length * Math.round(100 * ({disciple:1,master:1.5,keeper:2}[S.diff]||1));
+    const pct = Math.round((S.score / total) * 100);
+    try{
+      await fetch(WORKER, {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({action:'save_session', token:getToken(), diff:S.diff, rounds:S.sets.length, scores:[], avg_score:pct, game_type:'overlap'})});
+    }catch(e){}
+  }
   document.getElementById('mets').style.display = 'none';
   const total = S.sets.length * Math.round(100 * ({disciple:1,master:1.5,keeper:2}[S.diff]||1));
   const pct = Math.round((S.score / total) * 100);

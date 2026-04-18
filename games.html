@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choose a Game — History Challenger</title>
+<meta name="description" content="Two free history games. Place events on a timeline or figure out which civilizations coexisted. Test your historical knowledge.">
+<meta name="robots" content="index, follow">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#000;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.25rem;min-height:100vh}
+a{text-decoration:none}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:3rem;text-decoration:none}
+.logo-title{font-family:Georgia,serif;font-size:22px;font-weight:700;color:#fff}
+.logo-title span{color:#c8903a}
+.logo-sub{font-size:10px;color:#555;letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+.heading{font-family:Georgia,serif;font-size:clamp(1.5rem,4vw,2.25rem);font-weight:700;text-align:center;margin-bottom:.5rem}
+.sub{font-size:15px;color:#666;text-align:center;margin-bottom:2.5rem}
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem;width:100%;max-width:800px}
+.game-card{background:#0d0d0d;border:1.5px solid #2a2a2a;border-radius:16px;padding:2rem;cursor:pointer;transition:border-color .15s,transform .1s;display:block;text-decoration:none}
+.game-card:hover{border-color:#c8903a;transform:translateY(-2px)}
+.game-card.primary{border-color:#c8903a44}
+.game-icon{font-size:40px;margin-bottom:1rem}
+.game-name{font-family:Georgia,serif;font-size:1.3rem;font-weight:700;color:#fff;margin-bottom:.3rem}
+.game-tag{font-size:11px;color:#c8903a;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.75rem}
+.game-desc{font-size:14px;color:#666;line-height:1.7;margin-bottom:1.5rem}
+.game-cta{background:#c8903a;color:#000;border-radius:8px;padding:10px 22px;font-weight:700;font-size:14px;display:inline-block}
+.game-card:not(.primary) .game-cta{background:#111;color:#fff;border:1px solid #333}
+.back{margin-top:2rem;font-size:13px;color:#444}
+.back a{color:#555}
+.back a:hover{color:#aaa}
+</style>
+</head>
+<body>
+
+<a href="/" class="logo">
+  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <circle cx="18" cy="18" r="17" stroke="#c8903a" stroke-width="1.2"/>
+    <circle cx="18" cy="18" r="14" stroke="#c8903a" stroke-width="0.4" stroke-dasharray="2 2"/>
+    <text x="18" y="23" text-anchor="middle" font-family="Georgia,serif" font-size="12" font-weight="700" fill="#c8903a" letter-spacing="-0.5">HC</text>
+  </svg>
+  <div>
+    <div class="logo-title">History <span>Challenger</span></div>
+    <div class="logo-sub">Choose your game</div>
+  </div>
+</a>
+
+<h1 class="heading">What would you like to play?</h1>
+<p class="sub">Two games. Both free. No account required.</p>
+
+<div class="games">
+  <a href="/play.html" class="game-card primary">
+    <div class="game-icon">🧭</div>
+    <div class="game-name">History Challenger</div>
+    <div class="game-tag">Timeline placement</div>
+    <div class="game-desc">You're given 5 historical events. Place them on a timeline as accurately as possible — score points for correct order and precise spacing. From the Bronze Age to the Cold War.</div>
+    <span class="game-cta">Play →</span>
+  </a>
+  <a href="/overlap.html" class="game-card">
+    <div class="game-icon">🏛</div>
+    <div class="game-name">Did They Overlap?</div>
+    <div class="game-tag">Civilizations quiz</div>
+    <div class="game-desc">You're given a civilization and its era. Which of four options actually coexisted with it at some point in history? The Assyrians and Carthage? The Han Dynasty and the Roman Empire?</div>
+    <span class="game-cta">Play →</span>
+  </a>
+</div>
+
+<div class="back"><a href="/">← Back to historychallenger.com</a></div>
+
+</body>
+</html>

@@ -120,7 +120,7 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
       <a href="#how-it-works" id="nav-how">How it works</a>
       <a href="#about" id="nav-about">About</a>
       <a href="/blog.html" id="nav-blog">Blog</a>
-      <a href="/play.html" class="nav-play" id="nav-play">Play free →</a>
+      <a href="/games.html" class="nav-play" id="nav-play">Play free →</a>
     </div>
   </div>
 </nav>
@@ -132,7 +132,7 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
   <h1 class="hero-title" id="t-title"></h1>
   <p class="hero-sub" id="t-sub"></p>
   <div class="hero-cta">
-    <a href="/play.html" class="btn-primary" id="t-cta1"></a>
+    <a href="/games.html" class="btn-primary" id="t-cta1"></a>
     <a href="#how-it-works" class="btn-secondary" id="t-cta2"></a>
   </div>
   <p class="hero-note" id="t-note"></p>
@@ -271,7 +271,7 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
   <div class="section-inner">
     <h2 class="section-title" id="t-cta-title" style="margin-bottom:1rem"></h2>
     <p id="t-cta-sub" style="color:#666;margin-bottom:2rem;font-size:16px"></p>
-    <a href="/play.html" class="btn-primary" id="t-cta-btn" style="font-size:18px;padding:16px 40px"></a>
+    <a href="/games.html" class="btn-primary" id="t-cta-btn" style="font-size:18px;padding:16px 40px"></a>
   </div>
 </section>
 
@@ -336,18 +336,18 @@ const T = {
     pc1:'Battle of Hastings', pc2:'Fall of Constantinople', pc3:'Black Death reaches Europe',
     anc1:'Julius Caesar <strong style="color:#c8903a">44 BC</strong>',
     anc2:'<strong style="color:#c8903a">1687 AD</strong> Newton\'s Principia',
-    lblHow:'How it works', howTitle:'Simple to learn, hard to master',
-    howSub:'Each round gives you 5 historical events. Place them on a timeline as accurately as possible.',
-    s1t:'Find the anchors', s1d:'Identify which event came first and which came last. These define the scale of your timeline for the round.',
-    s2t:'Place the rest', s2d:'Drag the remaining 3 events onto the bar. A bracket tooltip shows the time window at your cursor as you drag.',
-    s3t:'Score points', s3d:'Full marks for the right bracket. Partial credit for being close. The precision required scales with the time span.',
-    lblDiff:'Difficulty', diffTitle:'Choose your challenge',
-    diffSub:'Three levels from broadly famous events spanning millennia to expert events packed into the same decade.',
-    d1name:'Disciple', d1tag:'Famous events · Wide spans', d1desc:'Events any educated adult would recognize. Spans thousands of years. Generous scoring. Perfect for beginners.',
-    d2name:'Master', d2tag:'Mixed eras · Real knowledge', d2desc:"A mix of clustered and outlier events. You'll need genuine knowledge beyond headlines and Wikipedia summaries.",
-    d3name:'Keeper of Time', d3tag:'Same era · Expert precision', d3desc:'All 5 events from the same tight period — same war, same reign, same decade. Specialist knowledge only.',
+    lblHow:'Our games', howTitle:'Two games, one shared passion for history',
+    howSub:'Both games are free, powered by AI, and built around the same idea: genuine historical knowledge beats guessing.',
+    s1t:'History Challenger', s1d:'Place 5 historical events on a timeline as accurately as possible. Score points for getting the right order and precise spacing across eras.',
+    s2t:'Did They Overlap?', s2d:'Given a civilization and its era, identify which of four options actually coexisted with it at some point in history. No dates shown until you answer.',
+    s3t:'Three difficulty levels', s3d:'Both games share the same difficulty system — Disciple, Master, and Keeper of Time — with increasing precision and knowledge required at each level.',
+    lblDiff:'Difficulty', diffTitle:'Choose your level',
+    diffSub:'Both games use the same three difficulty levels. The same logic applies — more knowledge required, tighter gaps, fewer obvious eliminations.',
+    d1name:'Disciple', d1tag:'Famous · Forgiving', d1desc:'A real challenge, but any history buff should feel at home. Famous civilizations and events, wide time spans, generous scoring.',
+    d2name:'Master', d2tag:'Mixed eras · Real knowledge', d2desc:'Wrong options are from the same broad era. You need genuine historical knowledge — not just recognition of famous names.',
+    d3name:'Keeper of Time', d3tag:'Expert precision', d3desc:'All options are from roughly the same era. Only precise date knowledge will save you. No easy eliminations.',
     lblAbout:'About', aboutTitle:'Built for curious minds',
-    aboutText:'<p>History Challenger was built out of a simple frustration: most history quizzes are multiple choice, and multiple choice lets you guess. We wanted something that tested genuine temporal reasoning — not just "did you recognize the name" but "do you actually know when things happened?"</p><p>Every game is generated fresh by AI, drawing on the full breadth of human history — from Bronze Age Mesopotamia to the Cold War, from European kingdoms to Asian dynasties, from battles to scientific discoveries.</p><p>The game adapts its scoring to the timeline you\'re given. Playing events from a single decade? Brackets are 1 year wide. Spanning 3000 years? They\'re 100 years wide.</p><p>Free to play. No account required to start. Sign in to track your scores and streaks over time.</p>',
+    aboutText:'<p>We built two history games around a simple idea: genuine historical knowledge beats guessing. No multiple choice tricks, no 50/50 lifelines — just you and what you actually know.</p><p><strong style="color:#ddd">History Challenger</strong> asks you to place events on a timeline with precision. <strong style="color:#ddd">Did They Overlap?</strong> asks whether two civilizations ever coexisted. Different mechanics, same obsession.</p><p>Every game is generated fresh by AI, drawing on the full breadth of human history — from Bronze Age Mesopotamia to the Cold War, across every civilization and continent.</p><p>Free to play. No account required. Sign in to track your scores and streaks across both games.</p>',
     stat1:'Unique games', stat2:'Years of history', stat3:'Difficulty levels', stat4:'Languages',
     lblFaq:'FAQ', faqTitle:'Questions',
     faqs:[
@@ -377,13 +377,13 @@ const T = {
     pc1:'Bataille de Hastings', pc2:'Chute de Constantinople', pc3:'La Peste Noire en Europe',
     anc1:'Jules César <strong style="color:#c8903a">44 av. J.-C.</strong>',
     anc2:'<strong style="color:#c8903a">1687 ap. J.-C.</strong> Principia de Newton',
-    lblHow:'Comment jouer', howTitle:'Simple à apprendre, difficile à maîtriser',
-    howSub:'Chaque manche vous donne 5 événements historiques. Placez-les sur la frise le plus précisément possible.',
-    s1t:'Trouvez les ancres', s1d:'Identifiez quel événement est arrivé en premier et lequel en dernier. Ils définissent l\'échelle de votre frise.',
-    s2t:'Placez le reste', s2d:'Faites glisser les 3 événements restants sur la barre. Une infobulle indique la fenêtre temporelle en direct.',
-    s3t:'Marquez des points', s3d:'Points complets pour la bonne position. Points partiels si vous êtes proche.',
-    lblDiff:'Difficulté', diffTitle:'Choisissez votre défi',
-    diffSub:"Trois niveaux : des événements les plus célèbres aux événements d'expert dans la même décennie.",
+    lblHow:'Nos jeux', howTitle:'Deux jeux, une passion pour l\'histoire',
+    howSub:'Les deux jeux sont gratuits, propulsés par IA, et construits autour d\'une même idée : la vraie connaissance historique bat le hasard.',
+    s1t:'History Challenger', s1d:'Placez 5 événements historiques sur une frise chronologique avec la plus grande précision possible. Points pour le bon ordre et l\'espacement précis.',
+    s2t:'Did They Overlap?', s2d:'Vous recevez une civilisation et son époque. Identifiez laquelle des 4 options a coexisté avec elle. Les dates ne sont révélées qu\'après votre réponse.',
+    s3t:'Trois niveaux de difficulté', s3d:'Les deux jeux partagent le même système : Disciple, Maître et Gardien du Temps. Chaque niveau exige une connaissance plus précise.',
+    lblDiff:'Difficulté', diffTitle:'Choisissez votre niveau',
+    diffSub:'Les deux jeux utilisent les mêmes trois niveaux de difficulté.',
     d1name:'Disciple', d1tag:'Événements célèbres · Grandes époques', d1desc:'Des événements que tout adulte cultivé reconnaît. Des millénaires d\'écart. Scoring généreux. Parfait pour débuter.',
     d2name:'Maître', d2tag:'Époques mixtes · Vraies connaissances', d2desc:"Un mélange d'événements groupés et isolés. Il faut de vraies connaissances au-delà des titres Wikipedia.",
     d3name:'Gardien du Temps', d3tag:'Même époque · Précision experte', d3desc:'Les 5 événements de la même période étroite — même guerre, même règne, même décennie. Expertise uniquement.',
@@ -418,13 +418,13 @@ const T = {
     pc1:'Schlacht bei Hastings', pc2:'Fall von Konstantinopel', pc3:'Schwarzer Tod in Europa',
     anc1:'Julius Caesar <strong style="color:#c8903a">44 v. Chr.</strong>',
     anc2:'<strong style="color:#c8903a">1687 n. Chr.</strong> Newtons Principia',
-    lblHow:'So funktioniert es', howTitle:'Leicht zu lernen, schwer zu meistern',
-    howSub:'Jede Runde gibt Ihnen 5 historische Ereignisse. Platzieren Sie sie so genau wie möglich.',
-    s1t:'Anker finden', s1d:'Welches Ereignis kam zuerst, welches zuletzt? Diese bestimmen die Skala Ihres Zeitstrahls.',
-    s2t:'Den Rest platzieren', s2d:'Ziehen Sie die 3 verbleibenden Ereignisse auf den Balken. Ein Tooltip zeigt das Zeitfenster live an.',
-    s3t:'Punkte sammeln', s3d:'Volle Punkte für die richtige Position. Teilpunkte für Näherungen.',
-    lblDiff:'Schwierigkeit', diffTitle:'Wählen Sie Ihre Herausforderung',
-    diffSub:'Drei Schwierigkeitsgrade, von weltbekannten Ereignissen bis zu Expertenwissen in derselben Dekade.',
+    lblHow:'Unsere Spiele', howTitle:'Zwei Spiele, eine Leidenschaft für Geschichte',
+    howSub:'Beide Spiele sind kostenlos, KI-gestützt und um dieselbe Idee gebaut: echtes historisches Wissen schlägt Raten.',
+    s1t:'History Challenger', s1d:'Platzieren Sie 5 historische Ereignisse so genau wie möglich auf einem Zeitstrahl. Punkte für richtige Reihenfolge und präzisen Abstand.',
+    s2t:'Did They Overlap?', s2d:'Sie erhalten eine Zivilisation und ihre Epoche. Welche der 4 Optionen hat sie tatsächlich überlappt? Daten werden erst nach Ihrer Antwort gezeigt.',
+    s3t:'Drei Schwierigkeitsgrade', s3d:'Beide Spiele teilen dasselbe System — Schüler, Meister und Hüter der Zeit. Jede Stufe erfordert mehr Präzision.',
+    lblDiff:'Schwierigkeit', diffTitle:'Wählen Sie Ihr Niveau',
+    diffSub:'Beide Spiele verwenden dieselben drei Schwierigkeitsgrade.',
     d1name:'Jünger', d1tag:'Bekannte Ereignisse · Große Zeiträume', d1desc:'Ereignisse, die jeder gebildete Erwachsene kennt. Jahrtausende auseinander. Großzügige Wertung.',
     d2name:'Meister', d2tag:'Gemischte Epochen · Echtes Wissen', d2desc:'Eine Mischung aus gruppierten und abgelegenen Ereignissen. Echtes historisches Wissen erforderlich.',
     d3name:'Hüter der Zeit', d3tag:'Gleiche Epoche · Expertengenauigkeit', d3desc:'Alle 5 Ereignisse aus derselben engen Periode — gleicher Krieg, gleiche Herrschaft, gleiche Dekade.',
@@ -459,13 +459,13 @@ const T = {
     pc1:'Batalla de Hastings', pc2:'Caída de Constantinopla', pc3:'La Peste Negra en Europa',
     anc1:'Julio César <strong style="color:#c8903a">44 a.C.</strong>',
     anc2:'<strong style="color:#c8903a">1687 d.C.</strong> Principia de Newton',
-    lblHow:'Cómo funciona', howTitle:'Fácil de aprender, difícil de dominar',
-    howSub:'Cada ronda te da 5 eventos históricos. Colócalos en la línea del tiempo con la mayor precisión posible.',
-    s1t:'Encuentra los anclajes', s1d:'Identifica qué evento ocurrió primero y cuál último. Definen la escala de tu línea del tiempo.',
-    s2t:'Coloca el resto', s2d:'Arrastra los 3 eventos restantes a la barra. Un tooltip muestra el período en tiempo real.',
-    s3t:'Gana puntos', s3d:'Puntos completos por la posición correcta. Puntos parciales si estás cerca.',
-    lblDiff:'Dificultad', diffTitle:'Elige tu desafío',
-    diffSub:'Tres niveles, desde eventos mundialmente famosos hasta conocimiento experto en la misma década.',
+    lblHow:'Nuestros juegos', howTitle:'Dos juegos, una pasión por la historia',
+    howSub:'Ambos juegos son gratuitos, impulsados por IA y construidos alrededor de la misma idea: el conocimiento histórico real supera a adivinar.',
+    s1t:'History Challenger', s1d:'Coloca 5 eventos históricos en una línea de tiempo con la mayor precisión posible. Puntos por el orden correcto y el espaciado preciso.',
+    s2t:'Did They Overlap?', s2d:'Se te da una civilización y su época. ¿Cuál de las 4 opciones coexistió con ella? Las fechas solo se revelan después de responder.',
+    s3t:'Tres niveles de dificultad', s3d:'Ambos juegos comparten el mismo sistema: Discípulo, Maestro y Guardián del Tiempo. Cada nivel exige mayor precisión.',
+    lblDiff:'Dificultad', diffTitle:'Elige tu nivel',
+    diffSub:'Ambos juegos usan los mismos tres niveles de dificultad.',
     d1name:'Discípulo', d1tag:'Eventos famosos · Grandes períodos', d1desc:'Eventos que cualquier adulto educado reconocería. Abarca miles de años. Puntuación generosa.',
     d2name:'Maestro', d2tag:'Épocas mixtas · Conocimiento real', d2desc:'Una mezcla de eventos agrupados y aislados. Necesitarás conocimiento genuino más allá de los titulares.',
     d3name:'Guardián del Tiempo', d3tag:'Misma época · Precisión experta', d3desc:'Los 5 eventos del mismo período — misma guerra, mismo reinado, misma década. Solo expertos.',

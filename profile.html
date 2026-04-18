@@ -111,7 +111,7 @@ nav{position:sticky;top:0;z-index:100;background:rgba(0,0,0,0.92);backdrop-filte
     <a href="/" class="nav-logo">History <span>Challenger</span></a>
     <div class="nav-links">
       <a href="/play.html">Play</a>
-      <a href="/play.html" class="nav-play">Play now →</a>
+      <a href="/games.html" class="nav-play">Play now →</a>
     </div>
   </div>
 </nav>
@@ -146,6 +146,8 @@ function signIn(){
 
 function diffLabel(d){return{disciple:'🕯 Disciple',master:'⚔️ Master',keeper:'🏆 Keeper'}[d]||d;}
 function diffColor(d){return{disciple:'#5acc8a',master:'#c8903a',keeper:'#e0a84a'}[d]||'#888';}
+function gameLabel(g){return g==='overlap'?'🏛 Did They Overlap?':'🧭 History Challenger';}
+function gameTag(g){return g==='overlap'?'Overlap':'Timeline';}
 function scoreColor(s){return s>=80?'great':s>=50?'good':'ok';}
 function medal(avg){
   if(avg>=90)return{icon:'🏆',title:'Keeper of Time',sub:'Exceptional historical mastery'};
@@ -197,33 +199,44 @@ function renderProfile(data){
     }).join('');
   }
 
-  // Build breakdown
+  // Build breakdown — grouped by game type then difficulty
   const diffs = ['disciple','master','keeper'];
+  const games = ['timeline','overlap'];
   const bMap = {};
-  (breakdown||[]).forEach(b=>bMap[b.diff]=b);
-  const breakdownHTML = diffs.map(d=>{
-    const b = bMap[d];
-    if(!b) return `<div class="breakdown-card">
-      <div class="breakdown-name">${diffLabel(d)}</div>
-      <div style="font-size:13px;color:#333">No games yet</div>
-    </div>`;
-    return `<div class="breakdown-card">
-      <div class="breakdown-name">${diffLabel(d)}</div>
-      <div class="breakdown-row"><span class="breakdown-key">Games</span><span class="breakdown-val">${b.games}</span></div>
-      <div class="breakdown-row"><span class="breakdown-key">Average</span><span class="breakdown-val">${Math.round(b.avg||0)}%</span></div>
-      <div class="breakdown-row"><span class="breakdown-key">Best</span><span class="breakdown-val">${Math.round(b.best||0)}%</span></div>
-      <div class="breakdown-bar"><div class="breakdown-fill" style="width:${Math.round(b.avg||0)}%"></div></div>
+  (breakdown||[]).forEach(b => { bMap[`${b.game_type||'timeline'}_${b.diff}`] = b; });
+
+  const breakdownHTML = games.map(g => {
+    const hasAny = diffs.some(d => bMap[`${g}_${d}`]);
+    if(!hasAny) return '';
+    return `<div style="margin-bottom:1.5rem">
+      <div style="font-size:12px;color:#666;font-family:-apple-system,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem">${gameLabel(g)}</div>
+      <div class="breakdown-grid">
+        ${diffs.map(d => {
+          const b = bMap[`${g}_${d}`];
+          if(!b) return `<div class="breakdown-card">
+            <div class="breakdown-name">${diffLabel(d)}</div>
+            <div style="font-size:13px;color:#333">No games yet</div>
+          </div>`;
+          return `<div class="breakdown-card">
+            <div class="breakdown-name">${diffLabel(d)}</div>
+            <div class="breakdown-row"><span class="breakdown-key">Games</span><span class="breakdown-val">${b.games}</span></div>
+            <div class="breakdown-row"><span class="breakdown-key">Average</span><span class="breakdown-val">${Math.round(b.avg||0)}%</span></div>
+            <div class="breakdown-row"><span class="breakdown-key">Best</span><span class="breakdown-val">${Math.round(b.best||0)}%</span></div>
+            <div class="breakdown-bar"><div class="breakdown-fill" style="width:${Math.round(b.avg||0)}%"></div></div>
+          </div>`;
+        }).join('')}
+      </div>
     </div>`;
   }).join('');
 
-  // Build sessions list
+  // Build sessions list — show game type badge
   const sessionsHTML = (sessions||[]).length===0
-    ? `<div class="empty-state">No games yet. <a href="/play.html">Play your first game →</a></div>`
+    ? `<div class="empty-state">No games yet. <a href="/games.html">Play your first game →</a></div>`
     : (sessions||[]).map(s=>`
       <div class="session-row">
         <div class="session-score ${scoreColor(s.avg_score||0)}">${Math.round(s.avg_score||0)}%</div>
         <div class="session-meta">
-          <div class="session-diff">${diffLabel(s.diff)}</div>
+          <div class="session-diff">${diffLabel(s.diff)} <span style="font-size:11px;color:#444;font-weight:400">· ${gameTag(s.game_type)}</span></div>
           <div class="session-date">${formatDate(s.completed_at)}</div>
         </div>
         <div class="session-rounds">${s.rounds} round${s.rounds!==1?'s':''}</div>
@@ -307,7 +320,7 @@ function renderProfile(data){
     <div class="sessions-list">${sessionsHTML}</div>
 
     <div style="text-align:center;margin-top:2rem">
-      <a href="/play.html" style="color:#c8903a;font-size:15px;font-weight:600">Play another game →</a>
+      <a href="/games.html" style="color:#c8903a;font-size:15px;font-weight:600">Play another game →</a>
     </div>`;
 }
 
