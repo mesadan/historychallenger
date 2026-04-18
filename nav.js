@@ -24,11 +24,15 @@ style.textContent = `
 #hc-nav .hcn-link:hover{color:#fff}
 #hc-nav .hcn-play{background:#c8903a;color:#000!important;border-radius:7px;padding:6px 14px;font-weight:700;font-size:13px}
 #hc-nav .hcn-play:hover{background:#e0a84a}
-@media(max-width:640px){#hc-nav .hcn-link:not(.hcn-play){display:none}}
-
+@media(max-width:640px){
+  #hc-nav .hcn-link:not(.hcn-play){display:none}
+  #hc-nav .hcn-play{display:none}
+  .hcn-uname{display:none}
+}
 /* Auth widget — used everywhere */
 .hcn-signin{background:#c8903a;color:#000;border:none;border-radius:7px;padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:-apple-system,sans-serif}
 .hcn-signin:hover{background:#e0a84a}
+@media(max-width:600px){.hcn-signin{padding:6px 10px;font-size:12px}}
 .hcn-user-wrap{position:relative}
 .hcn-user-btn{display:flex;align-items:center;gap:7px;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:12px;color:#aaa;font-family:-apple-system,sans-serif}
 .hcn-user-btn:hover{border-color:#555;color:#fff}
