@@ -38,6 +38,21 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
 .bar-fill{height:100%;background:#c8903a;border-radius:3px}
 .bar-fill.green{background:#0f0}
 .bar-fill.blue{background:#5ac8fa}
+/* QC */
+.qc-set{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:14px;margin-bottom:10px;font-size:12px}
+.qc-set.error{border-color:#f44}
+.qc-set.ok{border-color:#0a3a0a}
+.qc-anchor{color:#c8903a;font-size:13px;font-weight:700;margin-bottom:8px}
+.qc-row{display:flex;align-items:baseline;gap:8px;padding:3px 0;border-bottom:1px solid #111}
+.qc-row:last-child{border-bottom:none}
+.qc-civ{flex:1;color:#aaa}
+.qc-dates{color:#555;font-size:11px;min-width:160px}
+.qc-status{font-size:11px;font-weight:700;min-width:80px;text-align:right}
+.qc-status.correct{color:#0f0}
+.qc-status.wrong-ok{color:#555}
+.qc-status.wrong-err{color:#f44}
+.qc-del{background:#1a0000;border:1px solid #f44;color:#f44;padding:3px 10px;font-size:11px;border-radius:4px;cursor:pointer;margin-top:8px}
+.qc-del:hover{background:#f44;color:#000}
 </style>
 </head>
 <body>
@@ -54,6 +69,7 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
 <div class="tabs">
   <button class="tab active" onclick="switchTab('seeder')">🌱 Seeder</button>
   <button class="tab" onclick="switchTab('dashboard')">📊 Dashboard</button>
+  <button class="tab" onclick="switchTab('qc')">🔍 QC</button>
 </div>
 
 <!-- SEEDER TAB -->
@@ -121,6 +137,34 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
   <div id="dash-content" style="color:#555;font-size:14px">Click Refresh to load stats...</div>
 </div>
 
+<!-- QC TAB -->
+<div id="tab-qc" class="tab-content">
+  <div style="margin-bottom:1rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <label>Game: 
+      <select id="qc-game">
+        <option value="overlap">Did They Overlap?</option>
+      </select>
+    </label>
+    <label>Difficulty: 
+      <select id="qc-diff">
+        <option value="all">All</option>
+        <option value="disciple">Disciple</option>
+        <option value="master">Master</option>
+        <option value="keeper">Keeper</option>
+      </select>
+    </label>
+    <label>Show: 
+      <select id="qc-filter">
+        <option value="errors">Errors only</option>
+        <option value="all">All sets</option>
+      </select>
+    </label>
+    <button onclick="runQC()">🔍 Run QC</button>
+    <span id="qc-summary" style="color:#c8903a;font-size:12px"></span>
+  </div>
+  <div id="qc-content" style="color:#555;font-size:13px">Run QC to check database accuracy...</div>
+</div>
+
 <script>
 const WORKER='https://histroychallenger-api.maletethan.workers.dev';
 let running=false;
@@ -131,12 +175,23 @@ function checkPw(){
   if(pw.length>=8){
     ADMIN_KEY=pw;
     document.getElementById('gate').style.display='none';
+    // Auto-load dashboard on login
+    loadDashboard();
+    switchTabByName('dashboard');
   } else {
     document.getElementById('pw-err').style.display='block';
     document.getElementById('pw-err').textContent='Key must be at least 8 characters';
     document.getElementById('pw').value='';
     document.getElementById('pw').focus();
   }
+}
+
+function switchTabByName(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  const tabs=document.querySelectorAll('.tab');
+  tabs.forEach(t=>{ if(t.textContent.toLowerCase().includes(name)) t.classList.add('active'); });
 }
 
 function log(msg,cls=''){
@@ -364,7 +419,104 @@ async function seedAllThemes(){
   document.getElementById('btn-start').disabled=false;
   document.getElementById('btn-stop').disabled=true;
 }
-// ── TABS ─────────────────────────────────────────────────────────
+// ── QC ───────────────────────────────────────────────────────────
+function overlaps(s1, e1, s2, e2){
+  if(s1==null||e1==null||s2==null||e2==null) return null; // unknown
+  return s1 <= e2 && e1 >= s2;
+}
+
+function fy(y){ return y==null?'?': y<0?Math.abs(y)+' BC':y+' AD'; }
+
+async function runQC(){
+  const diff = document.getElementById('qc-diff').value;
+  const filterMode = document.getElementById('qc-filter').value;
+  const el = document.getElementById('qc-content');
+  const summary = document.getElementById('qc-summary');
+  el.innerHTML = '<span style="color:#c8903a">Loading all sets...</span>';
+  summary.textContent = '';
+
+  try{
+    const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'get_all_overlap', diff, admin_key:ADMIN_KEY})});
+    const d = await res.json();
+    if(d.error){ el.innerHTML=`<span class="err">Error: ${d.error}</span>`; return; }
+
+    const sets = d.sets || [];
+    let errors = 0, warnings = 0;
+    const html = [];
+
+    for(const s of sets){
+      const wrongs = [
+        {name:s.wrong_1_name, start:s.wrong_1_start, end:s.wrong_1_end},
+        {name:s.wrong_2_name, start:s.wrong_2_start, end:s.wrong_2_end},
+        {name:s.wrong_3_name, start:s.wrong_3_start, end:s.wrong_3_end},
+      ];
+
+      // Check correct answer overlaps anchor
+      const correctOk = overlaps(s.correct_start, s.correct_end, s.anchor_start, s.anchor_end);
+
+      // Check wrong answers don't overlap anchor
+      const wrongErrors = wrongs.map(w => ({
+        ...w,
+        overlapsAnchor: overlaps(w.start, w.end, s.anchor_start, s.anchor_end)
+      }));
+
+      const hasError = !correctOk || wrongErrors.some(w => w.overlapsAnchor);
+      const hasUnknown = correctOk === null || wrongErrors.some(w => w.overlapsAnchor === null);
+
+      if(hasError) errors++;
+      if(hasUnknown) warnings++;
+      if(filterMode === 'errors' && !hasError) continue;
+
+      const diffColor = {disciple:'#5acc8a',master:'#c8903a',keeper:'#e0a84a'}[s.diff]||'#888';
+
+      html.push(`<div class="qc-set ${hasError?'error':'ok'}" id="qc-${s.id}">
+        <div class="qc-anchor">
+          ⚓ ${s.anchor_name} &nbsp;<span style="color:#555;font-size:11px">${fy(s.anchor_start)} — ${fy(s.anchor_end)}</span>
+          &nbsp;<span style="color:${diffColor};font-size:10px;text-transform:uppercase">${s.diff}</span>
+        </div>
+        <div class="qc-row">
+          <span class="qc-civ" style="color:#5acc8a">✓ ${s.correct_name}</span>
+          <span class="qc-dates">${fy(s.correct_start)} — ${fy(s.correct_end)}</span>
+          <span class="qc-status ${correctOk===null?'wrong-err':correctOk?'correct':'wrong-err'}">
+            ${correctOk===null?'⚠ unknown':correctOk?'✓ overlaps':'✗ NO OVERLAP'}
+          </span>
+        </div>
+        ${wrongErrors.map((w,i)=>`
+        <div class="qc-row">
+          <span class="qc-civ" style="color:${w.overlapsAnchor?'#f44':'#666'}">✗ ${w.name}</span>
+          <span class="qc-dates">${fy(w.start)} — ${fy(w.end)}</span>
+          <span class="qc-status ${w.overlapsAnchor===null?'wrong-err':w.overlapsAnchor?'wrong-err':'wrong-ok'}">
+            ${w.overlapsAnchor===null?'⚠ unknown':w.overlapsAnchor?'✗ OVERLAPS!':'✓ no overlap'}
+          </span>
+        </div>`).join('')}
+        ${s.explanation?`<div style="color:#444;font-size:11px;margin-top:6px;font-style:italic">${s.explanation}</div>`:''}
+        ${hasError?`<button class="qc-del" onclick="deleteSet('${s.id}','overlap')">🗑 Delete this set</button>`:''}
+      </div>`);
+    }
+
+    el.innerHTML = html.join('') || '<span style="color:#0f0">No issues found!</span>';
+    summary.textContent = `${sets.length} sets checked — ${errors} errors, ${warnings} unknowns`;
+    if(errors>0) summary.style.color='#f44';
+    else summary.style.color='#0f0';
+  }catch(e){
+    el.innerHTML=`<span class="err">Failed: ${e.message}</span>`;
+  }
+}
+
+async function deleteSet(id, table){
+  if(!confirm('Delete this set?')) return;
+  try{
+    const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'delete_set', id, table, admin_key:ADMIN_KEY})});
+    const d = await res.json();
+    if(d.ok){
+      const el = document.getElementById('qc-'+id);
+      if(el){ el.style.opacity='0.3'; el.style.pointerEvents='none'; el.innerHTML+='<div style="color:#f44">DELETED</div>'; }
+    }
+  }catch(e){ alert('Delete failed: '+e.message); }
+}
+
 function switchTab(name){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
@@ -375,6 +527,7 @@ function switchTab(name){
 
 // ── DASHBOARD ────────────────────────────────────────────────────
 async function loadDashboard(){
+  if(!ADMIN_KEY){ document.getElementById('dash-content').innerHTML='<span class="err">Enter admin password first</span>'; return; }
   const el=document.getElementById('dash-content');
   el.innerHTML='<span style="color:#c8903a">Loading...</span>';
   try{
