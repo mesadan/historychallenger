@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Did They Overlap? — History Challenger</title>
+<meta name="description" content="Did these civilizations coexist? A history quiz about empires, kingdoms and dynasties that shared the same era.">
+<meta name="robots" content="index, follow">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh}
+body{font-family:Georgia,'Times New Roman',serif;background:#000;color:#fff;display:flex;justify-content:center;padding:1rem 0.75rem}
+@media(min-width:768px){body{padding:1.5rem}}
+@media(min-width:1200px){body{padding:2rem}}
+.wrap{width:100%;max-width:900px}
+@media(min-width:1024px){.wrap{max-width:1100px}}
+@media(min-width:1400px){.wrap{max-width:1280px}}
+.card{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:14px;padding:1.25rem}
+@media(min-width:600px){.card{padding:1.75rem 2rem}}
+@media(min-width:1024px){.card{padding:2rem 2.5rem}}
+
+/* HEADER */
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;border-bottom:1px solid #2a2a2a;padding-bottom:.9rem;flex-wrap:wrap;gap:8px}
+.hdr-left{display:flex;align-items:center;gap:11px}
+.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.ttl{font-size:20px;font-weight:700;color:#fff;letter-spacing:.01em}
+@media(min-width:600px){.ttl{font-size:24px}}
+.ttl-sub{font-size:10px;color:#666;letter-spacing:.09em;text-transform:uppercase;font-family:-apple-system,sans-serif}
+.mets{display:flex;gap:8px}
+.met{background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:5px 12px;text-align:center;min-width:56px}
+.mv{font-size:18px;font-weight:700;color:#fff}
+.ml{font-size:10px;color:#666;font-family:-apple-system,sans-serif;letter-spacing:.04em}
+
+/* USER */
+.user-btn{display:flex;align-items:center;gap:7px;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:5px 10px;cursor:pointer;font-family:-apple-system,sans-serif;font-size:12px;color:#aaa;-webkit-tap-highlight-color:transparent}
+.user-btn:hover{border-color:#555;color:#fff}
+.user-avatar{width:22px;height:22px;border-radius:50%;object-fit:cover}
+.user-name{max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sign-in-btn{background:#c8903a;color:#000;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif}
+.user-menu{position:fixed;right:8px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:10px;padding:8px;min-width:180px;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,.8);display:none}
+@media(min-width:600px){.user-menu{position:absolute;top:100%;right:0;margin-top:6px}}
+.user-menu-item{display:block;width:100%;text-align:left;padding:8px 12px;background:none;border:none;border-radius:6px;color:#aaa;font-family:-apple-system,sans-serif;font-size:13px;cursor:pointer}
+.user-menu-item:hover{background:#1a1a1a;color:#fff}
+.user-menu-item.danger{color:#e06040}
+.user-menu-divider{border:none;border-top:1px solid #2a2a2a;margin:4px 0}
+.user-stats-row{display:flex;gap:12px;padding:8px 12px 4px;border-bottom:1px solid #1a1a1a;margin-bottom:4px}
+.user-stat-val{font-size:16px;font-weight:700;color:#c8903a;font-family:Georgia,serif}
+.user-stat-lbl{font-size:10px;color:#555;font-family:-apple-system,sans-serif}
+
+/* SETUP */
+.sf{font-family:-apple-system,sans-serif}
+.setup-title{font-size:17px;font-weight:700;color:#fff;margin-bottom:.35rem;font-family:Georgia,serif}
+.diff-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1.25rem}
+@media(max-width:500px){.diff-grid{grid-template-columns:1fr}}
+.dc{border:1px solid #2a2a2a;border-radius:10px;padding:10px 12px;cursor:pointer;background:#111;transition:border-color .12s,background .12s;-webkit-tap-highlight-color:transparent}
+.dc:hover{background:#181818;border-color:#555}
+.dc.sel{border-color:#c8903a;background:#1a1000}
+.dn{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px}
+.dt{font-size:10px;color:#c8903a;background:#111;border:1px solid #2a2a2a;border-radius:3px;padding:1px 5px;display:inline-block;margin-bottom:4px;letter-spacing:.02em}
+.dd{font-size:11px;color:#666;line-height:1.4}
+.divider{border:none;border-top:1px solid #2a2a2a;margin:1.1rem 0}
+.round-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem}
+.rc{border:1px solid #2a2a2a;background:#111;border-radius:8px;padding:6px 18px;font-size:13px;cursor:pointer;color:#888;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent}
+.rc:hover{border-color:#555;color:#fff}
+.rc.sel{border-color:#c8903a;background:#1a1000;color:#c8903a;font-weight:700}
+.btn{border:1px solid #3a3a3a;background:#111;border-radius:10px;padding:10px 20px;font-size:14px;cursor:pointer;color:#fff;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent;transition:background .1s,border-color .1s}
+.btn:hover{background:#1a1a1a;border-color:#555}
+.btn:disabled{opacity:.4;cursor:default}
+.btn-p{background:#c8903a;border-color:#c8903a;color:#000;font-weight:700}
+.btn-p:hover{background:#e0a84a;border-color:#e0a84a}
+.section-num{font-size:11px;color:#c8903a;letter-spacing:.1em;text-transform:uppercase;font-family:-apple-system,sans-serif;font-weight:700;margin-bottom:.2rem}
+
+/* GAME */
+.round-label{font-size:11px;color:#555;font-family:-apple-system,sans-serif;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem}
+.anchor-name{font-family:Georgia,serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:700;color:#fff;margin-bottom:.25rem}
+.question-text{font-size:14px;color:#888;font-family:-apple-system,sans-serif;margin-bottom:1.5rem}
+
+/* TIMELINE VIS */
+.anchor-timeline{margin:1.25rem 0;position:relative}
+.tl-track{height:4px;background:#2a2a2a;border-radius:2px;position:relative;margin:0 8px}
+.tl-fill{position:absolute;top:0;height:100%;background:#c8903a;border-radius:2px;transition:all .6s ease}
+.tl-overlap{position:absolute;top:0;height:100%;background:#5acc8a;border-radius:2px;transition:all .6s ease;opacity:0}
+.tl-labels{display:flex;justify-content:space-between;font-size:11px;color:#555;font-family:-apple-system,sans-serif;margin-top:4px;padding:0 8px}
+.tl-overlap-label{text-align:center;font-size:11px;color:#5acc8a;font-family:-apple-system,sans-serif;margin-top:6px;opacity:0;transition:opacity .4s .5s}
+
+/* OPTIONS */
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
+@media(max-width:400px){.options-grid{grid-template-columns:1fr}}
+.opt-btn{border:1.5px solid #2a2a2a;background:#111;border-radius:12px;padding:1rem 1.25rem;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;transition:border-color .12s,background .12s;font-family:-apple-system,sans-serif}
+.opt-btn:hover:not(:disabled){border-color:#555;background:#181818}
+.opt-btn:disabled{cursor:default}
+.opt-name{font-size:15px;font-weight:700;color:#fff;margin-bottom:2px;font-family:Georgia,serif}
+.opt-dates{font-size:12px;color:#444;font-family:-apple-system,sans-serif;transition:color .3s}
+.opt-btn.correct{border-color:#5acc8a!important;background:#0a1a0a!important}
+.opt-btn.correct .opt-name{color:#5acc8a}
+.opt-btn.correct .opt-dates{color:#5acc8a;opacity:.7}
+.opt-btn.wrong{border-color:#e06040!important;background:#1a0a05!important}
+.opt-btn.wrong .opt-name{color:#e06040}
+.opt-btn.wrong .opt-dates{color:#e06040;opacity:.7}
+
+/* EXPLANATION */
+.explanation-box{background:#080808;border:1px solid #1e1e1e;border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.25rem;font-family:-apple-system,sans-serif;font-size:14px;color:#888;line-height:1.6;display:none}
+.explanation-box.show{display:block}
+.explanation-box strong{color:#c8903a}
+
+/* SCORE BAR */
+.score-big{font-family:Georgia,serif;font-size:clamp(3rem,10vw,5rem);font-weight:700;color:#c8903a;text-align:center;margin:.5rem 0}
+.score-bar-wrap{height:6px;background:#1a1a1a;border-radius:3px;overflow:hidden;margin-bottom:1rem}
+.score-bar-fill{height:100%;background:linear-gradient(90deg,#c8903a,#e0a84a);border-radius:3px;transition:width .8s ease}
+
+/* LOADING */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:100;display:none}
+.overlay.show{display:flex}
+.overlay-inner{text-align:center;font-family:-apple-system,sans-serif;color:#888;font-size:15px}
+.spinner{width:32px;height:32px;border:2px solid #2a2a2a;border-top-color:#c8903a;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.guest-banner{background:#1a1000;border:1px solid #c8903a33;border-radius:8px;padding:10px 14px;margin-bottom:1rem;font-family:-apple-system,sans-serif;font-size:12px;color:#c8903a;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.guest-banner-cta{background:#c8903a;color:#000;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="hdr">
+      <div class="hdr-left">
+        <a href="/" style="text-decoration:none;display:flex;align-items:center;gap:11px">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="18" r="17" stroke="#c8903a" stroke-width="1.2"/>
+            <circle cx="18" cy="18" r="14" stroke="#c8903a" stroke-width="0.4" stroke-dasharray="2 2"/>
+            <text x="18" y="23" text-anchor="middle" font-family="Georgia,serif" font-size="12" font-weight="700" fill="#c8903a" letter-spacing="-0.5">HC</text>
+          </svg>
+          <div>
+            <div class="ttl">Did They Overlap?</div>
+            <div class="ttl-sub">Civilizations through time</div>
+          </div>
+        </a>
+      </div>
+      <div class="hdr-right">
+        <div class="mets" id="mets" style="display:none">
+          <div class="met"><div class="mv" id="sc">—</div><div class="ml">Score</div></div>
+          <div class="met"><div class="mv" id="rn">—</div><div class="ml">Round</div></div>
+        </div>
+        <div style="position:relative" id="user-area">
+          <button class="sign-in-btn" onclick="signIn()" id="signin-btn" style="display:none">Sign in</button>
+          <button class="user-btn" onclick="toggleUserMenu()" id="user-btn" style="display:none">
+            <img class="user-avatar" id="user-avatar" src="" alt="">
+            <span class="user-name" id="user-name"></span>
+            <span style="color:#555">▾</span>
+          </button>
+          <div class="user-menu" id="user-menu">
+            <div class="user-stats-row">
+              <div class="user-stat"><div class="user-stat-val" id="um-games">0</div><div class="user-stat-lbl">Games</div></div>
+              <div class="user-stat"><div class="user-stat-val" id="um-streak">0</div><div class="user-stat-lbl">Streak</div></div>
+            </div>
+            <hr class="user-menu-divider">
+            <button class="user-menu-item" onclick="window.location.href='/profile.html'">📊 My profile</button>
+            <button class="user-menu-item" onclick="window.location.href='/play.html'">🕹 History Challenger</button>
+            <button class="user-menu-item danger" onclick="signOut()">Sign out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="guest-banner-area"></div>
+    <div id="body"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-inner">
+    <div class="spinner"></div>
+    <div id="overlay-msg">Loading questions…</div>
+  </div>
+</div>
+
+<script>
+const WORKER = 'https://histroychallenger-api.maletethan.workers.dev';
+const GOOGLE_CLIENT_ID = '413171729958-s5kimtsskjsfsu45ao1ah0gob8f4ghn9.apps.googleusercontent.com';
+
+// ── STATE ─────────────────────────────────────────────────────────
+let S = { diff: 'disciple', rounds: 5, round: 0, sets: [], score: 0, answered: 0, phase: 'setup' };
+let _user = null;
+let _guestGames = parseInt(localStorage.getItem('hc_guest_games_ov') || '0');
+let _seenIds = new Set(JSON.parse(localStorage.getItem('hc_seen_overlap') || '[]'));
+
+// ── AUTH ──────────────────────────────────────────────────────────
+function getToken(){ return localStorage.getItem('hc_token'); }
+function clearToken(){ localStorage.removeItem('hc_token'); }
+
+async function initAuth(){
+  const token = getToken();
+  if(token){
+    try{
+      const res = await fetch(WORKER, {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({action:'verify_token', token})});
+      const data = await res.json();
+      if(data.user){ _user = data.user; renderUserUI(); return; }
+    }catch(e){}
+    clearToken();
+  }
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if(code){
+    history.replaceState({}, '', '/overlap.html');
+    try{
+      const res = await fetch(WORKER, {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({action:'google_callback', code, redirect:'https://historychallenger.com/overlap.html'})});
+      const data = await res.json();
+      if(data.token){ localStorage.setItem('hc_token', data.token); _user = data.user; renderUserUI(); return; }
+    }catch(e){}
+  }
+  renderUserUI();
+}
+
+function renderUserUI(){
+  const signinBtn = document.getElementById('signin-btn');
+  const userBtn = document.getElementById('user-btn');
+  if(_user){
+    if(signinBtn) signinBtn.style.display = 'none';
+    if(userBtn){
+      userBtn.style.display = 'flex';
+      const av = document.getElementById('user-avatar');
+      const nm = document.getElementById('user-name');
+      if(av && _user.avatar) av.src = _user.avatar;
+      if(nm) nm.textContent = _user.name || _user.email.split('@')[0];
+      document.getElementById('um-games').textContent = _user.total_games || 0;
+      document.getElementById('um-streak').textContent = _user.current_streak || 0;
+    }
+  } else {
+    if(signinBtn) signinBtn.style.display = 'block';
+    if(userBtn) userBtn.style.display = 'none';
+    renderGuestBanner();
+  }
+}
+
+function renderGuestBanner(){
+  const area = document.getElementById('guest-banner-area');
+  if(!area || _user) return;
+  if(_guestGames >= 2){
+    area.innerHTML = `<div class="guest-banner">
+      <span>📊 Sign in to track your scores and streaks</span>
+      <button class="guest-banner-cta" onclick="signIn()">Sign in free</button>
+    </div>`;
+  }
+}
+
+function signIn(){
+  const params = new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID,
+    redirect_uri: 'https://historychallenger.com/overlap.html',
+    response_type: 'code', scope: 'openid email profile',
+    access_type: 'offline', prompt: 'select_account'
+  });
+  window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' + params;
+}
+
+function signOut(){ clearToken(); _user = null; renderUserUI(); }
+
+function toggleUserMenu(){
+  const m = document.getElementById('user-menu');
+  const btn = document.getElementById('user-btn');
+  if(!m) return;
+  if(m.style.display === 'block'){
+    m.style.display = 'none';
+  } else {
+    if(window.innerWidth < 600 && btn){
+      const rect = btn.getBoundingClientRect();
+      m.style.top = (rect.bottom + 6) + 'px';
+    }
+    m.style.display = 'block';
+  }
+}
+
+document.addEventListener('click', e => {
+  const menu = document.getElementById('user-menu');
+  const btn = document.getElementById('user-btn');
+  if(menu && btn && !btn.contains(e.target) && !menu.contains(e.target)){
+    menu.style.display = 'none';
+  }
+});
+
+// ── SETUP ─────────────────────────────────────────────────────────
+function renderSetup(){
+  S.phase = 'setup';
+  document.getElementById('mets').style.display = 'none';
+  const diffs = [
+    { k:'disciple', icon:'🕯', name:'Disciple', tag:'Famous civilizations · Clear gaps', desc:'One correct answer with a long clear overlap. Wrong options are from distant eras — a real challenge for any history buff.' },
+    { k:'master', icon:'⚔️', name:'Master', tag:'Mixed eras · Real knowledge', desc:'Wrong options are from the same broad era as the anchor. You need to actually know whether they coexisted.' },
+    { k:'keeper', icon:'🏆', name:'Keeper of Time', tag:'Same era · Expert precision', desc:'All four options are from roughly the same era as the anchor. Only precise date knowledge will save you.' }
+  ];
+  const rounds = [3, 5, 8];
+
+  document.getElementById('body').innerHTML = `
+    <div class="sf">
+      <div class="section-num">I — Difficulty</div>
+      <div class="diff-grid">
+        ${diffs.map(d => `
+          <div class="dc ${S.diff===d.k?'sel':''}" onclick="selDiff('${d.k}')">
+            <div style="font-size:20px;margin-bottom:6px">${d.icon}</div>
+            <div class="dn">${d.name}</div>
+            <div class="dt">${d.tag}</div>
+            <div class="dd">${d.desc}</div>
+          </div>`).join('')}
+      </div>
+      <div class="divider"></div>
+      <div class="section-num">II — Rounds</div>
+      <div class="round-row">
+        ${rounds.map(r => `<div class="rc ${S.rounds===r?'sel':''}" onclick="selRounds(${r})">${r} rounds</div>`).join('')}
+      </div>
+      <div class="divider"></div>
+      <button class="btn btn-p" onclick="startGame()" style="width:100%;font-size:16px;padding:14px">Start →</button>
+      <div style="text-align:center;margin-top:1rem">
+        <a href="/play.html" style="font-size:13px;color:#555;font-family:-apple-system,sans-serif">← Back to History Challenger</a>
+      </div>
+    </div>`;
+}
+
+function selDiff(k){ S.diff = k; renderSetup(); }
+function selRounds(r){ S.rounds = r; renderSetup(); }
+
+// ── GAME ──────────────────────────────────────────────────────────
+async function startGame(){
+  showOverlay('Loading questions…');
+  try{
+    const token = getToken();
+    const seenIds = [..._seenIds];
+    const res = await fetch(WORKER, {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({action:'get_overlap_sets', diff:S.diff, needed:S.rounds, token, seen_ids:seenIds})});
+    const data = await res.json();
+    if(data.error) throw new Error(data.error);
+
+    const sets = data.sets || [];
+    (data.sets || []).forEach(s => _seenIds.add(s.id));
+    localStorage.setItem('hc_seen_overlap', JSON.stringify([..._seenIds].slice(-500)));
+
+    if(!sets.length){ hideOverlay(); alert('No questions available. Please try again later.'); return; }
+
+    S.sets = sets;
+    S.round = 0;
+    S.score = 0;
+    S.answered = 0;
+    S.phase = 'game';
+
+    if(!_user){ _guestGames++; localStorage.setItem('hc_guest_games_ov', _guestGames); renderGuestBanner(); }
+
+    hideOverlay();
+    renderRound();
+  }catch(e){
+    hideOverlay();
+    alert('Failed to load questions: ' + e.message);
+  }
+}
+
+function renderRound(){
+  if(S.round >= S.sets.length){ showFinal(); return; }
+  const set = S.sets[S.round];
+
+  document.getElementById('mets').style.display = 'flex';
+  document.getElementById('sc').textContent = S.score;
+  document.getElementById('rn').textContent = (S.round + 1) + '/' + S.sets.length;
+
+  const anchorSpan = Math.abs(set.anchor.end - set.anchor.start);
+  const minYear = Math.min(set.anchor.start, ...set.options.map(o => o.start));
+  const maxYear = Math.max(set.anchor.end, ...set.options.map(o => o.end));
+  const totalSpan = maxYear - minYear || 1;
+
+  const fillLeft = ((set.anchor.start - minYear) / totalSpan * 100).toFixed(1);
+  const fillWidth = (anchorSpan / totalSpan * 100).toFixed(1);
+
+  document.getElementById('body').innerHTML = `
+    <div>
+      <div class="round-label">Round ${S.round + 1} of ${S.sets.length} · ${S.diff.charAt(0).toUpperCase()+S.diff.slice(1)}</div>
+      <div class="anchor-name">${set.anchor.name}</div>
+      <div class="question-text">Which of these civilizations existed at the same time?</div>
+
+      <div class="anchor-timeline">
+        <div class="tl-track">
+          <div class="tl-fill" id="tl-fill" style="left:${fillLeft}%;width:${fillWidth}%"></div>
+          <div class="tl-overlap" id="tl-overlap"></div>
+        </div>
+        <div class="tl-labels">
+          <span id="tl-left">${formatYear(set.anchor.start)}</span>
+          <span id="tl-right">${formatYear(set.anchor.end)}</span>
+        </div>
+        <div class="tl-overlap-label" id="tl-overlap-label"></div>
+      </div>
+
+      <div class="options-grid" id="options-grid">
+        ${set.options.map((opt, i) => `
+          <button class="opt-btn" id="opt-${i}" onclick="answer(${i})" data-correct="${opt.correct}">
+            <div class="opt-name">${opt.name}</div>
+            <div class="opt-dates" id="opt-dates-${i}" style="opacity:0">${formatYear(opt.start)} — ${formatYear(opt.end)}</div>
+          </button>`).join('')}
+      </div>
+
+      <div class="explanation-box" id="explanation-box"></div>
+
+      <div id="next-area"></div>
+    </div>`;
+}
+
+function answer(idx){
+  const set = S.sets[S.round];
+  const chosen = set.options[idx];
+  const multiplier = {disciple:1, master:1.5, keeper:2}[S.diff] || 1;
+  const pts = chosen.correct ? Math.round(100 * multiplier) : 0;
+  S.score += pts;
+  S.answered++;
+
+  // Disable all buttons
+  set.options.forEach((opt, i) => {
+    const btn = document.getElementById('opt-' + i);
+    if(btn){ btn.disabled = true; }
+    // Reveal dates
+    const datesEl = document.getElementById('opt-dates-' + i);
+    if(datesEl) datesEl.style.opacity = '1';
+  });
+
+  // Style buttons
+  set.options.forEach((opt, i) => {
+    const btn = document.getElementById('opt-' + i);
+    if(!btn) return;
+    if(opt.correct) btn.classList.add('correct');
+    else if(i === idx && !opt.correct) btn.classList.add('wrong');
+  });
+
+  // Show overlap on timeline if correct answer revealed
+  const minYear = Math.min(set.anchor.start, ...set.options.map(o => o.start));
+  const maxYear = Math.max(set.anchor.end, ...set.options.map(o => o.end));
+  const totalSpan = maxYear - minYear || 1;
+
+  if(set.overlap_start != null && set.overlap_end != null){
+    const ovLeft = ((set.overlap_start - minYear) / totalSpan * 100).toFixed(1);
+    const ovWidth = ((set.overlap_end - set.overlap_start) / totalSpan * 100).toFixed(1);
+    const ovEl = document.getElementById('tl-overlap');
+    const ovLabel = document.getElementById('tl-overlap-label');
+    if(ovEl){ ovEl.style.left = ovLeft + '%'; ovEl.style.width = ovWidth + '%'; ovEl.style.opacity = '1'; }
+    if(ovLabel){
+      const yrs = Math.abs(set.overlap_end - set.overlap_start);
+      ovLabel.textContent = `Overlap: ${formatYear(set.overlap_start)} – ${formatYear(set.overlap_end)} (${yrs} years)`;
+      ovLabel.style.opacity = '1';
+    }
+  }
+
+  // Show explanation
+  const expBox = document.getElementById('explanation-box');
+  if(expBox && set.explanation){
+    expBox.innerHTML = `<strong>${chosen.correct ? '✓ Correct' : '✗ Wrong'} — +${pts} pts</strong><br>${set.explanation}`;
+    expBox.classList.add('show');
+  }
+
+  // Update score display
+  document.getElementById('sc').textContent = S.score;
+
+  // Next button
+  const nextArea = document.getElementById('next-area');
+  if(nextArea){
+    const isLast = S.round + 1 >= S.sets.length;
+    nextArea.innerHTML = `<button class="btn btn-p" onclick="nextRound()" style="width:100%;margin-top:.75rem">
+      ${isLast ? 'See results →' : 'Next →'}
+    </button>`;
+  }
+}
+
+function nextRound(){
+  S.round++;
+  renderRound();
+}
+
+function showFinal(){
+  document.getElementById('mets').style.display = 'none';
+  const total = S.sets.length * Math.round(100 * ({disciple:1,master:1.5,keeper:2}[S.diff]||1));
+  const pct = Math.round((S.score / total) * 100);
+  const m = pct>=90?'🏆 Keeper of Time':pct>=70?'⚔️ Master':pct>=50?'🕯 Disciple':'📜 Initiate';
+
+  document.getElementById('body').innerHTML = `
+    <div style="text-align:center">
+      <div style="font-size:13px;color:#444;margin-bottom:.5rem;font-family:-apple-system,sans-serif">${S.sets.length} rounds · ${S.diff.charAt(0).toUpperCase()+S.diff.slice(1)}</div>
+      <div class="score-big">${S.score}</div>
+      <div class="score-bar-wrap"><div class="score-bar-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:22px;font-weight:700;color:#fff;margin:.75rem 0;font-family:Georgia,serif">${m}</div>
+      ${!_user?`<div style="margin:.75rem 0;padding:12px;background:#1a1000;border:1px solid #c8903a33;border-radius:8px;font-family:-apple-system,sans-serif;font-size:13px;color:#c8903a">
+        <div style="margin-bottom:8px">Sign in to save your score and track your progress</div>
+        <button class="sign-in-btn" onclick="signIn()">Sign in with Google</button>
+      </div>`:''}
+      <div style="display:flex;gap:10px;justify-content:center;margin-top:1rem;flex-wrap:wrap">
+        <button class="btn btn-p" onclick="startGame()">Play again</button>
+        <button class="btn" onclick="renderSetup()">← Menu</button>
+        <button class="btn" onclick="window.location.href='/play.html'">History Challenger</button>
+      </div>
+    </div>`;
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────
+function formatYear(y){
+  if(y == null) return '?';
+  return y < 0 ? Math.abs(y) + ' BC' : y + ' AD';
+}
+
+function showOverlay(msg){
+  document.getElementById('overlay-msg').textContent = msg;
+  document.getElementById('overlay').classList.add('show');
+}
+
+function hideOverlay(){
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+initAuth();
+renderSetup();
+</script>
+</body>
+</html>

@@ -33,6 +33,7 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
     <select id="mode" onchange="toggleMode()">
       <option value="random">Random pool</option>
       <option value="theme">Theme pool</option>
+      <option value="overlap">Did They Overlap?</option>
     </select>
   </label>
 </div>
@@ -76,6 +77,7 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
 </div>
 <div class="row" id="all-themes-row">
   <button onclick="seedAllThemes()" id="btn-all" style="background:#1a6a1a">🌍 Seed ALL themes (current diff/lang)</button>
+  <button onclick="seedAllOverlap()" id="btn-all-overlap" style="background:#1a1a6a;display:none">🏛 Seed ALL 3 difficulties (overlap)</button>
 </div>
 <div class="log" id="log"></div>
 
@@ -104,8 +106,113 @@ function log(msg,cls=''){
 }
 
 async function toggleMode(){
-  const isTheme=document.getElementById('mode').value==='theme';
-  document.getElementById('theme-row').style.display=isTheme?'block':'none';
+  const mode = document.getElementById('mode').value;
+  document.getElementById('theme-row').style.display = mode==='theme' ? 'block' : 'none';
+  document.getElementById('btn-all').style.display = mode==='overlap' ? 'none' : 'inline-block';
+  document.getElementById('btn-all-overlap').style.display = mode==='overlap' ? 'inline-block' : 'none';
+  // Hide lang for overlap (always English)
+  document.getElementById('lang').parentElement.style.display = mode==='overlap' ? 'none' : 'inline';
+}
+
+async function startSeeding(){
+  const mode = document.getElementById('mode').value;
+  if(mode === 'overlap'){ return seedOverlapBatch(); }
+
+  running = true;
+  document.getElementById('btn-start').disabled = true;
+  document.getElementById('btn-stop').disabled = false;
+  const diff = document.getElementById('diff').value;
+  const lang = document.getElementById('lang').value;
+  const batches = parseInt(document.getElementById('batches').value) || 10;
+
+  let themeSlug = null, themeQ = null;
+  if(mode === 'theme'){
+    const val = document.getElementById('theme-select').value;
+    [themeSlug, themeQ] = val.split('|');
+    themeSlug = diff + '_theme_' + themeSlug;
+    log(`Starting theme seeding: ${themeSlug} — ${batches} batches × 5 = ${batches*5} sets`, 'info');
+  } else {
+    log(`Starting random seeding: ${diff}/${lang} — ${batches} batches × 5 = ${batches*5} sets`, 'info');
+  }
+
+  for(let i = 0; i < batches; i++){
+    if(!running) break;
+    try{
+      log(`Batch ${i+1}/${batches}...`);
+      const payload = {action:'seed_pool', diff, lang, batch:5, admin_key:ADMIN_KEY};
+      if(mode === 'theme'){ payload.theme_slug = themeSlug; payload.theme_q = themeQ; }
+      const res = await fetch(WORKER, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+      const data = await res.json();
+      if(data.error){ log(`Error: ${data.error}`, 'err'); break; }
+      log(`✓ Saved ${data.saved} sets. Total: ${data.total}`, 'ok');
+      await new Promise(r => setTimeout(r, 1500));
+    }catch(e){
+      log(`Error: ${e.message}`, 'err'); break;
+    }
+  }
+  log('Done.', 'info');
+  running = false;
+  document.getElementById('btn-start').disabled = false;
+  document.getElementById('btn-stop').disabled = true;
+}
+
+async function seedOverlapBatch(){
+  running = true;
+  document.getElementById('btn-start').disabled = true;
+  document.getElementById('btn-stop').disabled = false;
+  const diff = document.getElementById('diff').value;
+  const batches = parseInt(document.getElementById('batches').value) || 10;
+  log(`Starting overlap seeding: ${diff} — ${batches} batches × 5 = ${batches*5} sets`, 'info');
+
+  for(let i = 0; i < batches; i++){
+    if(!running) break;
+    try{
+      log(`Batch ${i+1}/${batches}...`);
+      const res = await fetch(WORKER, {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({action:'seed_overlap', diff, batch:5, admin_key:ADMIN_KEY})});
+      const data = await res.json();
+      if(data.error){ log(`Error: ${data.error}`, 'err'); break; }
+      log(`✓ Saved ${data.saved}. Total ${diff}: ${data.total}`, 'ok');
+      await new Promise(r => setTimeout(r, 2000));
+    }catch(e){
+      log(`Error: ${e.message}`, 'err'); break;
+    }
+  }
+  log('Done.', 'info');
+  running = false;
+  document.getElementById('btn-start').disabled = false;
+  document.getElementById('btn-stop').disabled = true;
+}
+
+async function seedAllOverlap(){
+  running = true;
+  document.getElementById('btn-all-overlap').disabled = true;
+  document.getElementById('btn-stop').disabled = false;
+  const batches = parseInt(document.getElementById('batches').value) || 10;
+  const diffs = ['disciple', 'master', 'keeper'];
+
+  for(const diff of diffs){
+    if(!running) break;
+    log(`\n── Overlap ${diff} ──`, 'info');
+    for(let i = 0; i < batches; i++){
+      if(!running) break;
+      try{
+        log(`  Batch ${i+1}/${batches}...`);
+        const res = await fetch(WORKER, {method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({action:'seed_overlap', diff, batch:5, admin_key:ADMIN_KEY})});
+        const data = await res.json();
+        if(data.error){ log(`  Error: ${data.error}`, 'err'); break; }
+        log(`  ✓ Saved ${data.saved}. Total ${diff}: ${data.total}`, 'ok');
+        await new Promise(r => setTimeout(r, 2000));
+      }catch(e){
+        log(`  Error: ${e.message}`, 'err'); break;
+      }
+    }
+  }
+  log('\n🏛 All overlap difficulties done.', 'info');
+  running = false;
+  document.getElementById('btn-all-overlap').disabled = false;
+  document.getElementById('btn-stop').disabled = true;
 }
 
 async function checkCount(){
