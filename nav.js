@@ -56,8 +56,13 @@ function isActive(href) {
 
 // ── INJECT HTML ───────────────────────────────────────────────────
 function renderNav(user) {
-  const navEl = document.getElementById('site-nav');
-  if (!navEl) return;
+  let navEl = document.getElementById('site-nav');
+  if (!navEl) {
+    // Create and prepend to body if no placeholder exists
+    navEl = document.createElement('div');
+    navEl.id = 'site-nav';
+    document.body.insertBefore(navEl, document.body.firstChild);
+  }
 
   navEl.innerHTML = `
     <nav id="hc-nav">

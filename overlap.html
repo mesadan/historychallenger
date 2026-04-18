@@ -75,35 +75,47 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000;color:#fff;disp
 .anchor-name{font-family:Georgia,serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:700;color:#fff;margin-bottom:.25rem}
 .question-text{font-size:14px;color:#888;font-family:-apple-system,sans-serif;margin-bottom:1.5rem}
 
-/* TIMELINE VIS */
-.anchor-timeline{margin:1.25rem 0;position:relative}
-.tl-track{height:4px;background:#2a2a2a;border-radius:2px;position:relative;margin:0 8px}
-.tl-fill{position:absolute;top:0;height:100%;background:#c8903a;border-radius:2px;transition:all .6s ease}
-.tl-overlap{position:absolute;top:0;height:100%;background:#5acc8a;border-radius:2px;transition:all .6s ease;opacity:0}
-.tl-labels{display:flex;justify-content:space-between;font-size:11px;color:#555;font-family:-apple-system,sans-serif;margin-top:4px;padding:0 8px}
-.tl-overlap-label{text-align:center;font-size:11px;color:#5acc8a;font-family:-apple-system,sans-serif;margin-top:6px;opacity:0;transition:opacity .4s .5s}
+/* ANCHOR BLOCK */
+.anchor-block{margin-bottom:1.5rem;padding:1.25rem 1.5rem;background:#0a0800;border:1px solid #c8903a33;border-radius:12px}
+.anchor-name{font-family:Georgia,serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:700;color:#fff;margin-bottom:.2rem}
+.anchor-dates{font-size:13px;color:#c8903a;font-family:-apple-system,sans-serif;margin-bottom:.85rem;font-weight:600}
+.single-tl{padding:0 2px}
+.single-tl-bar{height:8px;background:#1a1a1a;border-radius:4px;overflow:hidden}
+.single-tl-fill{height:100%;width:100%;border-radius:4px}
+.single-tl-fill.gold{background:linear-gradient(90deg,#c8903a,#e0a84a)}
 
+/* QUESTION PROMPT */
+.question-prompt{font-size:15px;color:#aaa;font-family:-apple-system,sans-serif;margin-bottom:1.25rem;line-height:1.6;padding:0 2px}
+.question-prompt strong{color:#fff}
+
+/* RESOLUTION */
+.resolution-box{background:#080808;border:1px solid #1e1e1e;border-radius:12px;padding:1.25rem 1.5rem;margin-top:1rem}
+.res-result{font-family:-apple-system,sans-serif;font-size:15px;font-weight:700;margin-bottom:.75rem}
+.res-result.res-correct{color:#5acc8a}
+.res-result.res-wrong{color:#e06040}
+.overlap-note{font-size:13px;color:#c8903a;font-family:-apple-system,sans-serif;margin-bottom:.75rem;font-style:italic}
+.res-explanation{font-size:13px;color:#777;font-family:-apple-system,sans-serif;margin-bottom:1rem;line-height:1.6;padding-bottom:.75rem;border-bottom:1px solid #1a1a1a}
+.res-timelines{display:flex;flex-direction:column;gap:.75rem;margin-top:.75rem}
+.res-civ{display:flex;flex-direction:column;gap:.3rem}
+.res-civ-name{font-family:-apple-system,sans-serif;font-size:13px;font-weight:600;display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px}
+.res-civ-dates{font-size:11px;font-weight:400;color:#555}
+.res-track{height:10px;background:#111;border-radius:5px;position:relative;overflow:hidden}
+.res-fill{position:absolute;top:0;height:100%;border-radius:5px;min-width:2px}
+.res-legend{display:flex;gap:16px;margin-top:.85rem;font-size:12px;font-family:-apple-system,sans-serif;flex-wrap:wrap;padding-top:.75rem;border-top:1px solid #1a1a1a}
+
+/* ROUND LABEL */
+.round-label{font-size:11px;color:#555;font-family:-apple-system,sans-serif;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.75rem}
 /* OPTIONS */
-.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
 @media(max-width:400px){.options-grid{grid-template-columns:1fr}}
 .opt-btn{border:1.5px solid #2a2a2a;background:#111;border-radius:12px;padding:1rem 1.25rem;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent;transition:border-color .12s,background .12s;font-family:-apple-system,sans-serif}
 .opt-btn:hover:not(:disabled){border-color:#555;background:#181818}
 .opt-btn:disabled{cursor:default}
-.opt-name{font-size:15px;font-weight:700;color:#fff;margin-bottom:2px;font-family:Georgia,serif}
-.opt-dates{font-size:12px;color:#444;font-family:-apple-system,sans-serif;transition:color .3s}
+.opt-name{font-size:15px;font-weight:700;color:#fff;font-family:Georgia,serif}
 .opt-btn.correct{border-color:#5acc8a!important;background:#0a1a0a!important}
 .opt-btn.correct .opt-name{color:#5acc8a}
-.opt-btn.correct .opt-dates{color:#5acc8a;opacity:.7}
 .opt-btn.wrong{border-color:#e06040!important;background:#1a0a05!important}
 .opt-btn.wrong .opt-name{color:#e06040}
-.opt-btn.wrong .opt-dates{color:#e06040;opacity:.7}
-
-/* EXPLANATION */
-.explanation-box{background:#080808;border:1px solid #1e1e1e;border-radius:10px;padding:1rem 1.25rem;margin-bottom:1.25rem;font-family:-apple-system,sans-serif;font-size:14px;color:#888;line-height:1.6;display:none}
-.explanation-box.show{display:block}
-.explanation-box strong{color:#c8903a}
-
-/* SCORE BAR */
 .score-big{font-family:Georgia,serif;font-size:clamp(3rem,10vw,5rem);font-weight:700;color:#c8903a;text-align:center;margin:.5rem 0}
 .score-bar-wrap{height:6px;background:#1a1a1a;border-radius:3px;overflow:hidden;margin-bottom:1rem}
 .score-bar-fill{height:100%;background:linear-gradient(90deg,#c8903a,#e0a84a);border-radius:3px;transition:width .8s ease}
@@ -360,42 +372,33 @@ function renderRound(){
   document.getElementById('sc').textContent = S.score;
   document.getElementById('rn').textContent = (S.round + 1) + '/' + S.sets.length;
 
-  const anchorSpan = Math.abs(set.anchor.end - set.anchor.start);
-  const minYear = Math.min(set.anchor.start, ...set.options.map(o => o.start));
-  const maxYear = Math.max(set.anchor.end, ...set.options.map(o => o.end));
-  const totalSpan = maxYear - minYear || 1;
-
-  const fillLeft = ((set.anchor.start - minYear) / totalSpan * 100).toFixed(1);
-  const fillWidth = (anchorSpan / totalSpan * 100).toFixed(1);
-
+  // Anchor timeline — just show anchor bar in gold, clean and simple
   document.getElementById('body').innerHTML = `
     <div>
       <div class="round-label">Round ${S.round + 1} of ${S.sets.length} · ${S.diff.charAt(0).toUpperCase()+S.diff.slice(1)}</div>
-      <div class="anchor-name">${set.anchor.name}</div>
-      <div class="question-text">Which of these civilizations existed at the same time?</div>
 
-      <div class="anchor-timeline">
-        <div class="tl-track">
-          <div class="tl-fill" id="tl-fill" style="left:${fillLeft}%;width:${fillWidth}%"></div>
-          <div class="tl-overlap" id="tl-overlap"></div>
+      <div class="anchor-block">
+        <div class="anchor-name">${set.anchor.name}</div>
+        <div class="anchor-dates">${formatYear(set.anchor.start)} — ${formatYear(set.anchor.end)}</div>
+        <div class="single-tl">
+          <div class="single-tl-bar">
+            <div class="single-tl-fill gold"></div>
+          </div>
         </div>
-        <div class="tl-labels">
-          <span id="tl-left">${formatYear(set.anchor.start)}</span>
-          <span id="tl-right">${formatYear(set.anchor.end)}</span>
-        </div>
-        <div class="tl-overlap-label" id="tl-overlap-label"></div>
+      </div>
+
+      <div class="question-prompt">
+        Only one of these civilizations existed at some point simultaneously with <strong>${set.anchor.name}</strong>. Which one?
       </div>
 
       <div class="options-grid" id="options-grid">
         ${set.options.map((opt, i) => `
-          <button class="opt-btn" id="opt-${i}" onclick="answer(${i})" data-correct="${opt.correct}">
+          <button class="opt-btn" id="opt-${i}" onclick="answer(${i})">
             <div class="opt-name">${opt.name}</div>
-            <div class="opt-dates" id="opt-dates-${i}" style="opacity:0">${formatYear(opt.start)} — ${formatYear(opt.end)}</div>
           </button>`).join('')}
       </div>
 
-      <div class="explanation-box" id="explanation-box"></div>
-
+      <div id="resolution-area"></div>
       <div id="next-area"></div>
     </div>`;
 }
@@ -408,47 +411,92 @@ function answer(idx){
   S.score += pts;
   S.answered++;
 
-  // Disable all buttons
-  set.options.forEach((opt, i) => {
+  // Disable all buttons immediately
+  set.options.forEach((_, i) => {
     const btn = document.getElementById('opt-' + i);
-    if(btn){ btn.disabled = true; }
-    // Reveal dates
-    const datesEl = document.getElementById('opt-dates-' + i);
-    if(datesEl) datesEl.style.opacity = '1';
+    if(btn) btn.disabled = true;
   });
 
-  // Style buttons
-  set.options.forEach((opt, i) => {
-    const btn = document.getElementById('opt-' + i);
-    if(!btn) return;
-    if(opt.correct) btn.classList.add('correct');
-    else if(i === idx && !opt.correct) btn.classList.add('wrong');
-  });
+  // Style the chosen button
+  const chosenBtn = document.getElementById('opt-' + idx);
+  if(chosenBtn) chosenBtn.classList.add(chosen.correct ? 'correct' : 'wrong');
 
-  // Show overlap on timeline if correct answer revealed
-  const minYear = Math.min(set.anchor.start, ...set.options.map(o => o.start));
-  const maxYear = Math.max(set.anchor.end, ...set.options.map(o => o.end));
+  // Build the resolution — all timelines sorted chronologically
+  const allCivs = [
+    { name: set.anchor.name, start: set.anchor.start, end: set.anchor.end, role: 'anchor' },
+    ...set.options.map(o => ({
+      name: o.name, start: o.start, end: o.end,
+      role: o.correct ? 'correct' : 'wrong',
+      chosen: set.options.indexOf(o) === idx
+    }))
+  ].sort((a, b) => (a.start || 0) - (b.start || 0));
+
+  const minYear = Math.min(...allCivs.map(c => c.start || 0));
+  const maxYear = Math.max(...allCivs.map(c => c.end || 0));
   const totalSpan = maxYear - minYear || 1;
 
-  if(set.overlap_start != null && set.overlap_end != null){
-    const ovLeft = ((set.overlap_start - minYear) / totalSpan * 100).toFixed(1);
-    const ovWidth = ((set.overlap_end - set.overlap_start) / totalSpan * 100).toFixed(1);
-    const ovEl = document.getElementById('tl-overlap');
-    const ovLabel = document.getElementById('tl-overlap-label');
-    if(ovEl){ ovEl.style.left = ovLeft + '%'; ovEl.style.width = ovWidth + '%'; ovEl.style.opacity = '1'; }
-    if(ovLabel){
-      const yrs = Math.abs(set.overlap_end - set.overlap_start);
-      ovLabel.textContent = `Overlap: ${formatYear(set.overlap_start)} – ${formatYear(set.overlap_end)} (${yrs} years)`;
-      ovLabel.style.opacity = '1';
+  function barLeft(start){ return ((( start - minYear) / totalSpan) * 100).toFixed(1); }
+  function barWidth(start, end){ return (((end - start) / totalSpan) * 100).toFixed(1); }
+
+  const timelinesHTML = allCivs.map(c => {
+    const left = barLeft(c.start);
+    const width = barWidth(c.start, c.end);
+    let color, label;
+    if(c.role === 'anchor'){
+      color = '#c8903a'; label = 'anchor';
+    } else if(c.role === 'correct'){
+      color = '#5acc8a'; label = 'overlap';
+    } else {
+      color = '#e06040'; label = 'no overlap';
     }
+    return `
+      <div class="res-civ">
+        <div class="res-civ-name" style="color:${color}">${c.name}
+          <span class="res-civ-dates">${formatYear(c.start)} — ${formatYear(c.end)}</span>
+        </div>
+        <div class="res-track">
+          <div class="res-fill" style="left:${left}%;width:${width}%;background:${color}"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Show overlap period annotation for the correct civ
+  let overlapNote = '';
+  if(set.overlap_start != null && set.overlap_end != null){
+    const yrs = Math.abs(set.overlap_end - set.overlap_start);
+    overlapNote = `<div class="overlap-note">✦ ${set.anchor.name} and ${set.correct.name} coexisted from ${formatYear(set.overlap_start)} to ${formatYear(set.overlap_end)} — ${yrs} years</div>`;
   }
 
-  // Show explanation
-  const expBox = document.getElementById('explanation-box');
-  if(expBox && set.explanation){
-    expBox.innerHTML = `<strong>${chosen.correct ? '✓ Correct' : '✗ Wrong'} — +${pts} pts</strong><br>${set.explanation}`;
-    expBox.classList.add('show');
+  const resArea = document.getElementById('resolution-area');
+  if(resArea){
+    resArea.innerHTML = `
+      <div class="resolution-box">
+        <div class="res-result ${chosen.correct?'res-correct':'res-wrong'}">
+          ${chosen.correct ? '✓ Correct' : '✗ Wrong'} — +${pts} pts
+        </div>
+        ${overlapNote}
+        ${set.explanation ? `<div class="res-explanation">${set.explanation}</div>` : ''}
+        <div class="res-timelines">${timelinesHTML}</div>
+        <div class="res-legend">
+          <span style="color:#c8903a">━ ${set.anchor.name}</span>
+          <span style="color:#5acc8a">━ Overlapped</span>
+          <span style="color:#e06040">━ Did not overlap</span>
+        </div>
+      </div>`;
   }
+
+  // Update score
+  document.getElementById('sc').textContent = S.score;
+
+  // Next button
+  const nextArea = document.getElementById('next-area');
+  if(nextArea){
+    const isLast = S.round + 1 >= S.sets.length;
+    nextArea.innerHTML = `<button class="btn btn-p" onclick="nextRound()" style="width:100%;margin-top:.75rem">
+      ${isLast ? 'See results →' : 'Next round →'}
+    </button>`;
+  }
+}
 
   // Update score display
   document.getElementById('sc').textContent = S.score;
