@@ -102,19 +102,45 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
 .legal-wrap p,.legal-wrap li{color:#888;font-size:14px;line-height:1.8;margin-bottom:.75rem}
 .legal-wrap ul{padding-left:1.5rem}
 .legal-back{display:inline-flex;align-items:center;gap:6px;color:#c8903a;font-size:14px;margin-bottom:2rem;cursor:pointer;border:none;background:none;padding:0}
+.nav-logo-seal{display:none}
 @media(max-width:600px){
   .nav-links a:not(.nav-play){display:none}
   .nav-play{display:none}
   .hero{min-height:80vh;padding:3rem 1.25rem}
   #nav-auth-area{flex-shrink:0}
+  .nav-logo-seal{display:block}
 }
+.hcn-signin{background:#c8903a;color:#000;border:none;border-radius:7px;padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:-apple-system,sans-serif}
+.hcn-signin:hover{background:#e0a84a}
+.hcn-user-wrap{position:relative}
+.hcn-user-btn{display:flex;align-items:center;gap:7px;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:12px;color:#aaa;font-family:-apple-system,sans-serif}
+.hcn-user-btn:hover{border-color:#555;color:#fff}
+.hcn-avatar{width:22px;height:22px;border-radius:50%;object-fit:cover}
+.hcn-uname{max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hcn-menu{position:fixed;top:56px;right:12px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:10px;padding:8px;min-width:190px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.9);display:none}
+.hcn-menu.open{display:block}
+.hcn-menu-stats{display:flex;gap:12px;padding:8px 12px;border-bottom:1px solid #1a1a1a;margin-bottom:4px}
+.hcn-stat-val{font-size:16px;font-weight:700;color:#c8903a;font-family:Georgia,serif;display:block}
+.hcn-stat-lbl{font-size:10px;color:#555;font-family:-apple-system,sans-serif;display:block}
+.hcn-menu-item{display:block;width:100%;text-align:left;padding:8px 12px;background:none;border:none;border-radius:6px;color:#aaa;font-family:-apple-system,sans-serif;font-size:13px;cursor:pointer;text-decoration:none}
+.hcn-menu-item:hover{background:#1a1a1a;color:#fff}
+.hcn-menu-item.danger{color:#e06040}
+.hcn-divider{border:none;border-top:1px solid #2a2a2a;margin:4px 0}
+@media(max-width:640px){.hcn-uname{display:none}}
 </style>
 </head>
 <body>
 
 <nav>
   <div class="nav-inner">
-    <a href="/" class="nav-logo">History <span>Challenger</span></a>
+    <a href="/" class="nav-logo">
+      <svg width="28" height="28" viewBox="0 0 36 36" fill="none" class="nav-logo-seal">
+        <circle cx="18" cy="18" r="17" stroke="#c8903a" stroke-width="1.2"/>
+        <circle cx="18" cy="18" r="14" stroke="#c8903a" stroke-width="0.4" stroke-dasharray="2 2"/>
+        <text x="18" y="23" text-anchor="middle" font-family="Georgia,serif" font-size="12" font-weight="700" fill="#c8903a" letter-spacing="-0.5">HC</text>
+      </svg>
+      History <span>Challenger</span>
+    </a>
     <div class="nav-links">
       <select class="lang-select" id="site-lang" onchange="setLang(this.value)" title="Language">
         <option value="en">🇬🇧 EN</option>
@@ -127,7 +153,9 @@ footer{border-top:1px solid #1a1a1a;padding:2.5rem 1.5rem;text-align:center}
       <a href="/blog.html" id="nav-blog">Blog</a>
       <a href="/games.html" class="nav-play" id="nav-play">Play free →</a>
     </div>
-    <div id="nav-auth-area" style="display:flex;align-items:center;gap:8px;position:relative"></div>
+    <div id="nav-auth-area" style="display:flex;align-items:center;gap:8px;position:relative;flex-shrink:0">
+      <button class="hcn-signin" onclick="window._hcSignIn ? window._hcSignIn() : window.location.href='/games.html'">Sign in</button>
+    </div>
   </div>
 </nav>
 

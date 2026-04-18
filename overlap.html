@@ -464,7 +464,8 @@ function answer(idx){
   let overlapNote = '';
   if(set.overlap_start != null && set.overlap_end != null){
     const yrs = Math.abs(set.overlap_end - set.overlap_start);
-    overlapNote = `<div class="overlap-note">✦ ${set.anchor.name} and ${set.correct.name} coexisted from ${formatYear(set.overlap_start)} to ${formatYear(set.overlap_end)} — ${yrs} years</div>`;
+    const correctOpt = set.options.find(o => o.correct);
+    overlapNote = `<div class="overlap-note">✦ ${set.anchor.name} and ${correctOpt ? correctOpt.name : ''} coexisted from ${formatYear(set.overlap_start)} to ${formatYear(set.overlap_end)} — ${yrs} years</div>`;
   }
 
   const resArea = document.getElementById('resolution-area');
@@ -494,19 +495,6 @@ function answer(idx){
     const isLast = S.round + 1 >= S.sets.length;
     nextArea.innerHTML = `<button class="btn btn-p" onclick="nextRound()" style="width:100%;margin-top:.75rem">
       ${isLast ? 'See results →' : 'Next round →'}
-    </button>`;
-  }
-}
-
-  // Update score display
-  document.getElementById('sc').textContent = S.score;
-
-  // Next button
-  const nextArea = document.getElementById('next-area');
-  if(nextArea){
-    const isLast = S.round + 1 >= S.sets.length;
-    nextArea.innerHTML = `<button class="btn btn-p" onclick="nextRound()" style="width:100%;margin-top:.75rem">
-      ${isLast ? 'See results →' : 'Next →'}
     </button>`;
   }
 }
