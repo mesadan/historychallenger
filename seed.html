@@ -380,12 +380,16 @@ async function loadDashboard(){
   try{
     const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({action:'get_stats',admin_key:ADMIN_KEY})});
-    const d=await res.json();
+    const text=await res.text();
+    let d;
+    try{ d=JSON.parse(text); }
+    catch(e){ el.innerHTML=`<span class="err">Parse error (${res.status}): ${text.substring(0,200)}</span>`; return; }
     if(d.error){el.innerHTML=`<span class="err">Error: ${d.error}</span>`;return;}
     renderDashboard(d);
     document.getElementById('dash-updated').textContent='Updated '+new Date().toLocaleTimeString();
   }catch(e){
-    el.innerHTML=`<span class="err">Failed: ${e.message}</span>`;
+    el.innerHTML=`<span class="err">Failed: ${e.message} — Check browser console for details</span>`;
+    console.error('Dashboard fetch error:',e);
   }
 }
 
