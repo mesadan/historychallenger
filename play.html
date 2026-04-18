@@ -160,7 +160,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
 .tl-mobile-bar{display:block;margin-top:12px;position:relative;height:52px;background:#080808;border:1px solid #1e1e1e;border-radius:8px;cursor:pointer;overflow:visible}
 @media(min-width:600px){.tl-mobile-bar{display:none}}
 .tl-mobile-track{position:absolute;top:50%;left:12px;right:12px;height:5px;background:#2a2a2a;border-radius:2px;transform:translateY(-50%)}
-.tl-mobile-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;color:#333;font-family:-apple-system,sans-serif;white-space:nowrap;pointer-events:none}
+.tl-mobile-hint{display:block;text-align:center;font-size:11px;color:#444;font-family:-apple-system,sans-serif;white-space:nowrap;pointer-events:none;margin-top:10px}
 .mobile-pin{position:absolute;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;pointer-events:all;cursor:pointer}
 .mobile-pin-dot{width:14px;height:14px;border-radius:50%;background:#c8903a;border:2px solid #0d0d0d;flex-shrink:0}
 .mobile-pin-lbl{background:#111;border:1px solid #333;border-radius:5px;padding:2px 6px;font-size:10px;color:#ffffff;white-space:normal;max-width:80px;text-align:center;line-height:1.3;font-family:-apple-system,sans-serif;margin-top:3px}
@@ -187,7 +187,8 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
 .user-name{max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sign-in-btn{background:#c8903a;color:#000;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:-apple-system,sans-serif;-webkit-tap-highlight-color:transparent}
 .sign-in-btn:hover{background:#e0a84a}
-.user-menu{position:absolute;top:100%;right:0;margin-top:6px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:10px;padding:8px;min-width:180px;z-index:50;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.user-menu{position:fixed;top:auto;right:8px;margin-top:0;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:10px;padding:8px;min-width:180px;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,.8)}
+@media(min-width:600px){.user-menu{position:absolute;top:100%;right:0;margin-top:6px}}
 .user-menu-item{display:block;width:100%;text-align:left;padding:8px 12px;background:none;border:none;border-radius:6px;color:#aaa;font-family:-apple-system,sans-serif;font-size:13px;cursor:pointer}
 .user-menu-item:hover{background:#1a1a1a;color:#fff}
 .user-menu-item.danger{color:#e06040}
@@ -343,7 +344,18 @@ function signOut(){
 
 function toggleUserMenu(){
   const m=document.getElementById('user-menu');
-  if(m)m.style.display=m.style.display==='none'?'block':'none';
+  const btn=document.getElementById('user-btn');
+  if(!m)return;
+  if(m.style.display==='none'||m.style.display===''){
+    // Position below the button on mobile
+    if(window.innerWidth<600&&btn){
+      const rect=btn.getBoundingClientRect();
+      m.style.top=(rect.bottom+6)+'px';
+    }
+    m.style.display='block';
+  } else {
+    m.style.display='none';
+  }
 }
 
 document.addEventListener('click',e=>{
@@ -1177,9 +1189,9 @@ function renderStep2(lOk,rOk){
       </div>
       <div class="tl-mobile-bar" id="mobile-bar" data-miny="${minY}" data-maxy="${maxY}">
         <div class="tl-mobile-track"></div>
-        ${Object.keys(S.midP).length===0?`<div class="tl-mobile-hint">Hold & drag a card onto this bar</div>`:''}
         ${mobPins}
       </div>
+      ${Object.keys(S.midP).length===0?`<div class="tl-mobile-hint">Hold &amp; drag a card onto the bar above</div>`:''}
     </div></div>
     <div class="actions">
       <button class="btn btn-p" onclick="doSubmit()" ${!allPlaced?'disabled':''}>${t('submitBtn')}</button>
