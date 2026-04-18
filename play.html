@@ -6,7 +6,6 @@
 <title>Play — History Challenger | Free Online History Quiz</title>
 <meta name="description" content="Play History Challenger — the free online history quiz where you place events on a timeline. Test your knowledge across all eras. No signup required.">
 <meta name="robots" content="index, follow">
-<meta name="hc-nav" content="skip">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{min-height:100vh}
@@ -224,25 +223,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
           <div class="met"><div class="mv" id="sc">—</div><div class="ml" id="lbl-avg">Avg</div></div>
           <div class="met"><div class="mv" id="rn">—</div><div class="ml" id="lbl-round">Round</div></div>
         </div>
-        <div style="position:relative" id="user-area">
-          <button class="sign-in-btn" onclick="signIn()" id="signin-btn" style="display:none">Sign in</button>
-          <button class="user-btn" onclick="toggleUserMenu()" id="user-btn" style="display:none">
-            <img class="user-avatar" id="user-avatar" src="" alt="">
-            <span class="user-name" id="user-name"></span>
-            <span style="color:#555">▾</span>
-          </button>
-          <div class="user-menu" id="user-menu" style="display:none">
-            <div class="user-stats-row">
-              <div class="user-stat"><div class="user-stat-val" id="um-games">0</div><div class="user-stat-lbl">Games</div></div>
-              <div class="user-stat"><div class="user-stat-val" id="um-avg">—</div><div class="user-stat-lbl">Avg</div></div>
-              <div class="user-stat"><div class="user-stat-val" id="um-streak">0</div><div class="user-stat-lbl">Streak</div></div>
-            </div>
-            <hr class="user-menu-divider">
-            <button class="user-menu-item" onclick="window.location.href='/profile.html'">📊 My profile</button>
-            <button class="user-menu-item" onclick="window.location.href='/overlap.html'">🏛 Did They Overlap?</button>
-            <button class="user-menu-item danger" onclick="signOut()">Sign out</button>
-          </div>
-        </div>
+        <div id="nav-auth-area" style="display:flex;align-items:center"></div>
       </div>
     </div>
     <div id="guest-banner-area"></div>
@@ -266,53 +247,17 @@ function setToken(t){localStorage.setItem('hc_token',t);}
 function clearToken(){localStorage.removeItem('hc_token');}
 
 async function initAuth(){
+  // Use token directly — nav.js handles UI. We just need _user for session saving.
   const token=getToken();
   if(token){
     try{
       const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({action:'verify_token',token})});
       const data=await res.json();
-      if(data.user){_user=data.user;renderUserUI();return;}
+      if(data.user){_user=data.user;}
     }catch(e){}
-    clearToken();
   }
-  // Check for OAuth callback
-  const params=new URLSearchParams(window.location.search);
-  const code=params.get('code');
-  if(code){
-    history.replaceState({},'','/play.html');
-    try{
-      const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({action:'google_callback',code,redirect:'https://historychallenger.com/play.html'})});
-      const data=await res.json();
-      console.log('Auth response:',data);
-      if(data.token){setToken(data.token);_user=data.user;renderUserUI();return;}
-      else if(data.error){console.error('Auth error:',data.error);}
-    }catch(e){console.error('Auth fetch error:',e);}
-  }
-  renderUserUI();
-}
-
-function renderUserUI(){
-  const signinBtn=document.getElementById('signin-btn');
-  const userBtn=document.getElementById('user-btn');
-  if(_user){
-    if(signinBtn)signinBtn.style.display='none';
-    if(userBtn){
-      userBtn.style.display='flex';
-      const av=document.getElementById('user-avatar');
-      const nm=document.getElementById('user-name');
-      if(av&&_user.avatar)av.src=_user.avatar;
-      if(nm)nm.textContent=_user.name||_user.email.split('@')[0];
-      document.getElementById('um-games').textContent=_user.total_games||0;
-      document.getElementById('um-avg').textContent=_user.avg_score?Math.round(_user.avg_score)+'%':'—';
-      document.getElementById('um-streak').textContent=_user.current_streak||0;
-    }
-  } else {
-    if(signinBtn)signinBtn.style.display='block';
-    if(userBtn)userBtn.style.display='none';
-    renderGuestBanner();
-  }
+  renderGuestBanner();
 }
 
 function renderGuestBanner(){
@@ -321,22 +266,12 @@ function renderGuestBanner(){
   if(_guestGames>=2){
     area.innerHTML=`<div class="guest-banner">
       <span>📊 Sign in to track your scores, streaks and history</span>
-      <button class="guest-banner-cta" onclick="signIn()">Sign in free</button>
+      <button class="guest-banner-cta" onclick="window._hcSignIn()">Sign in free</button>
     </div>`;
   }
 }
 
-function signIn(){
-  const params=new URLSearchParams({
-    client_id:GOOGLE_CLIENT_ID,
-    redirect_uri:'https://historychallenger.com/play.html',
-    response_type:'code',
-    scope:'openid email profile',
-    access_type:'offline',
-    prompt:'select_account'
-  });
-  window.location.href='https://accounts.google.com/o/oauth2/v2/auth?'+params;
-}
+function signIn(){ if(window._hcSignIn) window._hcSignIn(); }
 
 function signOut(){
   clearToken();_user=null;

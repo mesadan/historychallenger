@@ -153,25 +153,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000;color:#fff;disp
           <div class="met"><div class="mv" id="sc">—</div><div class="ml">Score</div></div>
           <div class="met"><div class="mv" id="rn">—</div><div class="ml">Round</div></div>
         </div>
-        <div style="position:relative" id="user-area">
-          <button class="sign-in-btn" onclick="signIn()" id="signin-btn" style="display:none">Sign in</button>
-          <button class="user-btn" onclick="toggleUserMenu()" id="user-btn" style="display:none">
-            <img class="user-avatar" id="user-avatar" src="" alt="">
-            <span class="user-name" id="user-name"></span>
-            <span style="color:#555">▾</span>
-          </button>
-          <div class="user-menu" id="user-menu">
-            <div class="user-stats-row">
-              <div class="user-stat"><div class="user-stat-val" id="um-games">0</div><div class="user-stat-lbl">Games</div></div>
-              <div class="user-stat"><div class="user-stat-val" id="um-streak">0</div><div class="user-stat-lbl">Streak</div></div>
-            </div>
-            <hr class="user-menu-divider">
-            <button class="user-menu-item" onclick="window.location.href='/profile.html'">📊 My profile</button>
-            <button class="user-menu-item" onclick="window.location.href='/games.html'">🎮 All games</button>
-            <button class="user-menu-item" onclick="window.location.href='/play.html'">🧭 History Challenger</button>
-            <button class="user-menu-item danger" onclick="signOut()">Sign out</button>
-          </div>
-        </div>
+        <div id="nav-auth-area" style="display:flex;align-items:center"></div>
       </div>
     </div>
     <div id="guest-banner-area"></div>
@@ -201,96 +183,28 @@ function getToken(){ return localStorage.getItem('hc_token'); }
 function clearToken(){ localStorage.removeItem('hc_token'); }
 
 async function initAuth(){
-  const token = getToken();
+  const token=getToken();
   if(token){
     try{
-      const res = await fetch(WORKER, {method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({action:'verify_token', token})});
-      const data = await res.json();
-      if(data.user){ _user = data.user; renderUserUI(); return; }
-    }catch(e){}
-    clearToken();
-  }
-  const params = new URLSearchParams(window.location.search);
-  const code = params.get('code');
-  if(code){
-    history.replaceState({}, '', '/overlap.html');
-    try{
-      const res = await fetch(WORKER, {method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({action:'google_callback', code, redirect:'https://historychallenger.com/overlap.html'})});
-      const data = await res.json();
-      if(data.token){ localStorage.setItem('hc_token', data.token); _user = data.user; renderUserUI(); return; }
+      const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'verify_token',token})});
+      const d=await res.json();
+      if(d.user){_user=d.user;}
     }catch(e){}
   }
-  renderUserUI();
-}
-
-function renderUserUI(){
-  const signinBtn = document.getElementById('signin-btn');
-  const userBtn = document.getElementById('user-btn');
-  if(_user){
-    if(signinBtn) signinBtn.style.display = 'none';
-    if(userBtn){
-      userBtn.style.display = 'flex';
-      const av = document.getElementById('user-avatar');
-      const nm = document.getElementById('user-name');
-      if(av && _user.avatar) av.src = _user.avatar;
-      if(nm) nm.textContent = _user.name || _user.email.split('@')[0];
-      document.getElementById('um-games').textContent = _user.total_games || 0;
-      document.getElementById('um-streak').textContent = _user.current_streak || 0;
-    }
-  } else {
-    if(signinBtn) signinBtn.style.display = 'block';
-    if(userBtn) userBtn.style.display = 'none';
-    renderGuestBanner();
-  }
+  renderGuestBanner();
 }
 
 function renderGuestBanner(){
-  const area = document.getElementById('guest-banner-area');
-  if(!area || _user) return;
-  if(_guestGames >= 2){
-    area.innerHTML = `<div class="guest-banner">
+  const area=document.getElementById('guest-banner-area');
+  if(!area||_user)return;
+  if(_guestGames>=2){
+    area.innerHTML=`<div class="guest-banner">
       <span>📊 Sign in to track your scores and streaks</span>
-      <button class="guest-banner-cta" onclick="signIn()">Sign in free</button>
+      <button class="guest-banner-cta" onclick="window._hcSignIn()">Sign in free</button>
     </div>`;
   }
 }
-
-function signIn(){
-  const params = new URLSearchParams({
-    client_id: GOOGLE_CLIENT_ID,
-    redirect_uri: 'https://historychallenger.com/overlap.html',
-    response_type: 'code', scope: 'openid email profile',
-    access_type: 'offline', prompt: 'select_account'
-  });
-  window.location.href = 'https://accounts.google.com/o/oauth2/v2/auth?' + params;
-}
-
-function signOut(){ clearToken(); _user = null; renderUserUI(); }
-
-function toggleUserMenu(){
-  const m = document.getElementById('user-menu');
-  const btn = document.getElementById('user-btn');
-  if(!m) return;
-  if(m.style.display === 'block'){
-    m.style.display = 'none';
-  } else {
-    if(window.innerWidth < 600 && btn){
-      const rect = btn.getBoundingClientRect();
-      m.style.top = (rect.bottom + 6) + 'px';
-    }
-    m.style.display = 'block';
-  }
-}
-
-document.addEventListener('click', e => {
-  const menu = document.getElementById('user-menu');
-  const btn = document.getElementById('user-btn');
-  if(menu && btn && !btn.contains(e.target) && !menu.contains(e.target)){
-    menu.style.display = 'none';
-  }
-});
 
 // ── SETUP ─────────────────────────────────────────────────────────
 function renderSetup(){
