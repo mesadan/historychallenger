@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Signing in — History Challenger</title>
+<style>
+body{background:#000;color:#888;font-family:-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:1rem}
+.spinner{width:32px;height:32px;border:2px solid #2a2a2a;border-top-color:#c8903a;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="spinner"></div>
+<div>Signing you in…</div>
+<script>
+const WORKER = 'https://histroychallenger-api.maletethan.workers.dev';
+
+async function handleCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const state = params.get('state') || '/';
+
+  if (!code) { window.location.href = state; return; }
+
+  try {
+    const res = await fetch(WORKER, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'google_callback',
+        code,
+        redirect: 'https://historychallenger.com/auth-callback.html'
+      })
+    });
+    const data = await res.json();
+    if (data.token) {
+      localStorage.setItem('hc_token', data.token);
+    }
+  } catch(e) {}
+
+  // Redirect back to where they came from
+  const dest = state.startsWith('/') ? state : '/';
+  window.location.href = dest;
+}
+
+handleCallback();
+</script>
+</body>
+</html>
