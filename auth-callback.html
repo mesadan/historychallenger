@@ -35,12 +35,17 @@ async function handleCallback() {
     const data = await res.json();
     if (data.token) {
       localStorage.setItem('hc_token', data.token);
+      const dest = state.startsWith('/') ? state : '/';
+      window.location.href = dest;
+      return;
     }
-  } catch(e) {}
-
-  // Redirect back to where they came from
-  const dest = state.startsWith('/') ? state : '/';
-  window.location.href = dest;
+    // Show error if no token
+    document.querySelector('div:last-child').textContent = 'Sign-in failed: ' + (data.error || data.detail || 'Unknown error') + '. Redirecting…';
+    setTimeout(() => { window.location.href = state; }, 3000);
+  } catch(e) {
+    document.querySelector('div:last-child').textContent = 'Network error: ' + e.message + '. Redirecting…';
+    setTimeout(() => { window.location.href = state; }, 3000);
+  }
 }
 
 handleCallback();
