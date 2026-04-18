@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <title>Pool Seeder — Admin</title>
 <style>
-body{font-family:monospace;background:#000;color:#0f0;padding:2rem;max-width:700px}
+body{font-family:monospace;background:#000;color:#0f0;padding:2rem;max-width:900px}
 h1{color:#c8903a;margin-bottom:1rem}
 button{background:#c8903a;color:#000;border:none;padding:8px 20px;font-size:14px;cursor:pointer;border-radius:6px;margin:4px;font-weight:700}
 button:disabled{opacity:.5;cursor:default}
-.log{background:#0a0a0a;border:1px solid #1a1a1a;padding:1rem;margin-top:1rem;height:400px;overflow-y:auto;font-size:13px;line-height:1.6}
+.log{background:#0a0a0a;border:1px solid #1a1a1a;padding:1rem;margin-top:1rem;height:380px;overflow-y:auto;font-size:13px;line-height:1.6}
 .ok{color:#0f0}.err{color:#f44}.info{color:#c8903a}
 select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;border-radius:4px;font-family:monospace}
 .row{margin-bottom:1rem}
@@ -16,6 +16,28 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
 #gate input{font-size:16px;padding:10px 16px;width:260px;text-align:center}
 #gate button{font-size:15px;padding:10px 28px}
 #gate .err{color:#f44;font-size:13px;display:none}
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:1.5rem;border-bottom:1px solid #1a1a1a;padding-bottom:0}
+.tab{background:none;border:none;border-bottom:2px solid transparent;color:#555;padding:8px 20px;font-size:14px;cursor:pointer;font-family:monospace;margin-bottom:-1px}
+.tab:hover{color:#fff}
+.tab.active{color:#c8903a;border-bottom-color:#c8903a}
+.tab-content{display:none}
+.tab-content.active{display:block}
+/* DASHBOARD */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:1.5rem}
+.dash-card{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:16px;text-align:center}
+.dash-val{font-size:2rem;font-weight:700;color:#c8903a}
+.dash-lbl{font-size:11px;color:#555;margin-top:4px}
+.dash-section{margin-bottom:1.5rem}
+.dash-section h3{color:#c8903a;font-size:14px;margin-bottom:.75rem;border-bottom:1px solid #1a1a1a;padding-bottom:.4rem}
+.dash-table{width:100%;border-collapse:collapse;font-size:13px}
+.dash-table th{text-align:left;color:#555;padding:4px 8px;font-weight:normal;font-size:11px;text-transform:uppercase}
+.dash-table td{padding:5px 8px;border-bottom:1px solid #0a0a0a}
+.dash-table tr:hover td{background:#0a0a0a}
+.bar{height:6px;background:#1a1a1a;border-radius:3px;margin-top:4px;overflow:hidden}
+.bar-fill{height:100%;background:#c8903a;border-radius:3px}
+.bar-fill.green{background:#0f0}
+.bar-fill.blue{background:#5ac8fa}
 </style>
 </head>
 <body>
@@ -27,7 +49,15 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
   <div class="err" id="pw-err">Wrong password</div>
 </div>
 
-<h1>🌱 Event Pool Seeder</h1>
+<h1>⚙️ History Challenger Admin</h1>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('seeder')">🌱 Seeder</button>
+  <button class="tab" onclick="switchTab('dashboard')">📊 Dashboard</button>
+</div>
+
+<!-- SEEDER TAB -->
+<div id="tab-seeder" class="tab-content active">
 <div class="row">
   <label>Mode: 
     <select id="mode" onchange="toggleMode()">
@@ -80,6 +110,16 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
   <button onclick="seedAllOverlap()" id="btn-all-overlap" style="background:#1a1a6a;display:none">🏛 Seed ALL 3 difficulties (overlap)</button>
 </div>
 <div class="log" id="log"></div>
+</div><!-- end seeder tab -->
+
+<!-- DASHBOARD TAB -->
+<div id="tab-dashboard" class="tab-content">
+  <div style="margin-bottom:1rem">
+    <button onclick="loadDashboard()">🔄 Refresh</button>
+    <span id="dash-updated" style="color:#333;font-size:12px;margin-left:12px"></span>
+  </div>
+  <div id="dash-content" style="color:#555;font-size:14px">Click Refresh to load stats...</div>
+</div>
 
 <script>
 const WORKER='https://histroychallenger-api.maletethan.workers.dev';
@@ -324,6 +364,155 @@ async function seedAllThemes(){
   document.getElementById('btn-start').disabled=false;
   document.getElementById('btn-stop').disabled=true;
 }
+// ── TABS ─────────────────────────────────────────────────────────
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  event.target.classList.add('active');
+  if(name==='dashboard') loadDashboard();
+}
+
+// ── DASHBOARD ────────────────────────────────────────────────────
+async function loadDashboard(){
+  const el=document.getElementById('dash-content');
+  el.innerHTML='<span style="color:#c8903a">Loading...</span>';
+  try{
+    const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'get_stats',admin_key:ADMIN_KEY})});
+    const d=await res.json();
+    if(d.error){el.innerHTML=`<span class="err">Error: ${d.error}</span>`;return;}
+    renderDashboard(d);
+    document.getElementById('dash-updated').textContent='Updated '+new Date().toLocaleTimeString();
+  }catch(e){
+    el.innerHTML=`<span class="err">Failed: ${e.message}</span>`;
+  }
+}
+
+function bar(val,max,cls=''){
+  const pct=max>0?Math.min(100,Math.round(val/max*100)):0;
+  return `<div class="bar"><div class="bar-fill ${cls}" style="width:${pct}%"></div></div>`;
+}
+
+function renderDashboard(d){
+  const maxHC=Math.max(...d.hc.byDiff.map(x=>x.n)||[1]);
+  const maxOV=Math.max(...d.overlap.byDiff.map(x=>x.n)||[1]);
+  const maxSess=Math.max(...d.sessions.byDiff.map(x=>x.n)||[1]);
+
+  // Theme breakdown
+  const themeMap={};
+  d.hc.themes.forEach(t=>{
+    const name=t.theme_slug.replace(/^(disciple|master|keeper)_theme_/,'');
+    if(!themeMap[name])themeMap[name]={};
+    themeMap[name][t.diff]=t.n;
+  });
+  const themeRows=Object.entries(themeMap).map(([name,diffs])=>`
+    <tr>
+      <td style="color:#aaa">${name}</td>
+      <td style="color:#5acc8a">${diffs.disciple||0}</td>
+      <td style="color:#c8903a">${diffs.master||0}</td>
+      <td style="color:#e0a84a">${diffs.keeper||0}</td>
+      <td style="color:#666">${(diffs.disciple||0)+(diffs.master||0)+(diffs.keeper||0)}</td>
+    </tr>`).join('');
+
+  // Random pool rows
+  const randomRows=d.hc.random.map(r=>`
+    <tr>
+      <td style="color:#aaa">${r.diff}</td>
+      <td>${r.n}</td>
+      <td>${bar(r.n,maxHC)}</td>
+    </tr>`).join('');
+
+  // Overlap rows
+  const ovRows=d.overlap.byDiff.map(r=>`
+    <tr>
+      <td style="color:#aaa">${r.diff}</td>
+      <td>${r.n}</td>
+      <td>${bar(r.n,maxOV,'blue')}</td>
+    </tr>`).join('');
+
+  // Session rows
+  const sessRows=d.sessions.byDiff.map(r=>`
+    <tr>
+      <td style="color:#aaa">${r.game_type||'timeline'}</td>
+      <td style="color:#aaa">${r.diff}</td>
+      <td>${r.n}</td>
+      <td style="color:#c8903a">${r.avg}%</td>
+      <td>${bar(r.n,maxSess,'green')}</td>
+    </tr>`).join('');
+
+  // Lang breakdown
+  const langRows=d.hc.byLang.map(r=>`
+    <tr><td style="color:#aaa">${r.lang}</td><td>${r.n}</td></tr>`).join('');
+
+  document.getElementById('dash-content').innerHTML=`
+    <!-- TOP STATS -->
+    <div class="dash-grid">
+      <div class="dash-card"><div class="dash-val">${d.users.total}</div><div class="dash-lbl">Registered users</div></div>
+      <div class="dash-card"><div class="dash-val">${d.sessions.total}</div><div class="dash-lbl">Total game sessions</div></div>
+      <div class="dash-card"><div class="dash-val">${d.sessions.last7days}</div><div class="dash-lbl">Sessions (last 7 days)</div></div>
+      <div class="dash-card"><div class="dash-val">${d.hc.total}</div><div class="dash-lbl">HC sets in pool</div></div>
+      <div class="dash-card"><div class="dash-val">${d.overlap.total}</div><div class="dash-lbl">Overlap sets in pool</div></div>
+      <div class="dash-card"><div class="dash-val">${(d.hc.played||0)+(d.overlap.played||0)}</div><div class="dash-lbl">Total pool plays</div></div>
+    </div>
+
+    <!-- SESSIONS BY GAME -->
+    <div class="dash-section">
+      <h3>Sessions by game type</h3>
+      <table class="dash-table">
+        <tr>${d.sessions.byType.map(t=>`<td style="color:#aaa;padding:6px 12px;border:1px solid #1a1a1a;text-align:center"><div style="font-size:1.5rem;color:#c8903a">${t.n}</div><div style="font-size:11px;color:#555">${t.game_type||'timeline'}</div></td>`).join('')}</tr>
+      </table>
+    </div>
+
+    <!-- HC RANDOM POOL -->
+    <div class="dash-section">
+      <h3>🧭 History Challenger — Random pool</h3>
+      <table class="dash-table">
+        <tr><th>Difficulty</th><th>Sets</th><th style="width:200px">Fill</th></tr>
+        ${randomRows}
+      </table>
+    </div>
+
+    <!-- HC THEMES -->
+    <div class="dash-section">
+      <h3>🧭 History Challenger — Theme pool</h3>
+      <table class="dash-table">
+        <tr><th>Theme</th><th style="color:#5acc8a">Disciple</th><th style="color:#c8903a">Master</th><th style="color:#e0a84a">Keeper</th><th>Total</th></tr>
+        ${themeRows||'<tr><td colspan="5" style="color:#333">No theme sets yet</td></tr>'}
+      </table>
+    </div>
+
+    <!-- OVERLAP POOL -->
+    <div class="dash-section">
+      <h3>⏳ Did They Overlap? — Pool</h3>
+      <table class="dash-table">
+        <tr><th>Difficulty</th><th>Sets</th><th style="width:200px">Fill</th></tr>
+        ${ovRows||'<tr><td colspan="3" style="color:#333">No overlap sets yet</td></tr>'}
+      </table>
+    </div>
+
+    <!-- SESSIONS BY DIFF -->
+    <div class="dash-section">
+      <h3>Session performance by difficulty</h3>
+      <table class="dash-table">
+        <tr><th>Game</th><th>Difficulty</th><th>Sessions</th><th>Avg score</th><th style="width:160px"></th></tr>
+        ${sessRows||'<tr><td colspan="5" style="color:#333">No sessions yet</td></tr>'}
+      </table>
+    </div>
+
+    <!-- LANG -->
+    <div class="dash-section">
+      <h3>Pool by language</h3>
+      <table class="dash-table">
+        <tr><th>Language</th><th>Sets</th></tr>
+        ${langRows}
+      </table>
+    </div>
+  `;
+}
+
+</body>
+</html>
 </script>
 </body>
 </html>
