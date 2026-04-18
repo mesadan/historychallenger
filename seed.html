@@ -155,9 +155,8 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
     </label>
     <label>Show: 
       <select id="qc-filter">
-        <option value="errors">Errors only</option>
-        <option value="unknowns">Unknowns only</option>
         <option value="all">All sets</option>
+        <option value="errors">Errors only</option>
       </select>
     </label>
     <button onclick="runQC()">🔍 Run QC</button>
@@ -497,10 +496,10 @@ async function runQC(){
           </span>
         </div>`).join('')}
         ${s.explanation?`<div style="color:#444;font-size:11px;margin-top:6px;font-style:italic">${s.explanation}</div>`:''}
-        ${hasError?`
-          <button class="qc-del" onclick="fixSet('${s.id}', this)">🔧 Fix dates</button>
-          <button class="qc-del" onclick="deleteSet('${s.id}','overlap')" style="margin-left:4px">🗑 Delete</button>
-        `:''}
+        <div style="margin-top:6px">
+          <button class="qc-del" onclick="fixSet('${s.id}', this)" style="background:#0a0a3a;border-color:#5ac8fa;color:#5ac8fa">🔧 Fix</button>
+          ${hasError?`<button class="qc-del" onclick="deleteSet('${s.id}','overlap')" style="margin-left:4px">🗑 Delete</button>`:''}
+        </div>
       </div>`);
     }
 
