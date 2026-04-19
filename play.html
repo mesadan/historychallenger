@@ -200,6 +200,18 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000000;color:#fffff
 .guest-banner{background:#1a1000;border:1px solid #c8903a33;border-radius:8px;padding:10px 14px;margin-bottom:1rem;font-family:-apple-system,sans-serif;font-size:12px;color:#c8903a;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .guest-banner-cta{background:#c8903a;color:#000;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
 </style>
+<script src="/nav.js" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* Parchment theme overrides */
+:root{--ink:#1a150e;--parchment:#f5edd8;--gold:#9a7010;--gold-light:#c49020;--page-bg:#1a150e;}
+html,body{background:#1a150e !important}
+.card{background:#1e140a !important;border-color:#3a2a14 !important;border-radius:3px !important}
+.hdr{border-bottom-color:#3a2a14 !important}
+.ttl{font-family:'Playfair Display',serif !important;font-weight:400 !important;color:#f5edd8 !important}
+.ttl-sub{color:#7a6040 !important}
+.met{background:#241a0e !important;border-color:#3a2a14 !important;border-radius:2px !important}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -1343,6 +1355,6 @@ function beginGame(){S.round=0;S.totalPct=0;S.roundsPlayed=0;S.phase='game';S.ge
 function restartSetup(){S.phase='setup';S.path=null;S.diff=null;S.rounds=5;S.generatedSets=[];S.theme=null;S.customTheme='';renderSetup();}
 renderSetup();
 </script>
-<script src="/nav.js"></script>
+
 </body>
 </html>
