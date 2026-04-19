@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dispatch — Historical Decisions | History Challenger</title>
+<meta name="description" content="Make the same decisions as history's greatest commanders. Five choices per campaign. No right answers shown until the end.">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1a150e;--ink-mid:#3a2e1e;--ink-light:#7a6040;
+  --parchment:#f5edd8;--parchment-dark:#e8dfc0;--parchment-darker:#d4c89a;
+  --seal:#7a0a0a;--gold:#9a7010;--gold-light:#c49020;
+  --green:#1a5a1a;--red:#8a1a0a;--page-bg:#1a150e;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--page-bg);color:var(--ink);font-family:'Crimson Text',Georgia,serif;font-size:18px;line-height:1.7;overflow-x:hidden;}
+.screen{display:none;}.screen.active{display:block;}
+
+/* ── NAV ── */
+.parch-nav{
+  background:var(--ink);padding:10px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:200;
+}
+.nav-logo{font-family:'Playfair Display',serif;font-size:16px;color:var(--parchment);text-decoration:none;font-style:italic;}
+.nav-logo span{color:var(--gold-light);}
+.nav-links a{color:var(--parchment-darker);font-size:13px;text-decoration:none;margin-left:20px;letter-spacing:.04em;}
+.nav-links a:hover{color:var(--gold-light);}
+
+/* ── TITLE SCREEN ── */
+#s-title{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:3rem 2rem;text-align:center;
+  background:radial-gradient(ellipse at 50% 35%,#2e1e0a 0%,#0a0806 100%);
+}
+.orn{color:var(--gold-light);letter-spacing:.5em;margin-bottom:2rem;opacity:.65;font-size:20px;}
+h1.disp-title{font-family:'Playfair Display',serif;font-size:clamp(44px,7vw,76px);font-weight:400;color:var(--parchment);letter-spacing:.04em;line-height:1.1;margin-bottom:.3rem;}
+.disp-sub{font-size:15px;color:var(--parchment-darker);letter-spacing:.2em;text-transform:uppercase;font-style:italic;margin-bottom:2rem;}
+.disp-intro{max-width:520px;font-size:17px;color:var(--parchment-dark);line-height:1.8;margin-bottom:2.5rem;font-style:italic;}
+.start-btn{background:var(--gold);color:var(--parchment);border:2px solid var(--gold-light);padding:13px 44px;font-family:'Playfair Display',serif;font-size:19px;font-style:italic;cursor:pointer;border-radius:2px;transition:all .2s;letter-spacing:.03em;}
+.start-btn:hover{background:var(--gold-light);}
+.title-note{margin-top:1.2rem;font-size:13px;color:var(--ink-light);font-style:italic;}
+
+/* ── ERA PICKER ── */
+#s-era{background:var(--parchment);min-height:100vh;}
+.era-wrap{max-width:720px;margin:0 auto;padding:3rem 2rem;}
+.era-hd{text-align:center;margin-bottom:2.5rem;}
+.era-hd h2{font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,36px);font-weight:400;margin-bottom:.4rem;}
+.era-hd p{font-size:16px;color:var(--ink-light);font-style:italic;}
+.era-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;}
+.era-card{
+  background:var(--parchment-dark);border:1.5px solid var(--parchment-darker);
+  padding:1.8rem 1.4rem;text-align:center;cursor:pointer;border-radius:2px;
+  transition:all .15s;
+}
+.era-card:hover{background:#ecdfc0;border-color:var(--ink-light);}
+.era-card.active{background:var(--ink);border-color:var(--ink);}
+.era-card.active .era-icon,.era-card.active .era-name,.era-card.active .era-count{color:var(--parchment);}
+.era-icon{font-size:32px;margin-bottom:.6rem;display:block;}
+.era-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;color:var(--ink);margin-bottom:.25rem;}
+.era-count{font-size:13px;color:var(--ink-light);}
+
+/* Campaign list */
+.camp-list{margin-top:2rem;}
+.camp-list-hd{font-family:'Playfair Display',serif;font-size:16px;font-style:italic;color:var(--ink-light);margin-bottom:.8rem;border-bottom:1px solid var(--parchment-darker);padding-bottom:.4rem;}
+.camp-item{
+  background:var(--parchment-dark);border:1px solid var(--parchment-darker);
+  padding:14px 18px;margin-bottom:8px;cursor:pointer;border-radius:2px;
+  display:flex;justify-content:space-between;align-items:center;
+  transition:all .15s;
+}
+.camp-item:hover{background:#ecdfc0;border-color:var(--ink-light);}
+.camp-item-info{flex:1;}
+.camp-item-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;color:var(--ink);}
+.camp-item-sub{font-size:14px;color:var(--ink-light);font-style:italic;margin-top:2px;}
+.camp-item-arrow{color:var(--ink-light);font-size:18px;margin-left:12px;}
+.camp-loading{text-align:center;padding:2rem;color:var(--ink-light);font-style:italic;}
+.camp-error{color:var(--red);padding:1rem;font-style:italic;}
+
+/* ── GAME SCREEN ── */
+#s-game{background:var(--parchment);min-height:100vh;}
+.topbar{background:var(--ink);padding:9px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;}
+.dots{display:flex;gap:7px;}
+.dot{width:30px;height:30px;border-radius:50%;border:2px solid rgba(244,237,216,.18);background:rgba(244,237,216,.05);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:12px;color:rgba(244,237,216,.35);transition:all .35s;}
+.dot.cur{border-color:var(--gold-light);background:rgba(154,112,16,.28);color:var(--gold-light);}
+.dot.done{border-color:rgba(244,237,216,.45);background:rgba(244,237,216,.1);color:var(--parchment-dark);}
+.tlab{font-size:12px;color:var(--parchment-darker);letter-spacing:.1em;text-transform:uppercase;font-family:'Crimson Text',serif;}
+.node-wrap{max-width:680px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+.node-hd{border-bottom:2px solid var(--ink);padding-bottom:1.2rem;margin-bottom:1.5rem;}
+.nmeta{display:flex;gap:1.8rem;flex-wrap:wrap;margin-bottom:.6rem;}
+.ml{font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--ink-light);}
+.mv{font-family:'Playfair Display',serif;font-size:14px;font-style:italic;}
+h2.ntitle{font-family:'Playfair Display',serif;font-size:clamp(22px,3.5vw,30px);font-weight:400;line-height:1.2;}
+.slbl{font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--ink-light);margin-top:1.5rem;margin-bottom:.5rem;}
+.ctx{font-size:16px;line-height:1.8;color:var(--ink-mid);}
+.ctx p+p{margin-top:.6em;}
+.dispatch{background:#fbf4e0;border:1px solid var(--parchment-darker);border-left:4px solid var(--seal);padding:1.4rem 1.6rem;margin:1.4rem 0;font-style:italic;font-size:16px;line-height:1.8;position:relative;}
+.dispatch p+p{margin-top:.6em;}
+.seal-mark{position:absolute;top:-.5rem;right:1.2rem;width:20px;height:20px;background:var(--seal);clip-path:polygon(50% 0%,100% 30%,82% 100%,18% 100%,0% 30%);}
+.chd{font-family:'Playfair Display',serif;font-size:18px;font-style:italic;margin-bottom:.8rem;}
+.choices{display:flex;flex-direction:column;gap:8px;}
+.ch{background:var(--parchment-dark);border:1.5px solid var(--parchment-darker);padding:12px 16px;text-align:left;cursor:pointer;font-family:'Crimson Text',serif;font-size:16px;line-height:1.5;color:var(--ink);display:flex;gap:12px;align-items:flex-start;border-radius:2px;transition:all .12s;width:100%;}
+.ch:hover{background:#ecdfc0;border-color:var(--ink-light);}
+.ch:hover .cl{background:var(--ink);color:var(--parchment);border-color:var(--ink);}
+.cl{flex-shrink:0;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink-light);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:12px;color:var(--ink-light);margin-top:2px;transition:all .12s;}
+.ch.picked{background:#eaf2ea;border-color:var(--green);cursor:default;}
+.ch.picked .cl{background:var(--green);color:#fff;border-color:var(--green);}
+.ch.faded{opacity:.38;cursor:default;}
+.ch.faded:hover{background:var(--parchment-dark);border-color:var(--parchment-darker);}
+.ch.faded:hover .cl{background:none;color:var(--ink-light);border-color:var(--ink-light);}
+.bridge{overflow:hidden;max-height:0;transition:max-height .45s ease;}
+.bridge.open{max-height:600px;}
+.bridge-in{background:#fbf4e0;border:1px solid var(--parchment-darker);border-top:3px solid var(--ink);padding:1.4rem 1.6rem;margin-top:1rem;}
+.blbl{font-size:9px;text-transform:uppercase;letter-spacing:.2em;color:var(--ink-light);margin-bottom:.5rem;}
+.btxt{font-size:16px;line-height:1.8;color:var(--ink-mid);font-style:italic;}
+.div-note{font-size:13px;color:var(--ink-light);margin-top:.6rem;font-style:italic;border-top:1px solid var(--parchment-darker);padding-top:.6rem;}
+.cnt{display:block;width:100%;margin-top:1.2rem;background:var(--ink);color:var(--parchment);border:none;padding:12px 20px;font-family:'Playfair Display',serif;font-size:17px;font-style:italic;cursor:pointer;border-radius:2px;transition:background .2s;text-align:center;}
+.cnt:hover{background:#3a2e1e;}
+
+/* ── REVEAL ── */
+#s-reveal{background:var(--parchment);min-height:100vh;}
+.rev-wrap{max-width:900px;margin:0 auto;padding:2.5rem 1.5rem 4rem;}
+.rev-hd{text-align:center;padding-bottom:1.8rem;border-bottom:2px solid var(--ink);margin-bottom:2.5rem;}
+.rev-hd h2{font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,38px);font-weight:400;margin-bottom:.3rem;}
+.rev-hd p{font-size:16px;color:var(--ink-light);font-style:italic;}
+#tree-svg-wrap{width:100%;overflow-x:auto;margin-bottom:2rem;}
+.verdict{background:var(--ink);color:var(--parchment);padding:1.8rem 2rem;border-radius:2px;margin-top:1rem;}
+.verdict h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;color:var(--gold-light);font-style:italic;margin-bottom:.8rem;}
+.verdict p{font-size:16px;line-height:1.8;color:var(--parchment-dark);}
+.srow{display:flex;align-items:baseline;gap:8px;margin-bottom:.4rem;}
+.sbig{font-family:'Playfair Display',serif;font-size:56px;color:var(--gold-light);line-height:1;}
+.sden{font-size:24px;color:var(--parchment-darker);}
+.sdesc{font-size:16px;color:var(--parchment-dark);font-style:italic;margin-bottom:1.2rem;}
+.rev-btns{display:flex;gap:10px;margin-top:1.5rem;flex-wrap:wrap;}
+.again{flex:1;min-width:160px;background:var(--gold);color:var(--ink);border:none;padding:12px 20px;font-family:'Playfair Display',serif;font-size:17px;font-style:italic;cursor:pointer;border-radius:2px;text-align:center;transition:background .2s;}
+.again:hover{background:var(--gold-light);}
+.back-era{flex:1;min-width:160px;background:transparent;color:var(--parchment);border:1.5px solid rgba(244,237,216,.3);padding:12px 20px;font-family:'Playfair Display',serif;font-size:17px;font-style:italic;cursor:pointer;border-radius:2px;text-align:center;transition:all .2s;}
+.back-era:hover{border-color:var(--gold-light);color:var(--gold-light);}
+</style>
+</head>
+<body>
+
+<!-- TITLE -->
+<div id="s-title" class="screen active">
+  <nav class="parch-nav" style="position:fixed;top:0;width:100%;">
+    <a href="/" class="nav-logo">History <span>Challenger</span></a>
+    <div class="nav-links">
+      <a href="/games.html">All Games</a>
+      <a href="/play.html">Timeline</a>
+      <a href="/overlap.html">Overlap</a>
+    </div>
+  </nav>
+  <div style="margin-top:56px"></div>
+  <div class="orn">⚔ ✦ ⚔</div>
+  <h1 class="disp-title">Dispatch</h1>
+  <p class="disp-sub">Historical Decisions</p>
+  <p class="disp-intro">You receive the same dispatches as history's greatest commanders. The same information, the same constraints, the same uncertainty. Five decisions per campaign. No right answers shown until the end.</p>
+  <button class="start-btn" onclick="showEra()">Choose a Campaign →</button>
+  <p class="title-note">Free to play · No account required</p>
+</div>
+
+<!-- ERA PICKER -->
+<div id="s-era" class="screen">
+  <nav class="parch-nav">
+    <a href="/" class="nav-logo" style="color:var(--parchment)">History <span>Challenger</span></a>
+    <div class="nav-links">
+      <a href="/games.html" style="color:var(--parchment-darker)">← All Games</a>
+    </div>
+  </nav>
+  <div class="era-wrap">
+    <div class="era-hd">
+      <h2>Choose an Era</h2>
+      <p>Select a historical period, then choose your campaign</p>
+    </div>
+    <div class="era-cards">
+      <div class="era-card" onclick="selectEra('antiquity')">
+        <span class="era-icon">🏛</span>
+        <div class="era-name">Antiquity</div>
+        <div class="era-count" id="count-antiquity">Loading...</div>
+      </div>
+      <div class="era-card" onclick="selectEra('medieval')">
+        <span class="era-icon">⚔</span>
+        <div class="era-name">Medieval</div>
+        <div class="era-count" id="count-medieval">Loading...</div>
+      </div>
+      <div class="era-card" onclick="selectEra('modern')">
+        <span class="era-icon">🌍</span>
+        <div class="era-name">Modern</div>
+        <div class="era-count" id="count-modern">Loading...</div>
+      </div>
+    </div>
+    <div class="camp-list" id="camp-list" style="display:none">
+      <div class="camp-list-hd" id="camp-list-hd"></div>
+      <div id="camp-items"></div>
+    </div>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="s-game" class="screen">
+  <div class="topbar">
+    <div class="dots" id="dots"></div>
+    <div class="tlab" id="tlab"></div>
+  </div>
+  <div class="node-wrap" id="nwrap"></div>
+</div>
+
+<!-- REVEAL -->
+<div id="s-reveal" class="screen">
+  <div class="rev-wrap">
+    <div class="rev-hd">
+      <h2>The Historical Record</h2>
+      <p id="rev-camp-title"></p>
+    </div>
+    <div id="tree-svg-wrap"></div>
+    <div class="verdict" id="verdict"></div>
+    <div class="rev-btns">
+      <button class="again" onclick="playAgain()">Play Again →</button>
+      <button class="back-era" onclick="showEra()">Choose Another Campaign →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://histroychallenger-api.maletethan.workers.dev';
+
+// ── STATE ────────────────────────────────────────────────────────────
+let allCampaigns = {};  // era -> [{id,title,subtitle,sort_order}]
+let currentCampaign = null;  // full campaign data with nodes
+let answers = [];
+let cur = 0;
+
+// ── SCREENS ──────────────────────────────────────────────────────────
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ── TITLE → ERA ──────────────────────────────────────────────────────
+function showEra(){
+  show('era');
+  if(Object.keys(allCampaigns).length===0) loadCampaigns();
+}
+
+async function loadCampaigns(){
+  try{
+    const res = await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'get_campaigns',era:'all'})});
+    const data = await res.json();
+    const camps = data.campaigns||[];
+    allCampaigns = {};
+    camps.forEach(c=>{
+      if(!allCampaigns[c.era]) allCampaigns[c.era]=[];
+      allCampaigns[c.era].push(c);
+    });
+    ['antiquity','medieval','modern'].forEach(era=>{
+      const n = (allCampaigns[era]||[]).length;
+      const el = document.getElementById('count-'+era);
+      if(el) el.textContent = n===0 ? 'Coming soon' : n+' campaign'+(n!==1?'s':'');
+    });
+  }catch(e){
+    ['antiquity','medieval','modern'].forEach(era=>{
+      const el = document.getElementById('count-'+era);
+      if(el) el.textContent = 'Error loading';
+    });
+  }
+}
+
+function selectEra(era){
+  document.querySelectorAll('.era-card').forEach(c=>c.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  const camps = allCampaigns[era]||[];
+  const listEl = document.getElementById('camp-list');
+  const hdEl = document.getElementById('camp-list-hd');
+  const itemsEl = document.getElementById('camp-items');
+
+  const eraNames = {antiquity:'Antiquity',medieval:'Medieval & Exploration',modern:'Modern'};
+  hdEl.textContent = eraNames[era]+' campaigns';
+
+  if(camps.length===0){
+    itemsEl.innerHTML = '<div class="camp-loading">No campaigns available yet — check back soon.</div>';
+  } else {
+    itemsEl.innerHTML = camps.sort((a,b)=>a.sort_order-b.sort_order).map(c=>`
+      <div class="camp-item" onclick="loadCampaign('${c.id}')">
+        <div class="camp-item-info">
+          <div class="camp-item-title">${c.title}</div>
+          <div class="camp-item-sub">${c.subtitle||''}</div>
+        </div>
+        <div class="camp-item-arrow">→</div>
+      </div>`).join('');
+  }
+  listEl.style.display='block';
+}
+
+// ── LOAD CAMPAIGN ────────────────────────────────────────────────────
+async function loadCampaign(id){
+  const listEl = document.getElementById('camp-items');
+  listEl.innerHTML = '<div class="camp-loading">Loading campaign…</div>';
+  try{
+    const res = await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'get_campaign',campaign_id:id})});
+    const data = await res.json();
+    if(data.campaign){
+      const camp = data.campaign;
+      const parsed = typeof camp.data==='string' ? JSON.parse(camp.data) : camp.data;
+      currentCampaign = {...camp, ...parsed};
+      startGame();
+    } else {
+      listEl.innerHTML = '<div class="camp-error">Could not load campaign. Please try again.</div>';
+    }
+  }catch(e){
+    listEl.innerHTML = `<div class="camp-error">Error: ${e.message}</div>`;
+  }
+}
+
+// ── GAME ─────────────────────────────────────────────────────────────
+function startGame(){
+  answers=[]; cur=0;
+  show('game');
+  renderNode();
+}
+
+function renderNode(){
+  const node = currentCampaign.nodes[cur];
+  const dots = document.getElementById('dots');
+  dots.innerHTML='';
+  currentCampaign.nodes.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(i===cur?' cur':i<cur?' done':'');
+    d.textContent=i+1;
+    dots.appendChild(d);
+  });
+  document.getElementById('tlab').textContent=`Decision ${cur+1} of ${currentCampaign.nodes.length}`;
+
+  let divNote='';
+  if(cur>0 && !answers[cur-1].isHist){
+    divNote=`<div class="div-note">Your decision diverged from history — but events did not wait. What follows is what actually unfolded.</div>`;
+  }
+
+  document.getElementById('nwrap').innerHTML=`
+    <div class="node-hd">
+      <div class="nmeta">
+        <div><span class="ml">Year</span><div class="mv">${node.year}</div></div>
+        <div><span class="ml">Location</span><div class="mv">${node.loc||node.location}</div></div>
+      </div>
+      <h2 class="ntitle">${node.title}</h2>
+    </div>
+    ${divNote}
+    <div class="slbl">Situation</div>
+    <div class="ctx">${node.context.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>
+    <div class="slbl">Dispatch Received</div>
+    <div class="dispatch"><div class="seal-mark"></div>${node.dispatch.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>
+    <p class="chd">What is your decision?</p>
+    <div class="choices">${node.choices.map(c=>`
+      <button class="ch" id="ch${c.id}" onclick="pick('${c.id}')">
+        <div class="cl">${c.id}</div>
+        <div><strong>${c.label}.</strong> ${c.text}</div>
+      </button>`).join('')}</div>
+    <div class="bridge" id="bridge"></div>`;
+}
+
+function pick(cid){
+  const node=currentCampaign.nodes[cur];
+  const choice=node.choices.find(c=>c.id===cid);
+  answers.push({choiceId:cid,isHist:choice.is_historical});
+  node.choices.forEach(c=>{
+    const btn=document.getElementById('ch'+c.id);
+    btn.onclick=null;
+    btn.className='ch '+(c.id===cid?'picked':'faded');
+  });
+  const isLast=cur===currentCampaign.nodes.length-1;
+  const bridge=document.getElementById('bridge');
+  bridge.innerHTML=`<div class="bridge-in">
+    <div class="blbl">What follows your decision…</div>
+    <div class="btxt">${choice.narrative_lead||choice.narrative}</div>
+    <button class="cnt" onclick="${isLast?'showReveal()':'advance()'}">
+      ${isLast?'See what history decided →':'Continue to '+currentCampaign.nodes[cur+1].year+' →'}
+    </button>
+  </div>`;
+  requestAnimationFrame(()=>{
+    bridge.classList.add('open');
+    setTimeout(()=>bridge.scrollIntoView({behavior:'smooth',block:'nearest'}),120);
+  });
+}
+
+function advance(){
+  cur++;
+  renderNode();
+  document.getElementById('s-game').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ── REVEAL ───────────────────────────────────────────────────────────
+function showReveal(){
+  const correct=answers.filter(a=>a.isHist).length;
+  const total=currentCampaign.nodes.length;
+  const NODES=currentCampaign.nodes;
+
+  document.getElementById('rev-camp-title').textContent=
+    currentCampaign.title+' · '+(currentCampaign.subtitle||'');
+
+  // SVG tree
+  const COL_W=168,ROW_H=88,LEFT=20,TOP=70,DOT_X=18,LABEL_X=32;
+  const W=LEFT+COL_W*NODES.length+10;
+  const H=TOP+ROW_H*4+50;
+  const dotX=(n,b)=>LEFT+n*COL_W+DOT_X;
+  const dotY=(n,b)=>TOP+b*ROW_H+ROW_H/2;
+
+  let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;font-family:'Crimson Text',Georgia,serif;">`;
+  svg+=`<rect width="${W}" height="${H}" fill="#f5edd8" rx="4"/>`;
+
+  NODES.forEach((node,n)=>{
+    const cx=LEFT+n*COL_W+COL_W/2;
+    const t=node.title.length>14?node.title.slice(0,node.title.lastIndexOf(' ',14)||14)+'…':node.title;
+    svg+=`<text x="${cx}" y="20" text-anchor="middle" font-family="'Playfair Display',serif" font-size="11" fill="#1a150e" font-style="italic">${t}</text>`;
+    const yr=(node.year||'').replace('January ','Jan ').replace('March ','Mar ').replace('October ','Oct ').replace('September ','Sep ').replace('February ','Feb ');
+    svg+=`<text x="${cx}" y="34" text-anchor="middle" font-size="9" fill="#9a7010">${yr}</text>`;
+    if(n>0) svg+=`<line x1="${LEFT+n*COL_W}" y1="10" x2="${LEFT+n*COL_W}" y2="${H-30}" stroke="#e0d5b8" stroke-width="0.5"/>`;
+  });
+  svg+=`<line x1="${LEFT}" y1="44" x2="${W-10}" y2="44" stroke="#d4c89a" stroke-width="1"/>`;
+  ['A','B','C','D'].forEach((l,b)=>{
+    svg+=`<text x="${LEFT-2}" y="${dotY(0,b)+4}" text-anchor="end" font-family="'Playfair Display',serif" font-size="12" fill="#b0987a" font-weight="600">${l}</text>`;
+    svg+=`<line x1="${LEFT}" y1="${dotY(0,b)}" x2="${W-10}" y2="${dotY(0,b)}" stroke="#ede5cc" stroke-width="0.5" stroke-dasharray="3,5"/>`;
+  });
+
+  // Connectors
+  for(let n=0;n<NODES.length-1;n++){
+    const hB=NODES[n].choices.findIndex(c=>c.is_historical);
+    const nhB=NODES[n+1].choices.findIndex(c=>c.is_historical);
+    const x1=dotX(n,hB),y1=dotY(n,hB),x2=dotX(n+1,nhB),y2=dotY(n+1,nhB),mx=(x1+x2)/2;
+    svg+=`<path d="M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}" fill="none" stroke="#c49020" stroke-width="2.5" stroke-dasharray="6,3" opacity="0.8"/>`;
+  }
+  for(let n=0;n<NODES.length-1;n++){
+    const ans=answers[n],ans2=answers[n+1];
+    if(!ans||!ans2) continue;
+    const pB=NODES[n].choices.findIndex(c=>c.id===ans.choiceId);
+    const pB2=NODES[n+1].choices.findIndex(c=>c.id===ans2.choiceId);
+    const x1=dotX(n,pB),y1=dotY(n,pB),x2=dotX(n+1,pB2),y2=dotY(n+1,pB2),mx=(x1+x2)/2;
+    const col=ans.isHist&&ans2.isHist?'#1a5a1a':'#8a1a0a';
+    svg+=`<path d="M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}" fill="none" stroke="${col}" stroke-width="2.5" opacity="0.95"/>`;
+  }
+
+  // Dots + labels
+  NODES.forEach((node,n)=>{
+    const ans=answers[n];
+    const histB=node.choices.findIndex(c=>c.is_historical);
+    const playerB=ans?node.choices.findIndex(c=>c.id===ans.choiceId):-1;
+    node.choices.forEach((choice,b)=>{
+      const cx=dotX(n,b),cy=dotY(n,b);
+      const isH=b===histB,isP=b===playerB;
+      const isRight=isH&&isP,isWrong=isP&&!isH,isHistOnly=isH&&!isP;
+      let fill='#ddd3ba',stroke='#b8a87a',r=6;
+      if(isRight){fill='#1a5a1a';stroke='#2a8a2a';r=9;}
+      else if(isWrong){fill='#8a1a0a';stroke='#c02020';r=9;}
+      else if(isHistOnly){fill='#c49020';stroke='#9a7010';r=7;}
+      svg+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>`;
+      if(!isH&&!isP) return;
+      const lx=LEFT+n*COL_W+LABEL_X;
+      let tcol='#b0987a',tw='normal',tsz=10;
+      if(isRight){tcol='#1a5a1a';tw='600';tsz=11;}
+      else if(isWrong){tcol='#8a1a0a';tw='600';tsz=11;}
+      else if(isHistOnly){tcol='#9a7010';tw='600';tsz=11;}
+      const words=choice.label.split(' ');
+      const lines=[];let ln='';
+      words.forEach(w=>{if((ln+' '+w).trim().length>16&&ln){lines.push(ln);ln=w;}else ln=(ln+' '+w).trim();});
+      if(ln)lines.push(ln);
+      let tag='';
+      if(isRight)tag='you ✓ history';else if(isWrong)tag='your choice';else if(isHistOnly)tag='history';
+      const lineH=12,boxH=(lines.length+(tag?1:0))*lineH+6,boxW=COL_W-LABEL_X-6,startY=cy-boxH/2;
+      svg+=`<rect x="${lx-3}" y="${startY-1}" width="${boxW}" height="${boxH+2}" rx="3" fill="rgba(245,237,216,0.88)"/>`;
+      lines.forEach((l,li)=>{
+        svg+=`<text x="${lx}" y="${startY+li*lineH+lineH*0.82}" font-size="${tsz}" fill="${tcol}" font-weight="${tw}" font-family="'Crimson Text',Georgia,serif">${l}</text>`;
+      });
+      if(tag){
+        let tagcol=tcol;
+        svg+=`<text x="${lx}" y="${startY+lines.length*lineH+lineH*0.82}" font-size="8" fill="${tagcol}" font-style="italic" font-family="'Crimson Text',Georgia,serif">${tag}</text>`;
+      }
+    });
+  });
+
+  const ly=H-18;
+  [{col:'#c49020',txt:'Historical path'},{col:'#8a1a0a',txt:'Your path'},{col:'#1a5a1a',txt:'Matched'}]
+    .forEach(({col,txt},i)=>{
+      const lx=20+i*160;
+      svg+=`<circle cx="${lx+5}" cy="${ly}" r="5" fill="${col}"/>`;
+      svg+=`<text x="${lx+14}" y="${ly+4}" font-size="10" fill="#3a2e1e" font-family="'Crimson Text',Georgia,serif">${txt}</text>`;
+    });
+  svg+=`</svg>`;
+
+  const epilogue=currentCampaign.epilogue;
+  let eKey='mixed';
+  if(correct===total)eKey='all_correct';
+  else if(correct>=total-1)eKey='mostly_correct';
+  else if(correct<=1)eKey='mostly_wrong';
+
+  const scoreText={0:'No decisions matched the historical record.',1:'One decision matched history.',2:'Two decisions matched the historical record.',3:'Three of five decisions matched history.',4:'Four of five decisions matched history.',5:'Every decision matched the historical record.'};
+
+  document.getElementById('tree-svg-wrap').innerHTML=svg;
+  document.getElementById('verdict').innerHTML=`
+    <div class="srow"><span class="sbig">${correct}</span><span class="sden">/ ${total}</span></div>
+    <div class="sdesc">${scoreText[correct]}</div>
+    <h3>${correct===total?'The exact path of history':'The historian\'s view'}</h3>
+    <p>${(epilogue&&epilogue[eKey])||''}</p>`;
+
+  show('reveal');
+  setTimeout(()=>document.getElementById('s-reveal').scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+
+function playAgain(){answers=[];cur=0;startGame();}
+
+// Add get_campaign endpoint support — load on init
+window.addEventListener('DOMContentLoaded',()=>{
+  // Pre-load campaign list
+  loadCampaigns();
+});
+</script>
+</body>
+</html>
