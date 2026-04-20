@@ -181,6 +181,11 @@ a{color:#c8903a;text-decoration:none}
       <div class="result-summary" id="result-summary"></div>
     </div>
 
+    <div class="events-wrap" id="events-wrap" style="background:#111008;border:1px solid #2a1e0e;border-radius:4px;padding:1.75rem;margin-bottom:1.5rem">
+      <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#5a4a30;font-family:'Crimson Text',serif;margin-bottom:1rem">The decisions behind the questions</div>
+      <div id="events-list"></div>
+    </div>
+
     <div class="chart-wrap">
       <div class="chart-title">How your decisions compare</div>
       <canvas class="chart-canvas" id="radar-chart" width="400" height="400"></canvas>
@@ -223,6 +228,8 @@ let _current = 0;
 let _answers = {}; // qid -> leader_key
 let _scores = {}; // leader_key -> count
 let _gameQuestions = []; // 25 drawn questions
+
+const EVENTS_MAP = {"caesar": ["Crossing the Rubicon, January 49 BC", "Pardoning his enemies after victory — Clementia Caesaris", "The campaigns in Gaul, pushing beyond his mandate", "Seizing power in Rome while maintaining republican forms", "The Ides of March conspiracy — his refusal to act on warnings"], "lincoln": ["Holding firm on abolition through two years of military failure", "Appointing his rivals — the Team of Rivals cabinet", "The Emancipation Proclamation — timing and constitutional risk", "Delaying and then embracing the 13th Amendment", "The Second Inaugural — with malice toward none — after total war"], "saladin": ["The Battle of Hattin, 1187 — destroying the Crusader army", "The fall of Jerusalem — sparing the civilian population", "Protecting the Church of the Holy Sepulchre", "The Treaty of Jaffa with Richard I — a negotiated peace", "Refusing to accept terms that compromised his principles"], "napoleon": ["Crossing the Alps into Italy, 1796 — the impossible campaign", "The Continental System — overreaching against Britain", "The Russian campaign, 1812 — refusing to halt at Vitebsk", "Rejecting the Frankfurt peace proposals, 1813", "The Hundred Days — returning from Elba against all advice"], "bismarck": ["The wars of German unification — manufactured crises, precise force", "The Reinsurance Treaty — secretly balancing competing alliances", "Building the welfare state to neutralize socialist opposition", "Forcing the 1862 constitutional crisis without breaking the law", "Resigning rather than serve under a kaiser who rejected his system"], "genghis": ["Destroying Zhongdu — the total reduction of the Jin capital", "The Khwarezmian campaign — systematic annihilation after broken diplomacy", "Delegating full operational authority to Subutai and Jebe", "The Mongol legal code — applying consistent rules across conquest", "The campaign against the Tanguts — returning ill to finish the job"], "wuzetian": ["Maneuvering from consort to Empress Dowager over two decades", "Reforming the imperial examination — opening power to talent over birth", "Becoming the only woman to rule China as Emperor in her own name", "Using the secret police to neutralize aristocratic opposition", "Building the Longmen Grottoes — projecting power through cultural legacy"]};
 
 const TRAIT_LABELS = {
   decisiveness: 'Decisiveness',
@@ -369,6 +376,16 @@ function showResults() {
     document.getElementById('result-name').textContent = topLeader.name;
     document.getElementById('result-era').textContent = topLeader.era;
     document.getElementById('result-summary').textContent = topLeader.summary;
+
+    // Show the real historical events behind the anonymized questions
+    const events = EVENTS_MAP[topKey] || [];
+    const eventsEl = document.getElementById('events-list');
+    eventsEl.innerHTML = events.map(e =>
+      `<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:.65rem;font-size:15px;color:#c8b898;line-height:1.6;font-family:'Crimson Text',serif">
+        <span style="color:#c8903a;flex-shrink:0;margin-top:2px">◆</span>
+        <span>${e}</span>
+      </div>`
+    ).join('');
 
     // Scores grid
     renderScoresGrid(sorted, answered);
