@@ -305,13 +305,6 @@ footer{
         <div class="game-desc" id="t-s2d"></div>
         <span class="game-cta ghost" id="t-play3"></span>
       </a>
-      <a href="/persona.html" class="game-card">
-        <span class="game-icon"><svg width="28" height="28" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><circle cx="32" cy="22" r="10" fill="#e8cc80" stroke="#c8a050" stroke-width="1.5"/><path d="M12 52 C12 38 52 38 52 52" fill="#e8cc80" stroke="#c8a050" stroke-width="1.5"/><polygon points="32,4 34,10 40,10 35,14 37,20 32,16 27,20 29,14 24,10 30,10" fill="#cc2200" stroke="#8b1500" stroke-width="0.5"/></svg></span>
-        <div class="game-name">Which Leader Are You?</div>
-        <span class="game-tag">Historical Profile</span>
-        <div class="game-desc">25 anonymized decisions. No dates, no names. Just the pressure of the moment. Discover which of 7 historical leaders you think like and see your full decision profile.</div>
-        <span class="game-cta ghost">Find out →</span>
-      </a>
     </div>
   </div>
 </section>
@@ -325,7 +318,14 @@ footer{
   </div>
 </section>
 
-
+<!-- FAQ -->
+<section class="faq-section">
+  <div class="section-inner">
+    <div class="section-label" id="t-lblFaq"></div>
+    <h2 class="section-title" id="t-faqTitle"></h2>
+    <div class="faqs" id="t-faqs"></div>
+  </div>
+</section>
 
 <!-- CTA -->
 <section class="cta-section">
@@ -337,18 +337,6 @@ footer{
   </div>
 </section>
 
-
-<section id="blog" style="padding:5rem 1.5rem;background:var(--section-alt)">
-  <div class="section-inner">
-    <div class="section-label">From the archive</div>
-    <h2 class="section-title" style="margin-bottom:2rem">History worth reading</h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.4rem">
-      <a href="/blog.html" style="text-decoration:none;display:block"><div style="background:var(--card-bg);border:1.5px solid var(--border);border-radius:3px;padding:1.75rem 1.6rem;height:100%"><div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-family:'Crimson Text',serif;margin-bottom:.7rem;opacity:.8">Timeline</div><h3 style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:400;color:var(--ink);line-height:1.35;margin-bottom:.75rem">10 Timeline Facts That Will Break Your Brain</h3><p style="font-size:14px;color:var(--ink-light);line-height:1.7;font-style:italic;margin-bottom:1rem">Cleopatra lived closer to the Moon landing than to the pyramids. Ten facts that shatter your sense of historical time.</p><span style="font-size:13px;color:var(--gold-bright);font-family:'Crimson Text',serif">Read →</span></div></a>
-      <a href="/misconceptions.html" style="text-decoration:none;display:block"><div style="background:var(--card-bg);border:1.5px solid var(--border);border-radius:3px;padding:1.75rem 1.6rem;height:100%"><div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-family:'Crimson Text',serif;margin-bottom:.7rem;opacity:.8">History myths</div><h3 style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:400;color:var(--ink);line-height:1.35;margin-bottom:.75rem">9 Historical Myths That Most People Still Believe</h3><p style="font-size:14px;color:var(--ink-light);line-height:1.7;font-style:italic;margin-bottom:1rem">Napoleon was not short. Columbus did not prove the Earth was round. Nine persistent myths, examined.</p><span style="font-size:13px;color:var(--gold-bright);font-family:'Crimson Text',serif">Read →</span></div></a>
-      <a href="/battles.html" style="text-decoration:none;display:block"><div style="background:var(--card-bg);border:1.5px solid var(--border);border-radius:3px;padding:1.75rem 1.6rem;height:100%"><div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-family:'Crimson Text',serif;margin-bottom:.7rem;opacity:.8">Military history</div><h3 style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:400;color:var(--ink);line-height:1.35;margin-bottom:.75rem">Battles That Changed History But Nobody Talks About</h3><p style="font-size:14px;color:var(--ink-light);line-height:1.7;font-style:italic;margin-bottom:1rem">Cape Ecnomus. Ain Jalut. Talas. The battles that shaped the world but never made the textbooks.</p><span style="font-size:13px;color:var(--gold-bright);font-family:'Crimson Text',serif">Read →</span></div></a>
-    </div>
-  </div>
-</section>
 </div><!-- /main -->
 
 <!-- PRIVACY -->
@@ -386,7 +374,6 @@ footer{
       <a href="#games" id="f-how">Games</a>
       <a href="#" onclick="showLegal('privacy');return false" id="f-privacy">Privacy</a>
       <a href="#" onclick="showLegal('terms');return false" id="f-terms">Terms</a>
-      <a href="/blog-index.html">Articles</a>
       <a href="mailto:info@historychallenger.com" id="f-contact">Contact</a>
     </div>
     <div class="footer-copy">© 2026 History Challenger · All rights reserved</div>
@@ -398,10 +385,10 @@ const T = {
   en: {
     eyebrow:'Free · No account required · AI-powered',
     title:'How well do you <span>know history?</span>',
-    sub:'Four games. Every era. Completely free.',
+    sub:'Three games. Every era. Completely free.',
     cta1:'Choose a game', cta2:'See the games',
     note:'No download · Plays in your browser · Mobile friendly',
-    gamesLabel:'Four games',
+    gamesLabel:'Three games',
     gamesTitle:'Pick your challenge',
     gamesSub:'Each game tests a different kind of historical knowledge. All free, all generated fresh by AI.',
     newBadge:'New',
@@ -410,8 +397,8 @@ const T = {
     s2t:'Did They Overlap?', g3tag:'Civilizations Quiz', s2d:'Given a civilization and its era, which of four options actually coexisted with it? The Assyrians and Carthage? The Han Dynasty and Rome? History is stranger than you think.',
     play:'Play →',
     lblAbout:'About',
-    aboutTitle:'Built for people who actually know history',
-    aboutText:'<p>Most history quizzes test recognition, not knowledge. Multiple choice lets you guess. We wanted something harder.</p><p><strong>Dispatch</strong> puts you in the room where history was made — with the same information, the same constraints, and the same uncertainty as the people who were actually there. <strong>History Challenger</strong> asks you to place events on a timeline with precision, not just identify them. <strong>Did They Overlap?</strong> tests whether you understand the shape of time, not just the names.</p><p>Every game is generated fresh by AI. Free to play. No account required — sign in with Google to track scores and streaks.</p>',
+    aboutTitle:'Four games. One obsession.',
+    aboutText:'<p>Most history quizzes test recognition, not knowledge. Multiple choice lets you guess. We wanted something harder.</p><p><strong>Dispatch</strong> puts you in the room where history was made — with the same dispatches as Caesar, Kennedy, and Saladin. <strong>Timeline</strong> asks you to place events with precision across three millennia. <strong>Did They Overlap?</strong> tests whether you understand the shape of time itself. <strong>Which Leader Are You?</strong> reveals your decision-making profile across 25 anonymized scenarios — no dates, no names, just pressure.</p><p>Four games. Every era. Generated fresh by AI. Free to play. No account required.</p>',
     lblFaq:'FAQ', faqTitle:'Questions',
     faqs:[
       {q:'Is it really free?', a:'Yes, completely. Play without an account. Sign in with Google to save scores and track streaks.'},
@@ -425,10 +412,10 @@ const T = {
   fr: {
     eyebrow:'Gratuit · Sans inscription · Propulsé par IA',
     title:'Connaissez-vous bien <span>l\'histoire ?</span>',
-    sub:'Quatre jeux. Toutes les époques. Entièrement gratuit.',
+    sub:'Trois jeux. Toutes les époques. Entièrement gratuit.',
     cta1:'Choisir un jeu', cta2:'Voir les jeux',
     note:'Sans téléchargement · Dans le navigateur · Compatible mobile',
-    gamesLabel:'Quatre jeux',
+    gamesLabel:'Trois jeux',
     gamesTitle:'Choisissez votre défi',
     gamesSub:'Chaque jeu teste un type différent de connaissance historique. Tous gratuits, tous générés par IA.',
     newBadge:'Nouveau',
@@ -437,7 +424,7 @@ const T = {
     s2t:'Did They Overlap?', g3tag:'Quiz civilisations', s2d:'Quelle civilisation a réellement coexisté avec celle donnée ? Les Assyriens et Carthage ? La Chine Han et Rome ?',
     play:'Jouer →',
     lblAbout:'À propos',
-    aboutTitle:'Conçu pour ceux qui connaissent vraiment l\'histoire',
+    aboutTitle:'Quatre jeux. Une obsession.',
     aboutText:'<p>La plupart des quiz d\'histoire testent la reconnaissance, pas la connaissance. Le choix multiple permet de deviner. Nous voulions quelque chose de plus difficile.</p><p><strong>Dispatch</strong> vous place dans la salle où l\'histoire s\'est faite. <strong>History Challenger</strong> vous demande de placer des événements avec précision. <strong>Did They Overlap?</strong> teste si vous comprenez la forme du temps.</p><p>Chaque jeu est généré par IA. Gratuit. Sans inscription.</p>',
     lblFaq:'FAQ', faqTitle:'Questions',
     faqs:[
@@ -452,10 +439,10 @@ const T = {
   de: {
     eyebrow:'Kostenlos · Keine Anmeldung · KI-gestützt',
     title:'Wie gut kennen Sie <span>die Geschichte?</span>',
-    sub:'Vier Spiele. Alle Epochen. Völlig kostenlos.',
+    sub:'Drei Spiele. Alle Epochen. Völlig kostenlos.',
     cta1:'Spiel wählen', cta2:'Spiele ansehen',
     note:'Kein Download · Im Browser · Mobilfreundlich',
-    gamesLabel:'Vier Spiele',
+    gamesLabel:'Drei Spiele',
     gamesTitle:'Wählen Sie Ihre Herausforderung',
     gamesSub:'Jedes Spiel testet eine andere Art historischen Wissens. Alle kostenlos, alle frisch von KI generiert.',
     newBadge:'Neu',
@@ -464,7 +451,7 @@ const T = {
     s2t:'Did They Overlap?', g3tag:'Zivilisations-Quiz', s2d:'Welche Zivilisation hat tatsächlich mit der gegebenen koexistiert? Die Assyrer und Karthago? Die Han-Dynastie und Rom?',
     play:'Spielen →',
     lblAbout:'Über uns',
-    aboutTitle:'Für Menschen, die Geschichte wirklich kennen',
+    aboutTitle:'Vier Spiele. Eine Obsession.',
     aboutText:'<p>Die meisten Geschichtsquizze testen Wiedererkennung, nicht Wissen. Multiple-Choice erlaubt Raten. Wir wollten etwas Schwierigeres.</p><p><strong>Dispatch</strong> versetzt Sie in den Raum, in dem Geschichte gemacht wurde. <strong>History Challenger</strong> testet Präzision. <strong>Did They Overlap?</strong> testet Ihr Zeitgefühl.</p><p>Jedes Spiel wird frisch von KI generiert. Kostenlos. Ohne Anmeldung.</p>',
     lblFaq:'FAQ', faqTitle:'Häufige Fragen',
     faqs:[
@@ -479,10 +466,10 @@ const T = {
   es: {
     eyebrow:'Gratis · Sin registro · Con IA',
     title:'¿Cuánto sabes de <span>historia?</span>',
-    sub:'Cuatro juegos. Todas las épocas. Completamente gratis.',
+    sub:'Tres juegos. Todas las épocas. Completamente gratis.',
     cta1:'Elegir un juego', cta2:'Ver los juegos',
     note:'Sin descarga · En el navegador · Compatible con móvil',
-    gamesLabel:'Cuatro juegos',
+    gamesLabel:'Tres juegos',
     gamesTitle:'Elige tu desafío',
     gamesSub:'Cada juego prueba un tipo diferente de conocimiento histórico. Todos gratuitos, todos generados por IA.',
     newBadge:'Nuevo',
@@ -491,7 +478,7 @@ const T = {
     s2t:'Did They Overlap?', g3tag:'Quiz de civilizaciones', s2d:'¿Qué civilización coexistió realmente con la dada? ¿Los asirios y Cartago? ¿La dinastía Han y Roma?',
     play:'Jugar →',
     lblAbout:'Acerca de',
-    aboutTitle:'Construido para quienes realmente conocen la historia',
+    aboutTitle:'Cuatro juegos. Una obsesión.',
     aboutText:'<p>La mayoría de los cuestionarios de historia prueban el reconocimiento, no el conocimiento. La opción múltiple permite adivinar. Queríamos algo más difícil.</p><p><strong>Dispatch</strong> te coloca en la sala donde se hizo la historia. <strong>History Challenger</strong> prueba la precisión. <strong>Did They Overlap?</strong> prueba tu comprensión del tiempo.</p><p>Cada juego es generado por IA. Gratis. Sin registro.</p>',
     lblFaq:'FAQ', faqTitle:'Preguntas',
     faqs:[
@@ -528,7 +515,12 @@ function applyLang(){
   st('t-lbl-about', t.lblAbout);
   st('t-about-title', t.aboutTitle);
   s('t-about-text', t.aboutText);
-
+  st('t-lblFaq', t.lblFaq); st('t-faqTitle', t.faqTitle);
+  document.getElementById('t-faqs').innerHTML = t.faqs.map(f=>`
+    <div class="faq" onclick="this.classList.toggle('open')">
+      <div class="faq-q">${f.q}</div>
+      <div class="faq-a">${f.a}</div>
+    </div>`).join('');
   st('t-cta-title', t.ctaTitle); st('t-cta-sub', t.ctaSub); st('t-cta-btn', t.ctaBtn);
   st('f-about', t.fAbout); st('f-how', t.fHow);
   st('f-privacy', t.fPrivacy); st('f-terms', t.fTerms); st('f-contact', t.fContact);
