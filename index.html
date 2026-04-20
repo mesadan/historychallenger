@@ -543,5 +543,28 @@ function showLegal(page){
 
 applyLang();
 </script>
+
+<script>
+(function(){
+  function addPersonaLink(){
+    var nav = document.getElementById('hc-nav');
+    if(!nav) return setTimeout(addPersonaLink, 50);
+    var links = nav.querySelector('.hc-links');
+    if(!links) return;
+    if(document.querySelector('.hc-link[href="/persona.html"]')) return;
+    var path = window.location.pathname;
+    var active = path.includes('persona') ? ' active' : '';
+    var a = document.createElement('a');
+    a.href = '/persona.html';
+    a.className = 'hc-link' + active;
+    a.textContent = 'Who Are You?';
+    var authArea = document.getElementById('nav-auth-area');
+    if(authArea) links.insertBefore(a, authArea);
+    else links.appendChild(a);
+  }
+  document.addEventListener('DOMContentLoaded', addPersonaLink);
+  setTimeout(addPersonaLink, 200);
+})();
+</script>
 </body>
 </html>
