@@ -87,12 +87,6 @@ function injectNav(){
   document.body.insertBefore(nav, document.body.firstChild);
 }
 
-if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', injectNav);
-} else {
-  injectNav();
-}
-
 function signIn(){
   const p=new URLSearchParams({
     client_id:CLIENT_ID,
@@ -177,9 +171,10 @@ async function init(){
   }catch{render(null);}
 }
 
+// Always inject nav first, then init auth so nav-auth-area exists
 if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',init);
+  document.addEventListener('DOMContentLoaded',()=>{injectNav();init();});
 }else{
-  init();
+  injectNav();init();
 }
 })();
