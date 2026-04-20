@@ -325,14 +325,7 @@ footer{
   </div>
 </section>
 
-<!-- FAQ -->
-<section class="faq-section">
-  <div class="section-inner">
-    <div class="section-label" id="t-lblFaq"></div>
-    <h2 class="section-title" id="t-faqTitle"></h2>
-    <div class="faqs" id="t-faqs"></div>
-  </div>
-</section>
+
 
 <!-- CTA -->
 <section class="cta-section">
@@ -535,12 +528,7 @@ function applyLang(){
   st('t-lbl-about', t.lblAbout);
   st('t-about-title', t.aboutTitle);
   s('t-about-text', t.aboutText);
-  st('t-lblFaq', t.lblFaq); st('t-faqTitle', t.faqTitle);
-  document.getElementById('t-faqs').innerHTML = t.faqs.map(f=>`
-    <div class="faq" onclick="this.classList.toggle('open')">
-      <div class="faq-q">${f.q}</div>
-      <div class="faq-a">${f.a}</div>
-    </div>`).join('');
+
   st('t-cta-title', t.ctaTitle); st('t-cta-sub', t.ctaSub); st('t-cta-btn', t.ctaBtn);
   st('f-about', t.fAbout); st('f-how', t.fHow);
   st('f-privacy', t.fPrivacy); st('f-terms', t.fTerms); st('f-contact', t.fContact);
