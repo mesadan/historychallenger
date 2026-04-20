@@ -71,10 +71,10 @@ function injectNav(){
   const nav = document.createElement('nav');
   nav.id = 'hc-nav';
   const links = [
-    {href:'/dispatch.html',  label:'Dispatch',      key:'dispatch'},
-    {href:'/play.html',      label:'Timeline',      key:'play'},
-    {href:'/overlap.html',   label:'Overlap',       key:'overlap'},
-    {href:'/persona.html',   label:'Who Are You?',  key:'persona'},
+    {href:'/dispatch.html', label:'Dispatch', key:'dispatch'},
+    {href:'/play.html',     label:'Timeline', key:'play'},
+    {href:'/overlap.html',  label:'Overlap',  key:'overlap'},
+    {href:'/persona.html',   label:'Who Are You?', key:'persona'},
   ];
   const linksHtml = links.map(l=>{
     const active = path.includes(l.key) ? ' active' : '';
