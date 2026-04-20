@@ -318,14 +318,6 @@ footer{
   </div>
 </section>
 
-<!-- FAQ -->
-<section class="faq-section">
-  <div class="section-inner">
-    <div class="section-label" id="t-lblFaq"></div>
-    <h2 class="section-title" id="t-faqTitle"></h2>
-    <div class="faqs" id="t-faqs"></div>
-  </div>
-</section>
 
 <!-- CTA -->
 <section class="cta-section">
@@ -337,6 +329,18 @@ footer{
   </div>
 </section>
 
+
+<section id="blog" style="padding:5rem 1.5rem;background:var(--section-alt)">
+  <div class="section-inner">
+    <div class="section-label">From the archive</div>
+    <h2 class="section-title" style="margin-bottom:2rem">History worth reading</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.4rem">
+      <a href="/blog.html" style="text-decoration:none;display:block"><div style="background:var(--card-bg);border:1.5px solid var(--border);border-radius:3px;padding:1.75rem 1.6rem;height:100%"><div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-family:'Crimson Text',serif;margin-bottom:.7rem;opacity:.8">Timeline</div><h3 style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:400;color:var(--ink);line-height:1.35;margin-bottom:.75rem">10 Timeline Facts That Will Break Your Brain</h3><p style="font-size:14px;color:var(--ink-light);line-height:1.7;font-style:italic;margin-bottom:1rem">Cleopatra lived closer to the Moon landing than to the pyramids. Ten facts that shatter your sense of historical time.</p><span style="font-size:13px;color:var(--gold-bright);font-family:'Crimson Text',serif">Read &#8594;</span></div></a>
+      <a href="/misconceptions.html" style="text-decoration:none;display:block"><div style="background:var(--card-bg);border:1.5px solid var(--border);border-radius:3px;padding:1.75rem 1.6rem;height:100%"><div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-family:'Crimson Text',serif;margin-bottom:.7rem;opacity:.8">History myths</div><h3 style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:400;color:var(--ink);line-height:1.35;margin-bottom:.75rem">9 Historical Myths That Most People Still Believe</h3><p style="font-size:14px;color:var(--ink-light);line-height:1.7;font-style:italic;margin-bottom:1rem">Napoleon was not short. Columbus did not prove the Earth was round. Nine persistent myths, examined.</p><span style="font-size:13px;color:var(--gold-bright);font-family:'Crimson Text',serif">Read &#8594;</span></div></a>
+      <a href="/battles.html" style="text-decoration:none;display:block"><div style="background:var(--card-bg);border:1.5px solid var(--border);border-radius:3px;padding:1.75rem 1.6rem;height:100%"><div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-family:'Crimson Text',serif;margin-bottom:.7rem;opacity:.8">Military history</div><h3 style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:400;color:var(--ink);line-height:1.35;margin-bottom:.75rem">Battles That Changed History But Nobody Talks About</h3><p style="font-size:14px;color:var(--ink-light);line-height:1.7;font-style:italic;margin-bottom:1rem">Cape Ecnomus. Ain Jalut. Talas. The battles that shaped the world but never made the textbooks.</p><span style="font-size:13px;color:var(--gold-bright);font-family:'Crimson Text',serif">Read &#8594;</span></div></a>
+    </div>
+  </div>
+</section>
 </div><!-- /main -->
 
 <!-- PRIVACY -->
@@ -515,12 +519,6 @@ function applyLang(){
   st('t-lbl-about', t.lblAbout);
   st('t-about-title', t.aboutTitle);
   s('t-about-text', t.aboutText);
-  st('t-lblFaq', t.lblFaq); st('t-faqTitle', t.faqTitle);
-  document.getElementById('t-faqs').innerHTML = t.faqs.map(f=>`
-    <div class="faq" onclick="this.classList.toggle('open')">
-      <div class="faq-q">${f.q}</div>
-      <div class="faq-a">${f.a}</div>
-    </div>`).join('');
   st('t-cta-title', t.ctaTitle); st('t-cta-sub', t.ctaSub); st('t-cta-btn', t.ctaBtn);
   st('f-about', t.fAbout); st('f-how', t.fHow);
   st('f-privacy', t.fPrivacy); st('f-terms', t.fTerms); st('f-contact', t.fContact);
