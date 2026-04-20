@@ -17,6 +17,7 @@ s.textContent=`
   position:sticky;top:0;z-index:500;
   display:flex;align-items:center;justify-content:space-between;
   height:54px;
+  width:100%;
 }
 #hc-nav .hc-logo{
   font-family:'Playfair Display',Georgia,serif;
