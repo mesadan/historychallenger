@@ -139,12 +139,32 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000;color:#fff;disp
   --ink:#1a150e;--parchment:#f5edd8;
   --gold:#8a6208;--gold-light:#b88a18;--page-bg:#f0e6cc;
 }
-html,body{background:#f0e6cc !important}
+html,body{background:#f0e6cc !important;color:#1a150e !important}
 .card{background:#faf4e4 !important;border-color:#c8b888 !important;border-radius:3px !important;box-shadow:0 2px 8px rgba(26,21,14,.06) !important;padding-top:1.5rem !important}
 .hdr{border-bottom-color:#c8b888 !important}
 .ttl{font-family:'Playfair Display',serif !important;font-weight:400 !important;color:#1a150e !important;font-size:clamp(20px,3vw,26px) !important}
 .ttl-sub{color:#7a6040 !important}
 .met{background:#faf4e4 !important;border-color:#c8b888 !important;border-radius:2px !important;color:#3a2e1e !important}
+.mv{color:#1a150e !important}
+.ml{color:#7a6040 !important}
+.sf .section-num{color:#784c0c !important}
+.diff-grid .dc{background:#faf4e4 !important;border-color:#c8b888 !important}
+.diff-grid .dc:hover,.diff-grid .dc.sel{background:#f0e0c0 !important;border-color:#784c0c !important}
+.dn{color:#1a150e !important}
+.dt{color:#784c0c !important;background:#f5edd8 !important;border-color:#c8b888 !important}
+.options-grid .opt{background:#faf4e4 !important;border-color:#c8b888 !important;color:#1a150e !important}
+.options-grid .opt:hover{border-color:#784c0c !important;background:#f0e0c0 !important}
+.round-row .ro{background:#faf4e4 !important;border-color:#c8b888 !important;color:#5a3e1a !important}
+.round-row .ro.sel{background:#f0e0c0 !important;border-color:#784c0c !important;color:#1a150e !important}
+.btn{background:#faf4e4 !important;border-color:#c8b888 !important;color:#1a150e !important}
+.instr{background:#f5edd8 !important;border-color:#c8b888 !important;color:#5a3e1a !important;border-left-color:#784c0c !important}
+.user-btn{background:#faf4e4 !important;border-color:#c8b888 !important;color:#5a3e1a !important}
+.guest-banner{background:#f5edd8 !important;border-color:#c8903a55 !important;color:#784c0c !important}
+.err-msg{color:#a03010 !important}
+.res-timelines .res-civ-name{color:#1a150e !important}
+.res-legend{color:#5a3e1a !important}
+.overlay-inner{background:#faf4e4 !important;border:1px solid #c8b888 !important}
+.spinner{border-color:#c8b888 !important;border-top-color:#784c0c !important}
 </style>
 </head>
 <body>
@@ -210,7 +230,7 @@ function renderSetup(){
   document.getElementById('mets').style.display = 'none';
   const diffs = [
     { k:'disciple', icon:'🕯', name:'Disciple', tag:'Famous civilizations · Clear gaps', desc:'One correct answer with a long clear overlap. Wrong options are from distant eras — a real challenge for any history buff.' },
-    { k:'master', icon:'🎖', name:'Master', tag:'Mixed eras · Real knowledge', desc:'Wrong options are from the same broad era as the anchor. You need to actually know whether they coexisted.' },
+    { k:'master', icon:'⚔️', name:'Master', tag:'Mixed eras · Real knowledge', desc:'Wrong options are from the same broad era as the anchor. You need to actually know whether they coexisted.' },
     { k:'keeper', icon:'🏆', name:'Keeper of Time', tag:'Same era · Expert precision', desc:'All four options are from roughly the same era as the anchor. Only precise date knowledge will save you.' }
   ];
   const rounds = [3, 5, 8];
@@ -429,7 +449,7 @@ async function showFinal(){
   document.getElementById('mets').style.display = 'none';
   const total = S.sets.length * Math.round(100 * ({disciple:1,master:1.5,keeper:2}[S.diff]||1));
   const pct = Math.round((S.score / total) * 100);
-  const m = pct>=90?'🏆 Keeper of Time':pct>=70?'🎖 Master':pct>=50?'🕯 Disciple':'🪶 Initiate';
+  const m = pct>=90?'🏆 Keeper of Time':pct>=70?'⚔️ Master':pct>=50?'🕯 Disciple':'📜 Initiate';
 
   document.getElementById('body').innerHTML = `
     <div style="text-align:center">
