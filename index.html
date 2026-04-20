@@ -344,6 +344,39 @@ footer{
   </div>
 </section>
 
+
+<section id="blog" style="padding:5rem 1.5rem;background:var(--section-alt)">
+  <div class="section-inner">
+    <div class="section-label">From the archive</div>
+    <h2 class="section-title" style="margin-bottom:2rem">History worth reading</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.4rem">
+      <a href="/blog.html" style="text-decoration:none;display:block">
+        <div style="background:var(--card-bg);border:1.5px solid var(--border);border-radius:3px;padding:1.75rem 1.6rem;height:100%;transition:border-color .15s" onmouseover="this.style.borderColor='var(--gold-bright)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-family:'Crimson Text',serif;margin-bottom:.7rem;opacity:.8">Timeline</div>
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:400;color:var(--ink);line-height:1.35;margin-bottom:.75rem">10 Timeline Facts That Will Break Your Brain</h3>
+          <p style="font-size:14px;color:var(--ink-light);line-height:1.7;font-style:italic;margin-bottom:1.1rem">Cleopatra lived closer to the Moon landing than to the pyramids. Woolly mammoths were alive when the pyramids were built. Ten facts that shatter your sense of historical time.</p>
+          <span style="font-size:13px;color:var(--gold-bright);font-family:'Crimson Text',serif;letter-spacing:.04em">Read →</span>
+        </div>
+      </a>
+      <a href="/misconceptions.html" style="text-decoration:none;display:block">
+        <div style="background:var(--card-bg);border:1.5px solid var(--border);border-radius:3px;padding:1.75rem 1.6rem;height:100%;transition:border-color .15s" onmouseover="this.style.borderColor='var(--gold-bright)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-family:'Crimson Text',serif;margin-bottom:.7rem;opacity:.8">History myths</div>
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:400;color:var(--ink);line-height:1.35;margin-bottom:.75rem">9 Historical Myths That Most People Still Believe</h3>
+          <p style="font-size:14px;color:var(--ink-light);line-height:1.7;font-style:italic;margin-bottom:1.1rem">Napoleon was not short. Columbus did not prove the Earth was round. Medieval people did not think it was flat. Nine persistent myths, examined.</p>
+          <span style="font-size:13px;color:var(--gold-bright);font-family:'Crimson Text',serif;letter-spacing:.04em">Read →</span>
+        </div>
+      </a>
+      <a href="/battles.html" style="text-decoration:none;display:block">
+        <div style="background:var(--card-bg);border:1.5px solid var(--border);border-radius:3px;padding:1.75rem 1.6rem;height:100%;transition:border-color .15s" onmouseover="this.style.borderColor='var(--gold-bright)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-family:'Crimson Text',serif;margin-bottom:.7rem;opacity:.8">Military history</div>
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:400;color:var(--ink);line-height:1.35;margin-bottom:.75rem">Battles That Changed History But Nobody Talks About</h3>
+          <p style="font-size:14px;color:var(--ink-light);line-height:1.7;font-style:italic;margin-bottom:1.1rem">Cape Ecnomus. Ain Jalut. Talas. Yarmuk. The battles that shaped the world but never made the textbooks.</p>
+          <span style="font-size:13px;color:var(--gold-bright);font-family:'Crimson Text',serif;letter-spacing:.04em">Read →</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
 </div><!-- /main -->
 
 <!-- PRIVACY -->
@@ -381,6 +414,7 @@ footer{
       <a href="#games" id="f-how">Games</a>
       <a href="#" onclick="showLegal('privacy');return false" id="f-privacy">Privacy</a>
       <a href="#" onclick="showLegal('terms');return false" id="f-terms">Terms</a>
+      <a href="/blog-index.html">Articles</a>
       <a href="mailto:info@historychallenger.com" id="f-contact">Contact</a>
     </div>
     <div class="footer-copy">© 2026 History Challenger · All rights reserved</div>
@@ -392,10 +426,10 @@ const T = {
   en: {
     eyebrow:'Free · No account required · AI-powered',
     title:'How well do you <span>know history?</span>',
-    sub:'Three games. Every era. Completely free.',
+    sub:'Four games. Every era. Completely free.',
     cta1:'Choose a game', cta2:'See the games',
     note:'No download · Plays in your browser · Mobile friendly',
-    gamesLabel:'Three games',
+    gamesLabel:'Four games',
     gamesTitle:'Pick your challenge',
     gamesSub:'Each game tests a different kind of historical knowledge. All free, all generated fresh by AI.',
     newBadge:'New',
@@ -419,10 +453,10 @@ const T = {
   fr: {
     eyebrow:'Gratuit · Sans inscription · Propulsé par IA',
     title:'Connaissez-vous bien <span>l\'histoire ?</span>',
-    sub:'Trois jeux. Toutes les époques. Entièrement gratuit.',
+    sub:'Quatre jeux. Toutes les époques. Entièrement gratuit.',
     cta1:'Choisir un jeu', cta2:'Voir les jeux',
     note:'Sans téléchargement · Dans le navigateur · Compatible mobile',
-    gamesLabel:'Trois jeux',
+    gamesLabel:'Quatre jeux',
     gamesTitle:'Choisissez votre défi',
     gamesSub:'Chaque jeu teste un type différent de connaissance historique. Tous gratuits, tous générés par IA.',
     newBadge:'Nouveau',
@@ -446,10 +480,10 @@ const T = {
   de: {
     eyebrow:'Kostenlos · Keine Anmeldung · KI-gestützt',
     title:'Wie gut kennen Sie <span>die Geschichte?</span>',
-    sub:'Drei Spiele. Alle Epochen. Völlig kostenlos.',
+    sub:'Vier Spiele. Alle Epochen. Völlig kostenlos.',
     cta1:'Spiel wählen', cta2:'Spiele ansehen',
     note:'Kein Download · Im Browser · Mobilfreundlich',
-    gamesLabel:'Drei Spiele',
+    gamesLabel:'Vier Spiele',
     gamesTitle:'Wählen Sie Ihre Herausforderung',
     gamesSub:'Jedes Spiel testet eine andere Art historischen Wissens. Alle kostenlos, alle frisch von KI generiert.',
     newBadge:'Neu',
@@ -473,10 +507,10 @@ const T = {
   es: {
     eyebrow:'Gratis · Sin registro · Con IA',
     title:'¿Cuánto sabes de <span>historia?</span>',
-    sub:'Tres juegos. Todas las épocas. Completamente gratis.',
+    sub:'Cuatro juegos. Todas las épocas. Completamente gratis.',
     cta1:'Elegir un juego', cta2:'Ver los juegos',
     note:'Sin descarga · En el navegador · Compatible con móvil',
-    gamesLabel:'Tres juegos',
+    gamesLabel:'Cuatro juegos',
     gamesTitle:'Elige tu desafío',
     gamesSub:'Cada juego prueba un tipo diferente de conocimiento histórico. Todos gratuitos, todos generados por IA.',
     newBadge:'Nuevo',
