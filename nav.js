@@ -149,8 +149,8 @@ function render(user){
         </div>
         <hr class="hcn-hr">
         <a href="/profile.html" class="hcn-item">📊 My profile</a>
-        <a href="/dispatch.html" class="hcn-item">⚔ Dispatch</a>
-        <a href="/play.html" class="hcn-item">🧭 History Challenger</a>
+        <a href="/dispatch.html" class="hcn-item"><svg width="18" height="18" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;flex-shrink:0"><rect x="10" y="8" width="44" height="52" rx="3" fill="#f5edd8" stroke="#c8a050" stroke-width="2"/><rect x="10" y="8" width="44" height="18" rx="0" fill="#e8d5a0"/><rect x="10" y="8" width="44" height="18" rx="0" fill="none" stroke="#c8a050" stroke-width="2"/><circle cx="32" cy="17" r="9" fill="#cc2200" stroke="#8b1500" stroke-width="1"/><path d="M32 12 L33.5 15.5 L37 16 L34.5 18.5 L35.2 22 L32 20.2 L28.8 22 L29.5 18.5 L27 16 L30.5 15.5 Z" fill="#ff9977"/></svg> Dispatch</a>
+        <a href="/play.html" class="hcn-item"><svg width="18" height="18" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;flex-shrink:0"><ellipse cx="32" cy="42" rx="22" ry="7" fill="#e8cc80" stroke="#c8a050" stroke-width="2"/><line x1="32" y1="10" x2="32" y2="42" stroke="#8b6a10" stroke-width="2.5" stroke-linecap="round"/><path d="M32 42 L48 37" stroke="#5a3a00" stroke-width="2" stroke-linecap="round"/><line x1="14" y1="35" x2="16" y2="43" stroke="#c8a050" stroke-width="1.5" opacity="0.8"/><line x1="22" y1="32" x2="24" y2="43" stroke="#c8a050" stroke-width="1.5" opacity="0.8"/><line x1="42" y1="32" x2="40" y2="43" stroke="#c8a050" stroke-width="1.5" opacity="0.8"/><line x1="50" y1="35" x2="48" y2="43" stroke="#c8a050" stroke-width="1.5" opacity="0.8"/><circle cx="32" cy="42" r="3" fill="#8b6a10" stroke="#c8a050" stroke-width="1"/></svg> History Challenger</a>
         <a href="/overlap.html" class="hcn-item">⏳ Did They Overlap?</a>
         <hr class="hcn-hr">
         <button class="hcn-item red" onclick="window._hcSignOut()">Sign out</button>

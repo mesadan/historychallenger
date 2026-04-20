@@ -210,7 +210,7 @@ function renderSetup(){
   document.getElementById('mets').style.display = 'none';
   const diffs = [
     { k:'disciple', icon:'🕯', name:'Disciple', tag:'Famous civilizations · Clear gaps', desc:'One correct answer with a long clear overlap. Wrong options are from distant eras — a real challenge for any history buff.' },
-    { k:'master', icon:'⚔️', name:'Master', tag:'Mixed eras · Real knowledge', desc:'Wrong options are from the same broad era as the anchor. You need to actually know whether they coexisted.' },
+    { k:'master', icon:'🎖', name:'Master', tag:'Mixed eras · Real knowledge', desc:'Wrong options are from the same broad era as the anchor. You need to actually know whether they coexisted.' },
     { k:'keeper', icon:'🏆', name:'Keeper of Time', tag:'Same era · Expert precision', desc:'All four options are from roughly the same era as the anchor. Only precise date knowledge will save you.' }
   ];
   const rounds = [3, 5, 8];
@@ -429,7 +429,7 @@ async function showFinal(){
   document.getElementById('mets').style.display = 'none';
   const total = S.sets.length * Math.round(100 * ({disciple:1,master:1.5,keeper:2}[S.diff]||1));
   const pct = Math.round((S.score / total) * 100);
-  const m = pct>=90?'🏆 Keeper of Time':pct>=70?'⚔️ Master':pct>=50?'🕯 Disciple':'📜 Initiate';
+  const m = pct>=90?'🏆 Keeper of Time':pct>=70?'🎖 Master':pct>=50?'🕯 Disciple':'🪶 Initiate';
 
   document.getElementById('body').innerHTML = `
     <div style="text-align:center">

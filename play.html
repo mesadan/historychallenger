@@ -367,7 +367,7 @@ const T={
     connError:'Connection error — please try again.',
     noSets:'Could not generate events for this theme — try rephrasing it.',
     curatedSets:'Curated sets',
-    medals:{90:'🏆 Keeper of Time',70:'⚔️ Master',50:'🕯️ Disciple',0:'📜 Initiate'},
+    medals:{90:'🏆 Keeper of Time',70:'🎖 Master',50:'🕯️ Disciple',0:'🪶 Initiate'},
     diffs:{
       disciple:{label:'Disciple',tag:'Famous events · Wide spans',desc:'A real challenge, but any history buff should feel at home. Events span millennia — forgiving scoring, broad historical knowledge rewarded.'},
       master:{label:'Master',tag:'Mixed eras · Real knowledge required',desc:'3 events clustered in one era mixed with 2 from very different times. Requires genuine historical knowledge beyond headlines.'},
@@ -426,7 +426,7 @@ const T={
     connError:'Erreur de connexion — veuillez réessayer.',
     noSets:'Impossible de générer des événements — essayez de reformuler le thème.',
     curatedSets:'Séries présélectionnées',
-    medals:{90:'🏆 Gardien du Temps',70:'⚔️ Maître',50:'🕯️ Disciple',0:'📜 Initié'},
+    medals:{90:'🏆 Gardien du Temps',70:'🎖 Maître',50:'🕯️ Disciple',0:'📜 Initié'},
     diffs:{
       disciple:{label:'Disciple',tag:'Époques mixtes · Événements célèbres',desc:"Un vrai défi, mais tout passionné d'histoire devrait s'y retrouver. Les événements couvrent des millénaires — scoring généreux, culture historique large récompensée."},
       master:{label:'Maître',tag:'Défi mixte · Vraie connaissance requise',desc:"3 événements groupés dans une même époque, mélangés à 2 d'époques très différentes. Vraies connaissances historiques requises."},
@@ -485,7 +485,7 @@ const T={
     connError:'Verbindungsfehler — bitte erneut versuchen.',
     noSets:'Keine Ereignisse für dieses Thema gefunden — bitte anders formulieren.',
     curatedSets:'Kuratierte Sets',
-    medals:{90:'🏆 Hüter der Zeit',70:'⚔️ Meister',50:'🕯️ Schüler',0:'📜 Novize'},
+    medals:{90:'🏆 Hüter der Zeit',70:'🎖 Meister',50:'🕯️ Schüler',0:'📜 Novize'},
     diffs:{
       disciple:{label:'Schüler',tag:'Epochenmix · Bekannte Ereignisse',desc:'Eine echte Herausforderung, aber wer Geschichtsbegeistert ist, sollte sich wohlfühlen. Ereignisse über Jahrtausende — großzügige Wertung, breites Wissen belohnt.'},
       master:{label:'Meister',tag:'Gemischte Herausforderung · Echtes Wissen nötig',desc:'3 Ereignisse aus einer Epoche gemischt mit 2 aus sehr unterschiedlichen Zeiten. Echtes historisches Wissen erforderlich.'},
@@ -544,7 +544,7 @@ const T={
     connError:'Error de conexión — por favor inténtalo de nuevo.',
     noSets:'No se pudieron generar eventos para este tema — intenta reformularlo.',
     curatedSets:'Conjuntos seleccionados',
-    medals:{90:'🏆 Guardián del Tiempo',70:'⚔️ Maestro',50:'🕯️ Discípulo',0:'📜 Iniciado'},
+    medals:{90:'🏆 Guardián del Tiempo',70:'🎖 Maestro',50:'🕯️ Discípulo',0:'📜 Iniciado'},
     diffs:{
       disciple:{label:'Discípulo',tag:'Épocas mixtas · Eventos famosos',desc:'Un verdadero desafío, pero cualquier apasionado de la historia debería sentirse cómodo. Eventos a lo largo de milenios — puntuación generosa, amplia cultura histórica recompensada.'},
       master:{label:'Maestro',tag:'Desafío mixto · Conocimiento real requerido',desc:'3 eventos agrupados en una época mezclados con 2 de tiempos muy diferentes. Se requiere conocimiento histórico genuino.'},
@@ -734,7 +734,7 @@ function renderSetup(){
     </div>
     <div class="path-grid">
       <div class="path-card ${isRandomPath?'active':''}" onclick="selPath('random')">
-        <div class="path-icon">🧭</div>
+        <div class="path-icon"><svg width="28" height="28" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><ellipse cx="32" cy="44" rx="22" ry="7" fill="#c8a050" stroke="#8b6a10" stroke-width="1.5"/><ellipse cx="32" cy="42" rx="22" ry="7" fill="#e8cc80" stroke="#c8a050" stroke-width="1.5"/><line x1="32" y1="8" x2="32" y2="42" stroke="#8b6a10" stroke-width="2.5" stroke-linecap="round"/><path d="M32 42 L48 37" stroke="#5a3a00" stroke-width="2" stroke-linecap="round"/><line x1="14" y1="35" x2="16" y2="43" stroke="#c8a050" stroke-width="1.5" opacity="0.8"/><line x1="22" y1="32" x2="24" y2="43" stroke="#c8a050" stroke-width="1.5" opacity="0.8"/><line x1="42" y1="32" x2="40" y2="43" stroke="#c8a050" stroke-width="1.5" opacity="0.8"/><line x1="50" y1="35" x2="48" y2="43" stroke="#c8a050" stroke-width="1.5" opacity="0.8"/><circle cx="32" cy="42" r="3.5" fill="#8b6a10" stroke="#c8a050" stroke-width="1.5"/><circle cx="32" cy="8" r="2.5" fill="#c8a050"/></svg></div>
         <div class="path-title">${t('pathRandomTitle')}</div>
         <div class="path-desc">${t('pathRandomDesc')}</div>
       </div>
