@@ -29,7 +29,7 @@ s.textContent=`
 #hc-nav .hc-link{
   color:#9a8060;font-size:14px;text-decoration:none;
   font-family:'Crimson Text',Georgia,serif;
-  padding:5px 13px;border-radius:2px;
+  padding:5px 9px;border-radius:2px;
   letter-spacing:.04em;transition:color .15s;
 }
 #hc-nav .hc-link:hover{color:#f5edd8;}
@@ -60,7 +60,7 @@ s.textContent=`
 .hcn-item:hover{background:#241a0e;color:#f5edd8}
 .hcn-item.red{color:#c05040}
 .hcn-hr{border:none;border-top:1px solid #3a2a14;margin:4px 0}
-@media(max-width:600px){.hcn-uname{display:none}.hc-link:not(.hc-play){display:none}}
+@media(max-width:480px){.hcn-uname{display:none}.hc-link:not(.hc-play){display:none}}
 `;
 document.head.appendChild(s);
 
