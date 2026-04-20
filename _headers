@@ -1,0 +1,4 @@
+/auth-callback.html
+  Cache-Control: no-store, no-cache, must-revalidate
+  X-Robots-Tag: noindex, nofollow
+  Cloudflare-CDN-Cache-Control: no-store
