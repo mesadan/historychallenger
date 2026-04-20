@@ -74,6 +74,7 @@ function injectNav(){
     {href:'/dispatch.html', label:'Dispatch', key:'dispatch'},
     {href:'/play.html',     label:'Timeline', key:'play'},
     {href:'/overlap.html',  label:'Overlap',  key:'overlap'},
+    {href:'/persona.html',    label:'Who Are You?', key:'persona'},
     {href:'/blog-index.html', label:'Articles', key:'blog'},
   ];
   const linksHtml = links.map(l=>{

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Which Historical Leader Are You? — History Challenger</title>
+<meta name="description" content="25 decisions. No dates, no names. Discover which historical leader you think like — Caesar, Lincoln, Saladin, Napoleon, Bismarck, Genghis Khan, or Wu Zetian.">
+<meta property="og:title" content="Which Historical Leader Are You?">
+<meta property="og:description" content="25 decisions. No dates, no names. Discover which historical leader you think like.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://historychallenger.com/persona.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="/nav.js" defer></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100vh}
+body{font-family:'Crimson Text',Georgia,serif;background:#0d0d0d;color:#f0e8d8;display:flex;flex-direction:column;align-items:center;padding:0 0 4rem}
+a{color:#c8903a;text-decoration:none}
+
+.wrap{width:100%;max-width:760px;padding:2rem 1.25rem}
+@media(min-width:600px){.wrap{padding:2.5rem 2rem}}
+
+/* ── INTRO ── */
+.intro-eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#c8903a;font-family:'Crimson Text',serif;opacity:.8;margin-bottom:1rem;display:block}
+.intro-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:400;color:#f0e8d8;line-height:1.2;margin-bottom:1rem}
+.intro-sub{font-size:17px;color:#9a8060;line-height:1.8;font-style:italic;margin-bottom:2rem;max-width:580px}
+.leaders-preview{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2rem}
+.lp-chip{background:#1a150e;border:1px solid #3a2a14;border-radius:3px;padding:5px 12px;font-size:13px;color:#9a8060;font-family:'Crimson Text',serif}
+.start-btn{background:#c8903a;color:#000;border:none;border-radius:3px;padding:14px 32px;font-family:'Playfair Display',serif;font-size:16px;font-style:italic;cursor:pointer;transition:background .15s;display:inline-block}
+.start-btn:hover{background:#e0a84a}
+.intro-note{font-size:12px;color:#5a4a30;margin-top:1rem;font-style:italic}
+
+/* ── QUESTION CARD ── */
+.q-wrap{display:none}
+.q-progress{display:flex;align-items:center;gap:12px;margin-bottom:2rem}
+.q-bar{flex:1;height:4px;background:#1a150e;border-radius:2px;overflow:hidden}
+.q-fill{height:100%;background:#c8903a;border-radius:2px;transition:width .3s}
+.q-num{font-size:13px;color:#5a4a30;font-family:'Crimson Text',serif;white-space:nowrap}
+
+.q-card{background:#111008;border:1px solid #2a1e0e;border-radius:4px;padding:2rem}
+@media(min-width:600px){.q-card{padding:2.5rem}}
+
+.q-trait{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#c8903a;font-family:'Crimson Text',serif;opacity:.7;margin-bottom:1rem;display:block}
+.q-scenario{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:400;color:#f0e8d8;line-height:1.6;margin-bottom:1rem}
+.q-context{font-size:15px;color:#9a8060;line-height:1.75;font-style:italic;margin-bottom:2rem;padding-left:1rem;border-left:2px solid #2a1e0e}
+
+.choices{display:flex;flex-direction:column;gap:10px}
+.choice-btn{
+  background:#111008;border:1px solid #2a1e0e;border-radius:3px;
+  padding:1rem 1.25rem;text-align:left;cursor:pointer;
+  font-family:'Crimson Text',Georgia,serif;font-size:15px;color:#c8b898;
+  line-height:1.6;transition:border-color .12s,background .12s,color .12s;
+  -webkit-tap-highlight-color:transparent;
+}
+.choice-btn:hover{border-color:#c8903a;background:#1a150e;color:#f0e8d8}
+.choice-btn.selected{border-color:#c8903a;background:#1a150e;color:#f0e8d8}
+.choice-btn .choice-letter{
+  display:inline-block;width:22px;height:22px;border-radius:50%;
+  background:#1a150e;border:1px solid #3a2a14;
+  font-size:11px;font-weight:700;color:#c8903a;
+  text-align:center;line-height:22px;margin-right:10px;
+  flex-shrink:0;vertical-align:middle;font-family:-apple-system,sans-serif;
+}
+.choice-btn.selected .choice-letter{background:#c8903a;color:#000;border-color:#c8903a}
+
+.q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem}
+.q-next{background:#c8903a;color:#000;border:none;border-radius:3px;padding:10px 24px;font-family:'Playfair Display',serif;font-size:14px;font-style:italic;cursor:pointer;transition:background .15s;opacity:.4;pointer-events:none}
+.q-next.active{opacity:1;pointer-events:all}
+.q-next.active:hover{background:#e0a84a}
+.q-skip{font-size:12px;color:#5a4a30;cursor:pointer;font-style:italic;background:none;border:none;font-family:'Crimson Text',serif}
+.q-skip:hover{color:#9a8060}
+
+/* ── LOADING ── */
+.loading-wrap{display:none;text-align:center;padding:4rem 0}
+.loading-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:400;color:#f0e8d8;margin-bottom:1rem}
+.loading-sub{font-size:14px;color:#5a4a30;font-style:italic;margin-bottom:2rem}
+.dots{display:flex;gap:6px;justify-content:center}
+.dots span{width:8px;height:8px;border-radius:50%;background:#c8903a;animation:dotpulse 1.2s ease-in-out infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes dotpulse{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+/* ── RESULT ── */
+.result-wrap{display:none}
+.result-match{
+  background:#111008;border:1px solid #2a1e0e;border-radius:4px;
+  padding:2rem;margin-bottom:1.5rem;text-align:center;
+}
+.result-eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#c8903a;opacity:.8;font-family:'Crimson Text',serif;margin-bottom:.75rem;display:block}
+.result-name{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);font-weight:400;color:#f0e8d8;margin-bottom:.4rem}
+.result-era{font-size:14px;color:#5a4a30;font-style:italic;margin-bottom:1.25rem}
+.result-summary{font-size:16px;color:#c8b898;line-height:1.8;font-style:italic;max-width:520px;margin:0 auto}
+
+.chart-wrap{background:#111008;border:1px solid #2a1e0e;border-radius:4px;padding:1.75rem;margin-bottom:1.5rem}
+.chart-title{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#5a4a30;font-family:'Crimson Text',serif;margin-bottom:1.25rem;text-align:center}
+.chart-canvas{max-width:400px;margin:0 auto;display:block}
+
+.scores-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
+@media(min-width:500px){.scores-grid{grid-template-columns:repeat(4,1fr)}}
+.score-card{background:#111008;border:1px solid #2a1e0e;border-radius:3px;padding:10px 12px;text-align:center}
+.score-card.top{border-color:#c8903a}
+.score-pct{font-family:'Playfair Display',serif;font-size:1.4rem;color:#c8903a;font-weight:400}
+.score-name{font-size:11px;color:#5a4a30;font-style:italic;margin-top:2px;line-height:1.3}
+
+.traits-wrap{background:#111008;border:1px solid #2a1e0e;border-radius:4px;padding:1.75rem;margin-bottom:1.5rem}
+.traits-title{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#5a4a30;font-family:'Crimson Text',serif;margin-bottom:1.25rem}
+.trait-row{display:flex;align-items:center;gap:10px;margin-bottom:.75rem}
+.trait-label{font-size:13px;color:#9a8060;width:120px;flex-shrink:0;font-style:italic}
+.trait-bar-wrap{flex:1;height:6px;background:#1a150e;border-radius:3px;overflow:hidden}
+.trait-bar{height:100%;border-radius:3px;background:#c8903a;transition:width 1s ease}
+.trait-score{font-size:12px;color:#5a4a30;width:28px;text-align:right;flex-shrink:0}
+
+.dispatch-cta{background:#1a150e;border:1px solid #3a2a14;border-radius:4px;padding:1.5rem;margin-bottom:1.5rem;text-align:center}
+.dispatch-cta p{font-size:15px;color:#9a8060;line-height:1.7;margin-bottom:1rem;font-style:italic}
+.dispatch-cta a{display:inline-block;background:#c8903a;color:#000;border-radius:3px;padding:10px 24px;font-family:'Playfair Display',serif;font-size:14px;font-style:italic}
+.dispatch-cta a:hover{background:#e0a84a}
+
+.result-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.share-btn{background:#111008;border:1px solid #3a2a14;color:#9a8060;border-radius:3px;padding:10px 20px;font-family:'Crimson Text',serif;font-size:14px;cursor:pointer;transition:border-color .12s,color .12s}
+.share-btn:hover{border-color:#c8903a;color:#f0e8d8}
+.retry-btn{background:none;border:1px solid #2a1e0e;color:#5a4a30;border-radius:3px;padding:10px 20px;font-family:'Crimson Text',serif;font-size:14px;cursor:pointer;transition:border-color .12s,color .12s}
+.retry-btn:hover{border-color:#5a4a30;color:#9a8060}
+
+/* ── ERROR ── */
+.error-wrap{display:none;text-align:center;padding:3rem 0}
+.error-wrap h2{font-family:'Playfair Display',serif;font-weight:400;color:#f0e8d8;margin-bottom:.75rem}
+.error-wrap p{color:#5a4a30;font-style:italic;font-size:15px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- INTRO -->
+  <div id="intro">
+    <span class="intro-eyebrow">Historical Profile</span>
+    <h1 class="intro-title">Which historical leader<br>do you think like?</h1>
+    <p class="intro-sub">25 decisions. No dates, no names. Just situations — the kind that reveal how you actually think under pressure.</p>
+    <div class="leaders-preview" id="leaders-preview"></div>
+    <button class="start-btn" onclick="startGame()">Begin the assessment →</button>
+    <p class="intro-note">Takes about 5 minutes · No account required</p>
+  </div>
+
+  <!-- QUESTION -->
+  <div class="q-wrap" id="q-wrap">
+    <div class="q-progress">
+      <div class="q-bar"><div class="q-fill" id="q-fill"></div></div>
+      <div class="q-num" id="q-num">1 / 25</div>
+    </div>
+    <div class="q-card">
+      <span class="q-trait" id="q-trait"></span>
+      <div class="q-scenario" id="q-scenario"></div>
+      <div class="q-context" id="q-context"></div>
+      <div class="choices" id="choices"></div>
+    </div>
+    <div class="q-nav">
+      <button class="q-skip" onclick="skipQuestion()">Skip this one</button>
+      <button class="q-next" id="q-next" onclick="nextQuestion()">Next →</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-wrap" id="loading-wrap">
+    <div class="loading-title">Analysing your decisions…</div>
+    <p class="loading-sub">Cross-referencing with 7 historical profiles</p>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-wrap" id="result-wrap">
+    <div class="result-match">
+      <span class="result-eyebrow">Your historical profile</span>
+      <div class="result-name" id="result-name"></div>
+      <div class="result-era" id="result-era"></div>
+      <div class="result-summary" id="result-summary"></div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-title">How your decisions compare</div>
+      <canvas class="chart-canvas" id="radar-chart" width="400" height="400"></canvas>
+    </div>
+
+    <div class="scores-grid" id="scores-grid"></div>
+
+    <div class="traits-wrap">
+      <div class="traits-title">Your decision-making profile</div>
+      <div id="traits-bars"></div>
+    </div>
+
+    <div class="dispatch-cta">
+      <p>Now experience these decisions from the inside. Dispatch puts you in the room where history was actually made — the same dispatches, the same choices, the same weight.</p>
+      <a href="/dispatch.html">Play Dispatch →</a>
+    </div>
+
+    <div class="result-actions">
+      <button class="share-btn" onclick="shareResult()">Share your result</button>
+      <button class="retry-btn" onclick="restartGame()">Take it again</button>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div class="error-wrap" id="error-wrap">
+    <h2>Something went wrong</h2>
+    <p id="error-msg">Could not load questions. Please try again.</p>
+    <button class="start-btn" onclick="startGame()" style="margin-top:1.5rem">Try again</button>
+  </div>
+
+</div>
+
+<script>
+const WORKER = 'https://histroychallenger-api.maletethan.workers.dev';
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let _questions = [];
+let _leaders = {};
+let _current = 0;
+let _answers = {}; // qid -> leader_key
+let _scores = {}; // leader_key -> count
+let _gameQuestions = []; // 25 drawn questions
+
+const TRAIT_LABELS = {
+  decisiveness: 'Decisiveness',
+  strategic_patience: 'Strategic patience',
+  means_vs_ends: 'Means vs ends',
+  personal_control: 'Personal control',
+  risk_appetite: 'Risk appetite',
+  institutional_power: 'Institutional power'
+};
+
+// ── LOAD ───────────────────────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const [qRes, lRes] = await Promise.all([
+      fetch(WORKER, { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action: 'get_persona_questions' }) }),
+      fetch(WORKER, { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action: 'get_persona_leaders' }) })
+    ]);
+    const qData = await qRes.json();
+    const lData = await lRes.json();
+    if (!qData.success || !lData.success) throw new Error(qData.error || lData.error);
+    _questions = qData.questions;
+    _leaders = lData.leaders;
+    renderLeadersPreview();
+  } catch(e) {
+    console.error('Load error:', e);
+    showError('Could not load questions: ' + e.message);
+  }
+}
+
+function renderLeadersPreview() {
+  const el = document.getElementById('leaders-preview');
+  el.innerHTML = Object.values(_leaders).map(l =>
+    `<span class="lp-chip">${l.name}</span>`
+  ).join('');
+}
+
+// ── GAME ───────────────────────────────────────────────────────────────────────
+function startGame() {
+  if (_questions.length === 0) {
+    showError('Questions have not loaded yet. Please wait a moment and try again.');
+    return;
+  }
+
+  // Shuffle and draw 25
+  const shuffled = [..._questions].sort(() => Math.random() - .5);
+  _gameQuestions = shuffled.slice(0, Math.min(25, shuffled.length));
+
+  // Reset state
+  _current = 0;
+  _answers = {};
+  _scores = {};
+  Object.keys(_leaders).forEach(k => _scores[k] = 0);
+
+  show('q-wrap');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = _gameQuestions[_current];
+  const total = _gameQuestions.length;
+
+  // Progress
+  document.getElementById('q-fill').style.width = `${(_current / total) * 100}%`;
+  document.getElementById('q-num').textContent = `${_current + 1} / ${total}`;
+
+  // Content
+  document.getElementById('q-trait').textContent = TRAIT_LABELS[q.trait_axis] || q.trait_axis;
+  document.getElementById('q-scenario').textContent = q.scenario;
+  document.getElementById('q-context').textContent = q.context;
+
+  // Parse choices (might be string from DB)
+  const choices = typeof q.choices === 'string' ? JSON.parse(q.choices) : q.choices;
+
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = choices.map((c, i) => {
+    const letters = ['A','B','C','D'];
+    const selected = _answers[q.id] === c.leader_key ? ' selected' : '';
+    return `<button class="choice-btn${selected}" onclick="selectChoice('${q.id}','${c.leader_key}',this)">
+      <span class="choice-letter">${letters[i]}</span>${c.text}
+    </button>`;
+  }).join('');
+
+  // Next button
+  const nextBtn = document.getElementById('q-next');
+  nextBtn.textContent = _current === total - 1 ? 'See my result →' : 'Next →';
+  nextBtn.classList.toggle('active', !!_answers[q.id]);
+}
+
+function selectChoice(qid, leaderKey, btn) {
+  _answers[qid] = leaderKey;
+  // Update UI
+  document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('q-next').classList.add('active');
+}
+
+function nextQuestion() {
+  const q = _gameQuestions[_current];
+  // Record score
+  if (_answers[q.id]) {
+    _scores[_answers[q.id]] = (_scores[_answers[q.id]] || 0) + 1;
+  }
+
+  _current++;
+  if (_current >= _gameQuestions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function skipQuestion() {
+  _current++;
+  if (_current >= _gameQuestions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+// ── RESULTS ───────────────────────────────────────────────────────────────────
+function showResults() {
+  show('loading-wrap');
+
+  setTimeout(() => {
+    // Find top leader
+    const answered = Object.values(_answers).length;
+    const sorted = Object.entries(_scores)
+      .sort((a, b) => b[1] - a[1]);
+
+    const topKey = sorted[0][0];
+    const topLeader = _leaders[topKey];
+
+    // Show result
+    show('result-wrap');
+    document.getElementById('result-name').textContent = topLeader.name;
+    document.getElementById('result-era').textContent = topLeader.era;
+    document.getElementById('result-summary').textContent = topLeader.summary;
+
+    // Scores grid
+    renderScoresGrid(sorted, answered);
+
+    // Radar chart
+    renderRadarChart(sorted, answered);
+
+    // Trait bars (top leader's profile)
+    const traits = typeof topLeader.traits === 'string'
+      ? JSON.parse(topLeader.traits) : topLeader.traits;
+    renderTraitBars(traits);
+
+  }, 1800);
+}
+
+function renderScoresGrid(sorted, answered) {
+  const el = document.getElementById('scores-grid');
+  el.innerHTML = sorted.map(([key, count], i) => {
+    const leader = _leaders[key];
+    const pct = answered > 0 ? Math.round((count / answered) * 100) : 0;
+    return `<div class="score-card${i===0?' top':''}">
+      <div class="score-pct">${pct}%</div>
+      <div class="score-name">${leader ? leader.name : key}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderRadarChart(sorted, answered) {
+  const ctx = document.getElementById('radar-chart').getContext('2d');
+
+  // Show top 4 leaders on radar
+  const top4 = sorted.slice(0, 4);
+  const labels = Object.keys(TRAIT_LABELS).map(k => TRAIT_LABELS[k]);
+
+  const colors = [
+    { border: '#c8903a', bg: 'rgba(200,144,58,0.15)' },
+    { border: '#7a9060', bg: 'rgba(122,144,96,0.1)' },
+    { border: '#607890', bg: 'rgba(96,120,144,0.1)' },
+    { border: '#907860', bg: 'rgba(144,120,96,0.08)' }
+  ];
+
+  const datasets = top4.map(([key, count], i) => {
+    const leader = _leaders[key];
+    const traits = typeof leader.traits === 'string'
+      ? JSON.parse(leader.traits) : leader.traits;
+    const data = Object.keys(TRAIT_LABELS).map(k => traits[k] || 0);
+    return {
+      label: leader.name,
+      data,
+      borderColor: colors[i].border,
+      backgroundColor: colors[i].bg,
+      borderWidth: i === 0 ? 2.5 : 1.5,
+      pointBackgroundColor: colors[i].border,
+      pointRadius: i === 0 ? 4 : 2,
+    };
+  });
+
+  new Chart(ctx, {
+    type: 'radar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      scales: {
+        r: {
+          min: 0, max: 10,
+          ticks: { display: false, stepSize: 2 },
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          angleLines: { color: 'rgba(255,255,255,0.06)' },
+          pointLabels: {
+            font: { size: 11, family: "'Crimson Text', serif" },
+            color: '#9a8060'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            font: { size: 11, family: "'Crimson Text', serif" },
+            color: '#9a8060',
+            padding: 12,
+            usePointStyle: true,
+            pointStyleWidth: 8
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderTraitBars(traits) {
+  const el = document.getElementById('traits-bars');
+  el.innerHTML = Object.entries(TRAIT_LABELS).map(([key, label]) => {
+    const val = traits[key] || 0;
+    const pct = (val / 10) * 100;
+    return `<div class="trait-row">
+      <div class="trait-label">${label}</div>
+      <div class="trait-bar-wrap">
+        <div class="trait-bar" style="width:0%" data-target="${pct}%"></div>
+      </div>
+      <div class="trait-score">${val}/10</div>
+    </div>`;
+  }).join('');
+
+  // Animate bars
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.trait-bar').forEach(bar => {
+        bar.style.width = bar.dataset.target;
+      });
+    });
+  });
+}
+
+// ── SHARE ─────────────────────────────────────────────────────────────────────
+function shareResult() {
+  const sorted = Object.entries(_scores).sort((a,b) => b[1]-a[1]);
+  const topKey = sorted[0][0];
+  const leader = _leaders[topKey];
+  const answered = Object.values(_answers).length;
+  const pct = Math.round((_scores[topKey] / answered) * 100);
+
+  const text = `I think like ${leader.name} (${pct}% match) — History Challenger's decision profile test. 25 decisions, no dates, no names.\nhttps://historychallenger.com/persona.html`;
+
+  if (navigator.share) {
+    navigator.share({ text }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.share-btn');
+      btn.textContent = 'Copied to clipboard ✓';
+      setTimeout(() => btn.textContent = 'Share your result', 2000);
+    }).catch(() => {
+      prompt('Copy this to share:', text);
+    });
+  }
+}
+
+function restartGame() {
+  show('intro');
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function show(id) {
+  ['intro','q-wrap','loading-wrap','result-wrap','error-wrap'].forEach(s => {
+    document.getElementById(s).style.display = s === id ? 'block' : 'none';
+  });
+}
+
+function showError(msg) {
+  show('error-wrap');
+  document.getElementById('error-msg').textContent = msg;
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>
