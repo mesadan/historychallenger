@@ -149,6 +149,10 @@ a{color:#c8903a;text-decoration:none}
       <div class="q-bar"><div class="q-fill" id="q-fill"></div></div>
       <div class="q-num" id="q-num">1 / 25</div>
     </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+      <div style="font-size:13px;color:#5a4a30;font-style:italic;font-family:'Crimson Text',serif" id="q-pct-label">0% complete</div>
+      <div style="font-size:12px;color:#3a2a14;font-family:'Crimson Text',serif" id="q-remaining">25 questions remaining</div>
+    </div>
     <div class="q-card">
       <span class="q-trait" id="q-trait"></span>
       <div class="q-scenario" id="q-scenario"></div>
@@ -283,8 +287,14 @@ function renderQuestion() {
   const total = _gameQuestions.length;
 
   // Progress
-  document.getElementById('q-fill').style.width = `${(_current / total) * 100}%`;
+  const pct = Math.round((_current / total) * 100);
+  document.getElementById('q-fill').style.width = `${pct}%`;
   document.getElementById('q-num').textContent = `${_current + 1} / ${total}`;
+  document.getElementById('q-pct-label').textContent = `${pct}% complete`;
+  const remaining = total - _current;
+  document.getElementById('q-remaining').textContent = remaining === 1
+    ? '1 question remaining'
+    : `${remaining} questions remaining`;
 
   // Content
   document.getElementById('q-trait').textContent = TRAIT_LABELS[q.trait_axis] || q.trait_axis;
