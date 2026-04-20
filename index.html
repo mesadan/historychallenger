@@ -4,350 +4,353 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>History Challenger — Free Online History Quiz & Timeline Game</title>
-<meta name="description" content="Think you know history? History Challenger is a free online history quiz where you place events on a timeline. Test your knowledge across every era and civilization. No signup required.">
-<meta name="keywords" content="history quiz, history challenge, history test, history game, online history quiz, timeline quiz, history trivia, free history quiz">
+<meta name="description" content="Think you know history? Three free games. Place events on a timeline, make the decisions of history's greatest commanders, or figure out which civilizations coexisted.">
+<meta name="keywords" content="history quiz, history challenge, history game, online history quiz, timeline quiz, history trivia">
 <meta property="og:title" content="History Challenger — Free Online History Quiz & Timeline Game">
-<meta property="og:description" content="Think you know history? Place events on a timeline and score points for accuracy. Free online history quiz — no signup required.">
+<meta property="og:description" content="Three free history games. No account required.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://historychallenger.com">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#1a150e">
+<meta name="theme-color" content="#2c1f0e">
 <link rel="canonical" href="https://historychallenger.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebApplication","name":"History Challenger","description":"A free online history quiz game where players place historical events on a timeline.","url":"https://historychallenger.com","applicationCategory":"GameApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+{"@context":"https://schema.org","@type":"WebApplication","name":"History Challenger","description":"Free online history games.","url":"https://historychallenger.com","applicationCategory":"GameApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
 </script>
 <style>
 :root{
-  --ink:#1a150e;--ink-mid:#3a2e1e;--ink-light:#7a6040;
-  --parchment:#f5edd8;--parchment-dark:#e8dfc0;--parchment-darker:#d4c89a;
-  --gold:#9a7010;--gold-light:#c49020;--seal:#7a0a0a;
-  --page-bg:#1a150e;
+  --ink:#1a150e;
+  --ink-mid:#3a2e1e;
+  --ink-light:#7a6040;
+  --parchment:#f5edd8;
+  --parchment-dark:#ede0c0;
+  --parchment-darker:#d9c9a0;
+  --gold:#8a6208;
+  --gold-light:#b88a18;
+  --gold-bright:#c8a028;
+  --seal:#7a0a0a;
+  --page-bg:#f0e6cc;
+  --section-alt:#e8d9b8;
+  --card-bg:#faf4e4;
+  --border:#c8b888;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'Crimson Text',Georgia,serif;background:var(--page-bg);color:var(--parchment);line-height:1.7}
-a{color:var(--gold-light);text-decoration:none}
-a:hover{text-decoration:underline}
+body{
+  font-family:'Crimson Text',Georgia,serif;
+  background:var(--page-bg);
+  color:var(--ink);
+  line-height:1.75;
+  font-size:18px;
+}
+a{color:var(--gold);text-decoration:none}
+a:hover{color:var(--gold-bright)}
+
+/* ── LOGO SVG ── */
+.hc-logo-svg{display:flex;align-items:center;gap:10px;text-decoration:none}
+.hc-logo-svg:hover{text-decoration:none}
+.logo-mark{width:36px;height:36px;flex-shrink:0}
+.logo-text{display:flex;flex-direction:column;line-height:1.1}
+.logo-name{font-family:'Playfair Display',serif;font-size:16px;font-weight:400;font-style:italic;color:var(--parchment);letter-spacing:.02em}
+.logo-name span{color:var(--gold-bright)}
+.logo-sub{font-size:9px;color:rgba(245,237,216,.45);letter-spacing:.18em;text-transform:uppercase;font-family:'Crimson Text',serif;margin-top:1px}
 
 /* ── HERO ── */
 .hero{
-  min-height:92vh;display:flex;flex-direction:column;
+  min-height:96vh;
+  display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  text-align:center;padding:5rem 1.5rem 4rem;
-  background:radial-gradient(ellipse at 50% 35%,#2e1e0a 0%,#0a0806 100%);
+  text-align:center;
+  padding:6rem 1.5rem 4rem;
+  background:linear-gradient(160deg,#2c1f0e 0%,#1a1208 55%,#2a1a0a 100%);
+  position:relative;
+  overflow:hidden;
 }
-.hero-eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-light);margin-bottom:1.5rem;font-family:'Crimson Text',serif;opacity:.8}
-.hero-title{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,7vw,5rem);font-weight:400;line-height:1.1;margin-bottom:1.25rem;max-width:800px;color:var(--parchment)}
-.hero-title span{color:var(--gold-light)}
-.hero-sub{font-size:clamp(1rem,2.2vw,1.15rem);color:#9a8060;max-width:540px;margin-bottom:2.5rem;line-height:1.8;font-style:italic}
-.hero-cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-.btn-primary{background:var(--gold);color:var(--parchment);border:2px solid var(--gold-light);border-radius:2px;padding:13px 36px;font-size:17px;font-family:'Playfair Display',serif;font-style:italic;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;letter-spacing:.03em}
-.btn-primary:hover{background:var(--gold-light);text-decoration:none}
-.btn-secondary{background:transparent;color:var(--parchment-darker);border:1px solid #3a2a14;border-radius:2px;padding:13px 28px;font-size:15px;font-family:'Crimson Text',serif;cursor:pointer;transition:border-color .15s;text-decoration:none;display:inline-block;letter-spacing:.04em}
-.btn-secondary:hover{border-color:var(--gold);color:var(--parchment);text-decoration:none}
-.hero-note{margin-top:1.25rem;font-size:13px;color:#5a4a30;font-style:italic}
-.hero-blog{margin-top:1.5rem;padding:.8rem 1.2rem;background:rgba(154,112,16,.1);border:1px solid rgba(196,144,32,.2);border-radius:2px;font-size:14px;color:#9a8060;max-width:520px;text-align:left}
-.hero-blog a{color:var(--gold-light)}
-
-/* ── PREVIEW ── */
-.preview{
-  background:rgba(244,237,216,.06);border:1px solid rgba(196,144,32,.2);
-  border-radius:3px;padding:1.4rem 1.6rem;max-width:500px;margin:2rem auto 0;text-align:left;
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(196,144,32,.12) 0%,transparent 65%);
+  pointer-events:none;
 }
-.preview-badge{display:inline-block;background:rgba(154,112,16,.15);border:1px solid rgba(196,144,32,.3);color:var(--gold-light);font-size:11px;padding:3px 10px;border-radius:2px;margin-bottom:1rem;font-family:'Crimson Text',serif;letter-spacing:.06em}
-.preview-cards{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:1.2rem}
-.preview-card{background:rgba(244,237,216,.08);border:1px solid rgba(196,144,32,.15);border-radius:2px;padding:6px 12px;font-size:13px;color:var(--parchment-darker);font-family:'Crimson Text',serif}
-.preview-bar{height:4px;background:rgba(196,144,32,.15);border-radius:2px;margin:1rem 0;overflow:hidden}
-.preview-bar-inner{height:100%;background:linear-gradient(90deg,transparent,var(--gold-light),transparent);background-size:200%;animation:shimmer 2.5s linear infinite}
-@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
-.preview-anchors{display:flex;justify-content:space-between;font-size:11px;color:#5a4a30;font-style:italic}
+.hero-eyebrow{
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(196,144,32,.7);margin-bottom:1.8rem;
+  font-family:'Crimson Text',serif;
+}
+.hero-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.6rem,7vw,5.5rem);
+  font-weight:400;line-height:1.08;
+  margin-bottom:1.4rem;max-width:820px;
+  color:var(--parchment);
+}
+.hero-title span{color:var(--gold-bright)}
+.hero-sub{
+  font-size:clamp(1.05rem,2.2vw,1.2rem);
+  color:rgba(245,237,216,.65);
+  max-width:520px;margin-bottom:2.8rem;
+  line-height:1.85;font-style:italic;
+}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.btn-primary{
+  background:var(--gold);color:var(--parchment);
+  border:2px solid var(--gold-bright);border-radius:2px;
+  padding:14px 40px;font-size:17px;
+  font-family:'Playfair Display',serif;font-style:italic;
+  cursor:pointer;transition:all .2s;text-decoration:none;
+  display:inline-block;letter-spacing:.03em;
+}
+.btn-primary:hover{background:var(--gold-bright);color:var(--parchment);text-decoration:none}
+.btn-ghost{
+  background:transparent;color:rgba(245,237,216,.7);
+  border:1px solid rgba(245,237,216,.2);border-radius:2px;
+  padding:14px 28px;font-size:16px;
+  font-family:'Crimson Text',serif;
+  cursor:pointer;transition:all .2s;text-decoration:none;
+  display:inline-block;letter-spacing:.04em;
+}
+.btn-ghost:hover{border-color:var(--gold-bright);color:var(--parchment);text-decoration:none}
+.hero-note{margin-top:1.4rem;font-size:13px;color:rgba(245,237,216,.3);font-style:italic}
 
 /* ── SECTIONS ── */
-section{padding:4.5rem 1.5rem}
-.section-inner{max-width:900px;margin:0 auto}
-.section-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-light);font-family:'Crimson Text',serif;margin-bottom:.75rem;opacity:.8}
-.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3.5vw,2.3rem);font-weight:400;margin-bottom:1rem;color:var(--parchment)}
-.section-sub{font-size:16px;color:#7a6040;max-width:600px;line-height:1.8;font-style:italic}
+section{padding:5rem 1.5rem}
+.section-inner{max-width:960px;margin:0 auto}
+.section-label{
+  font-size:10px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--gold);font-family:'Crimson Text',serif;
+  margin-bottom:.9rem;opacity:.8;
+}
+.section-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.8rem,3.8vw,2.6rem);
+  font-weight:400;margin-bottom:1rem;color:var(--ink);
+  line-height:1.2;
+}
+.section-sub{
+  font-size:17px;color:var(--ink-light);
+  max-width:640px;line-height:1.85;font-style:italic;
+}
 
 /* ── GAME CARDS ── */
-.games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;margin-top:2rem}
-.game-card{
-  background:#1e140a;border:1.5px solid #3a2a14;border-radius:3px;
-  padding:1.8rem;position:relative;transition:border-color .15s;
-  display:block;text-decoration:none;
+.games-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.4rem;margin-top:2.5rem;
 }
-.game-card:hover{border-color:var(--gold);text-decoration:none}
-.game-card.featured{border-color:var(--gold);}
-.game-badge{position:absolute;top:-11px;left:1.5rem;background:var(--gold);color:var(--parchment);font-size:10px;padding:2px 10px;border-radius:2px;letter-spacing:.1em;text-transform:uppercase;font-family:'Crimson Text',serif}
-.game-icon{font-size:28px;margin-bottom:.7rem;margin-top:.2rem}
-.game-name{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:400;color:var(--parchment);margin-bottom:.25rem}
-.game-tag{font-size:10px;color:var(--gold-light);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.7rem;font-family:'Crimson Text',serif}
-.game-desc{font-size:14px;color:#7a6040;line-height:1.7;margin-bottom:1.3rem;font-style:italic}
-.game-cta{background:var(--gold);color:var(--parchment);border-radius:2px;padding:7px 18px;font-family:'Playfair Display',serif;font-size:13px;font-style:italic;display:inline-block;transition:background .15s}
-.game-card:hover .game-cta{background:var(--gold-light)}
-.game-cta.secondary{background:transparent;border:1px solid #3a2a14;color:#9a8060}
-.game-card:hover .game-cta.secondary{border-color:var(--gold);color:var(--parchment);background:transparent}
-
-/* ── DARK SECTION ── */
-.section-dark{background:#0e0a06;border-top:1px solid #2a1a08;border-bottom:1px solid #2a1a08}
-
-/* ── STEPS ── */
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;margin-top:2.5rem}
-.step{background:#1e140a;border:1px solid #3a2a14;border-radius:3px;padding:1.6rem}
-.step-num{font-family:'Playfair Display',serif;font-size:32px;font-weight:400;color:var(--gold-light);opacity:.4;margin-bottom:.7rem}
-.step-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:400;color:var(--parchment);margin-bottom:.5rem}
-.step-desc{font-size:14px;color:#7a6040;line-height:1.7;font-style:italic}
-
-/* ── DIFFS ── */
-.diffs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.1rem;margin-top:2rem}
-.diff-card{border:1px solid #3a2a14;border-radius:3px;padding:1.4rem;background:#1e140a}
-.diff-name{font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--parchment);margin-bottom:.3rem}
-.diff-tag{font-size:10px;color:var(--gold-light);background:rgba(154,112,16,.1);border:1px solid rgba(196,144,32,.2);border-radius:2px;padding:2px 8px;display:inline-block;margin-bottom:.7rem;letter-spacing:.08em;text-transform:uppercase;font-family:'Crimson Text',serif}
-.diff-desc{font-size:13px;color:#7a6040;line-height:1.6;font-style:italic}
+.game-card{
+  background:var(--card-bg);
+  border:1.5px solid var(--border);
+  border-radius:3px;padding:2rem 1.8rem;
+  position:relative;transition:all .18s;
+  display:block;text-decoration:none;
+  box-shadow:0 2px 8px rgba(26,21,14,.06);
+}
+.game-card:hover{
+  border-color:var(--gold);
+  box-shadow:0 4px 20px rgba(26,21,14,.12);
+  transform:translateY(-2px);
+  text-decoration:none;
+}
+.game-card.featured{border-color:var(--gold);border-width:2px}
+.game-badge{
+  position:absolute;top:-12px;left:1.6rem;
+  background:var(--gold);color:var(--parchment);
+  font-size:10px;padding:2px 12px;border-radius:2px;
+  letter-spacing:.1em;text-transform:uppercase;
+  font-family:'Crimson Text',serif;
+}
+.game-icon{font-size:30px;margin-bottom:.8rem;margin-top:.3rem;display:block}
+.game-name{
+  font-family:'Playfair Display',serif;font-size:1.3rem;
+  font-weight:400;color:var(--ink);margin-bottom:.3rem;
+}
+.game-tag{
+  font-size:10px;color:var(--gold);letter-spacing:.14em;
+  text-transform:uppercase;margin-bottom:.8rem;
+  font-family:'Crimson Text',serif;display:block;
+}
+.game-desc{
+  font-size:15px;color:var(--ink-light);line-height:1.75;
+  margin-bottom:1.4rem;font-style:italic;
+}
+.game-cta{
+  background:var(--gold);color:var(--parchment);border-radius:2px;
+  padding:8px 20px;font-family:'Playfair Display',serif;
+  font-size:14px;font-style:italic;display:inline-block;
+  transition:background .15s;border:1px solid var(--gold-bright);
+}
+.game-card:hover .game-cta{background:var(--gold-bright)}
+.game-cta.ghost{
+  background:transparent;border:1.5px solid var(--border);
+  color:var(--ink-light);
+}
+.game-card:hover .game-cta.ghost{border-color:var(--gold);color:var(--gold)}
 
 /* ── ABOUT ── */
-.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;margin-top:2rem}
-@media(max-width:640px){.about-grid{grid-template-columns:1fr}}
-.about-text p{color:#7a6040;line-height:1.9;margin-bottom:1rem;font-size:15px;font-style:italic}
-.about-text p strong{color:var(--parchment-dark);font-style:normal}
-.about-stats{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-.about-stat{background:#1e140a;border:1px solid #3a2a14;border-radius:3px;padding:1.2rem;text-align:center}
-.about-stat-val{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:400;color:var(--gold-light)}
-.about-stat-lbl{font-size:12px;color:#5a4a30;margin-top:.25rem;text-transform:uppercase;letter-spacing:.1em;font-family:'Crimson Text',serif}
+.about-section{background:var(--section-alt);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.about-text{font-size:17px;color:var(--ink-mid);line-height:1.9;max-width:660px}
+.about-text p+p{margin-top:1rem}
+.about-text strong{color:var(--ink);font-style:normal}
 
 /* ── FAQ ── */
-.faqs{margin-top:2rem;display:flex;flex-direction:column;gap:1px;border:1px solid #3a2a14;border-radius:3px;overflow:hidden}
-.faq{background:#1e140a;padding:1.2rem 1.5rem;cursor:pointer}
-.faq:hover{background:#241a0e}
-.faq-q{font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--parchment);display:flex;justify-content:space-between;align-items:center;gap:1rem}
-.faq-q::after{content:'＋';color:var(--gold-light);font-size:16px;flex-shrink:0}
+.faq-section{background:var(--page-bg)}
+.faqs{margin-top:2rem;display:flex;flex-direction:column;gap:2px}
+.faq{
+  background:var(--card-bg);border:1px solid var(--border);
+  border-radius:2px;padding:1.2rem 1.5rem;cursor:pointer;
+  transition:background .12s;
+}
+.faq:hover{background:#fdf8ee}
+.faq-q{
+  font-family:'Playfair Display',serif;font-size:16px;
+  font-weight:400;color:var(--ink);
+  display:flex;justify-content:space-between;align-items:center;gap:1rem;
+}
+.faq-q::after{content:'＋';color:var(--gold);font-size:16px;flex-shrink:0}
 .faq.open .faq-q::after{content:'－'}
-.faq-a{font-size:14px;color:#7a6040;line-height:1.7;margin-top:.75rem;display:none;font-style:italic}
+.faq-a{font-size:15px;color:var(--ink-light);line-height:1.8;margin-top:.8rem;display:none;font-style:italic}
 .faq.open .faq-a{display:block}
 
-/* ── BLOG SECTION ── */
-.blog-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.1rem;margin-top:2rem}
-.blog-card{background:#1e140a;border:1px solid #3a2a14;border-radius:3px;padding:1.3rem}
-.blog-cat{font-size:10px;color:var(--gold-light);text-transform:uppercase;letter-spacing:.12em;font-family:'Crimson Text',serif;margin-bottom:.4rem}
-.blog-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:400;color:var(--parchment);margin-bottom:.7rem;line-height:1.4}
-.blog-desc{font-size:13px;color:#7a6040;margin-bottom:.8rem;font-style:italic}
-.blog-read{color:var(--gold-light);font-size:13px;font-style:italic}
-
-/* ── CTA SECTION ── */
-.cta-section{text-align:center;background:radial-gradient(ellipse at 50% 50%,#1e1408 0%,#0a0806 100%);border-top:1px solid #2a1a08}
+/* ── CTA ── */
+.cta-section{
+  background:linear-gradient(160deg,#2c1f0e 0%,#1a1208 100%);
+  text-align:center;border-top:1px solid rgba(196,144,32,.15);
+}
+.cta-section .section-title{color:var(--parchment)}
+.cta-section .section-sub{color:rgba(245,237,216,.55);margin:0 auto 2.5rem}
 
 /* ── FOOTER ── */
-footer{border-top:1px solid #2a1a08;padding:2.5rem 1.5rem;text-align:center;background:#0a0806}
-.footer-inner{max-width:900px;margin:0 auto}
-.footer-logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;font-style:italic;color:var(--parchment);margin-bottom:.75rem}
-.footer-logo span{color:var(--gold-light)}
-.footer-links{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:1.5rem}
-.footer-links a{color:#5a4a30;font-size:13px;font-family:'Crimson Text',serif;transition:color .15s}
-.footer-links a:hover{color:var(--gold-light);text-decoration:none}
-.footer-copy{font-size:12px;color:#3a2a18}
+footer{
+  border-top:1px solid rgba(196,144,32,.2);
+  padding:2.5rem 1.5rem;text-align:center;
+  background:#140f08;
+}
+.footer-inner{max-width:960px;margin:0 auto}
+.footer-logo{
+  font-family:'Playfair Display',serif;font-size:18px;
+  font-weight:400;font-style:italic;color:var(--parchment);margin-bottom:.8rem;
+}
+.footer-logo span{color:var(--gold-bright)}
+.footer-links{display:flex;justify-content:center;gap:22px;flex-wrap:wrap;margin-bottom:1.4rem}
+.footer-links a{color:rgba(245,237,216,.35);font-size:13px;font-family:'Crimson Text',serif;transition:color .15s}
+.footer-links a:hover{color:var(--gold-bright);text-decoration:none}
+.footer-copy{font-size:12px;color:rgba(245,237,216,.18)}
 
 /* ── LEGAL ── */
 .legal-wrap{display:none;max-width:700px;margin:0 auto;padding:3rem 1.5rem}
 .legal-wrap.active{display:block}
-.legal-wrap h1{font-family:'Playfair Display',serif;font-weight:400;font-size:2rem;color:var(--parchment);margin-bottom:.5rem}
-.legal-wrap h2{font-family:'Playfair Display',serif;font-weight:400;font-size:1.2rem;color:var(--parchment-darker);margin:1.5rem 0 .5rem}
-.legal-wrap p{color:#7a6040;font-size:15px;line-height:1.8;margin-bottom:.8rem;font-style:italic}
-.legal-wrap a{color:var(--gold-light)}
-.legal-date{font-size:13px;color:#5a4a30;margin-bottom:1.5rem;font-style:italic}
-.legal-back{display:inline-flex;align-items:center;gap:6px;color:var(--gold-light);font-size:14px;margin-bottom:2rem;cursor:pointer;border:none;background:none;padding:0;font-family:'Crimson Text',serif}
+.legal-wrap h1{font-family:'Playfair Display',serif;font-weight:400;font-size:2rem;color:var(--ink);margin-bottom:.5rem}
+.legal-wrap h2{font-family:'Playfair Display',serif;font-weight:400;font-size:1.2rem;color:var(--ink-mid);margin:1.5rem 0 .5rem}
+.legal-wrap p{color:var(--ink-light);font-size:15px;line-height:1.8;margin-bottom:.8rem;font-style:italic}
+.legal-wrap a{color:var(--gold)}
+.legal-date{font-size:13px;color:var(--ink-light);margin-bottom:1.5rem;font-style:italic}
+.legal-back{display:inline-flex;align-items:center;gap:6px;color:var(--gold);font-size:14px;margin-bottom:2rem;cursor:pointer;border:none;background:none;padding:0;font-family:'Crimson Text',serif}
 
 /* ── ORN ── */
-.orn{color:var(--gold-light);letter-spacing:.4em;opacity:.5;font-size:18px;margin-bottom:1.5rem}
+.orn{color:var(--gold-bright);letter-spacing:.5em;opacity:.5;font-size:16px;margin-bottom:1.8rem}
 
-@media(max-width:640px){.hero{min-height:80vh;padding:3rem 1.25rem}}
+/* ── MOBILE ── */
+@media(max-width:680px){
+  body{font-size:17px}
+  .hero{min-height:88vh;padding:5rem 1.2rem 3rem}
+  section{padding:3.5rem 1.2rem}
+  .games-grid{grid-template-columns:1fr;gap:1.2rem}
+  .hero-cta{flex-direction:column;align-items:center}
+  .btn-primary,.btn-ghost{width:100%;text-align:center;padding:14px 20px}
+  .footer-links{gap:14px}
+}
 </style>
 <script src="/nav.js" defer></script>
 </head>
 <body>
 
-<div id="main-content">
+<div id="main">
 
 <!-- HERO -->
-<section class="hero">
-  <div class="orn">⚔ ✦ ⚔</div>
+<section class="hero" id="hero">
   <div id="t-eyebrow" class="hero-eyebrow"></div>
   <h1 class="hero-title" id="t-title"></h1>
   <p class="hero-sub" id="t-sub"></p>
   <div class="hero-cta">
     <a href="/games.html" class="btn-primary" id="t-cta1"></a>
-    <a href="#how-it-works" class="btn-secondary" id="t-cta2"></a>
+    <a href="#games" class="btn-ghost" id="t-cta2"></a>
   </div>
   <p class="hero-note" id="t-note"></p>
-  <div class="hero-blog">
-    <span style="color:var(--gold-light)">📜 </span>
-    <a href="/blog.html" id="t-blog-link"></a>
-  </div>
-  <div class="preview">
-    <div class="preview-badge" id="t-preview-badge"></div>
-    <div class="preview-cards">
-      <div class="preview-card" id="t-pc1">Battle of Hastings</div>
-      <div class="preview-card" id="t-pc2">Fall of Constantinople</div>
-      <div class="preview-card" id="t-pc3">Black Death reaches Europe</div>
-    </div>
-    <div class="preview-bar"><div class="preview-bar-inner"></div></div>
-    <div class="preview-anchors">
-      <span id="t-anc1">Julius Caesar <strong style="color:var(--gold-light)">44 BC</strong></span>
-      <span id="t-anc2"><strong style="color:var(--gold-light)">1687 AD</strong> Newton's Principia</span>
-    </div>
-  </div>
 </section>
 
 <!-- GAMES -->
-<section class="section-dark">
+<section id="games" style="background:var(--section-alt);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="section-inner">
-    <div class="section-label">Our games</div>
-    <h2 class="section-title" id="t-lbl-how" style="margin-bottom:.4rem"></h2>
+    <div class="section-label" id="t-games-label"></div>
+    <h2 class="section-title" id="t-games-title"></h2>
+    <p class="section-sub" id="t-games-sub"></p>
     <div class="games-grid">
       <a href="/dispatch.html" class="game-card featured">
-        <div class="game-badge">New</div>
-        <div class="game-icon">⚔</div>
+        <div class="game-badge" id="t-new-badge"></div>
+        <span class="game-icon">⚔</span>
         <div class="game-name">Dispatch</div>
-        <div class="game-tag">Historical Decisions</div>
-        <div class="game-desc">You receive the same dispatches as Caesar, Kennedy, Saladin. Five decisions per campaign. No right answers shown until the end. What would you have done?</div>
-        <span class="game-cta">Play →</span>
+        <span class="game-tag" id="t-g1tag"></span>
+        <div class="game-desc" id="t-g1desc"></div>
+        <span class="game-cta" id="t-play"></span>
       </a>
       <a href="/play.html" class="game-card">
-        <div class="game-icon">🧭</div>
+        <span class="game-icon">🧭</span>
         <div class="game-name" id="t-s1t"></div>
-        <div class="game-tag">Timeline placement</div>
+        <span class="game-tag" id="t-g2tag"></span>
         <div class="game-desc" id="t-s1d"></div>
-        <span class="game-cta secondary">Play →</span>
+        <span class="game-cta ghost" id="t-play2"></span>
       </a>
       <a href="/overlap.html" class="game-card">
-        <div class="game-icon">⏳</div>
+        <span class="game-icon">⏳</span>
         <div class="game-name" id="t-s2t"></div>
-        <div class="game-tag">Civilizations quiz</div>
+        <span class="game-tag" id="t-g3tag"></span>
         <div class="game-desc" id="t-s2d"></div>
-        <span class="game-cta secondary">Play →</span>
+        <span class="game-cta ghost" id="t-play3"></span>
       </a>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section id="how-it-works">
-  <div class="section-inner">
-    <div class="section-label" id="t-lbl-diff"></div>
-    <h2 class="section-title" id="t-how-title"></h2>
-    <p class="section-sub" id="t-how-sub"></p>
-    <div class="steps">
-      <div class="step"><div class="step-num">I</div><div class="step-title" id="t-s3t"></div><div class="step-desc" id="t-s3d"></div></div>
-      <div class="step"><div class="step-num">II</div><div class="step-title" id="t-d1name"></div><div class="step-desc" id="t-d1desc"></div></div>
-      <div class="step"><div class="step-num">III</div><div class="step-title" id="t-d2name"></div><div class="step-desc" id="t-d2desc"></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- DIFFICULTY -->
-<section class="section-dark">
-  <div class="section-inner">
-    <div class="section-label" id="t-lbl-about"></div>
-    <h2 class="section-title" id="t-diff-title"></h2>
-    <p class="section-sub" id="t-diff-sub"></p>
-    <div class="diffs">
-      <div class="diff-card">
-        <div class="diff-name">🕯 <span id="t-d1name2"></span></div>
-        <div class="diff-tag" id="t-d1tag"></div>
-        <div class="diff-desc" id="t-d1desc2"></div>
-      </div>
-      <div class="diff-card">
-        <div class="diff-name">⚡ <span id="t-d2name2"></span></div>
-        <div class="diff-tag" id="t-d2tag"></div>
-        <div class="diff-desc" id="t-d2desc2"></div>
-      </div>
-      <div class="diff-card">
-        <div class="diff-name">🏛 <span id="t-d3name"></span></div>
-        <div class="diff-tag" id="t-d3tag"></div>
-        <div class="diff-desc" id="t-d3desc"></div>
-      </div>
     </div>
   </div>
 </section>
 
 <!-- ABOUT -->
-<section id="about">
+<section id="about" class="about-section">
   <div class="section-inner">
-    <div class="section-label"></div>
-    <h2 class="section-title" id="t-aboutTitle"></h2>
-    <div class="about-grid">
-      <div class="about-text" id="t-aboutText"></div>
-      <div class="about-stats">
-        <div class="about-stat"><div class="about-stat-val">∞</div><div class="about-stat-lbl" id="t-stat1"></div></div>
-        <div class="about-stat"><div class="about-stat-val">3000+</div><div class="about-stat-lbl" id="t-stat2"></div></div>
-        <div class="about-stat"><div class="about-stat-val">3</div><div class="about-stat-lbl" id="t-stat3"></div></div>
-        <div class="about-stat"><div class="about-stat-val">4</div><div class="about-stat-lbl" id="t-stat4"></div></div>
-      </div>
-    </div>
+    <div class="section-label" id="t-lbl-about"></div>
+    <h2 class="section-title" id="t-about-title"></h2>
+    <div class="about-text" id="t-about-text"></div>
   </div>
 </section>
 
 <!-- FAQ -->
-<section class="section-dark">
+<section class="faq-section">
   <div class="section-inner">
     <div class="section-label" id="t-lblFaq"></div>
     <h2 class="section-title" id="t-faqTitle"></h2>
-    <div class="faqs" id="faq-list"></div>
-  </div>
-</section>
-
-<!-- BLOG -->
-<section>
-  <div class="section-inner">
-    <div class="section-label">From the archive</div>
-    <h2 class="section-title" id="t-bl-title"></h2>
-    <div class="blog-cards">
-      <div class="blog-card">
-        <div class="blog-cat" id="t-bl1cat"></div>
-        <div class="blog-title" id="t-bl1title"></div>
-        <div class="blog-desc" id="t-bl1desc"></div>
-        <a href="/blog.html" class="blog-read" id="t-read1"></a>
-      </div>
-      <div class="blog-card">
-        <div class="blog-cat" id="t-bl2cat"></div>
-        <div class="blog-title" id="t-bl2title"></div>
-        <div class="blog-desc" id="t-bl2desc"></div>
-        <a href="/misconceptions.html" class="blog-read" id="t-read2"></a>
-      </div>
-      <div class="blog-card">
-        <div class="blog-cat" id="t-bl3cat"></div>
-        <div class="blog-title" id="t-bl3title"></div>
-        <div class="blog-desc" id="t-bl3desc"></div>
-        <a href="/battles.html" class="blog-read" id="t-read3"></a>
-      </div>
-    </div>
+    <div class="faqs" id="t-faqs"></div>
   </div>
 </section>
 
 <!-- CTA -->
 <section class="cta-section">
-  <div class="section-inner" style="text-align:center;padding:1rem 0">
-    <div class="orn">✦</div>
-    <h2 class="section-title" id="t-cta-title" style="margin-bottom:1rem"></h2>
-    <p id="t-cta-sub" style="color:#7a6040;margin-bottom:2rem;font-size:16px;font-style:italic"></p>
-    <a href="/games.html" class="btn-primary" id="t-cta-btn" style="font-size:17px;padding:14px 40px"></a>
+  <div class="section-inner">
+    <div class="orn">⚔ ✦ ⚔</div>
+    <h2 class="section-title" id="t-cta-title"></h2>
+    <p class="section-sub" id="t-cta-sub"></p>
+    <a href="/games.html" class="btn-primary" id="t-cta-btn"></a>
   </div>
 </section>
 
-</div><!-- /main-content -->
+</div><!-- /main -->
 
 <!-- PRIVACY -->
 <div id="privacy" class="legal-wrap">
   <button class="legal-back" onclick="showLegal(null)">← Back</button>
   <h1>Privacy Policy</h1><div class="legal-date">Last updated: April 2026</div>
   <h2>Who we are</h2><p>History Challenger is operated as an independent project. Contact: <a href="mailto:info@historychallenger.com">info@historychallenger.com</a></p>
-  <h2>What data we collect</h2><p>Guests: nothing stored on our servers. We use browser local storage to count guest games.</p><p>Signed-in users: email address, display name, profile picture URL, game scores and session history, play streak and statistics.</p>
-  <h2>How we use your data</h2><p>Solely to provide the game experience. We do not sell your data. We do not use your data for advertising.</p>
-  <h2>Data storage and security</h2><p>Data is stored in Cloudflare's D1 database infrastructure. We use encrypted connections and secure token-based authentication.</p>
-  <h2>Your rights (GDPR)</h2><p>EEA users have the right to access, correct, or delete personal data at any time. Contact <a href="mailto:info@historychallenger.com">info@historychallenger.com</a> — we'll respond within 30 days.</p>
-  <h2>Cookies</h2><p>We use a single authentication token in browser local storage to keep you signed in. No advertising cookies or third-party tracking.</p>
-  <h2>Third-party services</h2><p>Google OAuth for sign-in and Anthropic's Claude API for event generation.</p>
-  <h2>Children</h2><p>Not directed at children under 13.</p>
+  <h2>What data we collect</h2><p>Guests: nothing stored on our servers. Signed-in users: email, display name, profile picture, game scores and session history.</p>
+  <h2>How we use your data</h2><p>Solely to provide the game experience. We do not sell your data or use it for advertising.</p>
+  <h2>Data storage</h2><p>Data is stored in Cloudflare's D1 database infrastructure with encrypted connections.</p>
+  <h2>Your rights (GDPR)</h2><p>EEA users may access, correct, or delete personal data at any time. Contact <a href="mailto:info@historychallenger.com">info@historychallenger.com</a>.</p>
+  <h2>Cookies</h2><p>A single authentication token in browser local storage. No advertising cookies or third-party tracking.</p>
+  <h2>Third-party services</h2><p>Google OAuth for sign-in. Anthropic's Claude API for content generation.</p>
   <h2>Contact</h2><p><a href="mailto:info@historychallenger.com">info@historychallenger.com</a></p>
 </div>
 
@@ -356,13 +359,10 @@ footer{border-top:1px solid #2a1a08;padding:2.5rem 1.5rem;text-align:center;back
   <button class="legal-back" onclick="showLegal(null)">← Back</button>
   <h1>Terms of Service</h1><div class="legal-date">Last updated: April 2026</div>
   <h2>Acceptance</h2><p>By using History Challenger, you agree to these Terms.</p>
-  <h2>The service</h2><p>History Challenger is a free online history quiz game. We reserve the right to modify, suspend, or discontinue any part of the service at any time.</p>
-  <h2>Accounts</h2><p>You may play as a guest without an account. If you sign in, you are responsible for the security of your account.</p>
-  <h2>Acceptable use</h2><p>You agree not to: manipulate scores through technical means; use automated tools; reverse-engineer our AI prompts or systems; use the service for any unlawful purpose.</p>
-  <h2>Content accuracy</h2><p>Historical events are AI-generated and intended to be accurate, but we do not guarantee accuracy.</p>
+  <h2>The service</h2><p>Free online history games. We reserve the right to modify or discontinue any part of the service.</p>
+  <h2>Acceptable use</h2><p>You agree not to manipulate scores, use automated tools, or use the service for any unlawful purpose.</p>
+  <h2>Content accuracy</h2><p>Historical content is AI-generated and intended to be accurate, but we do not guarantee accuracy.</p>
   <h2>Intellectual property</h2><p>The History Challenger name, design, and code are our intellectual property.</p>
-  <h2>Disclaimer</h2><p>The service is provided "as is" without warranties of any kind.</p>
-  <h2>Limitation of liability</h2><p>To the maximum extent permitted by law, we are not liable for any indirect, incidental, or consequential damages.</p>
   <h2>Governing law</h2><p>These terms are governed by the laws of France.</p>
   <h2>Contact</h2><p><a href="mailto:info@historychallenger.com">info@historychallenger.com</a></p>
 </div>
@@ -372,8 +372,7 @@ footer{border-top:1px solid #2a1a08;padding:2.5rem 1.5rem;text-align:center;back
     <div class="footer-logo">History <span>Challenger</span></div>
     <div class="footer-links">
       <a href="#about" id="f-about">About</a>
-      <a href="#how-it-works" id="f-how">How it works</a>
-      <a href="/blog.html">Archive</a>
+      <a href="#games" id="f-how">Games</a>
       <a href="#" onclick="showLegal('privacy');return false" id="f-privacy">Privacy</a>
       <a href="#" onclick="showLegal('terms');return false" id="f-terms">Terms</a>
       <a href="mailto:info@historychallenger.com" id="f-contact">Contact</a>
@@ -387,166 +386,110 @@ const T = {
   en: {
     eyebrow:'Free · No account required · AI-powered',
     title:'How well do you <span>know history?</span>',
-    sub:'Place historical events on a timeline. Score points for getting the right order and the right era. From the Bronze Age to the Cold War — across every civilization.',
-    cta1:"Play now — it's free", cta2:'How it works',
+    sub:'Three games. Every era. Completely free.',
+    cta1:'Choose a game', cta2:'See the games',
     note:'No download · Plays in your browser · Mobile friendly',
-    blogLink:'There is more time between Cleopatra and the pyramids than between Cleopatra and us →',
-    previewBadge:'📜 Drag events onto the timeline',
-    pc1:'Battle of Hastings', pc2:'Fall of Constantinople', pc3:'Black Death reaches Europe',
-    anc1:'Julius Caesar <strong style="color:#c8903a">44 BC</strong>',
-    anc2:'<strong style="color:#c8903a">1687 AD</strong> Newton\'s Principia',
-    lblHow:'Our games', howTitle:'Two games, one shared passion for history',
-    howSub:'Both games are free, powered by AI, and built around the same idea: genuine historical knowledge beats guessing.',
-    s1t:'History Challenger', s1d:'Place 5 historical events on a timeline as accurately as possible. Score points for getting the right order and precise spacing across eras.',
-    s2t:'Did They Overlap?', s2d:'Given a civilization and its era, identify which of four options actually coexisted with it at some point in history. No dates shown until you answer.',
-    s3t:'Three difficulty levels', s3d:'Both games share the same difficulty system — Disciple, Master, and Keeper of Time — with increasing precision and knowledge required at each level.',
-    lblDiff:'Difficulty', diffTitle:'Choose your level',
-    diffSub:'Both games use the same three difficulty levels. The same logic applies — more knowledge required, tighter gaps, fewer obvious eliminations.',
-    d1name:'Disciple', d1tag:'Famous · Forgiving', d1desc:'A real challenge, but any history buff should feel at home. Famous civilizations and events, wide time spans, generous scoring.',
-    d2name:'Master', d2tag:'Mixed eras · Real knowledge', d2desc:'Wrong options are from the same broad era. You need genuine historical knowledge — not just recognition of famous names.',
-    d3name:'Keeper of Time', d3tag:'Expert precision', d3desc:'All options are from roughly the same era. Only precise date knowledge will save you. No easy eliminations.',
-    lblAbout:'About', aboutTitle:'Built for curious minds',
-    aboutText:'<p>We built two history games around a simple idea: genuine historical knowledge beats guessing. No multiple choice tricks, no 50/50 lifelines — just you and what you actually know.</p><p><strong style="color:#ddd">History Challenger</strong> asks you to place events on a timeline with precision. <strong style="color:#ddd">Did They Overlap?</strong> asks whether two civilizations ever coexisted. Different mechanics, same obsession.</p><p>Every game is generated fresh by AI, drawing on the full breadth of human history — from Bronze Age Mesopotamia to the Cold War, across every civilization and continent.</p><p>Free to play. No account required. Sign in to track your scores and streaks across both games.</p>',
-    stat1:'Unique games', stat2:'Years of history', stat3:'Difficulty levels', stat4:'Languages',
+    gamesLabel:'Three games',
+    gamesTitle:'Pick your challenge',
+    gamesSub:'Each game tests a different kind of historical knowledge. All free, all generated fresh by AI.',
+    newBadge:'New',
+    g1tag:'Historical Decisions', g1desc:'You receive the same dispatches as Caesar, Kennedy, Saladin. Five decisions per campaign. No right answers shown until the end. What would you have done?',
+    s1t:'History Challenger', g2tag:'Timeline Placement', s1d:'Place five historical events on a timeline as accurately as possible. Score points for correct order and precise spacing. From the Bronze Age to the Cold War.',
+    s2t:'Did They Overlap?', g3tag:'Civilizations Quiz', s2d:'Given a civilization and its era, which of four options actually coexisted with it? The Assyrians and Carthage? The Han Dynasty and Rome? History is stranger than you think.',
+    play:'Play →',
+    lblAbout:'About',
+    aboutTitle:'Built for people who actually know history',
+    aboutText:'<p>Most history quizzes test recognition, not knowledge. Multiple choice lets you guess. We wanted something harder.</p><p><strong>Dispatch</strong> puts you in the room where history was made — with the same information, the same constraints, and the same uncertainty as the people who were actually there. <strong>History Challenger</strong> asks you to place events on a timeline with precision, not just identify them. <strong>Did They Overlap?</strong> tests whether you understand the shape of time, not just the names.</p><p>Every game is generated fresh by AI. Free to play. No account required — sign in with Google to track scores and streaks.</p>',
     lblFaq:'FAQ', faqTitle:'Questions',
     faqs:[
-      {q:'Is it really free?', a:'Yes. You can play without creating an account. Sign in with Google to save your scores, track streaks, and play unlimited games.'},
-      {q:'How are events generated?', a:"Every game is generated fresh by Claude (Anthropic's AI), drawing on historical knowledge spanning all eras and civilizations."},
-      {q:'Can I choose a historical theme?', a:'Yes — the Theme Challenge mode lets you pick a specific era, region, or topic. Choose from presets like "World War II" or type any custom theme.'},
-      {q:'What languages are supported?', a:'English, French, German, and Spanish. Select your language on the game screen.'},
-      {q:'How is scoring calculated?', a:'40 points for correctly identifying the earliest and most recent events. 60 points for placing the remaining 3 events accurately.'}
+      {q:'Is it really free?', a:'Yes, completely. Play without an account. Sign in with Google to save scores and track streaks.'},
+      {q:'How is the content generated?', a:"Every game is generated fresh by Claude (Anthropic's AI), drawing on the full breadth of human history across all eras and civilizations."},
+      {q:'Can I choose a historical theme?', a:'In History Challenger and Did They Overlap, yes — you can pick an era, region, or topic. Dispatch has 18 curated campaigns across Antiquity, Medieval, and Modern history.'},
+      {q:'What languages are supported?', a:'English, French, German, and Spanish. Select your language on the game screen.'}
     ],
-    lblBlog:'From the blog', blogTitle:'History worth reading',
-    bl1cat:'TIMELINE FACTS', bl1title:'10 Facts That Will Break Your Sense of Time', bl1desc:'Cleopatra lived closer to the Moon landing than to the pyramids.',
-    bl2cat:'HISTORY MYTHS', bl2title:'9 Historical Myths Most People Still Believe', bl2desc:"Napoleon wasn't short. Medieval people knew the Earth was round.",
-    bl3cat:'MILITARY HISTORY', bl3title:'Battles That Changed History But Nobody Talks About', bl3desc:'Cape Ecnomus. Ain Jalut. Khalkhyn Gol. The battles that shaped the world.',
-    read:'Read →',
-    ctaTitle:'Ready to test yourself?', ctaSub:'No signup required. Pick a difficulty and go.', ctaBtn:'Start playing →',
-    navHow:'How it works', navAbout:'About', navBlog:'Blog', navPlay:'Play free →',
-    fAbout:'About', fHow:'How it works', fPrivacy:'Privacy Policy', fTerms:'Terms of Service', fContact:'Contact'
+    ctaTitle:'Ready to find out?', ctaSub:'No signup. No download. Pick a game and go.', ctaBtn:'Start playing →',
+    fAbout:'About', fHow:'Games', fPrivacy:'Privacy', fTerms:'Terms', fContact:'Contact'
   },
   fr: {
     eyebrow:'Gratuit · Sans inscription · Propulsé par IA',
     title:'Connaissez-vous bien <span>l\'histoire ?</span>',
-    sub:"Placez des événements historiques sur une frise chronologique. Marquez des points en trouvant le bon ordre et la bonne époque. De l'Âge du Bronze à la Guerre Froide.",
-    cta1:"Jouer — c'est gratuit", cta2:'Comment ça marche',
+    sub:'Trois jeux. Toutes les époques. Entièrement gratuit.',
+    cta1:'Choisir un jeu', cta2:'Voir les jeux',
     note:'Sans téléchargement · Dans le navigateur · Compatible mobile',
-    blogLink:"Il y a plus de temps entre Cléopâtre et les pyramides qu'entre Cléopâtre et nous →",
-    previewBadge:'📜 Faites glisser les événements',
-    pc1:'Bataille de Hastings', pc2:'Chute de Constantinople', pc3:'La Peste Noire en Europe',
-    anc1:'Jules César <strong style="color:#c8903a">44 av. J.-C.</strong>',
-    anc2:'<strong style="color:#c8903a">1687 ap. J.-C.</strong> Principia de Newton',
-    lblHow:'Nos jeux', howTitle:'Deux jeux, une passion pour l\'histoire',
-    howSub:'Les deux jeux sont gratuits, propulsés par IA, et construits autour d\'une même idée : la vraie connaissance historique bat le hasard.',
-    s1t:'History Challenger', s1d:'Placez 5 événements historiques sur une frise chronologique avec la plus grande précision possible. Points pour le bon ordre et l\'espacement précis.',
-    s2t:'Did They Overlap?', s2d:'Vous recevez une civilisation et son époque. Identifiez laquelle des 4 options a coexisté avec elle. Les dates ne sont révélées qu\'après votre réponse.',
-    s3t:'Trois niveaux de difficulté', s3d:'Les deux jeux partagent le même système : Disciple, Maître et Gardien du Temps. Chaque niveau exige une connaissance plus précise.',
-    lblDiff:'Difficulté', diffTitle:'Choisissez votre niveau',
-    diffSub:'Les deux jeux utilisent les mêmes trois niveaux de difficulté.',
-    d1name:'Disciple', d1tag:'Événements célèbres · Grandes époques', d1desc:'Des événements que tout adulte cultivé reconnaît. Des millénaires d\'écart. Scoring généreux. Parfait pour débuter.',
-    d2name:'Maître', d2tag:'Époques mixtes · Vraies connaissances', d2desc:"Un mélange d'événements groupés et isolés. Il faut de vraies connaissances au-delà des titres Wikipedia.",
-    d3name:'Gardien du Temps', d3tag:'Même époque · Précision experte', d3desc:'Les 5 événements de la même période étroite — même guerre, même règne, même décennie. Expertise uniquement.',
-    lblAbout:'À propos', aboutTitle:'Conçu pour les esprits curieux',
-    aboutText:"<p>History Challenger est né d'une frustration simple : la plupart des quiz d'histoire sont à choix multiples, et le choix multiple permet de deviner. Nous voulions quelque chose qui teste le raisonnement temporel — pas seulement \"reconnaître le nom\" mais \"savoir vraiment quand les choses se sont passées\".</p><p>Chaque partie est générée par IA, couvrant toute l'histoire humaine — de la Mésopotamie à la Guerre Froide, des royaumes européens aux dynasties asiatiques.</p><p>Le jeu adapte son scoring à la période jouée. Des événements sur une décennie ? Les brackets font 1 an de large. Sur 3000 ans ? 100 ans de large.</p><p>Gratuit. Sans inscription pour commencer. Connectez-vous pour suivre vos scores et vos séries.</p>",
-    stat1:'Parties uniques', stat2:"Années d'histoire", stat3:'Niveaux de difficulté', stat4:'Langues',
+    gamesLabel:'Trois jeux',
+    gamesTitle:'Choisissez votre défi',
+    gamesSub:'Chaque jeu teste un type différent de connaissance historique. Tous gratuits, tous générés par IA.',
+    newBadge:'Nouveau',
+    g1tag:'Décisions historiques', g1desc:'Vous recevez les mêmes dépêches que César, Kennedy, Saladin. Cinq décisions par campagne. Aucune bonne réponse révélée avant la fin.',
+    s1t:'History Challenger', g2tag:'Placement chronologique', s1d:'Placez cinq événements historiques sur une frise avec la plus grande précision. Points pour le bon ordre et l\'espacement précis.',
+    s2t:'Did They Overlap?', g3tag:'Quiz civilisations', s2d:'Quelle civilisation a réellement coexisté avec celle donnée ? Les Assyriens et Carthage ? La Chine Han et Rome ?',
+    play:'Jouer →',
+    lblAbout:'À propos',
+    aboutTitle:'Conçu pour ceux qui connaissent vraiment l\'histoire',
+    aboutText:'<p>La plupart des quiz d\'histoire testent la reconnaissance, pas la connaissance. Le choix multiple permet de deviner. Nous voulions quelque chose de plus difficile.</p><p><strong>Dispatch</strong> vous place dans la salle où l\'histoire s\'est faite. <strong>History Challenger</strong> vous demande de placer des événements avec précision. <strong>Did They Overlap?</strong> teste si vous comprenez la forme du temps.</p><p>Chaque jeu est généré par IA. Gratuit. Sans inscription.</p>',
     lblFaq:'FAQ', faqTitle:'Questions',
     faqs:[
-      {q:'Est-ce vraiment gratuit ?', a:"Oui. Vous pouvez jouer sans créer de compte. Connectez-vous avec Google pour sauvegarder vos scores et suivre vos séries."},
-      {q:'Comment les événements sont-ils générés ?', a:"Chaque partie est générée par Claude (l'IA d'Anthropic), couvrant toutes les époques et civilisations."},
-      {q:'Puis-je choisir un thème historique ?', a:'Oui — le mode Thème vous permet de choisir une époque, une région ou un sujet spécifique.'},
-      {q:'Quelles langues sont supportées ?', a:'Anglais, français, allemand et espagnol. Sélectionnez votre langue sur l\'écran de jeu.'},
-      {q:'Comment le score est-il calculé ?', a:'40 points pour identifier les événements les plus anciens et les plus récents. 60 points pour placer les 3 événements restants avec précision.'}
+      {q:'Est-ce vraiment gratuit ?', a:'Oui, complètement. Jouez sans compte. Connectez-vous avec Google pour sauvegarder vos scores.'},
+      {q:'Comment le contenu est-il généré ?', a:'Chaque jeu est généré par Claude (l\'IA d\'Anthropic).'},
+      {q:'Puis-je choisir un thème historique ?', a:'Oui pour History Challenger et Did They Overlap. Dispatch a 18 campagnes dans l\'Antiquité, le Moyen Âge et l\'époque Moderne.'},
+      {q:'Quelles langues sont supportées ?', a:'Anglais, français, allemand et espagnol.'}
     ],
-    lblBlog:'Du blog', blogTitle:"Histoire qui vaut la lecture",
-    bl1cat:'FAITS CHRONOLOGIQUES', bl1title:'10 faits qui vont briser votre sens du temps', bl1desc:"Cléopâtre vivait plus près du débarquement sur la Lune que des pyramides.",
-    bl2cat:'MYTHES HISTORIQUES', bl2title:'9 mythes historiques que la plupart croient encore', bl2desc:"Napoléon n'était pas petit. Les médiévaux savaient que la Terre était ronde.",
-    bl3cat:'HISTOIRE MILITAIRE', bl3title:'Des batailles qui ont changé l\'histoire dont personne ne parle', bl3desc:'Cap Ecnome. Aïn Jalut. Khalkhyn Gol. Les batailles qui ont façonné le monde.',
-    read:'Lire →',
-    ctaTitle:'Prêt à vous tester ?', ctaSub:'Sans inscription. Choisissez une difficulté et commencez.', ctaBtn:'Commencer →',
-    navHow:'Comment jouer', navAbout:'À propos', navBlog:'Blog', navPlay:'Jouer →',
-    fAbout:'À propos', fHow:'Comment jouer', fPrivacy:'Politique de confidentialité', fTerms:"Conditions d'utilisation", fContact:'Contact'
+    ctaTitle:'Prêt à le découvrir ?', ctaSub:'Sans inscription. Choisissez un jeu et commencez.', ctaBtn:'Jouer maintenant →',
+    fAbout:'À propos', fHow:'Jeux', fPrivacy:'Confidentialité', fTerms:'Conditions', fContact:'Contact'
   },
   de: {
     eyebrow:'Kostenlos · Keine Anmeldung · KI-gestützt',
     title:'Wie gut kennen Sie <span>die Geschichte?</span>',
-    sub:'Ordnen Sie historische Ereignisse auf einem Zeitstrahl. Punkte für die richtige Reihenfolge und Epoche. Von der Bronzezeit bis zum Kalten Krieg.',
-    cta1:'Jetzt spielen — kostenlos', cta2:'So funktioniert es',
+    sub:'Drei Spiele. Alle Epochen. Völlig kostenlos.',
+    cta1:'Spiel wählen', cta2:'Spiele ansehen',
     note:'Kein Download · Im Browser · Mobilfreundlich',
-    blogLink:'Zwischen Kleopatra und den Pyramiden liegt mehr Zeit als zwischen Kleopatra und uns →',
-    previewBadge:'📜 Ereignisse auf den Zeitstrahl ziehen',
-    pc1:'Schlacht bei Hastings', pc2:'Fall von Konstantinopel', pc3:'Schwarzer Tod in Europa',
-    anc1:'Julius Caesar <strong style="color:#c8903a">44 v. Chr.</strong>',
-    anc2:'<strong style="color:#c8903a">1687 n. Chr.</strong> Newtons Principia',
-    lblHow:'Unsere Spiele', howTitle:'Zwei Spiele, eine Leidenschaft für Geschichte',
-    howSub:'Beide Spiele sind kostenlos, KI-gestützt und um dieselbe Idee gebaut: echtes historisches Wissen schlägt Raten.',
-    s1t:'History Challenger', s1d:'Platzieren Sie 5 historische Ereignisse so genau wie möglich auf einem Zeitstrahl. Punkte für richtige Reihenfolge und präzisen Abstand.',
-    s2t:'Did They Overlap?', s2d:'Sie erhalten eine Zivilisation und ihre Epoche. Welche der 4 Optionen hat sie tatsächlich überlappt? Daten werden erst nach Ihrer Antwort gezeigt.',
-    s3t:'Drei Schwierigkeitsgrade', s3d:'Beide Spiele teilen dasselbe System — Schüler, Meister und Hüter der Zeit. Jede Stufe erfordert mehr Präzision.',
-    lblDiff:'Schwierigkeit', diffTitle:'Wählen Sie Ihr Niveau',
-    diffSub:'Beide Spiele verwenden dieselben drei Schwierigkeitsgrade.',
-    d1name:'Jünger', d1tag:'Bekannte Ereignisse · Große Zeiträume', d1desc:'Ereignisse, die jeder gebildete Erwachsene kennt. Jahrtausende auseinander. Großzügige Wertung.',
-    d2name:'Meister', d2tag:'Gemischte Epochen · Echtes Wissen', d2desc:'Eine Mischung aus gruppierten und abgelegenen Ereignissen. Echtes historisches Wissen erforderlich.',
-    d3name:'Hüter der Zeit', d3tag:'Gleiche Epoche · Expertengenauigkeit', d3desc:'Alle 5 Ereignisse aus derselben engen Periode — gleicher Krieg, gleiche Herrschaft, gleiche Dekade.',
-    lblAbout:'Über uns', aboutTitle:'Für neugierige Köpfe',
-    aboutText:'<p>History Challenger entstand aus einer einfachen Frustration: Die meisten Geschichtsquizze sind Multiple-Choice, und Multiple-Choice erlaubt Raten. Wir wollten etwas, das echtes zeitliches Denkvermögen testet.</p><p>Jedes Spiel wird frisch von KI generiert und deckt die gesamte Menschheitsgeschichte ab — von der Bronzezeit bis zum Kalten Krieg.</p><p>Das Spiel passt seine Wertung an den gegebenen Zeitraum an. Ereignisse innerhalb einer Dekade? Brackets 1 Jahr breit. Über 3000 Jahre? 100 Jahre breit.</p><p>Kostenlos spielen. Keine Anmeldung erforderlich. Anmelden um Scores zu speichern.</p>',
-    stat1:'Einzigartige Spiele', stat2:'Jahre Geschichte', stat3:'Schwierigkeitsgrade', stat4:'Sprachen',
+    gamesLabel:'Drei Spiele',
+    gamesTitle:'Wählen Sie Ihre Herausforderung',
+    gamesSub:'Jedes Spiel testet eine andere Art historischen Wissens. Alle kostenlos, alle frisch von KI generiert.',
+    newBadge:'Neu',
+    g1tag:'Historische Entscheidungen', g1desc:'Sie erhalten dieselben Depeschen wie Caesar, Kennedy, Saladin. Fünf Entscheidungen pro Kampagne. Keine richtigen Antworten bis zum Ende.',
+    s1t:'History Challenger', g2tag:'Zeitstrahl-Platzierung', s1d:'Platzieren Sie fünf historische Ereignisse auf einem Zeitstrahl. Punkte für richtige Reihenfolge und präzisen Abstand.',
+    s2t:'Did They Overlap?', g3tag:'Zivilisations-Quiz', s2d:'Welche Zivilisation hat tatsächlich mit der gegebenen koexistiert? Die Assyrer und Karthago? Die Han-Dynastie und Rom?',
+    play:'Spielen →',
+    lblAbout:'Über uns',
+    aboutTitle:'Für Menschen, die Geschichte wirklich kennen',
+    aboutText:'<p>Die meisten Geschichtsquizze testen Wiedererkennung, nicht Wissen. Multiple-Choice erlaubt Raten. Wir wollten etwas Schwierigeres.</p><p><strong>Dispatch</strong> versetzt Sie in den Raum, in dem Geschichte gemacht wurde. <strong>History Challenger</strong> testet Präzision. <strong>Did They Overlap?</strong> testet Ihr Zeitgefühl.</p><p>Jedes Spiel wird frisch von KI generiert. Kostenlos. Ohne Anmeldung.</p>',
     lblFaq:'FAQ', faqTitle:'Häufige Fragen',
     faqs:[
-      {q:'Ist es wirklich kostenlos?', a:'Ja. Sie können ohne Konto spielen. Mit Google anmelden um Scores zu speichern.'},
-      {q:'Wie werden Ereignisse generiert?', a:'Jedes Spiel wird frisch von Claude (Anthropics KI) generiert.'},
-      {q:'Kann ich ein historisches Thema wählen?', a:'Ja — der Themen-Modus ermöglicht die Wahl einer Epoche, Region oder eines Themas.'},
-      {q:'Welche Sprachen werden unterstützt?', a:'Englisch, Französisch, Deutsch und Spanisch.'},
-      {q:'Wie wird der Score berechnet?', a:'40 Punkte für die ältesten und neuesten Ereignisse. 60 Punkte für die genaue Platzierung der restlichen 3.'}
+      {q:'Ist es wirklich kostenlos?', a:'Ja. Spielen Sie ohne Konto. Mit Google anmelden um Scores zu speichern.'},
+      {q:'Wie wird der Inhalt generiert?', a:'Jedes Spiel wird von Claude (Anthropics KI) generiert.'},
+      {q:'Kann ich ein historisches Thema wählen?', a:'Ja für History Challenger und Did They Overlap. Dispatch hat 18 kuratierte Kampagnen.'},
+      {q:'Welche Sprachen werden unterstützt?', a:'Englisch, Französisch, Deutsch und Spanisch.'}
     ],
-    lblBlog:'Aus dem Blog', blogTitle:'Geschichte, die es wert ist zu lesen',
-    bl1cat:'ZEITLEISTEN-FAKTEN', bl1title:'10 Fakten, die Ihr Zeitgefühl brechen', bl1desc:'Kleopatra lebte der Mondlandung näher als den Pyramiden.',
-    bl2cat:'HISTORISCHE MYTHEN', bl2title:'9 Historische Mythen, die die meisten noch glauben', bl2desc:'Napoleon war nicht klein. Mittelalterliche Menschen wussten, dass die Erde rund ist.',
-    bl3cat:'MILITÄRGESCHICHTE', bl3title:'Schlachten, die Geschichte veränderten, über die niemand spricht', bl3desc:'Kap Eknomos. Ain Jalut. Chalchin Gol. Die Schlachten, die die Welt geprägt haben.',
-    read:'Lesen →',
-    ctaTitle:'Bereit, sich zu testen?', ctaSub:'Keine Anmeldung. Schwierigkeit wählen und loslegen.', ctaBtn:'Jetzt starten →',
-    navHow:'So funktioniert es', navAbout:'Über uns', navBlog:'Blog', navPlay:'Spielen →',
-    fAbout:'Über uns', fHow:'So funktioniert es', fPrivacy:'Datenschutz', fTerms:'Nutzungsbedingungen', fContact:'Kontakt'
+    ctaTitle:'Bereit es herauszufinden?', ctaSub:'Keine Anmeldung. Kein Download. Spiel wählen und loslegen.', ctaBtn:'Jetzt spielen →',
+    fAbout:'Über uns', fHow:'Spiele', fPrivacy:'Datenschutz', fTerms:'Nutzungsbedingungen', fContact:'Kontakt'
   },
   es: {
     eyebrow:'Gratis · Sin registro · Con IA',
     title:'¿Cuánto sabes de <span>historia?</span>',
-    sub:'Coloca eventos históricos en una línea del tiempo. Gana puntos por el orden correcto y la época correcta. Del Bronce a la Guerra Fría.',
-    cta1:'Jugar — es gratis', cta2:'Cómo funciona',
+    sub:'Tres juegos. Todas las épocas. Completamente gratis.',
+    cta1:'Elegir un juego', cta2:'Ver los juegos',
     note:'Sin descarga · En el navegador · Compatible con móvil',
-    blogLink:'Hay más tiempo entre Cleopatra y las pirámides que entre Cleopatra y nosotros →',
-    previewBadge:'📜 Arrastra eventos a la línea del tiempo',
-    pc1:'Batalla de Hastings', pc2:'Caída de Constantinopla', pc3:'La Peste Negra en Europa',
-    anc1:'Julio César <strong style="color:#c8903a">44 a.C.</strong>',
-    anc2:'<strong style="color:#c8903a">1687 d.C.</strong> Principia de Newton',
-    lblHow:'Nuestros juegos', howTitle:'Dos juegos, una pasión por la historia',
-    howSub:'Ambos juegos son gratuitos, impulsados por IA y construidos alrededor de la misma idea: el conocimiento histórico real supera a adivinar.',
-    s1t:'History Challenger', s1d:'Coloca 5 eventos históricos en una línea de tiempo con la mayor precisión posible. Puntos por el orden correcto y el espaciado preciso.',
-    s2t:'Did They Overlap?', s2d:'Se te da una civilización y su época. ¿Cuál de las 4 opciones coexistió con ella? Las fechas solo se revelan después de responder.',
-    s3t:'Tres niveles de dificultad', s3d:'Ambos juegos comparten el mismo sistema: Discípulo, Maestro y Guardián del Tiempo. Cada nivel exige mayor precisión.',
-    lblDiff:'Dificultad', diffTitle:'Elige tu nivel',
-    diffSub:'Ambos juegos usan los mismos tres niveles de dificultad.',
-    d1name:'Discípulo', d1tag:'Eventos famosos · Grandes períodos', d1desc:'Eventos que cualquier adulto educado reconocería. Abarca miles de años. Puntuación generosa.',
-    d2name:'Maestro', d2tag:'Épocas mixtas · Conocimiento real', d2desc:'Una mezcla de eventos agrupados y aislados. Necesitarás conocimiento genuino más allá de los titulares.',
-    d3name:'Guardián del Tiempo', d3tag:'Misma época · Precisión experta', d3desc:'Los 5 eventos del mismo período — misma guerra, mismo reinado, misma década. Solo expertos.',
-    lblAbout:'Acerca de', aboutTitle:'Construido para mentes curiosas',
-    aboutText:'<p>History Challenger nació de una frustración simple: la mayoría de los cuestionarios de historia son de opción múltiple, y la opción múltiple permite adivinar. Queríamos algo que probara el razonamiento temporal genuino.</p><p>Cada partida es generada por IA, cubriendo toda la historia humana — desde la Mesopotamia de la Edad del Bronce hasta la Guerra Fría.</p><p>El juego adapta su puntuación al período dado. ¿Eventos en una sola década? Los brackets miden 1 año. ¿3000 años? Miden 100 años.</p><p>Gratis. Sin registro para empezar. Inicia sesión para seguir tus puntuaciones.</p>',
-    stat1:'Partidas únicas', stat2:'Años de historia', stat3:'Niveles de dificultad', stat4:'Idiomas',
+    gamesLabel:'Tres juegos',
+    gamesTitle:'Elige tu desafío',
+    gamesSub:'Cada juego prueba un tipo diferente de conocimiento histórico. Todos gratuitos, todos generados por IA.',
+    newBadge:'Nuevo',
+    g1tag:'Decisiones históricas', g1desc:'Recibes los mismos despachos que César, Kennedy, Saladino. Cinco decisiones por campaña. Sin respuestas correctas hasta el final.',
+    s1t:'History Challenger', g2tag:'Línea del tiempo', s1d:'Coloca cinco eventos históricos en una línea del tiempo con la mayor precisión posible. Puntos por orden correcto y espaciado preciso.',
+    s2t:'Did They Overlap?', g3tag:'Quiz de civilizaciones', s2d:'¿Qué civilización coexistió realmente con la dada? ¿Los asirios y Cartago? ¿La dinastía Han y Roma?',
+    play:'Jugar →',
+    lblAbout:'Acerca de',
+    aboutTitle:'Construido para quienes realmente conocen la historia',
+    aboutText:'<p>La mayoría de los cuestionarios de historia prueban el reconocimiento, no el conocimiento. La opción múltiple permite adivinar. Queríamos algo más difícil.</p><p><strong>Dispatch</strong> te coloca en la sala donde se hizo la historia. <strong>History Challenger</strong> prueba la precisión. <strong>Did They Overlap?</strong> prueba tu comprensión del tiempo.</p><p>Cada juego es generado por IA. Gratis. Sin registro.</p>',
     lblFaq:'FAQ', faqTitle:'Preguntas',
     faqs:[
-      {q:'¿Es realmente gratis?', a:'Sí. Puedes jugar sin crear una cuenta. Inicia sesión con Google para guardar tus puntuaciones.'},
-      {q:'¿Cómo se generan los eventos?', a:'Cada partida es generada por Claude (la IA de Anthropic), cubriendo todas las épocas y civilizaciones.'},
-      {q:'¿Puedo elegir un tema histórico?', a:'Sí — el modo Tema te permite elegir una época, región o tema específico.'},
-      {q:'¿Qué idiomas están disponibles?', a:'Inglés, francés, alemán y español.'},
-      {q:'¿Cómo se calcula la puntuación?', a:'40 puntos por identificar los eventos más antiguos y recientes. 60 puntos por colocar los 3 eventos restantes con precisión.'}
+      {q:'¿Es realmente gratis?', a:'Sí. Juega sin cuenta. Inicia sesión con Google para guardar puntuaciones.'},
+      {q:'¿Cómo se genera el contenido?', a:'Cada juego es generado por Claude (la IA de Anthropic).'},
+      {q:'¿Puedo elegir un tema histórico?', a:'Sí para History Challenger y Did They Overlap. Dispatch tiene 18 campañas curadas.'},
+      {q:'¿Qué idiomas están disponibles?', a:'Inglés, francés, alemán y español.'}
     ],
-    lblBlog:'Del blog', blogTitle:'Historia que vale la pena leer',
-    bl1cat:'HECHOS CRONOLÓGICOS', bl1title:'10 hechos que romperán tu sentido del tiempo', bl1desc:'Cleopatra vivió más cerca del alunizaje que de las pirámides.',
-    bl2cat:'MITOS HISTÓRICOS', bl2title:'9 mitos históricos que la mayoría aún cree', bl2desc:'Napoleón no era bajo. La gente medieval sabía que la Tierra era redonda.',
-    bl3cat:'HISTORIA MILITAR', bl3title:'Batallas que cambiaron la historia de las que nadie habla', bl3desc:'Cabo Ecnomo. Ain Yalut. Jaljin Gol. Las batallas que moldearon el mundo.',
-    read:'Leer →',
-    ctaTitle:'¿Listo para ponerte a prueba?', ctaSub:'Sin registro. Elige dificultad y empieza.', ctaBtn:'Empezar →',
-    navHow:'Cómo funciona', navAbout:'Acerca de', navBlog:'Blog', navPlay:'Jugar →',
-    fAbout:'Acerca de', fHow:'Cómo funciona', fPrivacy:'Privacidad', fTerms:'Términos de uso', fContact:'Contacto'
+    ctaTitle:'¿Listo para descubrirlo?', ctaSub:'Sin registro. Sin descarga. Elige un juego y empieza.', ctaBtn:'Empezar →',
+    fAbout:'Acerca de', fHow:'Juegos', fPrivacy:'Privacidad', fTerms:'Términos', fContact:'Contacto'
   }
 };
 
@@ -559,63 +502,42 @@ function applyLang(){
   const t = T[_lang] || T.en;
   s('t-eyebrow', t.eyebrow);
   s('t-title', t.title);
-  s('t-sub', t.sub);
-  st('t-cta1', t.cta1);
-  st('t-cta2', t.cta2);
+  st('t-sub', t.sub);
+  st('t-cta1', t.cta1); st('t-cta2', t.cta2);
   st('t-note', t.note);
-  s('t-blog-link', t.blogLink);
-  st('t-preview-badge', t.previewBadge);
-  s('t-pc1', t.pc1); s('t-pc2', t.pc2); s('t-pc3', t.pc3);
-  s('t-anc1', t.anc1); s('t-anc2', t.anc2);
-  st('t-lbl-how', t.lblHow); s('t-how-title', t.howTitle); s('t-how-sub', t.howSub);
-  st('t-s1t', t.s1t); st('t-s1d', t.s1d);
-  st('t-s2t', t.s2t); st('t-s2d', t.s2d);
-  st('t-s3t', t.s3t); st('t-s3d', t.s3d);
-  st('t-lbl-diff', t.lblDiff); s('t-diff-title', t.diffTitle); s('t-diff-sub', t.diffSub);
-  st('t-d1name', t.d1name); st('t-d1tag', t.d1tag); st('t-d1desc', t.d1desc);
-  st('t-d2name', t.d2name); st('t-d2tag', t.d2tag); st('t-d2desc', t.d2desc);
-  st('t-d3name', t.d3name); st('t-d3tag', t.d3tag); st('t-d3desc', t.d3desc);
-  st('t-lbl-about', t.lblAbout); st('t-about-title', t.aboutTitle);
+  st('t-games-label', t.gamesLabel);
+  st('t-games-title', t.gamesTitle);
+  st('t-games-sub', t.gamesSub);
+  st('t-new-badge', t.newBadge);
+  st('t-g1tag', t.g1tag); st('t-g1desc', t.g1desc);
+  st('t-s1t', t.s1t); st('t-g2tag', t.g2tag); st('t-s1d', t.s1d);
+  st('t-s2t', t.s2t); st('t-g3tag', t.g3tag); st('t-s2d', t.s2d);
+  st('t-play', t.play); st('t-play2', t.play); st('t-play3', t.play);
+  st('t-lbl-about', t.lblAbout);
+  st('t-about-title', t.aboutTitle);
   s('t-about-text', t.aboutText);
-  st('t-stat1', t.stat1); st('t-stat2', t.stat2); st('t-stat3', t.stat3); st('t-stat4', t.stat4);
-  st('t-lbl-faq', t.lblFaq); st('t-faq-title', t.faqTitle);
+  st('t-lblFaq', t.lblFaq); st('t-faqTitle', t.faqTitle);
   document.getElementById('t-faqs').innerHTML = t.faqs.map(f=>`
     <div class="faq" onclick="this.classList.toggle('open')">
       <div class="faq-q">${f.q}</div>
       <div class="faq-a">${f.a}</div>
     </div>`).join('');
-  st('t-lbl-blog', t.lblBlog); st('t-blog-title', t.blogTitle);
-  st('t-bl1cat', t.bl1cat); st('t-bl1title', t.bl1title); st('t-bl1desc', t.bl1desc);
-  st('t-bl2cat', t.bl2cat); st('t-bl2title', t.bl2title); st('t-bl2desc', t.bl2desc);
-  st('t-bl3cat', t.bl3cat); st('t-bl3title', t.bl3title); st('t-bl3desc', t.bl3desc);
-  st('t-read', t.read); st('t-read2', t.read); st('t-read3', t.read);
   st('t-cta-title', t.ctaTitle); st('t-cta-sub', t.ctaSub); st('t-cta-btn', t.ctaBtn);
-  st('nav-how', t.navHow); st('nav-about', t.navAbout); st('nav-blog', t.navBlog); st('nav-play', t.navPlay);
-  st('f-about', t.fAbout); st('f-how', t.fHow); st('f-privacy', t.fPrivacy); st('f-terms', t.fTerms); st('f-contact', t.fContact);
-  document.getElementById('site-lang').value = _lang;
+  st('f-about', t.fAbout); st('f-how', t.fHow);
+  st('f-privacy', t.fPrivacy); st('f-terms', t.fTerms); st('f-contact', t.fContact);
   document.documentElement.lang = _lang;
 }
 
-function setLang(l){
-  _lang = l;
-  localStorage.setItem('hc_lang', l);
-  applyLang();
-}
+function setLang(l){ _lang=l; localStorage.setItem('hc_lang',l); applyLang(); }
 
 function showLegal(page){
   document.getElementById('main').style.display = page ? 'none' : 'block';
-  document.getElementById('privacy').className = 'legal-wrap' + (page==='privacy' ? ' active' : '');
-  document.getElementById('terms').className = 'legal-wrap' + (page==='terms' ? ' active' : '');
+  document.getElementById('privacy').className = 'legal-wrap'+(page==='privacy'?' active':'');
+  document.getElementById('terms').className = 'legal-wrap'+(page==='terms'?' active':'');
   window.scrollTo(0,0);
 }
 
 applyLang();
-
-function navSignIn(){
-  const p=new URLSearchParams({client_id:"413171729958-s5kimtsskjsfsu45ao1ah0gob8f4ghn9.apps.googleusercontent.com",redirect_uri:"https://historychallenger.com/auth-callback.html",response_type:"code",scope:"openid email profile",access_type:"offline",prompt:"select_account",state:"/"});
-  window.location.href="https://accounts.google.com/o/oauth2/v2/auth?"+p;
-}
 </script>
-
 </body>
 </html>
