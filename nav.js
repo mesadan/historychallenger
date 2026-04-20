@@ -172,7 +172,7 @@ async function init(){
     const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({action:'verify_token',token})});
     const d=await res.json();
-    if(d.valid&&d.user)render(d.user);
+    if(d.user)render(d.user);
     else{localStorage.removeItem('hc_token');render(null);}
   }catch{render(null);}
 }

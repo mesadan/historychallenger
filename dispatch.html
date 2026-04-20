@@ -331,6 +331,7 @@ async function loadCampaign(id){
       const parsed = typeof camp.data==='string' ? JSON.parse(camp.data) : camp.data;
       currentCampaign = {...camp, ...parsed};
       startGame();
+      setTimeout(()=>document.getElementById('s-game').scrollIntoView({behavior:'smooth',block:'start'}),100);
     } else {
       listEl.innerHTML = '<div class="camp-error">Could not load campaign. Please try again.</div>';
     }
