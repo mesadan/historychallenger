@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Which Historical Leader Are You? — History Challenger</title>
-<meta name="description" content="25 decisions. No dates, no names. Discover which historical leader you think like — Caesar, Lincoln, Saladin, Napoleon, Bismarck, Genghis Khan, or Wu Zetian.">
+<meta name="description" content="25 decisions. No dates, no names. Discover which historical leader you think like — Caesar, Lincoln, Napoleon, Bismarck, Genghis Khan, Shaka Zulu, or Margaret Thatcher.">
 <meta property="og:title" content="Which Historical Leader Are You?">
 <meta property="og:description" content="25 decisions. No dates, no names. Discover which historical leader you think like.">
 <meta property="og:type" content="website">
@@ -89,9 +89,21 @@ a{color:#c8903a;text-decoration:none}
   padding:2rem;margin-bottom:1.5rem;text-align:center;
 }
 .result-eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#c8903a;opacity:.8;font-family:'Crimson Text',serif;margin-bottom:.75rem;display:block}
+.result-portrait-wrap{margin:.25rem auto 1.25rem;width:140px;height:140px;border-radius:50%;overflow:hidden;border:2px solid #3a2a14;background:#1a150e;position:relative}
+.result-portrait{width:100%;height:100%;object-fit:cover;display:block}
+.result-portrait-caption{font-size:11px;color:#6a5a40;font-style:italic;margin-top:.5rem;margin-bottom:1rem}
 .result-name{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);font-weight:400;color:#f0e8d8;margin-bottom:.4rem}
 .result-era{font-size:14px;color:#9a8060;font-style:italic;margin-bottom:1.25rem}
 .result-summary{font-size:16px;color:#c8b898;line-height:1.8;font-style:italic;max-width:520px;margin:0 auto}
+
+.result-match-pct{margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid #2a1e0e}
+.result-match-pct-num{font-family:'Playfair Display',serif;font-size:2.4rem;color:#c8903a;font-weight:400;line-height:1}
+.result-match-pct-label{font-size:12px;color:#9a8060;letter-spacing:.15em;text-transform:uppercase;font-family:'Crimson Text',serif;margin-top:.35rem}
+
+.bio-wrap{background:#111008;border:1px solid #2a1e0e;border-radius:4px;padding:1.75rem;margin-bottom:1.5rem}
+.bio-title{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#9a8060;font-family:'Crimson Text',serif;margin-bottom:1rem}
+.bio-text{font-size:15px;color:#c8b898;line-height:1.8;font-family:'Crimson Text',Georgia,serif}
+.bio-text strong{color:#f0e8d8;font-weight:600}
 
 .chart-wrap{background:#111008;border:1px solid #2a1e0e;border-radius:4px;padding:1.75rem;margin-bottom:1.5rem}
 .chart-title{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#9a8060;font-family:'Crimson Text',serif;margin-bottom:1.25rem;text-align:center}
@@ -176,9 +188,22 @@ a{color:#c8903a;text-decoration:none}
   <div class="result-wrap" id="result-wrap">
     <div class="result-match">
       <span class="result-eyebrow">Your historical profile</span>
+      <div class="result-portrait-wrap">
+        <img class="result-portrait" id="result-portrait" src="" alt="">
+      </div>
       <div class="result-name" id="result-name"></div>
       <div class="result-era" id="result-era"></div>
+      <div class="result-portrait-caption" id="result-portrait-caption"></div>
       <div class="result-summary" id="result-summary"></div>
+      <div class="result-match-pct">
+        <div class="result-match-pct-num" id="result-match-pct-num">0%</div>
+        <div class="result-match-pct-label">trait similarity</div>
+      </div>
+    </div>
+
+    <div class="bio-wrap">
+      <div class="bio-title">Who they were</div>
+      <div class="bio-text" id="result-bio"></div>
     </div>
 
     <div class="chart-wrap">
@@ -232,6 +257,54 @@ const TRAIT_LABELS = {
   risk_appetite: 'Risk appetite',
   institutional_power: 'Institutional power'
 };
+
+// Portrait mapping: leader_key -> {src, caption}
+// All images should live at /images/leaders/<key>.jpg
+const PORTRAITS = {
+  caesar:   { src: '/images/leaders/caesar.jpg',   caption: 'Tusculum bust, 1st century BC' },
+  lincoln:  { src: '/images/leaders/lincoln.jpg',  caption: 'Alexander Gardner, 1863' },
+  napoleon: { src: '/images/leaders/napoleon.jpg', caption: 'Jacques-Louis David, 1812' },
+  bismarck: { src: '/images/leaders/bismarck.jpg', caption: 'Franz von Lenbach, c.1890' },
+  genghis:  { src: '/images/leaders/genghis.jpg',  caption: 'National Palace Museum, 14th c.' },
+  shaka:    { src: '/images/leaders/shaka.jpg',    caption: 'James King, 1824' },
+  thatcher: { src: '/images/leaders/thatcher.jpg', caption: 'Chris Collins, 1983' }
+};
+
+// Compute similarity between the user's implicit trait profile (derived from their picks)
+// and each leader's trait profile. Returns 0-100.
+function traitSimilarity(userTraits, leaderTraits) {
+  const keys = Object.keys(TRAIT_LABELS);
+  let sumSq = 0;
+  for (const k of keys) {
+    const u = userTraits[k] || 0;
+    const l = leaderTraits[k] || 0;
+    const diff = u - l;
+    sumSq += diff * diff;
+  }
+  // Max possible distance: each of 6 axes can differ by 10, so maxDist = sqrt(6*100) = ~24.49
+  const dist = Math.sqrt(sumSq);
+  const maxDist = Math.sqrt(keys.length * 100);
+  return Math.max(0, Math.round((1 - dist / maxDist) * 100));
+}
+
+// Build the user's implicit trait profile by averaging the trait scores of the leaders
+// they picked across all answered questions.
+function buildUserTraits() {
+  const keys = Object.keys(TRAIT_LABELS);
+  const sums = {}; keys.forEach(k => sums[k] = 0);
+  let count = 0;
+  for (const qid in _answers) {
+    const leaderKey = _answers[qid];
+    const leader = _leaders[leaderKey];
+    if (!leader) continue;
+    const traits = typeof leader.traits === 'string' ? JSON.parse(leader.traits) : leader.traits;
+    keys.forEach(k => { sums[k] += (traits[k] || 0); });
+    count++;
+  }
+  const avg = {};
+  keys.forEach(k => { avg[k] = count > 0 ? sums[k] / count : 0; });
+  return avg;
+}
 
 // ── LOAD ───────────────────────────────────────────────────────────────────────
 async function loadData() {
@@ -356,26 +429,72 @@ function showResults() {
   show('loading-wrap');
 
   setTimeout(() => {
-    // Find top leader
     const answered = Object.values(_answers).length;
-    const sorted = Object.entries(_scores)
-      .sort((a, b) => b[1] - a[1]);
+    const userTraits = buildUserTraits();
 
-    const topKey = sorted[0][0];
-    const topLeader = _leaders[topKey];
+    // Build a ranked list using hybrid score:
+    //   primary: pick count (how often this leader's answer was chosen)
+    //   tiebreaker / refinement: trait similarity to user's implicit profile
+    // We sort by a combined score that favours pick count but uses similarity to break ties
+    // and to surface leaders you aligned with traitwise even when pick count was close.
+    const ranked = Object.keys(_leaders).map(key => {
+      const leader = _leaders[key];
+      const traits = typeof leader.traits === 'string' ? JSON.parse(leader.traits) : leader.traits;
+      const picks = _scores[key] || 0;
+      const sim = traitSimilarity(userTraits, traits); // 0-100
+      // combined: pick count weighted ~65%, trait similarity ~35%
+      // normalise picks to a 0-100 scale based on max possible (answered)
+      const pickPct = answered > 0 ? (picks / answered) * 100 : 0;
+      const combined = 0.65 * pickPct + 0.35 * sim;
+      return { key, leader, picks, pickPct, sim, combined };
+    }).sort((a, b) => b.combined - a.combined);
 
-    // Show result
+    const top = ranked[0];
+    const topLeader = top.leader;
+
     show('result-wrap');
+
+    // Portrait
+    const portrait = PORTRAITS[top.key];
+    const imgEl = document.getElementById('result-portrait');
+    const capEl = document.getElementById('result-portrait-caption');
+    if (portrait) {
+      imgEl.src = portrait.src;
+      imgEl.alt = topLeader.name;
+      imgEl.onerror = () => {
+        // Hide portrait wrap if image fails to load
+        imgEl.parentElement.style.display = 'none';
+        capEl.style.display = 'none';
+      };
+      capEl.textContent = portrait.caption;
+    } else {
+      imgEl.parentElement.style.display = 'none';
+      capEl.style.display = 'none';
+    }
+
     document.getElementById('result-name').textContent = topLeader.name;
     document.getElementById('result-era').textContent = topLeader.era;
     document.getElementById('result-summary').textContent = topLeader.summary;
+    document.getElementById('result-match-pct-num').textContent = Math.round(top.sim) + '%';
 
+    // Bio
+    const bioEl = document.getElementById('result-bio');
+    if (topLeader.bio) {
+      // Bold the cue phrases: "Famous for:", "Controversial because:", "Today"
+      const bioText = topLeader.bio
+        .replace(/Famous for:/g, '<strong>Famous for:</strong>')
+        .replace(/Controversial because:/g, '<strong>Controversial because:</strong>')
+        .replace(/\bToday (he|she|he's|she's)/g, '<strong>Today $1</strong>');
+      bioEl.innerHTML = bioText;
+    } else {
+      bioEl.parentElement.style.display = 'none';
+    }
 
-    // Scores grid
-    renderScoresGrid(sorted, answered);
+    // Scores grid (now uses trait similarity per leader)
+    renderScoresGrid(ranked);
 
     // Radar chart
-    renderRadarChart(sorted, answered);
+    renderRadarChart(ranked);
 
     // Trait bars (top leader's profile)
     const traits = typeof topLeader.traits === 'string'
@@ -385,23 +504,21 @@ function showResults() {
   }, 1800);
 }
 
-function renderScoresGrid(sorted, answered) {
+function renderScoresGrid(ranked) {
   const el = document.getElementById('scores-grid');
-  el.innerHTML = sorted.map(([key, count], i) => {
-    const leader = _leaders[key];
-    const pct = answered > 0 ? Math.round((count / answered) * 100) : 0;
+  el.innerHTML = ranked.map((r, i) => {
     return `<div class="score-card${i===0?' top':''}">
-      <div class="score-pct">${pct}%</div>
-      <div class="score-name">${leader ? leader.name : key}</div>
+      <div class="score-pct">${Math.round(r.sim)}%</div>
+      <div class="score-name">${r.leader ? r.leader.name : r.key}</div>
     </div>`;
   }).join('');
 }
 
-function renderRadarChart(sorted, answered) {
+function renderRadarChart(ranked) {
   const ctx = document.getElementById('radar-chart').getContext('2d');
 
   // Show top 4 leaders on radar
-  const top4 = sorted.slice(0, 4);
+  const top4 = ranked.slice(0, 4);
   const labels = Object.keys(TRAIT_LABELS).map(k => TRAIT_LABELS[k]);
 
   const colors = [
@@ -411,8 +528,8 @@ function renderRadarChart(sorted, answered) {
     { border: '#907860', bg: 'rgba(144,120,96,0.08)' }
   ];
 
-  const datasets = top4.map(([key, count], i) => {
-    const leader = _leaders[key];
+  const datasets = top4.map((r, i) => {
+    const leader = r.leader;
     const traits = typeof leader.traits === 'string'
       ? JSON.parse(leader.traits) : leader.traits;
     const data = Object.keys(TRAIT_LABELS).map(k => traits[k] || 0);
@@ -486,11 +603,23 @@ function renderTraitBars(traits) {
 
 // ── SHARE ─────────────────────────────────────────────────────────────────────
 function shareResult() {
-  const sorted = Object.entries(_scores).sort((a,b) => b[1]-a[1]);
-  const topKey = sorted[0][0];
-  const leader = _leaders[topKey];
   const answered = Object.values(_answers).length;
-  const pct = Math.round((_scores[topKey] / answered) * 100);
+  const userTraits = buildUserTraits();
+
+  // Same ranking logic as showResults
+  const ranked = Object.keys(_leaders).map(key => {
+    const leader = _leaders[key];
+    const traits = typeof leader.traits === 'string' ? JSON.parse(leader.traits) : leader.traits;
+    const picks = _scores[key] || 0;
+    const sim = traitSimilarity(userTraits, traits);
+    const pickPct = answered > 0 ? (picks / answered) * 100 : 0;
+    const combined = 0.65 * pickPct + 0.35 * sim;
+    return { key, leader, sim, combined };
+  }).sort((a, b) => b.combined - a.combined);
+
+  const top = ranked[0];
+  const leader = top.leader;
+  const pct = Math.round(top.sim);
 
   const text = `I think like ${leader.name} (${pct}% match) — History Challenger's decision profile test. 25 decisions, no dates, no names.\nhttps://historychallenger.com/persona.html`;
 
