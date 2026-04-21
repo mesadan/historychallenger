@@ -215,20 +215,29 @@ const WORKER='https://histroychallenger-api.maletethan.workers.dev';
 let running=false;
 let ADMIN_KEY='';
 
-function checkPw(){
-  const pw=document.getElementById('pw').value;
-  if(pw.length>=8){
-    ADMIN_KEY=pw;
-    document.getElementById('gate').style.display='none';
-    // Auto-load dashboard on login
-    loadDashboard();
-    switchTabByName('dashboard');
-  } else {
-    document.getElementById('pw-err').style.display='block';
-    document.getElementById('pw-err').textContent='Key must be at least 8 characters';
-    document.getElementById('pw').value='';
-    document.getElementById('pw').focus();
+async function checkPw(){
+  const pw=document.getElementById('pw').value.trim();
+  const errEl=document.getElementById('pw-err');
+  const btn=document.querySelector('#gate button');
+  if(!pw){errEl.textContent='Enter your admin key';errEl.style.display='block';return;}
+  btn.disabled=true; btn.textContent='Checking…'; errEl.style.display='none';
+  try{
+    const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'get_stats',admin_key:pw})});
+    const d=await res.json();
+    if(d.error){
+      errEl.textContent='Wrong key';errEl.style.display='block';
+      document.getElementById('pw').value='';document.getElementById('pw').focus();
+    } else {
+      ADMIN_KEY=pw;
+      document.getElementById('gate').style.display='none';
+      loadDashboard();
+      switchTabByName('dashboard');
+    }
+  }catch(e){
+    errEl.textContent='Network error — try again';errEl.style.display='block';
   }
+  btn.disabled=false; btn.textContent='Enter';
 }
 
 function switchTabByName(name){
