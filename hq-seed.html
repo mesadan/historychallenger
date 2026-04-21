@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HQ Seed — Admin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a0a;color:#ddd;min-height:100vh;padding:2rem 1.5rem}
+h1{font-family:Georgia,serif;font-size:1.4rem;color:#c8903a;margin-bottom:1.5rem}
+h2{font-size:13px;color:#888;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem}
+.card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:12px;padding:1.25rem;margin-bottom:1.25rem}
+.row{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-bottom:.75rem}
+.row:last-child{margin-bottom:0}
+input[type=password],input[type=number],select{background:#111;border:1px solid #333;color:#fff;border-radius:8px;padding:7px 12px;font-size:13px;font-family:-apple-system,sans-serif}
+input[type=password]:focus,input[type=number]:focus,select:focus{outline:none;border-color:#c8903a}
+.btn{background:#c8903a;color:#000;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#b07828}
+.btn:disabled{background:#444;color:#888;cursor:not-allowed}
+.btn-outline{background:none;border:1px solid #333;color:#aaa;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer}
+.btn-outline:hover{border-color:#c8903a;color:#c8903a}
+.btn-outline:disabled{opacity:.4;cursor:not-allowed}
+.btn-sm{padding:5px 12px;font-size:12px}
+
+/* STATS TABLE */
+.stats-table{width:100%;border-collapse:collapse}
+.stats-table th{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.06em;text-align:left;padding:.4rem .75rem;border-bottom:1px solid #1a1a1a}
+.stats-table td{padding:.5rem .75rem;font-size:13px;border-bottom:1px solid #111}
+.stats-table tr:last-child td{border-bottom:none}
+.level-badge{display:inline-block;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;color:#c8903a}
+
+/* LOG */
+.log{background:#050505;border:1px solid #111;border-radius:8px;padding:1rem;font-family:'Courier New',monospace;font-size:12px;max-height:340px;overflow-y:auto;line-height:1.7}
+.log-entry{margin-bottom:.1rem}
+.log-ok{color:#5acc8a}
+.log-err{color:#cc4444}
+.log-info{color:#888}
+.log-gold{color:#c8903a}
+
+/* LEVEL BUTTONS */
+.level-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:.5rem}
+@media(max-width:500px){.level-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* COUNT INPUT */
+input[type=number]{width:70px}
+
+/* CONNECTED STATE */
+#auth-section{margin-bottom:1.5rem}
+#main-section{display:none}
+</style>
+</head>
+<body>
+
+<h1>📊 HQ Question Bank — Admin</h1>
+
+<!-- AUTH -->
+<div id="auth-section" class="card">
+  <h2>Connect</h2>
+  <div class="row">
+    <input type="password" id="admin-key" placeholder="Admin key" style="flex:1;max-width:300px">
+    <button class="btn" onclick="connect()">Connect</button>
+  </div>
+  <div id="auth-msg" style="font-size:12px;color:#cc4444;margin-top:.4rem"></div>
+</div>
+
+<!-- MAIN (hidden until connected) -->
+<div id="main-section">
+
+  <!-- STATS -->
+  <div class="card" id="stats-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      <h2 style="margin:0">Question Bank</h2>
+      <button class="btn-outline btn-sm" onclick="loadStats()">Refresh</button>
+    </div>
+    <div id="stats-body"><div style="color:#555;font-size:13px">Loading…</div></div>
+  </div>
+
+  <!-- SEED ALL -->
+  <div class="card">
+    <h2>Seed All Levels</h2>
+    <div class="row">
+      <label style="font-size:13px;color:#aaa">Questions per level:</label>
+      <input type="number" id="count-all" value="5" min="1" max="10">
+      <button class="btn" id="btn-all" onclick="seedAll()">Seed all 5 levels</button>
+    </div>
+    <div style="font-size:12px;color:#555;margin-top:.25rem">Generates N questions at each difficulty level using Claude. Avoids duplicating existing questions.</div>
+  </div>
+
+  <!-- SEED PER LEVEL -->
+  <div class="card">
+    <h2>Seed Individual Level</h2>
+    <div class="row">
+      <label style="font-size:13px;color:#aaa">Count:</label>
+      <input type="number" id="count-single" value="5" min="1" max="10">
+    </div>
+    <div class="level-grid" id="level-btns">
+      ${[1,2,3,4,5].map(l=>`
+        <button class="btn-outline" id="btn-lvl-${l}" onclick="seedLevel(${l})">
+          Level ${l}
+          <div style="font-size:10px;color:#555;margin-top:2px">${['Very Easy','Easy','Medium','Hard','Expert'][l-1]}</div>
+        </button>`).join('')}
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+      <h2 style="margin:0">Log</h2>
+      <button class="btn-outline btn-sm" onclick="clearLog()">Clear</button>
+    </div>
+    <div class="log" id="log"><div class="log-info">— ready —</div></div>
+  </div>
+
+</div>
+
+<script>
+const WORKER = 'https://histroychallenger-api.maletethan.workers.dev';
+let ADMIN_KEY = '';
+
+const LEVEL_NAMES = ['','Very Easy (L1)','Easy (L2)','Medium (L3)','Hard (L4)','Expert (L5)'];
+const LEVEL_SCORES = [0,150,300,500,650,800];
+
+function log(msg, cls='log-info'){
+  const el=document.getElementById('log');
+  const line=document.createElement('div');
+  line.className='log-entry '+cls;
+  line.textContent=`[${new Date().toLocaleTimeString()}] ${msg}`;
+  el.appendChild(line);
+  el.scrollTop=el.scrollHeight;
+}
+function clearLog(){document.getElementById('log').innerHTML='';}
+
+async function connect(){
+  const key=document.getElementById('admin-key').value.trim();
+  if(!key){document.getElementById('auth-msg').textContent='Enter admin key';return;}
+  document.getElementById('auth-msg').textContent='';
+  // Test with get_hq_stats
+  try{
+    const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'get_hq_stats',admin_key:key})});
+    const d=await res.json();
+    if(d.error){document.getElementById('auth-msg').textContent=d.error;return;}
+    ADMIN_KEY=key;
+    document.getElementById('auth-section').style.display='none';
+    document.getElementById('main-section').style.display='block';
+    renderStats(d);
+    log('Connected. '+d.total+' questions in bank.','log-ok');
+  }catch(e){document.getElementById('auth-msg').textContent='Network error';}
+}
+
+async function loadStats(){
+  try{
+    const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'get_hq_stats',admin_key:ADMIN_KEY})});
+    const d=await res.json();
+    if(!d.error) renderStats(d);
+  }catch(e){}
+}
+
+function renderStats(d){
+  const levels=[1,2,3,4,5];
+  const byLevel={};
+  (d.stats||[]).forEach(s=>{byLevel[s.difficulty_level]=s;});
+  const total=d.total||0;
+  document.getElementById('stats-body').innerHTML=`
+    <table class="stats-table">
+      <thead><tr>
+        <th>Level</th><th>Difficulty</th><th>Questions</th><th>Times seen</th><th>Avg correct</th>
+      </tr></thead>
+      <tbody>
+        ${levels.map(l=>{
+          const s=byLevel[l]||{};
+          return `<tr>
+            <td><span class="level-badge">L${l}</span></td>
+            <td style="color:#aaa">${LEVEL_NAMES[l]}</td>
+            <td style="color:#fff;font-weight:600">${s.total||0}</td>
+            <td style="color:#888">${s.seen||0}</td>
+            <td style="color:${(s.avg_correct_pct||0)>=60?'#5acc8a':'#c8903a'}">${s.avg_correct_pct!=null?s.avg_correct_pct+'%':'—'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+      <tfoot><tr>
+        <td colspan="2" style="color:#666;font-size:12px;padding-top:.5rem">Total</td>
+        <td style="color:#c8903a;font-weight:700;padding-top:.5rem">${total}</td>
+        <td colspan="2"></td>
+      </tr></tfoot>
+    </table>`;
+}
+
+function setAllBtns(disabled){
+  ['btn-all',...[1,2,3,4,5].map(l=>'btn-lvl-'+l)].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.disabled=disabled;
+  });
+}
+
+async function seedAll(){
+  const count=parseInt(document.getElementById('count-all').value)||5;
+  setAllBtns(true);
+  log(`Seeding all 5 levels × ${count} questions…`,'log-gold');
+  for(const lvl of [1,2,3,4,5]){
+    await seedLevel(lvl, count, true);
+  }
+  await loadStats();
+  setAllBtns(false);
+  log('Done.','log-ok');
+}
+
+async function seedLevel(lvl, countOverride, silent=false){
+  const count=countOverride||parseInt(document.getElementById('count-single').value)||5;
+  if(!silent){setAllBtns(true); log(`Seeding Level ${lvl} (${LEVEL_NAMES[lvl]}) × ${count}…`,'log-gold');}
+  else{ log(`  → Level ${lvl}…`,'log-info'); }
+  try{
+    const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'seed_hq',admin_key:ADMIN_KEY,level:lvl,count})});
+    const d=await res.json();
+    if(d.error){log(`  ✗ Level ${lvl}: ${d.error}`,'log-err');}
+    else{
+      log(`  ✓ Level ${lvl}: saved ${d.saved_this_level||d.saved} questions (bank now has ${d.level_total||'?'} at this level)`, 'log-ok');
+    }
+    if(!silent){await loadStats(); setAllBtns(false);}
+  }catch(e){
+    log(`  ✗ Level ${lvl}: network error`,'log-err');
+    if(!silent) setAllBtns(false);
+  }
+}
+</script>
+</body>
+</html>
