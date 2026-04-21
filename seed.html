@@ -1245,15 +1245,24 @@ async function autoGrowPool(){
 
         // Over-seed to buffer
         const seedTarget = Math.ceil(target * BUFFER);
+        let consecFails = 0;
+        const MAX_CONSEC_FAILS = 3;
         while (current < seedTarget && !AG.stop) {
           const n = Math.min(BATCH, seedTarget - current);
           logAG('  → seeding '+n+' at L'+lvl+'…', '#888');
           try {
             const r = await agSeedBatch(lvl, n);
             current = r.total;
+            consecFails = 0;
             logAG('    saved '+r.saved+' · pool now '+current, '#5acc8a');
           } catch(e) {
-            logAG('    seed error: '+e.message+' (retrying)', '#cc6644');
+            consecFails++;
+            logAG('    seed error: '+e.message+' ('+consecFails+'/'+MAX_CONSEC_FAILS+')', '#cc6644');
+            if (consecFails >= MAX_CONSEC_FAILS) {
+              logAG('  ✗ aborting: '+MAX_CONSEC_FAILS+' consecutive seed failures. Check worker/API key.', '#f44');
+              AG.stop = true;
+              break;
+            }
             await new Promise(r=>setTimeout(r,800));
           }
         }
