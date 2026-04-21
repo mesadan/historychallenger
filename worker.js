@@ -1290,7 +1290,15 @@ async function handleSubmitHQAnswer(body, env) {
         `UPDATE users SET hq_score=?, hq_taken_at=? WHERE id=?`
       ).bind(newHQ, Math.floor(Date.now()/1000), userId).run();
 
-      return json({ correct, correct_idx: question.correct_idx, hq_delta: Math.round(delta), new_hq: newHQ, questions_answered: newAnswered, completed: true, final_hq: newHQ }, 200);
+      const pctRow = await env.db.prepare(
+        `SELECT
+           (SELECT COUNT(*) FROM hq_sessions WHERE completed=1) as total,
+           (SELECT COUNT(*) FROM hq_sessions WHERE completed=1 AND final_hq < ?) as below`
+      ).bind(newHQ).first();
+      const total_takers = pctRow?.total || 0;
+      const percentile = total_takers > 0 ? Math.round((pctRow.below / total_takers) * 100) : null;
+
+      return json({ correct, correct_idx: question.correct_idx, hq_delta: Math.round(delta), new_hq: newHQ, questions_answered: newAnswered, completed: true, final_hq: newHQ, total_takers, percentile }, 200);
     }
 
     await env.db.prepare(
