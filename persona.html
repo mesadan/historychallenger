@@ -197,7 +197,7 @@ a{color:#c8903a;text-decoration:none}
       <div class="result-summary" id="result-summary"></div>
       <div class="result-match-pct">
         <div class="result-match-pct-num" id="result-match-pct-num">0%</div>
-        <div class="result-match-pct-label">trait similarity</div>
+        <div class="result-match-pct-label">chose their approach</div>
       </div>
     </div>
 
@@ -315,7 +315,7 @@ const QUESTIONS = [
     context:"The failing operation was never your most important. The team has been loyal and capable — but loyalty cannot change the ground situation.",
     choices:[
       {id:"A",text:"Abandon it immediately and redirect the resources. You can compensate the team later. The math doesn't change by being slow about it.",leader_key:"caesar"},
-      {id:"B",text:"End it formally but transfer the team to the better-performing operation. Make the transition as clean as the situation allows.",leader_key:"bismarck"},
+      {id:"B",text:"Close it, but extract everything useful first — what failed, why, who performed under pressure. A well-documented failure is an asset. An undocumented one is just waste.",leader_key:"bismarck"},
       {id:"C",text:"Visit it personally before writing it off. Your presence on a failing operation has changed outcomes before. Assess it yourself.",leader_key:"shaka"},
       {id:"D",text:"Abandon it without ceremony. Resources follow success. People who understand what you're building will understand why.",leader_key:"genghis"}
     ]
@@ -414,7 +414,7 @@ const QUESTIONS = [
     context:"Granting more autonomy risks loss of coherence. Denying it risks losing a capable person or suppressing the judgment that makes them valuable.",
     choices:[
       {id:"A",text:"Grant it on specific decisions, not broadly. Freedom on how, not on what. The strategic frame stays yours.",leader_key:"caesar"},
-      {id:"B",text:"Grant it with a clear accountability structure. More freedom, more transparency about what they're doing and why.",leader_key:"bismarck"},
+      {id:"B",text:"Structure the autonomy so their visible success is inseparable from your strategy. They get real freedom; the conditions you design ensure where that freedom leads.",leader_key:"bismarck"},
       {id:"C",text:"Grant it and let them run. People who have earned trust should be trusted. The oversight is the output, not the process.",leader_key:"lincoln"},
       {id:"D",text:"Grant it only when they've internalised your goals so completely that their independent choices will align with yours. Otherwise it's not delegation — it's abdication.",leader_key:"thatcher"}
     ]
@@ -426,7 +426,7 @@ const QUESTIONS = [
     choices:[
       {id:"A",text:"Send the capable one, but spend intensive time with them first to lock in the strategic frame. One alignment session is worth months of check-ins.",leader_key:"caesar"},
       {id:"B",text:"Send the capable one with full autonomy. You selected them because they're good. Now let them be good — outcome is the only accountability.",leader_key:"genghis"},
-      {id:"C",text:"Send the aligned one. A moderately capable person who executes your approach is more predictable than a highly capable person who improvises.",leader_key:"bismarck"},
+      {id:"C",text:"Send the capable one, but redesign the operation's objectives so they can only be achieved through the methods you'd have used. Engineer the constraints; trust the person to work within them.",leader_key:"bismarck"},
       {id:"D",text:"Go yourself first. Establish the standard personally, then bring in the best person to maintain it.",leader_key:"shaka"}
     ]
   },
@@ -457,7 +457,7 @@ const QUESTIONS = [
     scenario:"Your advisors, without exception, are telling you that the approach you're considering carries unacceptable risk. They have data. They are not being timid — they genuinely believe you are wrong.",
     context:"You believe they are right about the data and wrong about the conclusion. You think they're solving for the wrong variable.",
     choices:[
-      {id:"A",text:"Design a smaller version that achieves 60% of the goal at 20% of the risk. Test the logic without betting everything on it.",leader_key:"bismarck"},
+      {id:"A",text:"The risk is high because the conditions are wrong — fix the conditions first. Your advisors are solving the right equation with the wrong inputs. Change the inputs.",leader_key:"bismarck"},
       {id:"B",text:"Delay. Not abandon — delay. You might be right and they might be wrong, but unanimity deserves more than override.",leader_key:"lincoln"},
       {id:"C",text:"Proceed, but lead the riskiest element personally. If you're deciding the risk is acceptable, you should be the one most exposed.",leader_key:"shaka"},
       {id:"D",text:"Proceed. Unanimous expert consensus has been wrong before, often on the most important questions. If you've thought it through, the dissent is not new information.",leader_key:"thatcher"}
@@ -480,7 +480,7 @@ const QUESTIONS = [
     context:"Building around yourself is working brilliantly right now. Building durable institutions will slow you down and require sharing credit with people who will take the structure in directions you won't like.",
     choices:[
       {id:"A",text:"Build the institution now. Personal authority is the scaffolding, not the building. Start the institutional design while you have the leverage to shape it.",leader_key:"lincoln"},
-      {id:"B",text:"Build both simultaneously. Use personal authority to create the institution, then use the institution to sustain it. They are not alternatives.",leader_key:"bismarck"},
+      {id:"B",text:"Build the institution so that dismantling it costs more than maintaining it — for everyone, including your enemies. The best structures are the ones even your opponents find it rational to preserve.",leader_key:"bismarck"},
       {id:"C",text:"Build around yourself for now. You are what makes this work. Systematise later, when there are people worthy of the structure.",leader_key:"genghis"},
       {id:"D",text:"Build institutions that encode your principles. A structure is only worth building if it enshrines the right ideas — not just any durable arrangement.",leader_key:"thatcher"}
     ]
@@ -523,7 +523,7 @@ const QUESTIONS = [
     scenario:"A major initiative you launched has been struggling for months. The core logic is still sound, but execution has been costly and morale is eroding. Your opponents say this proves the whole approach was wrong.",
     context:"Abandoning it validates the critics and wastes what you've invested. Doubling down requires resources you may not sustain. A third option — restructure while continuing — is available but complex.",
     choices:[
-      {id:"A",text:"Restructure it. The logic was right but the implementation needs rethinking. A mid-course correction is not a retreat — it's what rational operators do.",leader_key:"bismarck"},
+      {id:"A",text:"Use the struggle to identify who is a genuine supporter and who is a passenger. Strip it back, keep only those who are fully committed, and rebuild from that smaller but solid base.",leader_key:"bismarck"},
       {id:"B",text:"Cut the losses and redirect resources immediately to the next initiative. A struggling operation rarely recovers; a new one starts from a better position.",leader_key:"genghis"},
       {id:"C",text:"Stay the course and increase your public commitment to it. The critics are wrong. Abandoning now validates bad-faith opposition, not legitimate criticism.",leader_key:"thatcher"},
       {id:"D",text:"Go into it personally. Whatever is going wrong in execution requires your direct intervention, not a strategic review.",leader_key:"shaka"}
@@ -749,7 +749,7 @@ function showResults() {
     document.getElementById('result-name').textContent = topLeader.name;
     document.getElementById('result-era').textContent = topLeader.era;
     document.getElementById('result-summary').textContent = topLeader.summary;
-    document.getElementById('result-match-pct-num').textContent = Math.round(top.sim) + '%';
+    document.getElementById('result-match-pct-num').textContent = Math.round(top.pickPct) + '%';
 
     const bioEl = document.getElementById('result-bio');
     if (topLeader.bio) {
@@ -770,7 +770,7 @@ function showResults() {
 function renderScoresGrid(ranked) {
   document.getElementById('scores-grid').innerHTML = ranked.map((r, i) =>
     `<div class="score-card${i===0?' top':''}">
-      <div class="score-pct">${Math.round(r.sim)}%</div>
+      <div class="score-pct">${Math.round(r.pickPct)}%</div>
       <div class="score-name">${r.leader.name}</div>
     </div>`
   ).join('');
@@ -835,7 +835,7 @@ function renderTraitBars(traits) {
 function shareResult() {
   const ranked = buildRanking();
   const top = ranked[0];
-  const text = `I think like ${top.leader.name} (${Math.round(top.sim)}% match) — History Challenger's decision profile test. 25 decisions, no dates, no names.\nhttps://historychallenger.com/persona.html`;
+  const text = `I think like ${top.leader.name} (${Math.round(top.pickPct)}% match) — History Challenger's decision profile test. 25 decisions, no dates, no names.\nhttps://historychallenger.com/persona.html`;
   if (navigator.share) {
     navigator.share({ text }).catch(() => {});
   } else {
