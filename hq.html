@@ -132,7 +132,6 @@ function render(){
   if(S.phase==='intro')    p.innerHTML=renderIntro();
   if(S.phase==='loading')  p.innerHTML=renderLoading();
   if(S.phase==='quiz')     p.innerHTML=renderQuiz();
-  if(S.phase==='feedback') p.innerHTML=renderFeedback();
   if(S.phase==='result')   p.innerHTML=renderResult();
 }
 
@@ -170,7 +169,6 @@ function renderQuiz(){
   return `<div class="quiz-wrap">
     <div class="quiz-top">
       <div class="quiz-progress-text">Question ${S.questionNum} of ${TOTAL}</div>
-      <div class="quiz-hq-live">HQ ≈ <strong>${Math.round(S.hq)}</strong></div>
     </div>
     <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
     <div class="quiz-card">
@@ -181,38 +179,6 @@ function renderQuiz(){
           <span class="opt-letter">${labels[i]}</span>
           <span class="opt-text">${q.answers[i]}</span>
         </button>`).join('')}
-      </div>
-    </div>
-  </div>`;
-}
-
-function renderFeedback(){
-  const q=S.question;
-  const r=S.lastResult;
-  const opts=['a','b','c','d'];
-  const labels=['A','B','C','D'];
-  const pct=Math.round(((S.questionNum-1)/TOTAL)*100);
-  const hqDir=r.correct?'hq-up':'hq-down';
-  const arrow=r.correct?'↑':'↓';
-  return `<div class="quiz-wrap">
-    <div class="quiz-top">
-      <div class="quiz-progress-text">Question ${S.questionNum} of ${TOTAL}</div>
-      <div class="quiz-hq-live ${hqDir}">HQ ≈ <strong>${Math.round(r.new_hq)}</strong> ${arrow}</div>
-    </div>
-    <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
-    <div class="quiz-card">
-      <div class="feedback-banner ${r.correct?'correct':'incorrect'}">${r.correct?'✓ Correct':'✗ Incorrect — the right answer was highlighted below'}</div>
-      <div class="quiz-question">${q.question}</div>
-      <div class="quiz-options">
-        ${opts.map((o,i)=>{
-          let cls='opt-btn disabled';
-          if(i===r.correct_idx) cls+=' correct-ans';
-          else if(i===r.chosen&&!r.correct) cls+=' wrong-ans';
-          return `<button class="${cls}" disabled>
-            <span class="opt-letter">${labels[i]}</span>
-            <span class="opt-text">${q.answers[i]}</span>
-          </button>`;
-        }).join('')}
       </div>
     </div>
   </div>`;
@@ -268,12 +234,15 @@ async function submitAnswer(chosenIdx){
     S.lastResult={...d, chosen:chosenIdx};
     S.hq=d.new_hq;
     if(d.correct) S.correctCount++;
-    S.phase='feedback'; render();
-    setTimeout(()=>{
-      if(d.completed){S.phase='result';}
-      else{S.question=d.next_question; S.questionNum=d.questions_answered+1; S.hq=d.new_hq; S.answered=false; S.phase='quiz';}
-      render();
-    },FEEDBACK_MS);
+    if(d.completed){
+      S.phase='result';
+    } else {
+      S.question=d.next_question;
+      S.questionNum=d.questions_answered+1;
+      S.answered=false;
+      S.phase='quiz';
+    }
+    render();
   }catch(e){showError('Network error. Please try again.');}
 }
 
