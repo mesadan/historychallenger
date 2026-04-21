@@ -126,6 +126,10 @@ Events: ${JSON.stringify(events)}`;
       if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
       return handleUpdateHQQuestion(body, env);
     }
+    if (action === 'qc_hq_questions') {
+      if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
+      return handleQCHQQuestions(body, env, apiKey);
+    }
 
     const { theme, diff, rounds, lang } = body;
     if (!diff) return json({ error: 'Missing difficulty.' }, 400);
@@ -1380,6 +1384,87 @@ async function handleDeleteHQQuestion(body, env) {
     await env.db.prepare(`DELETE FROM hq_questions WHERE id=?`).bind(id).run();
     await env.db.prepare(`DELETE FROM hq_seen_questions WHERE question_id=?`).bind(id).run();
     return json({ ok: true }, 200);
+  } catch(e) {
+    return json({ error: e.message }, 500);
+  }
+}
+
+async function handleQCHQQuestions(body, env, apiKey) {
+  const { level } = body;
+  try {
+    const rows = level
+      ? await env.db.prepare(`SELECT id, level, question, answers, correct_idx, topic FROM hq_questions WHERE level=? ORDER BY topic`).bind(level).all()
+      : await env.db.prepare(`SELECT id, level, question, answers, correct_idx, topic FROM hq_questions ORDER BY level, topic`).all();
+    const questions = (rows.results || []).map(q => ({
+      ...q,
+      answers: typeof q.answers === 'string' ? JSON.parse(q.answers) : q.answers
+    }));
+    if (!questions.length) return json({ leaky: [], duplicates: [], total: 0 }, 200);
+
+    const compact = questions.map((q, i) => ({
+      idx: i,
+      q: q.question,
+      correct: q.answers[q.correct_idx]
+    }));
+
+    const SYS = `You are a rigorous QA checker for a history quiz. Analyse the provided questions for two issues:
+
+1. LEAKY — the correct answer can be inferred from the question text itself without knowing the historical fact. Typical patterns:
+   - A proper noun (place, person, empire) appears in both the question and the correct answer (e.g. question asks about "Alexandria", correct answer is "Lighthouse of Alexandria").
+   - The question contains a giveaway word that uniquely matches the correct answer.
+   - The correct answer restates or paraphrases a clause from the question.
+   Do NOT flag questions where the overlap is unavoidable or trivial (e.g. "Who wrote Hamlet?" → "Shakespeare" is fine, no leak).
+
+2. DUPLICATES — groups of two or more questions that test essentially the same historical fact, person, or event, even if worded differently. A group must have at least 2 questions.
+
+Return ONLY valid JSON, no markdown:
+{
+  "leaky":[{"idx":0,"reason":"..."}, ...],
+  "duplicates":[{"idxs":[0,5,12],"reason":"all ask about X"}, ...]
+}`;
+
+    const BATCH = 40;
+    let leaky = [];
+    let duplicates = [];
+
+    for (let i = 0; i < compact.length; i += BATCH) {
+      const batch = compact.slice(i, i + BATCH);
+      const prompt = `Analyse these ${batch.length} questions. Each has an "idx" (index in this batch), "q" (question text), and "correct" (the correct answer text).
+
+${JSON.stringify(batch, null, 2)}
+
+Return JSON with "leaky" and "duplicates" arrays as described. Use the idx values from this batch.`;
+
+      try {
+        const raw = await callClaude(apiKey, prompt, 4000, SYS);
+        let parsed;
+        try { parsed = JSON.parse(raw); }
+        catch {
+          const m = raw.match(/\{[\s\S]*\}/);
+          if (!m) continue;
+          parsed = JSON.parse(m[0]);
+        }
+
+        for (const l of (parsed.leaky || [])) {
+          const q = batch[l.idx];
+          if (q) {
+            const src = questions[i + l.idx];
+            leaky.push({ id: src.id, level: src.level, topic: src.topic, question: q.q, correct: q.correct, reason: l.reason });
+          }
+        }
+        for (const d of (parsed.duplicates || [])) {
+          const items = (d.idxs || []).map(bi => ({ src: questions[i + bi], q: batch[bi] })).filter(x => x.src && x.q);
+          if (items.length >= 2) {
+            duplicates.push({
+              reason: d.reason,
+              items: items.map(x => ({ id: x.src.id, level: x.src.level, topic: x.src.topic, question: x.q.q, correct: x.q.correct }))
+            });
+          }
+        }
+      } catch(e) { /* skip batch on failure */ }
+    }
+
+    return json({ leaky, duplicates, total: questions.length }, 200);
   } catch(e) {
     return json({ error: e.message }, 500);
   }

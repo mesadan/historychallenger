@@ -1045,7 +1045,116 @@ function logHQ(msg, color) {
     <span id="hq-browse-count" style="color:#555;font-size:12px;margin-left:auto"></span>
   </div>
   <div id="hq-browse" style="max-height:500px;overflow-y:auto;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;padding:.5rem"></div>
+
+  <div class="row" style="border-top:1px solid #1a1a1a;padding-top:1rem;margin-top:1rem">
+    <strong style="color:#c8903a;font-size:13px">🤖 AI Quality Check</strong>
+    <span style="color:#555;font-size:11px;margin-left:auto">Uses Claude — scans for leaky answers & semantic duplicates</span>
+  </div>
+  <div class="row">
+    <label style="color:#555;font-size:13px">Scope:</label>
+    <select id="hq-qc-level" style="padding:4px 8px;background:#0d0d0d;color:#ddd;border:1px solid #333">
+      <option value="">All levels</option>
+      <option value="1">L1 only</option>
+      <option value="2">L2 only</option>
+      <option value="3">L3 only</option>
+      <option value="4">L4 only</option>
+      <option value="5">L5 only</option>
+    </select>
+    <button id="hq-qc-btn" onclick="runHQQC()">🔬 Run QC Analysis</button>
+    <span id="hq-qc-status" style="color:#555;font-size:12px;margin-left:auto"></span>
+  </div>
+  <div id="hq-qc-results" style="margin-top:.75rem"></div>
 </div>
+
+<script>
+async function runHQQC(){
+  const level = document.getElementById('hq-qc-level').value;
+  const btn = document.getElementById('hq-qc-btn');
+  const status = document.getElementById('hq-qc-status');
+  const out = document.getElementById('hq-qc-results');
+  btn.disabled = true; btn.textContent = 'Analysing…';
+  status.textContent = 'This can take 30–60s depending on pool size.';
+  out.innerHTML = '';
+  try {
+    const payload = {action:'qc_hq_questions',admin_key:ADMIN_KEY};
+    if (level) payload.level = parseInt(level);
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d = await res.json();
+    if (d.error) { out.innerHTML = '<div class="err">'+d.error+'</div>'; status.textContent=''; return; }
+    status.textContent = 'Scanned '+d.total+' questions · '+d.leaky.length+' leaky · '+d.duplicates.length+' duplicate group'+(d.duplicates.length===1?'':'s');
+    renderHQQC(d);
+  } catch(e) { out.innerHTML = '<div class="err">'+e.message+'</div>'; status.textContent=''; }
+  finally { btn.disabled = false; btn.textContent = '🔬 Run QC Analysis'; }
+}
+
+function renderHQQC(d){
+  const out = document.getElementById('hq-qc-results');
+  const lvlColor = {1:'#5acc8a',2:'#8acc5a',3:'#c8a028',4:'#cc8844',5:'#cc4444'};
+  let html = '';
+
+  if (d.leaky.length) {
+    html += '<div style="margin-bottom:1rem"><div style="color:#cc6644;font-size:13px;font-weight:700;margin-bottom:.5rem">⚠ Leaky answers ('+d.leaky.length+')</div>';
+    html += '<div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;padding:.5rem;max-height:400px;overflow-y:auto">';
+    for (const l of d.leaky) {
+      html += `<div style="padding:.6rem .5rem;border-bottom:1px solid #111;font-size:12px" data-qc-id="${l.id}">
+        <div style="display:flex;gap:.5rem;align-items:start">
+          <span style="color:${lvlColor[l.level]};font-size:10px;font-weight:700;padding:1px 5px;border:1px solid ${lvlColor[l.level]}55;border-radius:2px;flex-shrink:0">L${l.level}</span>
+          <div style="flex:1;min-width:0">
+            <div style="color:#ddd;margin-bottom:.2rem">${l.question}</div>
+            <div style="color:#5acc8a;font-size:11px;margin-bottom:.2rem">✓ ${l.correct}</div>
+            <div style="color:#cc6644;font-size:11px;font-style:italic;margin-bottom:.3rem">${l.reason}</div>
+            <button style="padding:2px 8px;font-size:11px;background:#2a0a0a;color:#cc6644;border:1px solid #442020" onclick="deleteHQQCItem('${l.id}')">🗑 Delete</button>
+          </div>
+        </div>
+      </div>`;
+    }
+    html += '</div></div>';
+  } else {
+    html += '<div style="color:#5acc8a;font-size:12px;margin-bottom:1rem">✓ No leaky answers found</div>';
+  }
+
+  if (d.duplicates.length) {
+    html += '<div><div style="color:#cc8844;font-size:13px;font-weight:700;margin-bottom:.5rem">⚠ Duplicate groups ('+d.duplicates.length+')</div>';
+    html += '<div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;padding:.5rem;max-height:500px;overflow-y:auto">';
+    for (let g = 0; g < d.duplicates.length; g++) {
+      const grp = d.duplicates[g];
+      html += `<div style="padding:.6rem .5rem;border-bottom:2px solid #1a1a1a;margin-bottom:.25rem">
+        <div style="color:#cc8844;font-size:11px;font-style:italic;margin-bottom:.4rem">${grp.reason}</div>`;
+      for (const it of grp.items) {
+        html += `<div style="padding:.45rem .3rem;border-left:2px solid ${lvlColor[it.level]}55;margin-bottom:.3rem;background:#050505" data-qc-id="${it.id}">
+          <div style="display:flex;gap:.5rem;align-items:start">
+            <span style="color:${lvlColor[it.level]};font-size:10px;font-weight:700;padding:1px 5px;border:1px solid ${lvlColor[it.level]}55;border-radius:2px;flex-shrink:0">L${it.level}</span>
+            <div style="flex:1;min-width:0;font-size:12px">
+              <div style="color:#ddd;margin-bottom:.15rem">${it.question}</div>
+              <div style="color:#5acc8a;font-size:11px;margin-bottom:.3rem">✓ ${it.correct}</div>
+              <button style="padding:2px 8px;font-size:11px;background:#2a0a0a;color:#cc6644;border:1px solid #442020" onclick="deleteHQQCItem('${it.id}')">🗑 Delete</button>
+            </div>
+          </div>
+        </div>`;
+      }
+      html += '</div>';
+    }
+    html += '</div></div>';
+  } else if (!d.leaky.length) {
+    html += '<div style="color:#5acc8a;font-size:12px">✓ No duplicate groups found</div>';
+  } else {
+    html += '<div style="color:#5acc8a;font-size:12px">✓ No duplicate groups found</div>';
+  }
+
+  out.innerHTML = html;
+}
+
+async function deleteHQQCItem(id){
+  if (!confirm('Delete this question?')) return;
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'delete_hq_question',admin_key:ADMIN_KEY,id})});
+    const d = await res.json();
+    if (d.error) { alert('Error: '+d.error); return; }
+    document.querySelectorAll(`[data-qc-id="${id}"]`).forEach(el=>el.remove());
+  } catch(e) { alert('Network error'); }
+}
+</script>
 
 <script>
 async function loadHQBrowse(){
