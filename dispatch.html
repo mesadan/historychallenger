@@ -359,6 +359,11 @@ function selectEra(era){
       </div>`).join('');
   }
   listEl.style.display='block';
+
+  // Auto-scroll to the campaign list after a brief moment so it finishes rendering
+  setTimeout(()=>{
+    listEl.scrollIntoView({behavior:'smooth',block:'start'});
+  },80);
 }
 
 // ── LOAD CAMPAIGN ────────────────────────────────────────────────────
