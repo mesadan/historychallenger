@@ -301,6 +301,13 @@ footer{
         <div class="game-desc">25 anonymized decisions. No dates, no names. Just the pressure of the moment. Discover which of 7 historical leaders you think like.</div>
         <span class="game-cta ghost">Find out &#8594;</span>
       </a>
+      <a href="/hq.html" class="game-card">
+        <span class="game-icon"><svg width="36" height="36" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><circle cx="28" cy="26" r="16" fill="#e8cc80" stroke="#c8a050" stroke-width="1.5"/><path d="M20 20 Q20 14 28 14 Q36 14 36 20 Q36 25 30 27 L30 31" fill="none" stroke="#8a6a10" stroke-width="2.2" stroke-linecap="round"/><circle cx="30" cy="35" r="1.8" fill="#8a6a10"/><rect x="16" y="44" width="24" height="5" rx="1" fill="#c8a050" stroke="#8a6a10" stroke-width="1"/><text x="28" y="49" text-anchor="middle" font-family="Georgia,serif" font-size="5" font-weight="bold" fill="#1a150e">HQ</text></svg></span>
+        <div class="game-name" id="t-hqt">History Quotient</div>
+        <span class="game-tag" id="t-hqtag">Adaptive Knowledge Test</span>
+        <div class="game-desc" id="t-hqdesc">30 questions, 5 difficulty levels. The algorithm adjusts in real time. Earn a score from 0 to 1,000 that reflects your true depth of historical knowledge.</div>
+        <span class="game-cta ghost" id="t-hqcta">Test your HQ &#8594;</span>
+      </a>
     </div>
   </div>
 </section>
@@ -385,19 +392,20 @@ const T = {
   en: {
     eyebrow:'Free · No account required · AI-powered',
     title:'How well do you <span>know history?</span>',
-    sub:'Four games. Every era. Completely free.',
+    sub:'Five games. Every era. Completely free.',
     cta1:'Choose a game', cta2:'See the games',
     note:'No download · Plays in your browser · Mobile friendly',
-    gamesLabel:'Four games',
+    gamesLabel:'Five games',
     gamesTitle:'Pick your challenge',
     gamesSub:'Each game tests a different kind of historical knowledge. All free, all generated fresh by AI.',
     newBadge:'New',
     g1tag:'Historical Decisions', g1desc:'You receive the same dispatches as Caesar, Kennedy, Saladin. Five decisions per campaign. No right answers shown until the end. What would you have done?',
     s1t:'History Challenger', g2tag:'Timeline Placement', s1d:'Place five historical events on a timeline as accurately as possible. Score points for correct order and precise spacing. From the Bronze Age to the Cold War.',
     s2t:'Did They Overlap?', g3tag:'Civilizations Quiz', s2d:'Given a civilization and its era, which of four options actually coexisted with it? The Assyrians and Carthage? The Han Dynasty and Rome? History is stranger than you think.',
+    hqt:'History Quotient', hqtag:'Adaptive Knowledge Test', hqdesc:'30 questions, 5 difficulty levels. The algorithm adjusts in real time. Earn a score from 0 to 1,000 that reflects your true depth of historical knowledge.', hqcta:'Test your HQ →',
     play:'Play →',
     lblAbout:'About',
-    aboutTitle:'Four games. One obsession.',
+    aboutTitle:'Five games. One obsession.',
     aboutText:'<p>Most history quizzes test recognition, not knowledge. Multiple choice lets you guess. We wanted something harder.</p><p>Four games. Each one tests a different kind of historical thinking — decisions under pressure, precision on a timeline, the shape of time itself, the profile of a leader. No right answers shown until the end. No account required.</p><p>Every game is generated fresh by AI. Free to play. Sign in with Google to track scores and streaks.</p>',
     lblFaq:'FAQ', faqTitle:'Questions',
     faqs:[
@@ -412,10 +420,10 @@ const T = {
   fr: {
     eyebrow:'Gratuit · Sans inscription · Propulsé par IA',
     title:'Connaissez-vous bien <span>l\'histoire ?</span>',
-    sub:'Trois jeux. Toutes les époques. Entièrement gratuit.',
+    sub:'Cinq jeux. Toutes les époques. Entièrement gratuit.',
     cta1:'Choisir un jeu', cta2:'Voir les jeux',
     note:'Sans téléchargement · Dans le navigateur · Compatible mobile',
-    gamesLabel:'Trois jeux',
+    gamesLabel:'Cinq jeux',
     gamesTitle:'Choisissez votre défi',
     gamesSub:'Chaque jeu teste un type différent de connaissance historique. Tous gratuits, tous générés par IA.',
     newBadge:'Nouveau',
@@ -439,10 +447,10 @@ const T = {
   de: {
     eyebrow:'Kostenlos · Keine Anmeldung · KI-gestützt',
     title:'Wie gut kennen Sie <span>die Geschichte?</span>',
-    sub:'Drei Spiele. Alle Epochen. Völlig kostenlos.',
+    sub:'Fünf Spiele. Alle Epochen. Völlig kostenlos.',
     cta1:'Spiel wählen', cta2:'Spiele ansehen',
     note:'Kein Download · Im Browser · Mobilfreundlich',
-    gamesLabel:'Drei Spiele',
+    gamesLabel:'Fünf Spiele',
     gamesTitle:'Wählen Sie Ihre Herausforderung',
     gamesSub:'Jedes Spiel testet eine andere Art historischen Wissens. Alle kostenlos, alle frisch von KI generiert.',
     newBadge:'Neu',
@@ -466,10 +474,10 @@ const T = {
   es: {
     eyebrow:'Gratis · Sin registro · Con IA',
     title:'¿Cuánto sabes de <span>historia?</span>',
-    sub:'Tres juegos. Todas las épocas. Completamente gratis.',
+    sub:'Cinco juegos. Todas las épocas. Completamente gratis.',
     cta1:'Elegir un juego', cta2:'Ver los juegos',
     note:'Sin descarga · En el navegador · Compatible con móvil',
-    gamesLabel:'Tres juegos',
+    gamesLabel:'Cinco juegos',
     gamesTitle:'Elige tu desafío',
     gamesSub:'Cada juego prueba un tipo diferente de conocimiento histórico. Todos gratuitos, todos generados por IA.',
     newBadge:'Nuevo',
@@ -512,6 +520,7 @@ function applyLang(){
   st('t-s1t', t.s1t); st('t-g2tag', t.g2tag); st('t-s1d', t.s1d);
   st('t-s2t', t.s2t); st('t-g3tag', t.g3tag); st('t-s2d', t.s2d);
   st('t-play', t.play); st('t-play2', t.play); st('t-play3', t.play);
+  st('t-hqt', t.hqt||'History Quotient'); st('t-hqtag', t.hqtag||'Adaptive Knowledge Test'); st('t-hqdesc', t.hqdesc||''); st('t-hqcta', t.hqcta||'Test your HQ →');
   st('t-lbl-about', t.lblAbout);
   st('t-about-title', t.aboutTitle);
   s('t-about-text', t.aboutText);

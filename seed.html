@@ -975,7 +975,7 @@ async function seedHQLevel(lvl, countOverride, silent) {
       body:JSON.stringify({action:'seed_hq',admin_key:ADMIN_KEY,level:lvl,count})});
     const d = await res.json();
     if (d.error) { logHQ('  ✗ L'+lvl+': '+d.error, '#f44'); }
-    else { logHQ('  ✓ L'+lvl+': saved '+d.saved+' (total at this level: '+d.level_total+')', '#0f0'); }
+    else { logHQ('  ✓ L'+lvl+': saved '+d.saved+' (total at this level: '+d.total+')', '#0f0'); }
     if (!silent) { await loadHQStats(); if(btn) btn.disabled=false; }
   } catch(e) {
     logHQ('  ✗ L'+lvl+': network error', '#f44');
