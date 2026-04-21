@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Which Historical Leader Are You? — History Challenger</title>
-<meta name="description" content="25 decisions. No dates, no names. Discover which historical leader you think like — Caesar, Lincoln, Napoleon, Bismarck, Genghis Khan, Shaka Zulu, or Margaret Thatcher.">
+<meta name="description" content="25 decisions. No dates, no names. Discover which historical leader you think like — Caesar, Lincoln, Bismarck, Genghis Khan, Shaka Zulu, or Margaret Thatcher.">
 <meta property="og:title" content="Which Historical Leader Are You?">
 <meta property="og:description" content="25 decisions. No dates, no names. Discover which historical leader you think like.">
 <meta property="og:type" content="website">
@@ -109,8 +109,8 @@ a{color:#c8903a;text-decoration:none}
 .chart-title{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#9a8060;font-family:'Crimson Text',serif;margin-bottom:1.25rem;text-align:center}
 .chart-canvas{max-width:400px;margin:0 auto;display:block}
 
-.scores-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
-@media(min-width:500px){.scores-grid{grid-template-columns:repeat(4,1fr)}}
+.scores-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1.5rem}
+@media(min-width:500px){.scores-grid{grid-template-columns:repeat(6,1fr)}}
 .score-card{background:#111008;border:1px solid #2a1e0e;border-radius:3px;padding:10px 12px;text-align:center}
 .score-card.top{border-color:#c8903a}
 .score-pct{font-family:'Playfair Display',serif;font-size:1.4rem;color:#c8903a;font-weight:400}
@@ -180,7 +180,7 @@ a{color:#c8903a;text-decoration:none}
   <!-- LOADING -->
   <div class="loading-wrap" id="loading-wrap">
     <div class="loading-title">Analysing your decisions…</div>
-    <p class="loading-sub">Cross-referencing with 7 historical profiles</p>
+    <p class="loading-sub">Cross-referencing with 6 historical profiles</p>
     <div class="dots"><span></span><span></span><span></span></div>
   </div>
 
@@ -239,117 +239,410 @@ a{color:#c8903a;text-decoration:none}
 </div>
 
 <script>
-const WORKER = 'https://histroychallenger-api.maletethan.workers.dev';
+// ── EMBEDDED DATA ──────────────────────────────────────────────────────────────
 
-// ── STATE ──────────────────────────────────────────────────────────────────────
-let _questions = [];
-let _leaders = {};
-let _current = 0;
-let _answers = {}; // qid -> leader_key
-let _scores = {}; // leader_key -> count
-let _gameQuestions = []; // 25 drawn questions
+const LEADERS = {
+  caesar: {
+    name: "Julius Caesar",
+    era: "100–44 BC · Rome",
+    summary: "The decisive improviser. You process fast, commit fully, and trust that momentum is its own strategy. You believe in your own judgment more than in any institution — and you are usually right.",
+    bio: "Roman general, politician, and eventual dictator who destroyed the Roman Republic by refusing to stop winning. Crossed the Rubicon with one legion when ordered to disband, won a civil war he arguably started, then pardoned his enemies in a policy of clemency that his biographer Suetonius called both his greatest virtue and the mistake that got him killed. Famous for: the conquest of Gaul, the crossing of the Rubicon, veni vidi vici, the Ides of March. Controversial because: many historians see him as the man who ended five centuries of Roman self-government for personal ambition. Today he's remembered as the prototype of the charismatic authoritarian — admired by some, feared by others, studied by all.",
+    traits: {decisiveness:10,strategic_patience:2,means_vs_ends:7,personal_control:10,risk_appetite:9,institutional_power:1}
+  },
+  lincoln: {
+    name: "Abraham Lincoln",
+    era: "1809–1865 · United States",
+    summary: "The patient anchor. You hold to a principle even when everything argues for abandoning it. You absorb pressure without breaking, delegate to capable people, and move only when the moment is right — then move completely.",
+    bio: "Self-educated frontier lawyer who became the 16th US President and held the Union together through its civil war. Preserved the United States as one country, ended slavery through the Thirteenth Amendment, and wrote prose so good it's still quoted in English classes. Famous for: the Gettysburg Address, the Emancipation Proclamation, winning a war that killed 2% of the American population. Controversial because: he suspended habeas corpus, shut down hostile newspapers, and held strategic views on race that were humane by 1860s standards and uncomfortable by today's. Today he's consistently ranked the greatest American president by historians — the benchmark everyone else is measured against.",
+    traits: {decisiveness:4,strategic_patience:10,means_vs_ends:9,personal_control:3,risk_appetite:4,institutional_power:10}
+  },
+  bismarck: {
+    name: "Otto von Bismarck",
+    era: "1815–1898 · Prussia/Germany",
+    summary: "The system builder. You think in decades, not moments. You use conflict as a precision instrument — only when necessary, only as much as needed. You build structures that outlast you.",
+    bio: "Prussian aristocrat who unified Germany through three carefully engineered short wars, then spent twenty years preventing the fourth. Invented modern European diplomacy, pioneered the welfare state (to undercut the socialists), and was fired by an emperor who thought he was too cautious. Famous for: the unification of Germany, blood and iron, realpolitik, the first state pension system. Controversial because: his constitutional design made Germany powerful but democratically stunted, setting up the catastrophes of the 20th century. Today he's the archetype of the cold pragmatist — less admired than feared, less loved than respected. Henry Kissinger's hero.",
+    traits: {decisiveness:6,strategic_patience:9,means_vs_ends:4,personal_control:8,risk_appetite:3,institutional_power:9}
+  },
+  genghis: {
+    name: "Genghis Khan",
+    era: "1162–1227 · Mongolia",
+    summary: "The total commitment. Once you have decided, nothing is reserved. You do not manage risk — you eliminate the source of it. Efficiency is the only morality you recognise in conflict.",
+    bio: "Born Temüjin, unified the warring Mongol tribes and built the largest contiguous land empire in history, stretching from Korea to Hungary. Took existing Central Asian cavalry tactics and scaled them into something no settled civilisation could match. Famous for: conquering more territory in 25 years than Rome did in 400, sparing cities that surrendered and annihilating cities that resisted, creating a postal system that connected a continent. Controversial because: modern estimates of the death toll from his campaigns run from 20 to 40 million people — possibly the highest body count of any individual in human history. Today he's a founding national hero in Mongolia and a complicated figure everywhere else — brutal but also a pioneer of religious tolerance and meritocratic promotion.",
+    traits: {decisiveness:10,strategic_patience:5,means_vs_ends:1,personal_control:5,risk_appetite:10,institutional_power:2}
+  },
+  shaka: {
+    name: "Shaka Zulu",
+    era: "1787–1828 · Southern Africa",
+    summary: "The warrior founder. You see a system that isn't working and replace it entirely — personally, by force of will. You build through direct example, accepting that what you create will depend entirely on you being there to hold it.",
+    bio: "Illegitimate son of a minor chief who turned a small Zulu clan into the dominant military power of southern Africa in a decade. Reinvented African warfare by replacing the throwing spear with a short stabbing spear, introducing disciplined infantry formations, and training regiments that could march 50 miles a day and fight at the end of it. Famous for: the bull-horn encirclement tactic, the iklwa stabbing spear, the Mfecane — the cascade of wars his expansion triggered across southern Africa. Controversial because: his methods were brutal even by the standards of the time, and after his mother's death his grief-driven orders killed thousands of his own people before he was assassinated by his half-brothers. Today he's a national hero in South Africa and a figure of ongoing debate — founder of the Zulu nation but also a ruler whose state depended entirely on continuous war.",
+    traits: {decisiveness:9,strategic_patience:3,means_vs_ends:2,personal_control:10,risk_appetite:7,institutional_power:5}
+  },
+  thatcher: {
+    name: "Margaret Thatcher",
+    era: "1925–2013 · United Kingdom",
+    summary: "The ideological battler. You have a clear vision of what is right and you are willing to break institutions to get there. You value conviction over consensus — and you would rather be right and disliked than liked and compromised.",
+    bio: "Grocer's daughter who became Britain's first female Prime Minister and stayed there for eleven years, remaking the British economy through privatisation, deregulation, and breaking the power of the trade unions. Won the 1982 Falklands War, helped end the Cold War through her partnership with Reagan and early recognition of Gorbachev, and was eventually forced out by her own party. Famous for: the lady's not for turning, the miners' strike, the poll tax, the Iron Lady nickname (given by a Soviet newspaper and worn as a badge). Controversial because: her reforms created winners and losers on a scale Britain is still arguing about — some regions never recovered from the deindustrialisation she accelerated. Today she's the figure British politics still defines itself in relation to — admired by the right as a conviction politician who turned Britain around, hated by the left as the architect of inequality.",
+    traits: {decisiveness:8,strategic_patience:7,means_vs_ends:5,personal_control:7,risk_appetite:5,institutional_power:2}
+  }
+};
+
+const QUESTIONS = [
+  {
+    id:"q01", trait_axis:"decisiveness",
+    scenario:"You are at a boundary that commits you fully once crossed. Standing still means defeat, but crossing means openly defying the authority that governs you. Your rivals have maneuvered you here deliberately.",
+    context:"The window is hours. Some of your people urge one last negotiation. Others say the moment you hesitate, you lose it.",
+    choices:[
+      {id:"A",text:"Cross now. They used the rules as a weapon against you — you are no longer bound by them. The only mistake is hesitation.",leader_key:"caesar"},
+      {id:"B",text:"Wait for one final attempt at negotiation. Moving with moral clarity is worth the cost of a delay.",leader_key:"lincoln"},
+      {id:"C",text:"Secure the loyalty of every key subordinate before you move. An uncertain army is worse than a delayed advance.",leader_key:"bismarck"},
+      {id:"D",text:"Cross and commit everything at once. Make the first blow so decisive that no coherent response is possible.",leader_key:"genghis"}
+    ]
+  },
+  {
+    id:"q02", trait_axis:"decisiveness",
+    scenario:"A crisis arrives with no warning. Your regular decision-making process would take days. You have hours. You have instincts but no data.",
+    context:"Your advisors want to convene a process. You know that by the time it concludes, the opportunity — or the damage — will already be determined.",
+    choices:[
+      {id:"A",text:"Act on instinct immediately. You have spent years accumulating judgment for exactly this moment. Trust it.",leader_key:"caesar"},
+      {id:"B",text:"Slow down even if it's painful. Rushing a bad decision compounds the crisis. Get the minimum information you need.",leader_key:"lincoln"},
+      {id:"C",text:"Act, but only after you've personally assessed every key element yourself. Your read on the situation is what matters, not a committee's.",leader_key:"shaka"},
+      {id:"D",text:"Act and announce it simultaneously. In a crisis, visible decisive action is itself part of the solution.",leader_key:"thatcher"}
+    ]
+  },
+  {
+    id:"q03", trait_axis:"decisiveness",
+    scenario:"One of your operations is failing and will probably not recover. Reinforcing it will cost resources your other operations need. Abandoning it means accepting the failure and leaving the people running it behind.",
+    context:"The failing operation was never your most important. The team has been loyal and capable — but loyalty cannot change the ground situation.",
+    choices:[
+      {id:"A",text:"Abandon it immediately and redirect the resources. You can compensate the team later. The math doesn't change by being slow about it.",leader_key:"caesar"},
+      {id:"B",text:"End it formally but transfer the team to the better-performing operation. Make the transition as clean as the situation allows.",leader_key:"bismarck"},
+      {id:"C",text:"Visit it personally before writing it off. Your presence on a failing operation has changed outcomes before. Assess it yourself.",leader_key:"shaka"},
+      {id:"D",text:"Abandon it without ceremony. Resources follow success. People who understand what you're building will understand why.",leader_key:"genghis"}
+    ]
+  },
+  {
+    id:"q04", trait_axis:"strategic_patience",
+    scenario:"The moment you have prepared for is close — but not yet exactly right. Acting now would probably work. Acting in three months, when conditions improve further, would work with near certainty.",
+    context:"Holding your team in readiness has costs — fatigue, leaks, wavering commitment. But the probability gap between now and three months is real.",
+    choices:[
+      {id:"A",text:"Wait the three months. A near-certain outcome is worth more than a probably-fine one. This is not a situation that rewards gambling.",leader_key:"lincoln"},
+      {id:"B",text:"Begin with a smaller initial action that locks in the first step, while reserving the main move for when conditions are better.",leader_key:"bismarck"},
+      {id:"C",text:"Act now. Conditions never become perfect, and waiting signals hesitation to the people who are watching.",leader_key:"thatcher"},
+      {id:"D",text:"Act now at full force. Perfect conditions are for people who aren't willing to create their own.",leader_key:"genghis"}
+    ]
+  },
+  {
+    id:"q05", trait_axis:"strategic_patience",
+    scenario:"You are managing a long-running problem that will require years of sustained effort to resolve. Every week, people demand you do something visible and immediate — even if it accomplishes nothing structurally.",
+    context:"Doing something visible would quiet the noise temporarily but set back the actual solution by months. Doing nothing visible looks like weakness.",
+    choices:[
+      {id:"A",text:"Find an action that is both visible and strategically useful. Serve both needs simultaneously.",leader_key:"caesar"},
+      {id:"B",text:"Hold the long-term course and accept the political cost. Doing the wrong thing visibly is worse than doing the right thing quietly.",leader_key:"lincoln"},
+      {id:"C",text:"Do the visible thing, and use it as a platform to explain the long-term strategy. Make the patience itself a public statement.",leader_key:"thatcher"},
+      {id:"D",text:"Train the people around you to tolerate the discomfort of the long game. Change the expectations rather than meeting the wrong ones.",leader_key:"shaka"}
+    ]
+  },
+  {
+    id:"q06", trait_axis:"strategic_patience",
+    scenario:"A rival organisation is weakening. Their internal problems are real and worsening. You could move on them now, while they're distracted, or wait until they've deteriorated further.",
+    context:"Moving now requires more resources and carries more risk. Waiting increases the chance of either a complete collapse — ideal — or an unexpected recovery — bad.",
+    choices:[
+      {id:"A",text:"Wait. Let the deterioration run its course. A patient move against a collapsed opponent costs less and wins more cleanly.",leader_key:"bismarck"},
+      {id:"B",text:"Move now. Do not give a weakening enemy time to reconsider, reorganise, or find new allies.",leader_key:"genghis"},
+      {id:"C",text:"Move now with overwhelming force. A slow-moving opponent gives you the space to commit everything rather than hedge.",leader_key:"shaka"},
+      {id:"D",text:"Wait, and use the time to build the public case for why moving will be necessary. When you do move, you have moral authority in addition to strategic advantage.",leader_key:"thatcher"}
+    ]
+  },
+  {
+    id:"q07", trait_axis:"means_vs_ends",
+    scenario:"The outcome you're pursuing is clearly right. The method required to achieve it will cause real, documented harm to people who did nothing wrong. There is no version of the outcome that avoids the harm.",
+    context:"You can acknowledge the harm openly, minimise it practically while staying the course, or simply pursue the goal and let critics address the costs later.",
+    choices:[
+      {id:"A",text:"Pursue the goal, acknowledge the costs honestly, and deal with them as best you can. The outcome was worth it — say so clearly.",leader_key:"caesar"},
+      {id:"B",text:"Pursue the goal but build compensation mechanisms for the harmed parties. Manage the exposure while running the strategy.",leader_key:"bismarck"},
+      {id:"C",text:"Pursue the goal. The harm is a side effect of a correct strategic decision. People who weren't harmed can afford their principles.",leader_key:"genghis"},
+      {id:"D",text:"Pursue the goal and defend the costs publicly. If the cause is right, the costs are the price — and pretending otherwise is a form of dishonesty.",leader_key:"thatcher"}
+    ]
+  },
+  {
+    id:"q08", trait_axis:"means_vs_ends",
+    scenario:"An opponent has repeatedly broken agreements, negotiated in bad faith, and caused significant damage. You now have the capacity to end the threat. The question is how completely to do so.",
+    context:"A partial resolution leaves some capacity intact for future resistance. A total resolution removes the threat permanently but requires methods beyond what the situation militarily requires.",
+    choices:[
+      {id:"A",text:"Decisive defeat, then generous terms. Their leadership is broken. The people they led are not the enemy.",leader_key:"lincoln"},
+      {id:"B",text:"Break their capacity, then rebuild them as a dependent. A functional but controlled former rival is more useful than a destroyed one.",leader_key:"bismarck"},
+      {id:"C",text:"End it completely. The cost of half-measures with an opponent who breaks agreements is another war in five years.",leader_key:"shaka"},
+      {id:"D",text:"Eliminate the capacity for future resistance entirely. They demonstrated what they do when given the opportunity. Don't give it again.",leader_key:"genghis"}
+    ]
+  },
+  {
+    id:"q09", trait_axis:"means_vs_ends",
+    scenario:"You can accelerate your objective significantly by using a method that is legal but that you find ethically uncomfortable — exploiting a loophole clearly not intended for this purpose.",
+    context:"The objective is genuinely important. The method won't be closely scrutinised. Using it won't create an easily-cited precedent.",
+    choices:[
+      {id:"A",text:"Use it. The objective matters. Moral discomfort about legal tools is a luxury for people who aren't trying to accomplish anything.",leader_key:"caesar"},
+      {id:"B",text:"Don't use it. The method you use shapes who you are and what you build. This one will cost more than the acceleration is worth.",leader_key:"lincoln"},
+      {id:"C",text:"Use it through a structure that creates maximum deniability and minimum precedent. The goal is the result, not the lesson.",leader_key:"bismarck"},
+      {id:"D",text:"Use it and own it openly. If the tool works, others should know about it. The discomfort means it's effective, not that it's wrong.",leader_key:"shaka"}
+    ]
+  },
+  {
+    id:"q10", trait_axis:"means_vs_ends",
+    scenario:"Your strategy is producing the outcomes you intended at the aggregate level. But specific groups — people you can identify, document, see — are being harmed in the process. The harm is a direct result of your approach.",
+    context:"Adjusting the strategy to protect these groups would slow the overall outcome significantly. The overall outcome is worth it. But these people are real, and they did not choose this.",
+    choices:[
+      {id:"A",text:"Continue the strategy. Compensate the harmed groups directly through a separate mechanism — but don't compromise the approach itself.",leader_key:"caesar"},
+      {id:"B",text:"Continue. The aggregate result is what matters. Suffering in the path of a correct strategy is not a strategic error.",leader_key:"genghis"},
+      {id:"C",text:"Continue, but personally lead the hardest part of it. If the strategy produces costs, the person ordering it should bear some of them.",leader_key:"shaka"},
+      {id:"D",text:"Continue and defend the harm openly. If the cause is right, the costs are the price of it. Mitigation that undermines the strategy is a disguised retreat.",leader_key:"thatcher"}
+    ]
+  },
+  {
+    id:"q11", trait_axis:"personal_control",
+    scenario:"Your operation has grown beyond what any individual can directly supervise. You have capable people who could lead distributed elements, but all of them have views that diverge from yours on at least some important questions.",
+    context:"Full delegation accelerates everything. Full control creates a bottleneck. The middle path exists but has its own failure modes.",
+    choices:[
+      {id:"A",text:"Delegate broadly to the most capable people. Accept that their judgment will differ from yours on some things. The aggregate result will be better.",leader_key:"lincoln"},
+      {id:"B",text:"Give full operational autonomy to leaders who have proven themselves. They know the objective — trust them to find the path.",leader_key:"genghis"},
+      {id:"C",text:"Expand your direct span of control before delegating. Train the people who will lead until their instincts match yours.",leader_key:"shaka"},
+      {id:"D",text:"Delegate to people who share your fundamental worldview. Capability without alignment produces drift. The selection of people is the form of control.",leader_key:"thatcher"}
+    ]
+  },
+  {
+    id:"q12", trait_axis:"personal_control",
+    scenario:"A capable subordinate is asking for more autonomy than you currently give them. They have a strong track record. Their proposed approach differs from how you would do it — not wrongly, just differently.",
+    context:"Granting more autonomy risks loss of coherence. Denying it risks losing a capable person or suppressing the judgment that makes them valuable.",
+    choices:[
+      {id:"A",text:"Grant it on specific decisions, not broadly. Freedom on how, not on what. The strategic frame stays yours.",leader_key:"caesar"},
+      {id:"B",text:"Grant it with a clear accountability structure. More freedom, more transparency about what they're doing and why.",leader_key:"bismarck"},
+      {id:"C",text:"Grant it and let them run. People who have earned trust should be trusted. The oversight is the output, not the process.",leader_key:"lincoln"},
+      {id:"D",text:"Grant it only when they've internalised your goals so completely that their independent choices will align with yours. Otherwise it's not delegation — it's abdication.",leader_key:"thatcher"}
+    ]
+  },
+  {
+    id:"q13", trait_axis:"personal_control",
+    scenario:"You must assign a leader to a distant operation where communication will be slow and your direct oversight is impossible. Two candidates: one is fully aligned with your approach but moderately capable; the other is highly capable but has strong independent views.",
+    context:"The distant operation will face decisions you cannot anticipate. A wrong call there could be costly before you even know it happened.",
+    choices:[
+      {id:"A",text:"Send the capable one, but spend intensive time with them first to lock in the strategic frame. One alignment session is worth months of check-ins.",leader_key:"caesar"},
+      {id:"B",text:"Send the capable one with full autonomy. You selected them because they're good. Now let them be good — outcome is the only accountability.",leader_key:"genghis"},
+      {id:"C",text:"Send the aligned one. A moderately capable person who executes your approach is more predictable than a highly capable person who improvises.",leader_key:"bismarck"},
+      {id:"D",text:"Go yourself first. Establish the standard personally, then bring in the best person to maintain it.",leader_key:"shaka"}
+    ]
+  },
+  {
+    id:"q14", trait_axis:"risk_appetite",
+    scenario:"You have an opportunity that could transform your position dramatically, but it has a real chance of costing you everything you've built so far. The expected value calculation is positive, but the downside is catastrophic and irreversible.",
+    context:"Your people are divided. Some see the opportunity clearly. Others see only the downside. Both groups are looking at the same information.",
+    choices:[
+      {id:"A",text:"Don't take it. An irreversible catastrophic downside changes the math regardless of expected value. Preserve what you've built.",leader_key:"lincoln"},
+      {id:"B",text:"Take it, but only after you've personally reviewed every element of the preparation. Catastrophic outcomes are usually failures of preparation, not bad luck.",leader_key:"shaka"},
+      {id:"C",text:"Take it. History is not made by people who declined the transformational bet. The downside is real but not certain; the upside is real and big.",leader_key:"thatcher"},
+      {id:"D",text:"Take it immediately and fully. Commit everything. Hesitation in this moment is itself the risk.",leader_key:"genghis"}
+    ]
+  },
+  {
+    id:"q15", trait_axis:"risk_appetite",
+    scenario:"You have just achieved your main objective ahead of schedule. An unexpected opening has appeared — something outside the original plan that you now have the capacity to pursue. It would extend the operation significantly.",
+    context:"Consolidating now locks in a real, substantial win. Pursuing the opening might produce something historic, but it changes the nature of what you set out to do.",
+    choices:[
+      {id:"A",text:"Pursue the opening. A merely good outcome is forgettable. A historic one redefines your position permanently. Momentum is its own argument.",leader_key:"caesar"},
+      {id:"B",text:"Consolidate. The original objective was the right objective. Scope creep driven by opportunity is how real wins get undone.",leader_key:"lincoln"},
+      {id:"C",text:"Pursue it immediately at maximum speed. The window won't stay open. The argument for consolidation is always available — this one isn't.",leader_key:"genghis"},
+      {id:"D",text:"Pursue it, but frame it publicly as a logical extension of the original mission. The extension has to mean something beyond opportunism.",leader_key:"thatcher"}
+    ]
+  },
+  {
+    id:"q16", trait_axis:"risk_appetite",
+    scenario:"Your advisors, without exception, are telling you that the approach you're considering carries unacceptable risk. They have data. They are not being timid — they genuinely believe you are wrong.",
+    context:"You believe they are right about the data and wrong about the conclusion. You think they're solving for the wrong variable.",
+    choices:[
+      {id:"A",text:"Design a smaller version that achieves 60% of the goal at 20% of the risk. Test the logic without betting everything on it.",leader_key:"bismarck"},
+      {id:"B",text:"Delay. Not abandon — delay. You might be right and they might be wrong, but unanimity deserves more than override.",leader_key:"lincoln"},
+      {id:"C",text:"Proceed, but lead the riskiest element personally. If you're deciding the risk is acceptable, you should be the one most exposed.",leader_key:"shaka"},
+      {id:"D",text:"Proceed. Unanimous expert consensus has been wrong before, often on the most important questions. If you've thought it through, the dissent is not new information.",leader_key:"thatcher"}
+    ]
+  },
+  {
+    id:"q17", trait_axis:"institutional_power",
+    scenario:"A legitimate institution is blocking something you need to do. Its authority is real — established through a valid process and representing genuine interests. But in this case, it is wrong, and its opposition will cause real harm.",
+    context:"You could respect the institution and work within it, achieving a reduced version of what you need — or push through and accept the costs to its authority.",
+    choices:[
+      {id:"A",text:"Push through. The institution is wrong here, and being wrong is the only thing that matters. Authority that produces bad outcomes is not a reason to accept them.",leader_key:"caesar"},
+      {id:"B",text:"Work within the institution to reshape the constraint from the inside. Find the people inside who agree with you and give them the tools to win the argument.",leader_key:"bismarck"},
+      {id:"C",text:"Push through, but demonstrate that you're replacing the institution's function, not just breaking its authority. Build the alternative as you remove the obstacle.",leader_key:"shaka"},
+      {id:"D",text:"Push through and make the confrontation public. The institution is not just wrong in this case — it's structurally wrong. The public fight is part of the correction.",leader_key:"thatcher"}
+    ]
+  },
+  {
+    id:"q18", trait_axis:"institutional_power",
+    scenario:"You are building something you intend to outlast you. You could build it around your personal authority — fast, effective, completely aligned with your vision — or build institutions, rules, and structures that don't depend on any individual.",
+    context:"Building around yourself is working brilliantly right now. Building durable institutions will slow you down and require sharing credit with people who will take the structure in directions you won't like.",
+    choices:[
+      {id:"A",text:"Build the institution now. Personal authority is the scaffolding, not the building. Start the institutional design while you have the leverage to shape it.",leader_key:"lincoln"},
+      {id:"B",text:"Build both simultaneously. Use personal authority to create the institution, then use the institution to sustain it. They are not alternatives.",leader_key:"bismarck"},
+      {id:"C",text:"Build around yourself for now. You are what makes this work. Systematise later, when there are people worthy of the structure.",leader_key:"genghis"},
+      {id:"D",text:"Build institutions that encode your principles. A structure is only worth building if it enshrines the right ideas — not just any durable arrangement.",leader_key:"thatcher"}
+    ]
+  },
+  {
+    id:"q19", trait_axis:"institutional_power",
+    scenario:"You have won a conflict that ran for years. The old system is shattered. You can now build whatever comes next. You have significant latitude — and significant opposition from people who want different things.",
+    context:"The institutions you build now will shape what follows for generations. The choices you make about power — who has it, how it's checked, what it's used for — will outlast you.",
+    choices:[
+      {id:"A",text:"Build structures that concentrate authority where it needs to be to accomplish the next objectives. Disperse it later when the foundational work is done.",leader_key:"caesar"},
+      {id:"B",text:"Build the most durable, broadly representative structure you can make it. Concentrated authority produces short-term efficiency and long-term brittleness.",leader_key:"lincoln"},
+      {id:"C",text:"Build a structure that balances the key interests against each other — each gets enough to prevent rebellion, you get enough to run the machinery.",leader_key:"bismarck"},
+      {id:"D",text:"Build what is needed for the next generation of expansion. Stability systems are for people who are done building. You are not done.",leader_key:"genghis"}
+    ]
+  },
+  {
+    id:"q20", trait_axis:"risk_appetite",
+    scenario:"The rules of the game you're operating in were designed by your competitors to favour them. Playing by those rules means accepting a permanent structural disadvantage. Breaking them means accepting permanent enmity from the people who made them.",
+    context:"Your predecessors tried to succeed within the rules. They did not. You could be different — or you could choose to be.",
+    choices:[
+      {id:"A",text:"Break the rules, but replace them with something better. Show that the old rules were not just unfair but inferior — and that yours produce better outcomes.",leader_key:"shaka"},
+      {id:"B",text:"Ignore the rules entirely. Win so completely that the people who made them no longer have the standing to enforce them.",leader_key:"genghis"},
+      {id:"C",text:"Break the rules that block you, preserve the ones that don't. You are not an ideological opponent of the system — you're a practical one.",leader_key:"caesar"},
+      {id:"D",text:"Break the rules publicly, loudly, and on principle. Make the argument for why they were wrong before you break them. The argument is part of the move.",leader_key:"thatcher"}
+    ]
+  },
+  {
+    id:"q21", trait_axis:"personal_control",
+    scenario:"The role you most need to fill is best suited to someone who has publicly criticised your approach, disagrees on several key points, and has their own political ambitions. The next best candidate is loyal and capable but genuinely less suited.",
+    context:"The role will be highly visible. Appointing the critic elevates a rival. Not appointing them means accepting a less effective outcome on something that matters enormously.",
+    choices:[
+      {id:"A",text:"Appoint the critic. The job requires the best person. Your job is to put the best people in position regardless of personal politics.",leader_key:"lincoln"},
+      {id:"B",text:"Appoint them with carefully defined limits on their authority. Capture the capability while constraining the independence.",leader_key:"bismarck"},
+      {id:"C",text:"Appoint the loyal candidate and elevate them through your direct involvement. The outcome is better with someone fully aligned whom you can drive personally.",leader_key:"shaka"},
+      {id:"D",text:"Appoint the critic, then bind them to you. Make the appointment a public demonstration of confidence and turn the rival into an ally through the act itself.",leader_key:"caesar"}
+    ]
+  },
+  {
+    id:"q22", trait_axis:"strategic_patience",
+    scenario:"A major initiative you launched has been struggling for months. The core logic is still sound, but execution has been costly and morale is eroding. Your opponents say this proves the whole approach was wrong.",
+    context:"Abandoning it validates the critics and wastes what you've invested. Doubling down requires resources you may not sustain. A third option — restructure while continuing — is available but complex.",
+    choices:[
+      {id:"A",text:"Restructure it. The logic was right but the implementation needs rethinking. A mid-course correction is not a retreat — it's what rational operators do.",leader_key:"bismarck"},
+      {id:"B",text:"Cut the losses and redirect resources immediately to the next initiative. A struggling operation rarely recovers; a new one starts from a better position.",leader_key:"genghis"},
+      {id:"C",text:"Stay the course and increase your public commitment to it. The critics are wrong. Abandoning now validates bad-faith opposition, not legitimate criticism.",leader_key:"thatcher"},
+      {id:"D",text:"Go into it personally. Whatever is going wrong in execution requires your direct intervention, not a strategic review.",leader_key:"shaka"}
+    ]
+  },
+  {
+    id:"q23", trait_axis:"means_vs_ends",
+    scenario:"You have defeated an opponent who fought hard and caused significant harm. Your supporters expect severity. Among the defeated are capable people whose skills would be genuinely useful.",
+    context:"Enemies who believe they've been treated generously can become the most loyal. Enemies who are merely neutralised retain the capacity to become enemies again.",
+    choices:[
+      {id:"A",text:"Pardon them and bring the best into your operation. Winning people over completely is worth the risk of some betrayal.",leader_key:"caesar"},
+      {id:"B",text:"Pardon broadly. The fight is over. Generous terms are what make the peace last — save firmness for the few cases that truly require it.",leader_key:"lincoln"},
+      {id:"C",text:"Incorporate those who are useful, remove those who aren't. Generosity is a tool, not a principle. Use it where it serves the objective.",leader_key:"shaka"},
+      {id:"D",text:"Remove the leadership permanently. They demonstrated what they are. The capable ones are capable in the service of future resistance as well.",leader_key:"genghis"}
+    ]
+  },
+  {
+    id:"q24", trait_axis:"institutional_power",
+    scenario:"Your core supporters — the people whose backing makes everything possible — are demanding an action you believe would be a strategic mistake. The underlying grievance is legitimate, but the specific action they want would cause more harm than good.",
+    context:"Refusing them risks your political base. Doing it satisfies them but creates a problem you'll manage for years. An adjacent action that addresses the grievance differently is possible but won't fully satisfy them.",
+    choices:[
+      {id:"A",text:"Refuse the action and explain why, at length. People who understand what you're trying to build will respect the reasoning even if they don't like the answer.",leader_key:"lincoln"},
+      {id:"B",text:"Do the adjacent thing. Give your supporters something real that addresses the actual grievance without the specific costs of what they're asking for.",leader_key:"bismarck"},
+      {id:"C",text:"Refuse, but use the moment to clarify what you stand for. The supporters who can't accept a principled refusal are not the ones whose judgment you should be managing to.",leader_key:"thatcher"},
+      {id:"D",text:"Do it, but do it on your terms and in your way. Giving supporters what they want while shaping how it's done is better than a refusal that costs you the base.",leader_key:"caesar"}
+    ]
+  },
+  {
+    id:"q25", trait_axis:"institutional_power",
+    scenario:"You are asked, directly, what happens when you are no longer there. The thing you've built depends on you in ways you've never fully acknowledged. No successor is you.",
+    context:"The people asking are not wrong. You have always believed the work itself was the answer. But the question is not going away.",
+    choices:[
+      {id:"A",text:"The work continues because you'll expand it to the point where the infrastructure is self-sustaining before the question becomes urgent. Cross that bridge when you reach it.",leader_key:"genghis"},
+      {id:"B",text:"You are the institution. What comes after will be different, not worse — just different. Your job is to push as far as you can while you're here.",leader_key:"shaka"},
+      {id:"C",text:"Build the structure now, before the question becomes urgent. The institution should function without you. That's the whole point of building one.",leader_key:"bismarck"},
+      {id:"D",text:"Find and prepare the person who believes what you believe. The institution is only as durable as the principles it encodes — and principles need people who hold them.",leader_key:"thatcher"}
+    ]
+  }
+];
+
+const PORTRAITS = {
+  caesar:   { src:'/images/leaders/caesar.jpg',   caption:'Tusculum bust, 1st century BC' },
+  lincoln:  { src:'/images/leaders/lincoln.jpg',  caption:'Alexander Gardner, 1863' },
+  bismarck: { src:'/images/leaders/bismarck.jpg', caption:'Franz von Lenbach, c.1890' },
+  genghis:  { src:'/images/leaders/genghis.jpg',  caption:'National Palace Museum, 14th c.' },
+  shaka:    { src:'/images/leaders/shaka.jpg',    caption:'James King, 1824' },
+  thatcher: { src:'/images/leaders/thatcher.jpg', caption:'White House photo, 1988' }
+};
 
 const TRAIT_LABELS = {
-  decisiveness: 'Decisiveness',
+  decisiveness:       'Decisiveness',
   strategic_patience: 'Strategic patience',
-  means_vs_ends: 'Means vs ends',
-  personal_control: 'Personal control',
-  risk_appetite: 'Risk appetite',
-  institutional_power: 'Institutional power'
+  means_vs_ends:      'Ethical constraint',
+  personal_control:   'Personal control',
+  risk_appetite:      'Risk appetite',
+  institutional_power:'Institutional trust'
 };
 
-// Portrait mapping: leader_key -> {src, caption}
-// All images should live at /images/leaders/<key>.jpg
-const PORTRAITS = {
-  caesar:   { src: '/images/leaders/caesar.jpg',   caption: 'Tusculum bust, 1st century BC' },
-  lincoln:  { src: '/images/leaders/lincoln.jpg',  caption: 'Alexander Gardner, 1863' },
-  napoleon: { src: '/images/leaders/napoleon.jpg', caption: 'Jacques-Louis David, 1812' },
-  bismarck: { src: '/images/leaders/bismarck.jpg', caption: 'Franz von Lenbach, c.1890' },
-  genghis:  { src: '/images/leaders/genghis.jpg',  caption: 'National Palace Museum, 14th c.' },
-  shaka:    { src: '/images/leaders/shaka.jpg',    caption: 'James King, 1824' },
-  thatcher: { src: '/images/leaders/thatcher.jpg', caption: 'Chris Collins, 1983' }
-};
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let _current = 0;
+let _answers = {};
+let _scores = {};
+let _appearances = {};
+let _gameQuestions = [];
 
-// Compute similarity between the user's implicit trait profile (derived from their picks)
-// and each leader's trait profile. Returns 0-100.
+// ── SCORING ───────────────────────────────────────────────────────────────────
+
+// Euclidean distance → 0-100 similarity.
 function traitSimilarity(userTraits, leaderTraits) {
   const keys = Object.keys(TRAIT_LABELS);
   let sumSq = 0;
   for (const k of keys) {
-    const u = userTraits[k] || 0;
-    const l = leaderTraits[k] || 0;
-    const diff = u - l;
+    const diff = (userTraits[k] || 0) - (leaderTraits[k] || 0);
     sumSq += diff * diff;
   }
-  // Max possible distance: each of 6 axes can differ by 10, so maxDist = sqrt(6*100) = ~24.49
-  const dist = Math.sqrt(sumSq);
   const maxDist = Math.sqrt(keys.length * 100);
-  return Math.max(0, Math.round((1 - dist / maxDist) * 100));
+  return Math.max(0, Math.round((1 - Math.sqrt(sumSq) / maxDist) * 100));
 }
 
-// Build the user's implicit trait profile by averaging the trait scores of the leaders
-// they picked across all answered questions.
+// Average trait values of all leaders the user actually picked.
 function buildUserTraits() {
   const keys = Object.keys(TRAIT_LABELS);
   const sums = {}; keys.forEach(k => sums[k] = 0);
   let count = 0;
   for (const qid in _answers) {
-    const leaderKey = _answers[qid];
-    const leader = _leaders[leaderKey];
+    const lk = _answers[qid];
+    const leader = LEADERS[lk];
     if (!leader) continue;
-    const traits = typeof leader.traits === 'string' ? JSON.parse(leader.traits) : leader.traits;
-    keys.forEach(k => { sums[k] += (traits[k] || 0); });
+    keys.forEach(k => { sums[k] += (leader.traits[k] || 0); });
     count++;
   }
   const avg = {};
-  keys.forEach(k => { avg[k] = count > 0 ? sums[k] / count : 0; });
+  keys.forEach(k => { avg[k] = count > 0 ? sums[k] / count : 5; });
   return avg;
 }
 
-// ── LOAD ───────────────────────────────────────────────────────────────────────
-async function loadData() {
-  try {
-    const [qRes, lRes] = await Promise.all([
-      fetch(WORKER, { method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ action: 'get_persona_questions' }) }),
-      fetch(WORKER, { method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ action: 'get_persona_leaders' }) })
-    ]);
-    const qData = await qRes.json();
-    const lData = await lRes.json();
-    if (!qData.success || !lData.success) throw new Error(qData.error || lData.error);
-    _questions = qData.questions;
-    _leaders = lData.leaders;
-    renderLeadersPreview();
-  } catch(e) {
-    console.error('Load error:', e);
-    showError('Could not load questions: ' + e.message);
-  }
-}
-
-function renderLeadersPreview() {
+// ── INIT ──────────────────────────────────────────────────────────────────────
+function init() {
   const el = document.getElementById('leaders-preview');
-  el.innerHTML = Object.values(_leaders).map(l =>
+  el.innerHTML = Object.values(LEADERS).map(l =>
     `<span class="lp-chip">${l.name}</span>`
   ).join('');
 }
 
 // ── GAME ───────────────────────────────────────────────────────────────────────
 function startGame() {
-  if (_questions.length === 0) {
-    showError('Questions have not loaded yet. Please wait a moment and try again.');
-    return;
-  }
+  const shuffled = [...QUESTIONS].sort(() => Math.random() - .5);
+  _gameQuestions = shuffled.slice(0, 25);
 
-  // Shuffle and draw 25
-  const shuffled = [..._questions].sort(() => Math.random() - .5);
-  _gameQuestions = shuffled.slice(0, Math.min(25, shuffled.length));
-
-  // Reset state
   _current = 0;
   _answers = {};
   _scores = {};
-  Object.keys(_leaders).forEach(k => _scores[k] = 0);
+  _appearances = {};
+
+  // Pre-compute how many times each leader appears as an option in this draw.
+  Object.keys(LEADERS).forEach(k => { _scores[k] = 0; _appearances[k] = 0; });
+  _gameQuestions.forEach(q => {
+    q.choices.forEach(c => { _appearances[c.leader_key] = (_appearances[c.leader_key] || 0) + 1; });
+  });
 
   show('q-wrap');
   renderQuestion();
@@ -359,26 +652,20 @@ function renderQuestion() {
   const q = _gameQuestions[_current];
   const total = _gameQuestions.length;
 
-  // Progress
   const pct = Math.round((_current / total) * 100);
   document.getElementById('q-fill').style.width = `${pct}%`;
   document.getElementById('q-num').textContent = `${_current + 1} / ${total}`;
   document.getElementById('q-pct-label').textContent = `${pct}% complete`;
   const remaining = total - _current;
-  document.getElementById('q-remaining').textContent = remaining === 1
-    ? '1 question remaining'
-    : `${remaining} questions remaining`;
+  document.getElementById('q-remaining').textContent =
+    remaining === 1 ? '1 question remaining' : `${remaining} questions remaining`;
 
-  // Content
   document.getElementById('q-trait').textContent = TRAIT_LABELS[q.trait_axis] || q.trait_axis;
   document.getElementById('q-scenario').textContent = q.scenario;
   document.getElementById('q-context').textContent = q.context;
 
-  // Parse choices (might be string from DB)
-  const choices = typeof q.choices === 'string' ? JSON.parse(q.choices) : q.choices;
-
   const choicesEl = document.getElementById('choices');
-  choicesEl.innerHTML = choices.map((c, i) => {
+  choicesEl.innerHTML = q.choices.map((c, i) => {
     const letters = ['A','B','C','D'];
     const selected = _answers[q.id] === c.leader_key ? ' selected' : '';
     return `<button class="choice-btn${selected}" onclick="selectChoice('${q.id}','${c.leader_key}',this)">
@@ -386,7 +673,6 @@ function renderQuestion() {
     </button>`;
   }).join('');
 
-  // Next button
   const nextBtn = document.getElementById('q-next');
   nextBtn.textContent = _current === total - 1 ? 'See my result →' : 'Next →';
   nextBtn.classList.toggle('active', !!_answers[q.id]);
@@ -394,7 +680,6 @@ function renderQuestion() {
 
 function selectChoice(qid, leaderKey, btn) {
   _answers[qid] = leaderKey;
-  // Update UI
   document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   document.getElementById('q-next').classList.add('active');
@@ -402,11 +687,9 @@ function selectChoice(qid, leaderKey, btn) {
 
 function nextQuestion() {
   const q = _gameQuestions[_current];
-  // Record score
   if (_answers[q.id]) {
     _scores[_answers[q.id]] = (_scores[_answers[q.id]] || 0) + 1;
   }
-
   _current++;
   if (_current >= _gameQuestions.length) {
     showResults();
@@ -425,47 +708,38 @@ function skipQuestion() {
 }
 
 // ── RESULTS ───────────────────────────────────────────────────────────────────
+function buildRanking() {
+  const userTraits = buildUserTraits();
+  return Object.keys(LEADERS).map(key => {
+    const leader = LEADERS[key];
+    const picks = _scores[key] || 0;
+    const appearances = _appearances[key] || 1;
+    const sim = traitSimilarity(userTraits, leader.traits);
+    // Normalise pick rate by appearances so every leader is on equal footing
+    // regardless of how often they showed up in this draw.
+    const pickPct = (picks / appearances) * 100;
+    // Pick rate drives the result (82%); trait similarity breaks close ties (18%).
+    const combined = 0.82 * pickPct + 0.18 * sim;
+    return { key, leader, picks, appearances, pickPct, sim, combined };
+  }).sort((a, b) => b.combined - a.combined);
+}
+
 function showResults() {
   show('loading-wrap');
-
   setTimeout(() => {
-    const answered = Object.values(_answers).length;
-    const userTraits = buildUserTraits();
-
-    // Build a ranked list using hybrid score:
-    //   primary: pick count (how often this leader's answer was chosen)
-    //   tiebreaker / refinement: trait similarity to user's implicit profile
-    // We sort by a combined score that favours pick count but uses similarity to break ties
-    // and to surface leaders you aligned with traitwise even when pick count was close.
-    const ranked = Object.keys(_leaders).map(key => {
-      const leader = _leaders[key];
-      const traits = typeof leader.traits === 'string' ? JSON.parse(leader.traits) : leader.traits;
-      const picks = _scores[key] || 0;
-      const sim = traitSimilarity(userTraits, traits); // 0-100
-      // combined: pick count weighted ~65%, trait similarity ~35%
-      // normalise picks to a 0-100 scale based on max possible (answered)
-      const pickPct = answered > 0 ? (picks / answered) * 100 : 0;
-      const combined = 0.65 * pickPct + 0.35 * sim;
-      return { key, leader, picks, pickPct, sim, combined };
-    }).sort((a, b) => b.combined - a.combined);
-
+    const ranked = buildRanking();
     const top = ranked[0];
     const topLeader = top.leader;
 
     show('result-wrap');
 
-    // Portrait
     const portrait = PORTRAITS[top.key];
     const imgEl = document.getElementById('result-portrait');
     const capEl = document.getElementById('result-portrait-caption');
     if (portrait) {
       imgEl.src = portrait.src;
       imgEl.alt = topLeader.name;
-      imgEl.onerror = () => {
-        // Hide portrait wrap if image fails to load
-        imgEl.parentElement.style.display = 'none';
-        capEl.style.display = 'none';
-      };
+      imgEl.onerror = () => { imgEl.parentElement.style.display = 'none'; capEl.style.display = 'none'; };
       capEl.textContent = portrait.caption;
     } else {
       imgEl.parentElement.style.display = 'none';
@@ -477,152 +751,91 @@ function showResults() {
     document.getElementById('result-summary').textContent = topLeader.summary;
     document.getElementById('result-match-pct-num').textContent = Math.round(top.sim) + '%';
 
-    // Bio
     const bioEl = document.getElementById('result-bio');
     if (topLeader.bio) {
-      // Bold the cue phrases: "Famous for:", "Controversial because:", "Today"
-      const bioText = topLeader.bio
+      bioEl.innerHTML = topLeader.bio
         .replace(/Famous for:/g, '<strong>Famous for:</strong>')
         .replace(/Controversial because:/g, '<strong>Controversial because:</strong>')
         .replace(/\bToday (he|she|he's|she's)/g, '<strong>Today $1</strong>');
-      bioEl.innerHTML = bioText;
     } else {
       bioEl.parentElement.style.display = 'none';
     }
 
-    // Scores grid (now uses trait similarity per leader)
     renderScoresGrid(ranked);
-
-    // Radar chart
     renderRadarChart(ranked);
-
-    // Trait bars (top leader's profile)
-    const traits = typeof topLeader.traits === 'string'
-      ? JSON.parse(topLeader.traits) : topLeader.traits;
-    renderTraitBars(traits);
-
+    renderTraitBars(topLeader.traits);
   }, 1800);
 }
 
 function renderScoresGrid(ranked) {
-  const el = document.getElementById('scores-grid');
-  el.innerHTML = ranked.map((r, i) => {
-    return `<div class="score-card${i===0?' top':''}">
+  document.getElementById('scores-grid').innerHTML = ranked.map((r, i) =>
+    `<div class="score-card${i===0?' top':''}">
       <div class="score-pct">${Math.round(r.sim)}%</div>
-      <div class="score-name">${r.leader ? r.leader.name : r.key}</div>
-    </div>`;
-  }).join('');
+      <div class="score-name">${r.leader.name}</div>
+    </div>`
+  ).join('');
 }
 
 function renderRadarChart(ranked) {
   const ctx = document.getElementById('radar-chart').getContext('2d');
-
-  // Show top 4 leaders on radar
-  const top4 = ranked.slice(0, 4);
+  const top3 = ranked.slice(0, 3);
   const labels = Object.keys(TRAIT_LABELS).map(k => TRAIT_LABELS[k]);
-
   const colors = [
-    { border: '#c8903a', bg: 'rgba(200,144,58,0.15)' },
-    { border: '#7a9060', bg: 'rgba(122,144,96,0.1)' },
-    { border: '#607890', bg: 'rgba(96,120,144,0.1)' },
-    { border: '#907860', bg: 'rgba(144,120,96,0.08)' }
+    { border:'#c8903a', bg:'rgba(200,144,58,0.15)' },
+    { border:'#7a9060', bg:'rgba(122,144,96,0.1)'  },
+    { border:'#607890', bg:'rgba(96,120,144,0.1)'  }
   ];
-
-  const datasets = top4.map((r, i) => {
-    const leader = r.leader;
-    const traits = typeof leader.traits === 'string'
-      ? JSON.parse(leader.traits) : leader.traits;
-    const data = Object.keys(TRAIT_LABELS).map(k => traits[k] || 0);
-    return {
-      label: leader.name,
-      data,
-      borderColor: colors[i].border,
-      backgroundColor: colors[i].bg,
-      borderWidth: i === 0 ? 2.5 : 1.5,
-      pointBackgroundColor: colors[i].border,
-      pointRadius: i === 0 ? 4 : 2,
-    };
-  });
-
+  const datasets = top3.map((r, i) => ({
+    label: r.leader.name,
+    data: Object.keys(TRAIT_LABELS).map(k => r.leader.traits[k] || 0),
+    borderColor: colors[i].border,
+    backgroundColor: colors[i].bg,
+    borderWidth: i === 0 ? 2.5 : 1.5,
+    pointBackgroundColor: colors[i].border,
+    pointRadius: i === 0 ? 4 : 2
+  }));
   new Chart(ctx, {
-    type: 'radar',
-    data: { labels, datasets },
-    options: {
-      responsive: true,
-      scales: {
-        r: {
-          min: 0, max: 10,
-          ticks: { display: false, stepSize: 2 },
-          grid: { color: 'rgba(255,255,255,0.06)' },
-          angleLines: { color: 'rgba(255,255,255,0.06)' },
-          pointLabels: {
-            font: { size: 11, family: "'Crimson Text', serif" },
-            color: '#9a8060'
-          }
-        }
-      },
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: {
-            font: { size: 11, family: "'Crimson Text', serif" },
-            color: '#9a8060',
-            padding: 12,
-            usePointStyle: true,
-            pointStyleWidth: 8
-          }
-        }
-      }
+    type:'radar',
+    data:{ labels, datasets },
+    options:{
+      responsive:true,
+      scales:{ r:{
+        min:0, max:10,
+        ticks:{ display:false, stepSize:2 },
+        grid:{ color:'rgba(255,255,255,0.06)' },
+        angleLines:{ color:'rgba(255,255,255,0.06)' },
+        pointLabels:{ font:{ size:11, family:"'Crimson Text', serif" }, color:'#9a8060' }
+      }},
+      plugins:{ legend:{
+        position:'bottom',
+        labels:{ font:{ size:11, family:"'Crimson Text', serif" }, color:'#9a8060', padding:12, usePointStyle:true, pointStyleWidth:8 }
+      }}
     }
   });
 }
 
 function renderTraitBars(traits) {
-  const el = document.getElementById('traits-bars');
-  el.innerHTML = Object.entries(TRAIT_LABELS).map(([key, label]) => {
-    const val = traits[key] || 0;
-    const pct = (val / 10) * 100;
-    return `<div class="trait-row">
-      <div class="trait-label">${label}</div>
-      <div class="trait-bar-wrap">
-        <div class="trait-bar" style="width:0%" data-target="${pct}%"></div>
-      </div>
-      <div class="trait-score">${val}/10</div>
-    </div>`;
-  }).join('');
-
-  // Animate bars
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      document.querySelectorAll('.trait-bar').forEach(bar => {
-        bar.style.width = bar.dataset.target;
-      });
-    });
-  });
+  document.getElementById('traits-bars').innerHTML =
+    Object.entries(TRAIT_LABELS).map(([key, label]) => {
+      const val = traits[key] || 0;
+      return `<div class="trait-row">
+        <div class="trait-label">${label}</div>
+        <div class="trait-bar-wrap">
+          <div class="trait-bar" style="width:0%" data-target="${(val/10)*100}%"></div>
+        </div>
+        <div class="trait-score">${val}/10</div>
+      </div>`;
+    }).join('');
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    document.querySelectorAll('.trait-bar').forEach(b => { b.style.width = b.dataset.target; });
+  }));
 }
 
 // ── SHARE ─────────────────────────────────────────────────────────────────────
 function shareResult() {
-  const answered = Object.values(_answers).length;
-  const userTraits = buildUserTraits();
-
-  // Same ranking logic as showResults
-  const ranked = Object.keys(_leaders).map(key => {
-    const leader = _leaders[key];
-    const traits = typeof leader.traits === 'string' ? JSON.parse(leader.traits) : leader.traits;
-    const picks = _scores[key] || 0;
-    const sim = traitSimilarity(userTraits, traits);
-    const pickPct = answered > 0 ? (picks / answered) * 100 : 0;
-    const combined = 0.65 * pickPct + 0.35 * sim;
-    return { key, leader, sim, combined };
-  }).sort((a, b) => b.combined - a.combined);
-
+  const ranked = buildRanking();
   const top = ranked[0];
-  const leader = top.leader;
-  const pct = Math.round(top.sim);
-
-  const text = `I think like ${leader.name} (${pct}% match) — History Challenger's decision profile test. 25 decisions, no dates, no names.\nhttps://historychallenger.com/persona.html`;
-
+  const text = `I think like ${top.leader.name} (${Math.round(top.sim)}% match) — History Challenger's decision profile test. 25 decisions, no dates, no names.\nhttps://historychallenger.com/persona.html`;
   if (navigator.share) {
     navigator.share({ text }).catch(() => {});
   } else {
@@ -630,15 +843,11 @@ function shareResult() {
       const btn = document.querySelector('.share-btn');
       btn.textContent = 'Copied to clipboard ✓';
       setTimeout(() => btn.textContent = 'Share your result', 2000);
-    }).catch(() => {
-      prompt('Copy this to share:', text);
-    });
+    }).catch(() => { prompt('Copy this to share:', text); });
   }
 }
 
-function restartGame() {
-  show('intro');
-}
+function restartGame() { show('intro'); }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 function show(id) {
@@ -647,13 +856,7 @@ function show(id) {
   });
 }
 
-function showError(msg) {
-  show('error-wrap');
-  document.getElementById('error-msg').textContent = msg;
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────────
-loadData();
+init();
 </script>
 </body>
 </html>
