@@ -13,49 +13,68 @@ a{color:#c8903a;text-decoration:none}
 /* XP / TIER */
 .tier-section{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:14px;padding:1.5rem;margin-bottom:2rem;text-align:center}
 .tier-name{font-family:Georgia,serif;font-size:1.4rem;font-weight:700;color:#c8903a;margin-bottom:.2rem}
-.tier-xp{font-size:12px;color:#555;margin-bottom:.75rem;font-family:-apple-system,sans-serif}
+.tier-xp{font-size:12px;color:#aaa;margin-bottom:.75rem;font-family:-apple-system,sans-serif}
 .tier-bar-wrap{height:6px;background:#1a1a1a;border-radius:3px;overflow:hidden;margin-bottom:.4rem}
 .tier-bar-fill{height:100%;background:linear-gradient(90deg,#8a6208,#c8903a);border-radius:3px;transition:width 1s ease}
-.tier-bar-labels{display:flex;justify-content:space-between;font-size:10px;color:#444;font-family:-apple-system,sans-serif}
+.tier-bar-labels{display:flex;justify-content:space-between;font-size:10px;color:#888;font-family:-apple-system,sans-serif}
 
 /* LAYOUT */
 .page{max-width:900px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
 
 /* PROFILE HEADER */
-.profile-hero{display:flex;align-items:center;gap:1.5rem;margin-bottom:2.5rem;flex-wrap:wrap}
+.profile-hero{display:flex;align-items:center;gap:1.5rem;margin-bottom:1rem;flex-wrap:wrap}
 .avatar-wrap{position:relative}
 .profile-avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid #c8903a;display:block}
-.avatar-placeholder{width:72px;height:72px;border-radius:50%;background:#1a1000;border:2px solid #c8903a;display:flex;align-items:center;justify-content:center;font-size:28px}
-.profile-info h1{font-family:Georgia,serif;font-size:1.75rem;font-weight:700;margin-bottom:.2rem}
-.profile-info .email{font-size:13px;color:#555;margin-bottom:.4rem}
-.profile-info .joined{font-size:12px;color:#444}
-.sign-out-btn{background:none;border:1px solid #2a2a2a;color:#666;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:-apple-system,sans-serif}
-.sign-out-btn:hover{border-color:#555;color:#aaa}
+.avatar-placeholder{width:72px;height:72px;border-radius:50%;background:#d4b98a;border:2px solid #c8903a;display:flex;align-items:center;justify-content:center;font-size:28px}
+.profile-info h1{font-family:Georgia,serif;font-size:1.75rem;font-weight:700;margin-bottom:.2rem;color:#1a150e}
+.profile-info .email{font-size:13px;color:#5a3e1a;margin-bottom:.4rem}
+.profile-info .joined{font-size:12px;color:#7a6040}
+.hero-btns{display:flex;gap:.5rem;margin-left:auto;align-items:center;flex-wrap:wrap}
+.sign-out-btn{background:none;border:1px solid #b8a878;color:#5a3e1a;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:-apple-system,sans-serif}
+.sign-out-btn:hover{border-color:#8a6208;color:#3a2e1e}
+.edit-profile-btn{background:none;border:1px solid #b8a878;color:#5a3e1a;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:-apple-system,sans-serif}
+.edit-profile-btn:hover{border-color:#8a6208;color:#3a2e1e}
+
+/* SETTINGS PANEL */
+.settings-panel{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:14px;padding:1.5rem;margin-bottom:2rem;display:none}
+.settings-panel.open{display:block}
+.settings-section-label{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem;font-family:-apple-system,sans-serif}
+.settings-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;flex-wrap:wrap}
+.settings-label{font-size:13px;color:#aaa;min-width:120px}
+.settings-input{flex:1;min-width:180px;background:#1a1a1a;border:1px solid #333;color:#fff;border-radius:8px;padding:7px 12px;font-size:13px;font-family:-apple-system,sans-serif}
+.settings-input:focus{outline:none;border-color:#c8903a}
+.settings-save{background:#c8903a;color:#000;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.settings-save:hover{background:#b07828}
+.settings-divider{border:none;border-top:1px solid #1e1e1e;margin:1.25rem 0}
+.danger-btn{background:none;border:1px solid #6b2020;color:#cc4444;border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer}
+.danger-btn:hover{background:#2a0808;border-color:#cc4444}
+.settings-msg{font-size:12px;color:#5acc8a;min-height:18px;margin-top:.25rem}
 
 /* STAT CARDS */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1rem;margin-bottom:2.5rem}
 .stat-card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:12px;padding:1.25rem;text-align:center}
 .stat-val{font-family:Georgia,serif;font-size:2rem;font-weight:700;color:#c8903a;line-height:1}
-.stat-lbl{font-size:12px;color:#555;margin-top:.4rem;font-family:-apple-system,sans-serif}
+.stat-lbl{font-size:12px;color:#bbb;margin-top:.4rem;font-family:-apple-system,sans-serif}
 .stat-card.highlight{border-color:#c8903a33;background:#0a0800}
 
 /* CHART */
 .chart-section{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:14px;padding:1.5rem;margin-bottom:2rem}
-.section-title{font-size:13px;color:#666;letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:1.25rem;font-family:-apple-system,sans-serif}
-.chart-wrap{height:140px;position:relative;display:flex;align-items:flex-end;gap:4px}
+.section-title{font-size:13px;color:#3a2e1e;letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:1.25rem;font-family:-apple-system,sans-serif}
+.chart-section .section-title{color:#aaa}
+.chart-wrap{height:140px;position:relative;display:flex;align-items:flex-end;gap:6px}
 .chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
-.chart-bar{width:100%;border-radius:3px 3px 0 0;min-height:2px;transition:height .6s ease;position:relative}
-.chart-bar:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #333;color:#fff;font-size:11px;padding:3px 8px;border-radius:5px;white-space:nowrap;font-family:-apple-system,sans-serif}
-.chart-label{font-size:9px;color:#444;text-align:center;font-family:-apple-system,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
-.chart-empty{display:flex;align-items:center;justify-content:center;height:100%;color:#333;font-size:14px;font-family:-apple-system,sans-serif}
+.chart-bar{width:100%;border-radius:3px 3px 0 0;min-height:3px;transition:height .6s ease;position:relative;cursor:default}
+.chart-bar:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #333;color:#fff;font-size:11px;padding:3px 8px;border-radius:5px;white-space:nowrap;font-family:-apple-system,sans-serif;z-index:10}
+.chart-label{font-size:9px;color:#888;text-align:center;font-family:-apple-system,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.chart-empty{display:flex;align-items:center;justify-content:center;height:100%;color:#666;font-size:14px;font-family:-apple-system,sans-serif}
 
 /* BREAKDOWN */
 .breakdown-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
 .breakdown-card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:12px;padding:1.25rem}
-.breakdown-name{font-size:15px;font-weight:700;margin-bottom:.75rem}
+.breakdown-name{font-size:15px;font-weight:700;margin-bottom:.75rem;color:#ddd}
 .breakdown-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:.4rem}
-.breakdown-key{color:#555}
-.breakdown-val{color:#ddd;font-weight:600}
+.breakdown-key{color:#aaa}
+.breakdown-val{color:#fff;font-weight:600}
 .breakdown-bar{height:4px;background:#1a1a1a;border-radius:2px;margin-top:.75rem;overflow:hidden}
 .breakdown-fill{height:100%;border-radius:2px;background:#c8903a;transition:width .8s ease}
 
@@ -69,33 +88,35 @@ a{color:#c8903a;text-decoration:none}
 .session-score.good{color:#c8903a}
 .session-score.ok{color:#888}
 .session-meta{flex:1}
-.session-diff{font-size:13px;font-weight:600;color:#ddd;margin-bottom:.2rem}
-.session-date{font-size:12px;color:#444}
-.session-rounds{font-size:12px;color:#555;margin-left:auto}
+.session-diff{font-size:13px;font-weight:600;color:#fff;margin-bottom:.2rem}
+.session-date{font-size:12px;color:#888}
+.session-rounds{font-size:12px;color:#888;margin-left:auto}
 
 /* DISPATCH BADGE */
 .dispatch-card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
-.dispatch-era{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.08em;font-family:-apple-system,sans-serif;margin-top:.2rem}
 
 /* STREAK */
 .streak-display{display:flex;align-items:center;justify-content:center;gap:1.5rem;background:#0a0800;border:1px solid #c8903a33;border-radius:14px;padding:1.5rem;margin-bottom:2rem}
 .streak-num{font-family:Georgia,serif;font-size:3rem;font-weight:700;color:#c8903a;line-height:1}
 .streak-info{text-align:left}
-.streak-label{font-size:14px;font-weight:600;color:#ddd}
-.streak-sub{font-size:12px;color:#555;margin-top:.2rem}
+.streak-label{font-size:14px;font-weight:600;color:#fff}
+.streak-sub{font-size:12px;color:#aaa;margin-top:.2rem}
 
 /* EMPTY / LOADING */
-.loading{text-align:center;padding:4rem;color:#444;font-size:15px}
-.empty-state{text-align:center;padding:3rem;color:#444;font-size:14px;line-height:1.8}
+.loading{text-align:center;padding:4rem;color:#7a6040;font-size:15px}
+.empty-state{text-align:center;padding:3rem;color:#888;font-size:14px;line-height:1.8}
 .empty-state a{color:#c8903a}
 .not-signed-in{text-align:center;padding:5rem 1.5rem}
-.not-signed-in h2{font-family:Georgia,serif;font-size:1.5rem;margin-bottom:.75rem}
-.not-signed-in p{color:#666;margin-bottom:1.5rem;font-size:15px}
+.not-signed-in h2{font-family:Georgia,serif;font-size:1.5rem;margin-bottom:.75rem;color:#1a150e}
+.not-signed-in p{color:#7a6040;margin-bottom:1.5rem;font-size:15px}
 .sign-in-btn{background:#c8903a;color:#000;border:none;border-radius:10px;padding:12px 28px;font-size:16px;font-weight:700;cursor:pointer}
 
 @media(max-width:600px){
   .profile-hero{flex-direction:column;align-items:flex-start;gap:1rem}
+  .hero-btns{margin-left:0}
   .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .settings-row{flex-direction:column;align-items:flex-start}
+  .settings-input{width:100%}
   .nav-links a:not(.nav-play){display:none}
 }
 </style>
@@ -116,7 +137,6 @@ html,body{background:#f0e6cc !important}
 </style>
 </head>
 <body>
-
 
 <div class="page" id="page">
   <div class="loading">Loading your profile…</div>
@@ -144,6 +164,56 @@ function signIn(){
     prompt:'select_account'
   });
   window.location.href='https://accounts.google.com/o/oauth2/v2/auth?'+params;
+}
+
+function toggleSettings(){
+  const panel=document.getElementById('settings-panel');
+  if(panel) panel.classList.toggle('open');
+}
+
+async function saveProfileName(){
+  const name=document.getElementById('settings-name').value.trim();
+  if(!name) return;
+  const msg=document.getElementById('settings-msg');
+  msg.textContent='Saving…';
+  try{
+    const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'update_profile',token:getToken(),name})});
+    const d=await res.json();
+    if(d.ok){
+      msg.textContent='Name updated!';
+      const h1=document.querySelector('.profile-info h1');
+      if(h1) h1.textContent=name;
+      setTimeout(()=>{msg.textContent='';},2500);
+    } else { msg.textContent=d.error||'Error saving'; }
+  }catch(e){ msg.textContent='Network error'; }
+}
+
+async function saveProfileAvatar(){
+  const avatar=document.getElementById('settings-avatar').value.trim();
+  const msg=document.getElementById('settings-msg');
+  msg.textContent='Saving…';
+  try{
+    const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'update_profile',token:getToken(),avatar})});
+    const d=await res.json();
+    if(d.ok){
+      msg.textContent='Picture updated — reload to see it.';
+      setTimeout(()=>{msg.textContent='';},3000);
+    } else { msg.textContent=d.error||'Error saving'; }
+  }catch(e){ msg.textContent='Network error'; }
+}
+
+async function deleteAccount(){
+  if(!confirm('Delete your account? This will permanently erase all your scores and history. This cannot be undone.')) return;
+  if(!confirm('Absolutely sure? All data will be gone.')) return;
+  try{
+    const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'delete_account',token:getToken()})});
+    const d=await res.json();
+    if(d.ok){ clearToken(); window.location.href='/'; }
+    else { alert(d.error||'Error deleting account'); }
+  }catch(e){ alert('Network error'); }
 }
 
 function diffLabel(d){return{disciple:'🕯 Disciple',master:'⚔️ Master',keeper:'🏆 Keeper'}[d]||d;}
@@ -186,15 +256,14 @@ function renderProfile(data){
   const {user, sessions, history, breakdown} = data;
   const avg = user.avg_score || 0;
 
-  // Build chart
-  const chartItems = [...(history||[])].reverse();
+  // Chart — 10 most recent, displayed oldest → newest (left → right)
+  const chartItems = [...(history||[])].slice(0,10).reverse();
   let chartHTML = '';
   if(chartItems.length===0){
     chartHTML = `<div class="chart-empty">Play some games to see your score history</div>`;
   } else {
     const maxScore = Math.max(...chartItems.map(h=>h.avg_score||0), 1);
     chartHTML = chartItems.map(h=>{
-      const pct = Math.round(((h.avg_score||0)/100)*100);
       const heightPct = Math.max(4, Math.round(((h.avg_score||0)/maxScore)*100));
       const color = diffColor(h.diff);
       const dateStr = formatDate(h.completed_at);
@@ -205,19 +274,20 @@ function renderProfile(data){
     }).join('');
   }
 
-  // Build tier / XP section
+  // Tier / XP
   const xp = user.total_xp || 0;
   const t = getTier(xp);
   const tPct = tierPct(xp);
+  const nextTierName = t.next ? TIERS[TIERS.findIndex(x=>x.name===t.name)-1]?.name : null;
   const tierHTML = `
     <div class="tier-section">
       <div class="tier-name">${t.name}</div>
-      <div class="tier-xp">${xp.toLocaleString()} XP${t.next?' · '+t.next.toLocaleString()+' to '+TIERS[TIERS.findIndex(x=>x.name===t.name)-1]?.name:' · Max tier reached'}</div>
+      <div class="tier-xp">${xp.toLocaleString()} XP${nextTierName?' · '+t.next.toLocaleString()+' to '+nextTierName:' · Max tier reached'}</div>
       <div class="tier-bar-wrap"><div class="tier-bar-fill" style="width:${tPct}%"></div></div>
-      <div class="tier-bar-labels"><span>${t.name}</span>${t.next?`<span>${TIERS[TIERS.findIndex(x=>x.name===t.name)-1]?.name}</span>`:'<span>Sage</span>'}</div>
+      <div class="tier-bar-labels"><span>${t.name}</span>${nextTierName?`<span>${nextTierName}</span>`:'<span>Sage</span>'}</div>
     </div>`;
 
-  // Build breakdown — grouped by game type then difficulty
+  // Breakdown by game / difficulty
   const diffs = ['disciple','master','keeper'];
   const scoredGames = ['timeline','overlap'];
   const bMap = {};
@@ -227,13 +297,13 @@ function renderProfile(data){
     const hasAny = diffs.some(d => bMap[`${g}_${d}`]);
     if(!hasAny) return '';
     return `<div style="margin-bottom:1.5rem">
-      <div style="font-size:12px;color:#666;font-family:-apple-system,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem">${gameLabel(g)}</div>
+      <div style="font-size:12px;color:#3a2e1e;font-family:-apple-system,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem">${gameLabel(g)}</div>
       <div class="breakdown-grid">
         ${diffs.map(d => {
           const b = bMap[`${g}_${d}`];
           if(!b) return `<div class="breakdown-card">
             <div class="breakdown-name">${diffLabel(d)}</div>
-            <div style="font-size:13px;color:#333">No games yet</div>
+            <div style="font-size:13px;color:#666">No games yet</div>
           </div>`;
           return `<div class="breakdown-card">
             <div class="breakdown-name">${diffLabel(d)}</div>
@@ -249,23 +319,22 @@ function renderProfile(data){
 
   const dispatchTotal = (breakdown||[]).filter(b=>b.game_type==='dispatch').reduce((s,b)=>s+(b.games||0),0);
   const dispatchBreakdown = dispatchTotal>0 ? `<div style="margin-bottom:1.5rem">
-    <div style="font-size:12px;color:#666;font-family:-apple-system,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem">${gameLabel('dispatch')}</div>
+    <div style="font-size:12px;color:#3a2e1e;font-family:-apple-system,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem">${gameLabel('dispatch')}</div>
     <div class="dispatch-card">
       <div class="breakdown-row"><span class="breakdown-key">Campaigns completed</span><span class="breakdown-val">${dispatchTotal}</span></div>
     </div>
   </div>` : '';
 
-  const breakdownHTML = scoredBreakdown + dispatchBreakdown;
-
-  // Build sessions list — dispatch shown with era, scored games with %
-  const sessionsHTML = (sessions||[]).length===0
+  // Sessions — last 10
+  const recentSessions = (sessions||[]).slice(0,10);
+  const sessionsHTML = recentSessions.length===0
     ? `<div class="empty-state">No games yet. <a href="/play.html">Play your first game →</a></div>`
-    : (sessions||[]).map(s => {
+    : recentSessions.map(s => {
       if(s.game_type==='dispatch'){
         return `<div class="session-row">
-          <div class="session-score ok" style="font-size:1rem">⚔️</div>
+          <div class="session-score ok" style="font-size:1.1rem">⚔️</div>
           <div class="session-meta">
-            <div class="session-diff">${eraLabel(s.diff)} <span style="font-size:11px;color:#444;font-weight:400">· Dispatch</span></div>
+            <div class="session-diff">${eraLabel(s.diff)} <span style="font-size:11px;color:#888;font-weight:400">· Dispatch</span></div>
             <div class="session-date">${formatDate(s.completed_at)}</div>
           </div>
           <div class="session-rounds">${s.rounds} decision${s.rounds!==1?'s':''}</div>
@@ -274,19 +343,22 @@ function renderProfile(data){
       return `<div class="session-row">
         <div class="session-score ${scoreColor(s.avg_score||0)}">${Math.round(s.avg_score||0)}%</div>
         <div class="session-meta">
-          <div class="session-diff">${diffLabel(s.diff)} <span style="font-size:11px;color:#444;font-weight:400">· ${gameTag(s.game_type)}</span></div>
+          <div class="session-diff">${diffLabel(s.diff)} <span style="font-size:11px;color:#888;font-weight:400">· ${gameTag(s.game_type)}</span></div>
           <div class="session-date">${formatDate(s.completed_at)}</div>
         </div>
         <div class="session-rounds">${s.rounds} round${s.rounds!==1?'s':''}</div>
       </div>`;
     }).join('');
 
+  const avatarVal = (user.avatar||'').replace(/"/g,'&quot;');
+  const nameVal = (user.name||'').replace(/"/g,'&quot;');
+
   document.getElementById('page').innerHTML=`
     <!-- HEADER -->
     <div class="profile-hero">
       <div class="avatar-wrap">
         ${user.avatar
-          ? `<img class="profile-avatar" src="${user.avatar}" alt="${user.name||''}">`
+          ? `<img class="profile-avatar" src="${user.avatar}" alt="${nameVal}">`
           : `<div class="avatar-placeholder">👤</div>`}
       </div>
       <div class="profile-info">
@@ -294,7 +366,28 @@ function renderProfile(data){
         <div class="email">${user.email}</div>
         <div class="joined">${formatJoined(user.created_at)}</div>
       </div>
-      <button class="sign-out-btn" onclick="signOut()">Sign out</button>
+      <div class="hero-btns">
+        <button class="edit-profile-btn" onclick="toggleSettings()">Edit profile</button>
+        <button class="sign-out-btn" onclick="signOut()">Sign out</button>
+      </div>
+    </div>
+
+    <!-- SETTINGS PANEL -->
+    <div class="settings-panel" id="settings-panel">
+      <div class="settings-section-label">Account settings</div>
+      <div class="settings-row">
+        <span class="settings-label">Display name</span>
+        <input id="settings-name" class="settings-input" type="text" value="${nameVal}" placeholder="Your name" maxlength="80">
+        <button class="settings-save" onclick="saveProfileName()">Save</button>
+      </div>
+      <div class="settings-row">
+        <span class="settings-label">Picture URL</span>
+        <input id="settings-avatar" class="settings-input" type="url" value="${avatarVal}" placeholder="https://…">
+        <button class="settings-save" onclick="saveProfileAvatar()">Save</button>
+      </div>
+      <div class="settings-msg" id="settings-msg"></div>
+      <hr class="settings-divider">
+      <button class="danger-btn" onclick="deleteAccount()">Delete account</button>
     </div>
 
     <!-- TIER / XP -->
@@ -303,9 +396,7 @@ function renderProfile(data){
     <!-- STREAK -->
     ${(user.current_streak||0)>0?`
     <div class="streak-display">
-      <div>
-        <div class="streak-num">🔥 ${user.current_streak}</div>
-      </div>
+      <div class="streak-num">🔥 ${user.current_streak}</div>
       <div class="streak-info">
         <div class="streak-label">Day streak</div>
         <div class="streak-sub">Longest ever: ${user.longest_streak||0} days</div>
@@ -342,13 +433,13 @@ function renderProfile(data){
 
     <!-- CHART -->
     <div class="chart-section">
-      <div class="section-title">Score history — last ${Math.min(chartItems.length,30)} games</div>
+      <div class="section-title">Score history — last ${chartItems.length} games</div>
       <div class="chart-wrap">${chartHTML}</div>
     </div>
 
     <!-- BREAKDOWN -->
     <div class="section-title" style="margin-bottom:1rem">Performance by game</div>
-    ${breakdownHTML}
+    ${scoredBreakdown + dispatchBreakdown}
 
     <!-- SESSIONS -->
     <div class="section-title" style="margin-bottom:1rem">Recent games</div>
@@ -360,7 +451,6 @@ function renderProfile(data){
 }
 
 async function init(){
-  // Handle OAuth callback on profile page
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
   if(code){
