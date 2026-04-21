@@ -114,6 +114,18 @@ Events: ${JSON.stringify(events)}`;
       if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
       return handleGetHQStats(body, env);
     }
+    if (action === 'list_hq_questions') {
+      if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
+      return handleListHQQuestions(body, env);
+    }
+    if (action === 'delete_hq_question') {
+      if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
+      return handleDeleteHQQuestion(body, env);
+    }
+    if (action === 'update_hq_question') {
+      if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
+      return handleUpdateHQQuestion(body, env);
+    }
 
     const { theme, diff, rounds, lang } = body;
     if (!diff) return json({ error: 'Missing difficulty.' }, 400);
@@ -1343,4 +1355,49 @@ function sanitizeHQQuestion(q) {
     level: q.level,
     topic: q.topic
   };
+}
+
+async function handleListHQQuestions(body, env) {
+  const { level } = body;
+  try {
+    const rows = level
+      ? await env.db.prepare(`SELECT id, level, difficulty, question, answers, correct_idx, topic, year FROM hq_questions WHERE level=? ORDER BY topic, difficulty`).bind(level).all()
+      : await env.db.prepare(`SELECT id, level, difficulty, question, answers, correct_idx, topic, year FROM hq_questions ORDER BY level, topic, difficulty`).all();
+    const questions = (rows.results || []).map(q => ({
+      ...q,
+      answers: typeof q.answers === 'string' ? JSON.parse(q.answers) : q.answers
+    }));
+    return json({ questions }, 200);
+  } catch(e) {
+    return json({ error: e.message }, 500);
+  }
+}
+
+async function handleDeleteHQQuestion(body, env) {
+  const { id } = body;
+  if (!id) return json({ error: 'Missing id' }, 400);
+  try {
+    await env.db.prepare(`DELETE FROM hq_questions WHERE id=?`).bind(id).run();
+    await env.db.prepare(`DELETE FROM hq_seen_questions WHERE question_id=?`).bind(id).run();
+    return json({ ok: true }, 200);
+  } catch(e) {
+    return json({ error: e.message }, 500);
+  }
+}
+
+async function handleUpdateHQQuestion(body, env) {
+  const { id, difficulty, level } = body;
+  if (!id) return json({ error: 'Missing id' }, 400);
+  const updates = [];
+  const values = [];
+  if (difficulty != null) { updates.push('difficulty=?'); values.push(Math.max(50, Math.min(1000, Number(difficulty)))); }
+  if (level != null) { updates.push('level=?'); values.push(Math.max(1, Math.min(5, Number(level)))); }
+  if (!updates.length) return json({ error: 'Nothing to update' }, 400);
+  values.push(id);
+  try {
+    await env.db.prepare(`UPDATE hq_questions SET ${updates.join(', ')} WHERE id=?`).bind(...values).run();
+    return json({ ok: true }, 200);
+  } catch(e) {
+    return json({ error: e.message }, 500);
+  }
 }

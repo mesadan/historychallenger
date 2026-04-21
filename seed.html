@@ -1027,7 +1027,108 @@ function logHQ(msg, color) {
   </div>
 
   <div class="log" id="hq-log" style="height:220px"><span style="color:#555">— ready —</span></div>
+
+  <div class="row" style="border-top:1px solid #1a1a1a;padding-top:1rem;margin-top:1rem">
+    <strong style="color:#c8903a;font-size:13px">🔍 Browse & QC Questions</strong>
+  </div>
+  <div class="row">
+    <label style="color:#555;font-size:13px">Filter level:</label>
+    <select id="hq-browse-level" style="padding:4px 8px;background:#0d0d0d;color:#ddd;border:1px solid #333">
+      <option value="">All levels</option>
+      <option value="1">L1 Very Easy</option>
+      <option value="2">L2 Easy</option>
+      <option value="3">L3 Medium</option>
+      <option value="4">L4 Hard</option>
+      <option value="5">L5 Expert</option>
+    </select>
+    <button onclick="loadHQBrowse()">Load Questions</button>
+    <span id="hq-browse-count" style="color:#555;font-size:12px;margin-left:auto"></span>
+  </div>
+  <div id="hq-browse" style="max-height:500px;overflow-y:auto;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;padding:.5rem"></div>
 </div>
+
+<script>
+async function loadHQBrowse(){
+  const level = document.getElementById('hq-browse-level').value;
+  const el = document.getElementById('hq-browse');
+  const cnt = document.getElementById('hq-browse-count');
+  el.innerHTML = '<div style="padding:1rem;color:#555;font-size:12px">Loading…</div>';
+  try {
+    const payload = { action:'list_hq_questions', admin_key:ADMIN_KEY };
+    if (level) payload.level = parseInt(level);
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+    const d = await res.json();
+    if (d.error) { el.innerHTML = '<div class="err" style="padding:1rem">'+d.error+'</div>'; return; }
+    const qs = d.questions || [];
+    cnt.textContent = qs.length + ' question' + (qs.length===1?'':'s');
+    if (!qs.length) { el.innerHTML = '<div style="padding:1rem;color:#555;font-size:12px">No questions.</div>'; return; }
+
+    const byTopic = {};
+    for (const q of qs) {
+      const key = (q.topic || '(no topic)');
+      if (!byTopic[key]) byTopic[key] = [];
+      byTopic[key].push(q);
+    }
+    const lvlName = {1:'L1',2:'L2',3:'L3',4:'L4',5:'L5'};
+    const lvlColor = {1:'#5acc8a',2:'#8acc5a',3:'#c8a028',4:'#cc8844',5:'#cc4444'};
+
+    let html = '';
+    for (const topic of Object.keys(byTopic).sort()) {
+      const group = byTopic[topic];
+      const dup = group.length > 1 ? ' <span style="color:#cc4444;font-size:11px">· possible duplicates</span>' : '';
+      html += '<div style="margin-bottom:.5rem">';
+      html += '<div style="color:#c8903a;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.4rem 0 .25rem;border-bottom:1px solid #1a1a1a">'+topic+' <span style="color:#555;font-weight:400">('+group.length+')</span>'+dup+'</div>';
+      for (const q of group) {
+        const answers = q.answers.map((a,i)=>`<span style="color:${i===q.correct_idx?'#5acc8a':'#777'}">${String.fromCharCode(65+i)}. ${a}</span>`).join(' · ');
+        html += `<div style="padding:.6rem .25rem;border-bottom:1px solid #111;font-size:12px;line-height:1.5" data-id="${q.id}">
+          <div style="display:flex;gap:.5rem;align-items:start">
+            <span style="color:${lvlColor[q.level]};font-size:10px;font-weight:700;padding:1px 5px;border:1px solid ${lvlColor[q.level]}55;border-radius:2px;flex-shrink:0">${lvlName[q.level]}</span>
+            <div style="flex:1;min-width:0">
+              <div style="color:#ddd;margin-bottom:.25rem">${q.question}</div>
+              <div style="color:#888;font-size:11px;margin-bottom:.35rem">${answers}</div>
+              <div style="display:flex;gap:.5rem;align-items:center;font-size:11px;color:#555">
+                <span>Diff:</span>
+                <input type="number" value="${q.difficulty}" min="50" max="1000" style="width:70px;padding:2px 5px;background:#0d0d0d;color:#ddd;border:1px solid #333;font-size:11px" onchange="updateHQQ('${q.id}', this.value, null)">
+                <span>· Level:</span>
+                <select onchange="updateHQQ('${q.id}', null, this.value)" style="padding:2px 5px;background:#0d0d0d;color:#ddd;border:1px solid #333;font-size:11px">
+                  ${[1,2,3,4,5].map(l=>`<option value="${l}" ${l===q.level?'selected':''}>L${l}</option>`).join('')}
+                </select>
+                ${q.year?`<span>· Year: ${q.year}</span>`:''}
+                <button style="margin-left:auto;padding:2px 8px;font-size:11px;background:#2a0a0a;color:#cc6644;border:1px solid #442020" onclick="deleteHQQ('${q.id}')">🗑 Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }
+      html += '</div>';
+    }
+    el.innerHTML = html;
+  } catch(e) { el.innerHTML = '<div class="err" style="padding:1rem">'+e.message+'</div>'; }
+}
+
+async function deleteHQQ(id){
+  if (!confirm('Delete this question?')) return;
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'delete_hq_question',admin_key:ADMIN_KEY,id})});
+    const d = await res.json();
+    if (d.error) { alert('Error: '+d.error); return; }
+    const row = document.querySelector(`[data-id="${id}"]`);
+    if (row) row.remove();
+  } catch(e) { alert('Network error'); }
+}
+
+async function updateHQQ(id, difficulty, level){
+  try {
+    const payload = {action:'update_hq_question',admin_key:ADMIN_KEY,id};
+    if (difficulty != null) payload.difficulty = parseInt(difficulty);
+    if (level != null) payload.level = parseInt(level);
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+    const d = await res.json();
+    if (d.error) alert('Error: '+d.error);
+  } catch(e) { alert('Network error'); }
+}
+</script>
 
 </body>
 </html>
