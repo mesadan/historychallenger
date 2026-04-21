@@ -1174,19 +1174,40 @@ async function handleSeedHQ(body, env, apiKey) {
   const batchCount = Math.min(count || 10, 20);
   const targetDiff = diffMap[lvl];
 
-  const SYS = `You are a historian creating multiple-choice history quiz questions.
+  // Pull existing questions at this level so Claude can avoid generating duplicates
+  const existingRows = await env.db.prepare(
+    `SELECT question, answers, correct_idx FROM hq_questions WHERE level=?`
+  ).bind(lvl).all();
+  const existing = (existingRows.results || []).map(r => {
+    const a = typeof r.answers === 'string' ? JSON.parse(r.answers) : r.answers;
+    return { q: r.question, correct: a[r.correct_idx] };
+  });
+
+  const exclusionBlock = existing.length > 0
+    ? `\n\nEXISTING QUESTIONS AT THIS LEVEL (${existing.length} total) — you MUST NOT generate anything that tests the same fact, event, person, or concept as any of these, even reworded. Pick genuinely different topics.\n${existing.map((e,i) => `${i+1}. Q: ${e.q}\n   A: ${e.correct}`).join('\n')}`
+    : '';
+
+  const SYS = `You are a historian generating multiple-choice history quiz questions for an adaptive quiz.
 Difficulty level: ${lvl}/5 — ${diffGuide[lvl]}
-Rules:
-1. Each question has exactly 4 answer options with exactly one correct answer.
-2. Questions must be factual and verifiable.
-3. Wrong answers must be plausible but clearly incorrect to someone who knows the topic.
-4. Vary topics broadly: ancient, medieval, modern; different continents; wars, culture, science, politics.
+
+STRICT RULES:
+1. Exactly 4 answer options per question, exactly one correct.
+2. ANSWER LEAKAGE — the correct answer MUST NOT be inferable from the question text.
+   - Never include a proper noun (place, person, event, empire) in the question that also appears in the correct answer.
+   - Example of BAD leakage: Q "What famous lighthouse stood in Alexandria?" → A "Lighthouse of Alexandria" (the word "Alexandria" gives it away).
+   - Fix leakage by rephrasing: Q "Which Wonder of the Ancient World guided ships into a Ptolemaic Egyptian harbour?" → A "Lighthouse of Alexandria" is now earned, not given away.
+   - If the correct answer shares a key term with the question, rewrite the question to remove that term.
+3. Wrong answers must be plausible distractors from the same era or topic — never absurd, never obviously wrong by category. A knowledgeable person should have to think.
+4. Vary topics AGGRESSIVELY — ancient, medieval, early-modern, modern; different continents; different domains (war, culture, science, religion, politics, technology, economics, exploration).
+5. Questions must be factually accurate and verifiable.${exclusionBlock}
+
 Return ONLY valid JSON, no markdown.`;
 
-  const prompt = `Generate ${batchCount} history quiz questions at difficulty ${lvl}/5.
+  const prompt = `Generate ${batchCount} NEW history quiz questions at difficulty ${lvl}/5, obeying every rule above. Pick topics and facts that do NOT overlap with the existing questions listed in the system prompt.
+
 Return ONLY valid JSON:
 {"questions":[{"q":"Question text?","a":["Option A","Option B","Option C","Option D"],"c":0,"topic":"brief tag","year":1850}]}
-"c" = 0-based index of correct answer. "year" = approximate year of event (null if not applicable).`;
+"c" = 0-based index of correct answer. "year" = approximate year of the event (null if not applicable). "topic" = short tag (e.g. "WW2", "Ancient Rome", "Silk Road").`;
 
   try {
     const raw = await callClaude(apiKey, prompt, 6000, SYS);
