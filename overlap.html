@@ -455,10 +455,10 @@ async function showFinal(){
 
   document.getElementById('body').innerHTML = `
     <div style="text-align:center">
-      <div style="font-size:13px;color:#444;margin-bottom:.5rem;font-family:-apple-system,sans-serif">${S.sets.length} rounds · ${S.diff.charAt(0).toUpperCase()+S.diff.slice(1)}</div>
-      <div class="score-big">${S.score}</div>
+      <div style="font-size:13px;color:#7a6040;margin-bottom:.5rem;font-family:-apple-system,sans-serif">${S.sets.length} rounds · ${S.diff.charAt(0).toUpperCase()+S.diff.slice(1)} level</div>
+      <div class="score-big">${S.score} <span style="font-size:1.2rem;color:#7a6040;font-weight:400">/ ${total}</span></div>
       <div class="score-bar-wrap"><div class="score-bar-fill" style="width:${pct}%"></div></div>
-      <div style="font-size:22px;font-weight:700;color:#fff;margin:.75rem 0;font-family:Georgia,serif">${m}</div>
+      <div style="font-size:13px;color:#7a6040;margin:.4rem 0 .75rem;font-family:-apple-system,sans-serif;letter-spacing:.06em;text-transform:uppercase">${m}</div>
       ${!_user?`<div style="margin:.75rem 0;padding:12px;background:#1a1000;border:1px solid #c8903a33;border-radius:8px;font-family:-apple-system,sans-serif;font-size:13px;color:#c8903a">
         <div style="margin-bottom:8px">Sign in to save your score and track your progress</div>
         <button class="sign-in-btn" onclick="signIn()">Sign in with Google</button>
