@@ -46,17 +46,22 @@ h1.disp-title{font-family:'Playfair Display',serif;font-size:clamp(44px,7vw,76px
 
 /* ── ERA PICKER ── */
 #s-era{background:var(--parchment);min-height:100vh;display:block !important;}
-.era-wrap{max-width:860px;margin:0 auto;padding:3rem 2rem;}
+.era-wrap{max-width:1080px;margin:0 auto;padding:3rem 2rem;}
 .era-hd{text-align:center;margin-bottom:2.5rem;}
 .era-hd h2{font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,36px);font-weight:400;margin-bottom:.4rem;}
 .era-hd p{font-size:16px;color:var(--ink-light);font-style:italic;}
-.era-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.1rem;}
+.era-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.4rem;}
 .era-card{
   position:relative;overflow:hidden;cursor:pointer;border-radius:3px;
   min-height:220px;
   background-size:cover;background-position:center center;
   box-shadow:0 2px 8px rgba(26,21,14,.25),inset 0 0 0 1px rgba(26,21,14,.4);
   transition:transform .25s ease, box-shadow .25s ease;
+}
+@media (min-width:720px){
+  .era-card{min-height:340px;}
+  .era-card .era-name{font-size:32px;}
+  .era-card-inner{padding:1.8rem 1.6rem 1.5rem;}
 }
 .era-card::before{
   content:"";position:absolute;inset:0;
@@ -69,7 +74,7 @@ h1.disp-title{font-family:'Playfair Display',serif;font-size:clamp(44px,7vw,76px
 .era-card.active::before{background:linear-gradient(180deg,rgba(26,21,14,.4) 0%,rgba(26,21,14,.6) 45%,rgba(26,21,14,.85) 100%);}
 .era-card--antiquity{background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Le%C3%B3nidas_en_las_Term%C3%B3pilas%2C_por_Jacques-Louis_David.jpg/1280px-Le%C3%B3nidas_en_las_Term%C3%B3pilas%2C_por_Jacques-Louis_David.jpg');background-position:center 35%;}
 .era-card--medieval{background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Paolo_Uccello_-_Battaglia_di_San_Romano_-_Google_Art_Project.jpg/1280px-Paolo_Uccello_-_Battaglia_di_San_Romano_-_Google_Art_Project.jpg');background-position:center center;}
-.era-card--modern{background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/David_-_Napoleon_crossing_the_Alps_-_Malmaison2.jpg/900px-David_-_Napoleon_crossing_the_Alps_-_Malmaison2.jpg');background-position:center 25%;}
+.era-card--modern{background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Jacques-Louis_David_-_Napoleon_Crossing_the_Alps_-_Kunsthistorisches_Museum.jpg/1024px-Jacques-Louis_David_-_Napoleon_Crossing_the_Alps_-_Kunsthistorisches_Museum.jpg');background-position:center 25%;}
 .era-card-inner{
   position:relative;z-index:1;height:100%;min-height:220px;
   display:flex;flex-direction:column;justify-content:flex-end;
