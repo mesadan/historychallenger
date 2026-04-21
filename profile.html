@@ -184,6 +184,7 @@ function renderNotSignedIn(){
 
 function renderProfile(data){
   const {user, sessions, history, breakdown} = data;
+  const avg = user.avg_score || 0;
 
   // Build chart
   const chartItems = [...(history||[])].reverse();
