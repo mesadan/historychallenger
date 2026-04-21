@@ -1046,6 +1046,18 @@ function logHQ(msg, color) {
   </div>
   <div id="hq-browse" style="max-height:500px;overflow-y:auto;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;padding:.5rem"></div>
 
+  <div class="row" style="border-top:2px solid #2a1a0a;padding-top:1rem;margin-top:1rem">
+    <strong style="color:#e8b060;font-size:13px">🚀 Auto-Grow Pool</strong>
+    <span style="color:#555;font-size:11px;margin-left:auto">Seed → QC → prune → repeat until every level hits target</span>
+  </div>
+  <div class="row">
+    <label style="color:#555;font-size:13px">Target per level:</label>
+    <input type="number" id="hq-grow-target" value="50" min="10" max="300" style="width:70px">
+    <button id="hq-grow-btn" onclick="autoGrowPool()" style="background:#2a1a0a;border-color:#c8903a;color:#c8903a">🚀 Auto-Grow Pool</button>
+    <button id="hq-grow-stop" onclick="AG.stop=true" style="display:none;background:#2a0a0a;border-color:#cc4444;color:#cc6644" disabled>⏹ Stop</button>
+  </div>
+  <div class="log" id="hq-grow-log" style="height:260px"><span style="color:#555">— ready —</span></div>
+
   <div class="row" style="border-top:1px solid #1a1a1a;padding-top:1rem;margin-top:1rem">
     <strong style="color:#c8903a;font-size:13px">🤖 AI Quality Check</strong>
     <span style="color:#555;font-size:11px;margin-left:auto">Uses Claude — scans for leaky answers & semantic duplicates</span>
@@ -1153,6 +1165,139 @@ async function deleteHQQCItem(id){
     if (d.error) { alert('Error: '+d.error); return; }
     document.querySelectorAll(`[data-qc-id="${id}"]`).forEach(el=>el.remove());
   } catch(e) { alert('Network error'); }
+}
+
+// ── AUTO-GROW POOL ────────────────────────────────────────────────────
+const AG = { stop:false, running:false };
+
+function logAG(msg, color){
+  const el = document.getElementById('hq-grow-log');
+  if (el.querySelector('span[style*="color:#555"]')) el.innerHTML = '';
+  const line = document.createElement('div');
+  if (color) line.style.color = color;
+  line.textContent = '['+new Date().toLocaleTimeString()+'] '+msg;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+async function agGetCounts(){
+  const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({action:'get_hq_stats',admin_key:ADMIN_KEY})});
+  const d = await res.json();
+  if (d.error) throw new Error(d.error);
+  const counts = {1:0,2:0,3:0,4:0,5:0};
+  for (const row of (d.byLevel||[])) counts[row.level] = row.n;
+  return counts;
+}
+
+async function agSeedBatch(level, count){
+  const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({action:'seed_hq',admin_key:ADMIN_KEY,level,count})});
+  const d = await res.json();
+  if (d.error) throw new Error(d.error);
+  return d;
+}
+
+async function agQCLevel(level){
+  const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({action:'qc_hq_questions',admin_key:ADMIN_KEY,level})});
+  const d = await res.json();
+  if (d.error) throw new Error(d.error);
+  return d;
+}
+
+async function agDelete(id){
+  const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({action:'delete_hq_question',admin_key:ADMIN_KEY,id})});
+  return await res.json();
+}
+
+async function autoGrowPool(){
+  if (AG.running) return;
+  const target = parseInt(document.getElementById('hq-grow-target').value) || 50;
+  if (target < 10 || target > 300) { alert('Target must be 10–300'); return; }
+
+  AG.running = true; AG.stop = false;
+  const btn = document.getElementById('hq-grow-btn');
+  const stopBtn = document.getElementById('hq-grow-stop');
+  btn.disabled = true; btn.textContent = 'Growing…';
+  stopBtn.style.display = ''; stopBtn.disabled = false;
+
+  const BUFFER = 1.2;
+  const BATCH  = 10;
+  const MAX_ATTEMPTS = 5;
+
+  logAG('Starting auto-grow. Target: '+target+' per level.', '#c8903a');
+
+  try {
+    for (const lvl of [1,2,3,4,5]) {
+      if (AG.stop) break;
+      logAG('──────── Level '+lvl+' ────────', '#e8b060');
+
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        if (AG.stop) break;
+
+        let counts = await agGetCounts();
+        let current = counts[lvl];
+        logAG('  L'+lvl+' attempt '+attempt+'/'+MAX_ATTEMPTS+' · current: '+current, '#888');
+
+        if (current >= target) { logAG('  L'+lvl+' already at/above target. Skipping.', '#5acc8a'); break; }
+
+        // Over-seed to buffer
+        const seedTarget = Math.ceil(target * BUFFER);
+        while (current < seedTarget && !AG.stop) {
+          const n = Math.min(BATCH, seedTarget - current);
+          logAG('  → seeding '+n+' at L'+lvl+'…', '#888');
+          try {
+            const r = await agSeedBatch(lvl, n);
+            current = r.total;
+            logAG('    saved '+r.saved+' · pool now '+current, '#5acc8a');
+          } catch(e) {
+            logAG('    seed error: '+e.message+' (retrying)', '#cc6644');
+            await new Promise(r=>setTimeout(r,800));
+          }
+        }
+
+        if (AG.stop) break;
+
+        // QC
+        logAG('  → QC analysis on L'+lvl+'…', '#888');
+        let qc;
+        try { qc = await agQCLevel(lvl); }
+        catch(e) { logAG('    QC error: '+e.message+' (skipping QC this round)', '#cc6644'); continue; }
+
+        // Collect IDs to delete: all leaky + all but first of each dup group
+        const toDelete = new Set();
+        for (const l of (qc.leaky||[])) toDelete.add(l.id);
+        for (const g of (qc.duplicates||[])) {
+          for (let i = 1; i < g.items.length; i++) toDelete.add(g.items[i].id);
+        }
+        logAG('    leaky: '+(qc.leaky||[]).length+' · dup groups: '+(qc.duplicates||[]).length+' · will delete '+toDelete.size, toDelete.size?'#cc8844':'#5acc8a');
+
+        for (const id of toDelete) {
+          if (AG.stop) break;
+          await agDelete(id);
+        }
+
+        counts = await agGetCounts();
+        current = counts[lvl];
+        logAG('  L'+lvl+' after prune: '+current+' (target '+target+')', current>=target?'#5acc8a':'#cc8844');
+
+        if (current >= target) break;
+      }
+    }
+
+    const final = await agGetCounts();
+    logAG('════════ DONE ════════', '#e8b060');
+    logAG('Final: L1='+final[1]+' L2='+final[2]+' L3='+final[3]+' L4='+final[4]+' L5='+final[5]+' · total '+(final[1]+final[2]+final[3]+final[4]+final[5]), '#c8903a');
+    await loadHQStats();
+  } catch(e) {
+    logAG('Fatal error: '+e.message, '#f44');
+  } finally {
+    AG.running = false; AG.stop = false;
+    btn.disabled = false; btn.textContent = '🚀 Auto-Grow Pool';
+    stopBtn.style.display = 'none';
+  }
 }
 </script>
 
