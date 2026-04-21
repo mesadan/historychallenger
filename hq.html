@@ -62,6 +62,7 @@ a{color:#c8903a;text-decoration:none}
 .result-card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:16px;padding:2.5rem 2rem;max-width:480px;width:100%;text-align:center}
 .result-hq-label{font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem}
 .result-hq-value{font-family:Georgia,serif;font-size:5rem;font-weight:700;line-height:1;margin-bottom:.25rem}
+.result-hq-max{font-family:Georgia,serif;font-size:1.6rem;font-weight:400;color:#666;margin-left:.25rem;vertical-align:super}
 .result-band{font-size:1.2rem;font-weight:700;color:#c8903a;margin-bottom:.5rem}
 .result-desc{font-size:13px;color:#aaa;line-height:1.6;margin-bottom:1.25rem;max-width:320px;margin-left:auto;margin-right:auto}
 .result-percentile{font-size:13px;color:#c8903a;line-height:1.5;margin-bottom:1.5rem;padding:.75rem 1rem;background:#0a0800;border:1px solid #c8903a33;border-radius:8px;font-family:-apple-system,sans-serif}
@@ -196,7 +197,7 @@ function renderResult(){
   const showPercentile = r.total_takers && r.total_takers >= 20 && r.percentile != null;
   return `<div class="result-wrap"><div class="result-card">
     <div class="result-hq-label">Your History Quotient</div>
-    <div class="result-hq-value" style="color:${band.color}">${finalHQ}</div>
+    <div class="result-hq-value" style="color:${band.color}">${finalHQ}<span class="result-hq-max">/ 1000</span></div>
     <div class="result-band">${band.label}</div>
     <div class="result-desc">${band.desc}</div>
     ${showPercentile?`<div class="result-percentile">Higher than <strong>${r.percentile}%</strong> of ${r.total_takers.toLocaleString()} people who have taken the test.</div>`:''}
