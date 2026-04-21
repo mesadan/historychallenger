@@ -10,15 +10,13 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#000;color:#fff;min-height:100vh}
 a{color:#c8903a;text-decoration:none}
 
-/* NAV */
-nav{position:sticky;top:0;z-index:100;background:rgba(0,0,0,0.92);backdrop-filter:blur(12px);border-bottom:1px solid #1a1a1a;padding:0 1.5rem}
-.nav-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
-.nav-logo{font-family:Georgia,serif;font-size:18px;font-weight:700;color:#fff}
-.nav-logo span{color:#c8903a}
-.nav-links{display:flex;gap:16px;align-items:center}
-.nav-links a{color:#888;font-size:14px}
-.nav-links a:hover{color:#fff}
-.nav-play{background:#c8903a;color:#000!important;border-radius:8px;padding:6px 16px;font-weight:700;font-size:13px}
+/* XP / TIER */
+.tier-section{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:14px;padding:1.5rem;margin-bottom:2rem;text-align:center}
+.tier-name{font-family:Georgia,serif;font-size:1.4rem;font-weight:700;color:#c8903a;margin-bottom:.2rem}
+.tier-xp{font-size:12px;color:#555;margin-bottom:.75rem;font-family:-apple-system,sans-serif}
+.tier-bar-wrap{height:6px;background:#1a1a1a;border-radius:3px;overflow:hidden;margin-bottom:.4rem}
+.tier-bar-fill{height:100%;background:linear-gradient(90deg,#8a6208,#c8903a);border-radius:3px;transition:width 1s ease}
+.tier-bar-labels{display:flex;justify-content:space-between;font-size:10px;color:#444;font-family:-apple-system,sans-serif}
 
 /* LAYOUT */
 .page{max-width:900px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
@@ -75,11 +73,9 @@ nav{position:sticky;top:0;z-index:100;background:rgba(0,0,0,0.92);backdrop-filte
 .session-date{font-size:12px;color:#444}
 .session-rounds{font-size:12px;color:#555;margin-left:auto}
 
-/* MEDAL */
-.medal-section{text-align:center;margin-bottom:2.5rem}
-.medal-big{font-size:56px;margin-bottom:.5rem}
-.medal-title{font-family:Georgia,serif;font-size:1.25rem;font-weight:700;margin-bottom:.25rem}
-.medal-sub{font-size:13px;color:#555}
+/* DISPATCH BADGE */
+.dispatch-card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.dispatch-era{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.08em;font-family:-apple-system,sans-serif;margin-top:.2rem}
 
 /* STREAK */
 .streak-display{display:flex;align-items:center;justify-content:center;gap:1.5rem;background:#0a0800;border:1px solid #c8903a33;border-radius:14px;padding:1.5rem;margin-bottom:2rem}
@@ -121,15 +117,6 @@ html,body{background:#f0e6cc !important}
 </head>
 <body>
 
-<nav>
-  <div class="nav-inner">
-    <a href="/" class="nav-logo">History <span>Challenger</span></a>
-    <div class="nav-links">
-      <a href="/games.html" class="nav-play">All games →</a>
-    </div>
-    <div id="nav-auth-area" style="display:flex;align-items:center"></div>
-  </div>
-</nav>
 
 <div class="page" id="page">
   <div class="loading">Loading your profile…</div>
@@ -161,15 +148,20 @@ function signIn(){
 
 function diffLabel(d){return{disciple:'🕯 Disciple',master:'⚔️ Master',keeper:'🏆 Keeper'}[d]||d;}
 function diffColor(d){return{disciple:'#5acc8a',master:'#c8903a',keeper:'#e0a84a'}[d]||'#888';}
-function gameLabel(g){return g==='overlap'?'🏛 Did They Overlap?':'🧭 History Challenger';}
-function gameTag(g){return g==='overlap'?'Overlap':'Timeline';}
+function gameLabel(g){return{overlap:'🏛 Did They Overlap?',dispatch:'⚔️ Dispatch',timeline:'🧭 History Challenger'}[g]||'🧭 History Challenger';}
+function gameTag(g){return{overlap:'Overlap',dispatch:'Dispatch',timeline:'Timeline'}[g]||'Timeline';}
+function eraLabel(e){return{antiquity:'Antiquity',medieval:'Medieval',modern:'Modern'}[e]||(e||'Campaign');}
 function scoreColor(s){return s>=80?'great':s>=50?'good':'ok';}
-function medal(avg){
-  if(avg>=90)return{icon:'🏆',title:'Keeper of Time',sub:'Exceptional historical mastery'};
-  if(avg>=70)return{icon:'⚔️',title:'Master',sub:'Strong command of history'};
-  if(avg>=50)return{icon:'🕯',title:'Disciple',sub:'Building your historical knowledge'};
-  return{icon:'📜',title:'Initiate',sub:'Keep playing to improve'};
-}
+
+const TIERS=[
+  {name:'Sage',       min:10000,next:null},
+  {name:'Historian',  min:4000, next:10000},
+  {name:'Chronicler', min:1500, next:4000},
+  {name:'Scribe',     min:500,  next:1500},
+  {name:'Witness',    min:0,    next:500}
+];
+function getTier(xp){return TIERS.find(t=>xp>=t.min)||TIERS[TIERS.length-1];}
+function tierPct(xp){const t=getTier(xp);if(!t.next)return 100;return Math.round(((xp-t.min)/(t.next-t.min))*100);}
 function formatDate(ts){
   const d=new Date(ts*1000);
   return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
@@ -192,8 +184,6 @@ function renderNotSignedIn(){
 
 function renderProfile(data){
   const {user, sessions, history, breakdown} = data;
-  const avg = user.avg_score || 0;
-  const m = medal(avg);
 
   // Build chart
   const chartItems = [...(history||[])].reverse();
@@ -214,13 +204,25 @@ function renderProfile(data){
     }).join('');
   }
 
+  // Build tier / XP section
+  const xp = user.total_xp || 0;
+  const t = getTier(xp);
+  const tPct = tierPct(xp);
+  const tierHTML = `
+    <div class="tier-section">
+      <div class="tier-name">${t.name}</div>
+      <div class="tier-xp">${xp.toLocaleString()} XP${t.next?' · '+t.next.toLocaleString()+' to '+TIERS[TIERS.findIndex(x=>x.name===t.name)-1]?.name:' · Max tier reached'}</div>
+      <div class="tier-bar-wrap"><div class="tier-bar-fill" style="width:${tPct}%"></div></div>
+      <div class="tier-bar-labels"><span>${t.name}</span>${t.next?`<span>${TIERS[TIERS.findIndex(x=>x.name===t.name)-1]?.name}</span>`:'<span>Sage</span>'}</div>
+    </div>`;
+
   // Build breakdown — grouped by game type then difficulty
   const diffs = ['disciple','master','keeper'];
-  const games = ['timeline','overlap'];
+  const scoredGames = ['timeline','overlap'];
   const bMap = {};
-  (breakdown||[]).forEach(b => { bMap[`${b.game_type||'timeline'}_${b.diff}`] = b; });
+  (breakdown||[]).forEach(b => { bMap[`${b.game_type||'timeline'}_${b.diff||'none'}`] = b; });
 
-  const breakdownHTML = games.map(g => {
+  const scoredBreakdown = scoredGames.map(g => {
     const hasAny = diffs.some(d => bMap[`${g}_${d}`]);
     if(!hasAny) return '';
     return `<div style="margin-bottom:1.5rem">
@@ -244,18 +246,39 @@ function renderProfile(data){
     </div>`;
   }).join('');
 
-  // Build sessions list — show game type badge
+  const dispatchTotal = (breakdown||[]).filter(b=>b.game_type==='dispatch').reduce((s,b)=>s+(b.games||0),0);
+  const dispatchBreakdown = dispatchTotal>0 ? `<div style="margin-bottom:1.5rem">
+    <div style="font-size:12px;color:#666;font-family:-apple-system,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem">${gameLabel('dispatch')}</div>
+    <div class="dispatch-card">
+      <div class="breakdown-row"><span class="breakdown-key">Campaigns completed</span><span class="breakdown-val">${dispatchTotal}</span></div>
+    </div>
+  </div>` : '';
+
+  const breakdownHTML = scoredBreakdown + dispatchBreakdown;
+
+  // Build sessions list — dispatch shown with era, scored games with %
   const sessionsHTML = (sessions||[]).length===0
-    ? `<div class="empty-state">No games yet. <a href="/games.html">Play your first game →</a></div>`
-    : (sessions||[]).map(s=>`
-      <div class="session-row">
+    ? `<div class="empty-state">No games yet. <a href="/play.html">Play your first game →</a></div>`
+    : (sessions||[]).map(s => {
+      if(s.game_type==='dispatch'){
+        return `<div class="session-row">
+          <div class="session-score ok" style="font-size:1rem">⚔️</div>
+          <div class="session-meta">
+            <div class="session-diff">${eraLabel(s.diff)} <span style="font-size:11px;color:#444;font-weight:400">· Dispatch</span></div>
+            <div class="session-date">${formatDate(s.completed_at)}</div>
+          </div>
+          <div class="session-rounds">${s.rounds} decision${s.rounds!==1?'s':''}</div>
+        </div>`;
+      }
+      return `<div class="session-row">
         <div class="session-score ${scoreColor(s.avg_score||0)}">${Math.round(s.avg_score||0)}%</div>
         <div class="session-meta">
           <div class="session-diff">${diffLabel(s.diff)} <span style="font-size:11px;color:#444;font-weight:400">· ${gameTag(s.game_type)}</span></div>
           <div class="session-date">${formatDate(s.completed_at)}</div>
         </div>
         <div class="session-rounds">${s.rounds} round${s.rounds!==1?'s':''}</div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
 
   document.getElementById('page').innerHTML=`
     <!-- HEADER -->
@@ -273,12 +296,8 @@ function renderProfile(data){
       <button class="sign-out-btn" onclick="signOut()">Sign out</button>
     </div>
 
-    <!-- MEDAL -->
-    <div class="medal-section">
-      <div class="medal-big">${m.icon}</div>
-      <div class="medal-title">${m.title}</div>
-      <div class="medal-sub">${m.sub}</div>
-    </div>
+    <!-- TIER / XP -->
+    ${tierHTML}
 
     <!-- STREAK -->
     ${(user.current_streak||0)>0?`
@@ -327,8 +346,8 @@ function renderProfile(data){
     </div>
 
     <!-- BREAKDOWN -->
-    <div class="section-title" style="margin-bottom:1rem">Performance by difficulty</div>
-    <div class="breakdown-grid">${breakdownHTML}</div>
+    <div class="section-title" style="margin-bottom:1rem">Performance by game</div>
+    ${breakdownHTML}
 
     <!-- SESSIONS -->
     <div class="section-title" style="margin-bottom:1rem">Recent games</div>

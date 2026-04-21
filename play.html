@@ -353,7 +353,7 @@ async function saveGameSession(scores,avgScore){
   if(!_user)return;
   try{
     await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'save_session',token:getToken(),diff:S.diff,rounds:S.rounds,scores,avg_score:avgScore})});
+      body:JSON.stringify({action:'save_session',token:getToken(),game_type:'timeline',diff:S.diff,rounds:S.rounds,scores,avg_score:avgScore})});
     // Refresh user stats
     const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({action:'verify_token',token:getToken()})});

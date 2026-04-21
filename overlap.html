@@ -340,9 +340,7 @@ function renderRound(){
 function answer(idx){
   const set = S.sets[S.round];
   const chosen = set.options[idx];
-  const multiplier = {disciple:1, master:1.5, keeper:2}[S.diff] || 1;
-  const pts = chosen.correct ? Math.round(100 * multiplier) : 0;
-  S.score += pts;
+  S.score += chosen.correct ? 1 : 0;
   S.answered++;
 
   // Disable all buttons immediately
@@ -440,23 +438,20 @@ function nextRound(){
 
 async function showFinal(){
   // Save session
+  const pct = Math.round((S.score / S.sets.length) * 100);
   if(_user){
-    const total = S.sets.length * Math.round(100 * ({disciple:1,master:1.5,keeper:2}[S.diff]||1));
-    const pct = Math.round((S.score / total) * 100);
     try{
       await fetch(WORKER, {method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({action:'save_session', token:getToken(), diff:S.diff, rounds:S.sets.length, scores:[], avg_score:pct, game_type:'overlap'})});
     }catch(e){}
   }
   document.getElementById('mets').style.display = 'none';
-  const total = S.sets.length * Math.round(100 * ({disciple:1,master:1.5,keeper:2}[S.diff]||1));
-  const pct = Math.round((S.score / total) * 100);
   const m = pct>=90?'🏆 Keeper of Time':pct>=70?'⚔️ Master':pct>=50?'🕯 Disciple':'📜 Initiate';
 
   document.getElementById('body').innerHTML = `
     <div style="text-align:center">
       <div style="font-size:13px;color:#7a6040;margin-bottom:.5rem;font-family:-apple-system,sans-serif">${S.sets.length} rounds · ${S.diff.charAt(0).toUpperCase()+S.diff.slice(1)} level</div>
-      <div class="score-big">${S.score} <span style="font-size:1.2rem;color:#7a6040;font-weight:400">/ ${total}</span></div>
+      <div class="score-big">${S.score} <span style="font-size:1.2rem;color:#7a6040;font-weight:400">/ ${S.sets.length}</span></div>
       <div class="score-bar-wrap"><div class="score-bar-fill" style="width:${pct}%"></div></div>
       <div style="font-size:13px;color:#7a6040;margin:.4rem 0 .75rem;font-family:-apple-system,sans-serif;letter-spacing:.06em;text-transform:uppercase">${m}</div>
       ${!_user?`<div style="margin:.75rem 0;padding:12px;background:#1a1000;border:1px solid #c8903a33;border-radius:8px;font-family:-apple-system,sans-serif;font-size:13px;color:#c8903a">

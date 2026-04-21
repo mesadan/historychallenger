@@ -555,6 +555,14 @@ function showReveal(){
 
   show('reveal');
   setTimeout(()=>document.getElementById('s-reveal').scrollIntoView({behavior:'smooth',block:'start'}),50);
+
+  // Save dispatch session (flat XP, no score)
+  const token = localStorage.getItem('hc_token');
+  if(token){
+    fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'save_session',token,game_type:'dispatch',diff:currentCampaign.era||'unknown',rounds:total,avg_score:null})
+    }).catch(()=>{});
+  }
 }
 
 function playAgain(){answers=[];cur=0;startGame();}
