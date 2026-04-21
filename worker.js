@@ -1310,7 +1310,7 @@ async function handleSubmitHQAnswer(body, env) {
     const expectedP = 1 / (1 + Math.exp(-(currentHQ - qDiff) / 150));
     const K         = Math.max(15, 55 - qAnswered * 1.4);
     const delta     = K * ((correct ? 1 : 0) - expectedP);
-    const newHQ     = Math.min(1000, Math.max(50, Math.round(currentHQ + delta)));
+    const newHQ     = Math.min(990, Math.max(50, Math.round(currentHQ + delta)));
     const newAnswered = qAnswered + 1;
     const isComplete  = newAnswered >= 30;
 

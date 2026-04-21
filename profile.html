@@ -380,7 +380,7 @@ function renderProfile(data){
       </div>
       <div class="hero-btns">
         ${user.hq_score
-          ? `<div class="hq-badge"><div class="hq-badge-val" style="color:${hqColor(user.hq_score)}">${Math.round(user.hq_score)}<span style="font-size:.65em;color:#666;font-weight:400"> / 1000</span></div><div class="hq-badge-lbl">HQ</div></div>`
+          ? `<div class="hq-badge"><div class="hq-badge-val" style="color:${hqColor(user.hq_score)}">${Math.round(user.hq_score)}<span style="font-size:.65em;color:#666;font-weight:400"> / 990</span></div><div class="hq-badge-lbl">HQ</div></div>`
           : `<a href="/hq.html" class="hq-no-score">Take HQ test →</a>`}
         <button class="edit-profile-btn" onclick="toggleSettings()">Edit profile</button>
         <button class="sign-out-btn" onclick="signOut()">Sign out</button>

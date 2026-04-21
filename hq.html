@@ -153,7 +153,7 @@ function renderIntro(){
       <div class="detail-row"><span class="detail-icon">📝</span> 30 adaptive questions</div>
       <div class="detail-row"><span class="detail-icon">📈</span> Difficulty adjusts after every answer</div>
       <div class="detail-row"><span class="detail-icon">🔁</span> Minimises repeats across retakes</div>
-      <div class="detail-row"><span class="detail-icon">🏆</span> Maximum score: 1000</div>
+      <div class="detail-row"><span class="detail-icon">🏆</span> Maximum score: 990</div>
     </div>
     <button class="start-btn" onclick="startSession()">Begin Assessment</button>
     ${!getToken()?`<p class="guest-note">Sign in to save your HQ to your profile.</p>`:''}
@@ -197,7 +197,7 @@ function renderResult(){
   const showPercentile = r.total_takers && r.total_takers >= 20 && r.percentile != null;
   return `<div class="result-wrap"><div class="result-card">
     <div class="result-hq-label">Your History Quotient</div>
-    <div class="result-hq-value" style="color:${band.color}">${finalHQ}<span class="result-hq-max">/ 1000</span></div>
+    <div class="result-hq-value" style="color:${band.color}">${finalHQ}<span class="result-hq-max">/ 990</span></div>
     <div class="result-band">${band.label}</div>
     <div class="result-desc">${band.desc}</div>
     ${showPercentile?`<div class="result-percentile">Higher than <strong>${r.percentile}%</strong> of ${r.total_takers.toLocaleString()} people who have taken the test.</div>`:''}
