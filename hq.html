@@ -177,9 +177,9 @@ function renderQuiz(){
       <div class="quiz-meta">${[q.era,q.topic].filter(Boolean).join(' · ')}</div>
       <div class="quiz-question">${q.question}</div>
       <div class="quiz-options">
-        ${opts.map((o,i)=>`<button class="opt-btn" id="opt-${o}" onclick="submitAnswer('${o}')">
+        ${opts.map((o,i)=>`<button class="opt-btn" id="opt-${o}" onclick="submitAnswer(${i})">
           <span class="opt-letter">${labels[i]}</span>
-          <span class="opt-text">${q['option_'+o]}</span>
+          <span class="opt-text">${q.answers[i]}</span>
         </button>`).join('')}
       </div>
     </div>
@@ -197,7 +197,7 @@ function renderFeedback(){
   return `<div class="quiz-wrap">
     <div class="quiz-top">
       <div class="quiz-progress-text">Question ${S.questionNum} of ${TOTAL}</div>
-      <div class="quiz-hq-live ${hqDir}">HQ ≈ <strong>${Math.round(r.hq_after)}</strong> ${arrow}</div>
+      <div class="quiz-hq-live ${hqDir}">HQ ≈ <strong>${Math.round(r.new_hq)}</strong> ${arrow}</div>
     </div>
     <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
     <div class="quiz-card">
@@ -206,11 +206,11 @@ function renderFeedback(){
       <div class="quiz-options">
         ${opts.map((o,i)=>{
           let cls='opt-btn disabled';
-          if(o===r.correct_answer) cls+=' correct-ans';
-          else if(o===r.chosen&&!r.correct) cls+=' wrong-ans';
+          if(i===r.correct_idx) cls+=' correct-ans';
+          else if(i===r.chosen&&!r.correct) cls+=' wrong-ans';
           return `<button class="${cls}" disabled>
             <span class="opt-letter">${labels[i]}</span>
-            <span class="opt-text">${q['option_'+o]}</span>
+            <span class="opt-text">${q.answers[i]}</span>
           </button>`;
         }).join('')}
       </div>
@@ -222,7 +222,7 @@ function renderResult(){
   const r=S.lastResult;
   const finalHQ=Math.round(r.final_hq);
   const band=getBand(finalHQ);
-  const correct=r.correct_count;
+  const correct=S.correctCount;
   const wrong=TOTAL-correct;
   const pct=Math.round((correct/TOTAL)*100);
   return `<div class="result-wrap"><div class="result-card">
@@ -256,22 +256,22 @@ async function startSession(){
   }catch(e){showError('Network error. Please try again.');}
 }
 
-async function submitAnswer(chosen){
+async function submitAnswer(chosenIdx){
   if(S.phase!=='quiz'||S.answered) return;
   S.answered=true;
   document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
   try{
     const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'submit_hq_answer',token:getToken(),session_id:S.sessionId,question_id:S.question.id,answer:chosen})});
+      body:JSON.stringify({action:'submit_hq_answer',token:getToken(),session_id:S.sessionId,question_id:S.question.id,answer_idx:chosenIdx})});
     const d=await res.json();
     if(d.error){showError(d.error);return;}
-    S.lastResult={...d,chosen};
-    S.hq=d.hq_after;
+    S.lastResult={...d, chosen:chosenIdx};
+    S.hq=d.new_hq;
     if(d.correct) S.correctCount++;
     S.phase='feedback'; render();
     setTimeout(()=>{
       if(d.completed){S.phase='result';}
-      else{S.question=d.question; S.questionNum=d.question_number; S.hq=d.current_hq; S.answered=false; S.phase='quiz';}
+      else{S.question=d.next_question; S.questionNum=d.questions_answered+1; S.hq=d.new_hq; S.answered=false; S.phase='quiz';}
       render();
     },FEEDBACK_MS);
   }catch(e){showError('Network error. Please try again.');}
