@@ -189,7 +189,7 @@ a{color:#c8903a;text-decoration:none}
     <div class="result-match">
       <span class="result-eyebrow">Your historical profile</span>
       <div class="result-portrait-wrap">
-        <img class="result-portrait" id="result-portrait" src="" alt="">
+        <img class="result-portrait" id="result-portrait" alt="">
       </div>
       <div class="result-name" id="result-name"></div>
       <div class="result-era" id="result-era"></div>
@@ -739,11 +739,7 @@ function showResults() {
     if (portrait) {
       imgEl.src = portrait.src;
       imgEl.alt = topLeader.name;
-      imgEl.onerror = () => { imgEl.parentElement.style.display = 'none'; capEl.style.display = 'none'; };
       capEl.textContent = portrait.caption;
-    } else {
-      imgEl.parentElement.style.display = 'none';
-      capEl.style.display = 'none';
     }
 
     document.getElementById('result-name').textContent = topLeader.name;
