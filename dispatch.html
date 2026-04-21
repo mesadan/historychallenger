@@ -46,22 +46,55 @@ h1.disp-title{font-family:'Playfair Display',serif;font-size:clamp(44px,7vw,76px
 
 /* ── ERA PICKER ── */
 #s-era{background:var(--parchment);min-height:100vh;display:block !important;}
-.era-wrap{max-width:720px;margin:0 auto;padding:3rem 2rem;}
+.era-wrap{max-width:860px;margin:0 auto;padding:3rem 2rem;}
 .era-hd{text-align:center;margin-bottom:2.5rem;}
 .era-hd h2{font-family:'Playfair Display',serif;font-size:clamp(26px,4vw,36px);font-weight:400;margin-bottom:.4rem;}
 .era-hd p{font-size:16px;color:var(--ink-light);font-style:italic;}
-.era-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;}
+.era-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.1rem;}
 .era-card{
-  background:var(--parchment-dark);border:1.5px solid var(--parchment-darker);
-  padding:1.8rem 1.4rem;text-align:center;cursor:pointer;border-radius:2px;
-  transition:all .15s;
+  position:relative;overflow:hidden;cursor:pointer;border-radius:3px;
+  min-height:220px;
+  background-size:cover;background-position:center center;
+  box-shadow:0 2px 8px rgba(26,21,14,.25),inset 0 0 0 1px rgba(26,21,14,.4);
+  transition:transform .25s ease, box-shadow .25s ease;
 }
-.era-card:hover{background:#ecdfc0;border-color:var(--ink-light);}
-.era-card.active{background:var(--ink);border-color:var(--ink);}
-.era-card.active .era-icon,.era-card.active .era-name,.era-card.active .era-count{color:var(--parchment);}
-.era-icon{font-size:32px;margin-bottom:.6rem;display:block;}
-.era-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:400;color:var(--ink);margin-bottom:.25rem;}
-.era-count{font-size:13px;color:var(--ink-light);}
+.era-card::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(26,21,14,.35) 0%,rgba(26,21,14,.55) 45%,rgba(26,21,14,.8) 100%);
+  transition:background .25s ease;
+}
+.era-card:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(26,21,14,.45),inset 0 0 0 1px var(--gold-light);}
+.era-card:hover::before{background:linear-gradient(180deg,rgba(26,21,14,.25) 0%,rgba(26,21,14,.45) 45%,rgba(26,21,14,.75) 100%);}
+.era-card.active{box-shadow:0 6px 16px rgba(26,21,14,.5),inset 0 0 0 2px var(--gold-light);}
+.era-card.active::before{background:linear-gradient(180deg,rgba(26,21,14,.4) 0%,rgba(26,21,14,.6) 45%,rgba(26,21,14,.85) 100%);}
+.era-card--antiquity{background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Le%C3%B3nidas_en_las_Term%C3%B3pilas%2C_por_Jacques-Louis_David.jpg/1280px-Le%C3%B3nidas_en_las_Term%C3%B3pilas%2C_por_Jacques-Louis_David.jpg');background-position:center 35%;}
+.era-card--medieval{background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Paolo_Uccello_-_Battaglia_di_San_Romano_-_Google_Art_Project.jpg/1280px-Paolo_Uccello_-_Battaglia_di_San_Romano_-_Google_Art_Project.jpg');background-position:center center;}
+.era-card--modern{background-image:url('https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/David_-_Napoleon_crossing_the_Alps_-_Malmaison2.jpg/900px-David_-_Napoleon_crossing_the_Alps_-_Malmaison2.jpg');background-position:center 25%;}
+.era-card-inner{
+  position:relative;z-index:1;height:100%;min-height:220px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:1.4rem 1.3rem 1.2rem;
+  color:var(--parchment);
+}
+.era-card .era-name{
+  font-family:'Playfair Display',serif;font-size:26px;font-weight:400;
+  color:var(--parchment);letter-spacing:.02em;line-height:1.1;
+  margin-bottom:.2rem;
+  text-shadow:0 1px 4px rgba(0,0,0,.6);
+}
+.era-card .era-count{
+  font-size:13px;color:var(--parchment-darker);font-style:italic;
+  letter-spacing:.04em;
+  text-shadow:0 1px 3px rgba(0,0,0,.6);
+}
+.era-card.active .era-name{color:var(--gold-light);}
+.era-card-credit{
+  position:absolute;bottom:6px;right:8px;z-index:1;
+  font-size:9px;color:rgba(245,237,216,.55);font-style:italic;
+  letter-spacing:.02em;
+  text-shadow:0 1px 2px rgba(0,0,0,.7);
+  max-width:70%;text-align:right;line-height:1.2;
+}
 
 /* Campaign list */
 .camp-list{margin-top:2rem;}
@@ -176,20 +209,26 @@ h2.ntitle{font-family:'Playfair Display',serif;font-size:clamp(22px,3.5vw,30px);
       <p>Select a historical period, then choose your campaign</p>
     </div>
     <div class="era-cards">
-      <div class="era-card" onclick="selectEra('antiquity')">
-        <span class="era-icon">🏛</span>
-        <div class="era-name">Antiquity</div>
-        <div class="era-count" id="count-antiquity">Loading...</div>
+      <div class="era-card era-card--antiquity" onclick="selectEra('antiquity')">
+        <div class="era-card-inner">
+          <div class="era-name">Antiquity</div>
+          <div class="era-count" id="count-antiquity">Loading...</div>
+        </div>
+        <div class="era-card-credit">Leonidas at Thermopylae · David, 1814</div>
       </div>
-      <div class="era-card" onclick="selectEra('medieval')">
-        <span class="era-icon">⚔</span>
-        <div class="era-name">Medieval</div>
-        <div class="era-count" id="count-medieval">Loading...</div>
+      <div class="era-card era-card--medieval" onclick="selectEra('medieval')">
+        <div class="era-card-inner">
+          <div class="era-name">Medieval</div>
+          <div class="era-count" id="count-medieval">Loading...</div>
+        </div>
+        <div class="era-card-credit">Battle of San Romano · Uccello, c.1438</div>
       </div>
-      <div class="era-card" onclick="selectEra('modern')">
-        <span class="era-icon">🌍</span>
-        <div class="era-name">Modern</div>
-        <div class="era-count" id="count-modern">Loading...</div>
+      <div class="era-card era-card--modern" onclick="selectEra('modern')">
+        <div class="era-card-inner">
+          <div class="era-name">Modern</div>
+          <div class="era-count" id="count-modern">Loading...</div>
+        </div>
+        <div class="era-card-credit">Napoleon Crossing the Alps · David, 1801</div>
       </div>
     </div>
     <div class="camp-list" id="camp-list" style="display:none">
