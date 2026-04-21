@@ -71,6 +71,7 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
   <button class="tab" onclick="switchTab('dashboard')">📊 Dashboard</button>
   <button class="tab" onclick="switchTab('qc')">🔍 QC</button>
   <button class="tab" onclick="switchTab('dispatch')">⚔ Dispatch</button>
+  <button class="tab" onclick="switchTab('hq')">📊 HQ</button>
 </div>
 
 <!-- SEEDER TAB -->
@@ -911,6 +912,113 @@ async function seedPersona() {
   btn.disabled = false;
   btn.textContent = '🎭 Seed Persona Data';
 }
+
+// ── HQ ────────────────────────────────────────────────────────────────────────
+
+async function loadHQStats() {
+  const el = document.getElementById('hq-stats');
+  el.innerHTML = '<span style="color:#555">Loading…</span>';
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'get_hq_stats',admin_key:ADMIN_KEY})});
+    const d = await res.json();
+    if (d.error) { el.innerHTML='<span class="err">'+d.error+'</span>'; return; }
+    const names = ['','Very Easy','Easy','Medium','Hard','Expert'];
+    const rows = [1,2,3,4,5].map(l => {
+      const s = (d.stats||[]).find(x=>x.difficulty_level===l)||{};
+      const acc = s.avg_correct_pct!=null ? s.avg_correct_pct+'%' : '—';
+      return `<tr>
+        <td style="color:#c8903a">L${l}</td>
+        <td style="color:#555">${names[l]}</td>
+        <td style="color:#fff;font-weight:700">${s.total||0}</td>
+        <td style="color:#555">${s.seen||0}</td>
+        <td style="color:${(s.avg_correct_pct||0)>=60?'#0f0':'#c8903a'}">${acc}</td>
+      </tr>`;
+    }).join('');
+    el.innerHTML = `<table class="dash-table" style="margin-bottom:.5rem">
+      <thead><tr><th>Lvl</th><th>Name</th><th>Questions</th><th>Times seen</th><th>Avg correct</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr><td colspan="2" style="color:#555;padding-top:6px">Total</td><td style="color:#c8903a;font-weight:700;padding-top:6px">${d.total||0}</td><td colspan="2"></td></tr></tfoot>
+    </table>`;
+  } catch(e) { el.innerHTML='<span class="err">'+e.message+'</span>'; }
+}
+
+async function seedHQAll() {
+  const count = parseInt(document.getElementById('hq-count-all').value)||5;
+  const btn = document.getElementById('hq-btn-all');
+  btn.disabled = true; btn.textContent = 'Seeding…';
+  logHQ('Seeding all 5 levels × '+count+' questions…', '#c8903a');
+  for (const lvl of [1,2,3,4,5]) {
+    await seedHQLevel(lvl, count, true);
+  }
+  await loadHQStats();
+  btn.disabled = false; btn.textContent = '🌱 Seed All Levels';
+  logHQ('Done.', '#0f0');
+}
+
+async function seedHQLevel(lvl, countOverride, silent) {
+  const count = countOverride || parseInt(document.getElementById('hq-count-single').value)||5;
+  const btn = document.getElementById('hq-btn-lvl-'+lvl);
+  if (!silent) { if(btn) btn.disabled=true; }
+  logHQ((silent?'  → ':'')+'Level '+lvl+' ('+count+' questions)…', silent?'#555':'#c8903a');
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'seed_hq',admin_key:ADMIN_KEY,level:lvl,count})});
+    const d = await res.json();
+    if (d.error) { logHQ('  ✗ L'+lvl+': '+d.error, '#f44'); }
+    else { logHQ('  ✓ L'+lvl+': saved '+d.saved+' (total at this level: '+d.level_total+')', '#0f0'); }
+    if (!silent) { await loadHQStats(); if(btn) btn.disabled=false; }
+  } catch(e) {
+    logHQ('  ✗ L'+lvl+': network error', '#f44');
+    if (!silent && btn) btn.disabled=false;
+  }
+}
+
+function logHQ(msg, color) {
+  const el = document.getElementById('hq-log');
+  const line = document.createElement('div');
+  if (color) line.style.color = color;
+  line.textContent = '['+new Date().toLocaleTimeString()+'] '+msg;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
 </script>
+
+<!-- HQ TAB -->
+<div id="tab-hq" class="tab-content">
+  <div class="row" style="display:flex;justify-content:space-between;align-items:center">
+    <span style="color:#c8903a;font-size:14px;font-weight:700">📊 History Quotient — Question Bank</span>
+    <button onclick="loadHQStats()" style="font-size:12px;padding:5px 14px">↻ Refresh</button>
+  </div>
+
+  <div id="hq-stats" style="margin-bottom:1.25rem"><span style="color:#555">Click Refresh to load stats</span></div>
+
+  <div class="row" style="border-top:1px solid #1a1a1a;padding-top:1rem;margin-top:.5rem">
+    <strong style="color:#c8903a;font-size:13px">Seed All Levels</strong>
+  </div>
+  <div class="row">
+    <label style="color:#555;font-size:13px">Questions per level:</label>
+    <input type="number" id="hq-count-all" value="5" min="1" max="10" style="width:60px">
+    <button id="hq-btn-all" onclick="seedHQAll()">🌱 Seed All Levels</button>
+  </div>
+
+  <div class="row" style="border-top:1px solid #1a1a1a;padding-top:1rem;margin-top:.25rem">
+    <strong style="color:#c8903a;font-size:13px">Seed Individual Level</strong>
+  </div>
+  <div class="row">
+    <label style="color:#555;font-size:13px">Count:</label>
+    <input type="number" id="hq-count-single" value="5" min="1" max="10" style="width:60px">
+  </div>
+  <div class="row">
+    <button id="hq-btn-lvl-1" onclick="seedHQLevel(1)">L1 Very Easy</button>
+    <button id="hq-btn-lvl-2" onclick="seedHQLevel(2)">L2 Easy</button>
+    <button id="hq-btn-lvl-3" onclick="seedHQLevel(3)">L3 Medium</button>
+    <button id="hq-btn-lvl-4" onclick="seedHQLevel(4)">L4 Hard</button>
+    <button id="hq-btn-lvl-5" onclick="seedHQLevel(5)">L5 Expert</button>
+  </div>
+
+  <div class="log" id="hq-log" style="height:220px"><span style="color:#555">— ready —</span></div>
+</div>
+
 </body>
 </html>
