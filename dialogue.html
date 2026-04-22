@@ -17,11 +17,17 @@ a{color:#8a6208;text-decoration:none}
 .scenario-figure{font-family:'Playfair Display',serif;font-size:2rem;color:#1a150e;line-height:1.1;margin-bottom:.4rem}
 .scenario-role{font-size:14px;color:#5a3e1a;font-style:italic;margin-bottom:1.25rem}
 .scenario-setting{font-size:16px;color:#3a2e1e;line-height:1.7;margin-bottom:1.25rem;white-space:pre-wrap}
-.scenario-goal{background:#f0e6cc;border-left:3px solid #8a6208;padding:.75rem 1rem;margin-bottom:1.5rem;font-size:15px;color:#1a150e}
+.scenario-goal{background:#f0e6cc;border-left:3px solid #8a6208;padding:.75rem 1rem;margin-bottom:1.25rem;font-size:15px;color:#1a150e}
 .scenario-goal strong{color:#7a0a0a}
-.rules{font-size:13px;color:#5a3e1a;line-height:1.7;margin-bottom:1.5rem}
+.rules{font-size:13px;color:#5a3e1a;line-height:1.7;margin-bottom:1.25rem}
 .rules-row{display:flex;gap:.5rem;margin-bottom:.4rem}
 .rules-icon{width:20px;text-align:center;flex-shrink:0}
+.diff-row{display:flex;gap:.5rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.diff-btn{flex:1;min-width:120px;background:#fff8e8;border:1.5px solid #c8b888;border-radius:4px;padding:.6rem .8rem;cursor:pointer;text-align:center;transition:all .15s;font-family:'Crimson Text',serif}
+.diff-btn:hover{border-color:#8a6208;background:#fdf4dc}
+.diff-btn.sel{border-color:#8a6208;background:#f0e6cc;color:#1a150e}
+.diff-name{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:#1a150e;display:block;margin-bottom:.15rem}
+.diff-hint{font-size:11px;color:#7a6040;line-height:1.4}
 .start-btn{background:#8a6208;color:#f5edd8;border:1.5px solid #c8a028;border-radius:3px;padding:14px 28px;font-family:'Playfair Display',serif;font-style:italic;font-size:16px;cursor:pointer;width:100%}
 .start-btn:hover{background:#b88a18}
 .start-btn:disabled{opacity:.5;cursor:not-allowed}
@@ -33,7 +39,16 @@ a{color:#8a6208;text-decoration:none}
 .chat-meta strong{color:#f5edd8}
 .timer.warn strong{color:#cc8844}
 .timer.crit strong{color:#cc4444}
-.chat-pane{background:#0d0d0d;border:1px solid #3a2a14;border-top:none;padding:1rem;min-height:340px;max-height:55vh;overflow-y:auto}
+
+/* CONVICTION BAR */
+.conv-bar-wrap{background:#0d0d0d;border-left:1px solid #3a2a14;border-right:1px solid #3a2a14;padding:.55rem 1rem .6rem;color:#bbb;font-family:-apple-system,sans-serif}
+.conv-bar-top{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#888;margin-bottom:.3rem}
+.conv-bar-top strong{color:#c8903a;font-family:Georgia,serif;font-size:13px}
+.conv-bar{height:8px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:4px;overflow:hidden;position:relative}
+.conv-fill{height:100%;background:linear-gradient(90deg,#cc4444 0%,#c8903a 50%,#5acc8a 100%);border-radius:3px;transition:width .6s ease;width:0%}
+.conv-mark{position:absolute;top:-2px;width:2px;height:12px;background:#5acc8a88}
+
+.chat-pane{background:#0d0d0d;border:1px solid #3a2a14;border-top:none;padding:1rem;min-height:340px;max-height:50vh;overflow-y:auto}
 .bubble{margin-bottom:.85rem;max-width:85%;line-height:1.55;font-size:15px}
 .bubble.figure{margin-right:auto}
 .bubble.player{margin-left:auto;text-align:right}
@@ -80,9 +95,10 @@ a{color:#8a6208;text-decoration:none}
 .error-box{background:#2a0808;color:#cc6644;border:1px solid #5a2a2a;border-radius:6px;padding:.8rem 1rem;margin-top:1rem;font-size:14px}
 
 @media(max-width:600px){
-  .chat-pane{min-height:280px}
+  .chat-pane{min-height:280px;max-height:45vh}
   .scenario-figure{font-size:1.6rem}
   .verdict-label{font-size:1.8rem}
+  .diff-btn{min-width:100%}
 }
 </style>
 <script src="/nav.js?v=3" defer></script>
@@ -95,20 +111,31 @@ a{color:#8a6208;text-decoration:none}
 const WORKER = 'https://histroychallenger-api.maletethan.workers.dev';
 const SCENARIO_ID = 'hannibal-cannae';
 
+const DIFFICULTIES = [
+  { key:'easy',   label:'Apprentice',  hint:'Hannibal listens with patience.' },
+  { key:'medium', label:'Strategist',  hint:'Hannibal weighs every word.' },
+  { key:'hard',   label:'Imperator',   hint:'Hannibal will not be moved by anything but masterful argument.' }
+];
+
 let S = {
-  phase:'intro', // intro | chat | judging | result | error
+  phase:'intro', // intro | loading | chat | judging | result | error
+  difficulty:'medium',
   scenario:null,
   sessionId:null,
-  messages:[], // {role:'figure'|'player', content}
+  messages:[],
   turn:0,
   maxTurns:8,
-  charLimit:500,
-  timeLimit:300,
+  charLimit:300,
+  timeLimit:900,
   startedAt:null,
   timerInterval:null,
   awaitingReply:false,
+  conviction:25,
+  winAt:90,
+  loseAt:0,
   result:null,
-  errorMsg:null
+  errorMsg:null,
+  endReason:null
 };
 
 function getToken(){return localStorage.getItem('hc_token');}
@@ -125,6 +152,12 @@ function render(){
 }
 
 function renderIntro(){
+  const diffHtml = DIFFICULTIES.map(d => `
+    <div class="diff-btn ${S.difficulty===d.key?'sel':''}" onclick="setDifficulty('${d.key}')">
+      <span class="diff-name">${d.label}</span>
+      <span class="diff-hint">${d.hint}</span>
+    </div>`).join('');
+
   return `<div class="intro-card">
     <div class="scenario-date">Field of Cannae · August, 216 BC</div>
     <h1 class="scenario-figure">An Audience with Hannibal Barca</h1>
@@ -135,10 +168,11 @@ You believe Carthage will never have this chance again.</div>
     <div class="scenario-goal"><strong>Your goal:</strong> Convince Hannibal to march on Rome immediately.</div>
     <div class="rules">
       <div class="rules-row"><span class="rules-icon">⏱</span> 15 minutes total</div>
-      <div class="rules-row"><span class="rules-icon">💬</span> 8 message exchanges maximum</div>
-      <div class="rules-row"><span class="rules-icon">✍</span> 500 characters per message</div>
-      <div class="rules-row"><span class="rules-icon">⚖</span> Hannibal will judge you afterwards. He has no patience for vagueness, flattery, or anachronism.</div>
+      <div class="rules-row"><span class="rules-icon">💬</span> Up to 8 exchanges — but the audience can end sooner</div>
+      <div class="rules-row"><span class="rules-icon">✍</span> 300 characters per message</div>
+      <div class="rules-row"><span class="rules-icon">📈</span> A conviction bar tracks how close you are. Fill it to win — empty it and you're dismissed.</div>
     </div>
+    <div class="diff-row">${diffHtml}</div>
     <button class="start-btn" onclick="startSession()">Enter the tent →</button>
   </div>`;
 }
@@ -162,6 +196,8 @@ function renderChat(){
   ).join('') + (S.awaitingReply ? `<div class="thinking">${S.scenario.figure_short} considers…</div>` : '');
 
   const turnsLeft = S.maxTurns - S.turn;
+  const convPct = Math.max(0, Math.min(100, S.conviction));
+  const winPct  = Math.max(0, Math.min(100, S.winAt));
 
   return `<div class="chat-top">
     <div class="chat-figure">${S.scenario.figure}</div>
@@ -169,6 +205,10 @@ function renderChat(){
       <div>Turn <strong>${S.turn}</strong> / ${S.maxTurns}</div>
       <div class="timer ${timerCls}"><strong id="timer">${mins}:${String(secs).padStart(2,'0')}</strong></div>
     </div>
+  </div>
+  <div class="conv-bar-wrap">
+    <div class="conv-bar-top"><span>Hannibal's resolve to march</span><strong>${convPct} / ${winPct}</strong></div>
+    <div class="conv-bar"><div class="conv-fill" style="width:${convPct}%"></div><div class="conv-mark" style="left:${winPct}%"></div></div>
   </div>
   <div class="chat-pane" id="chat-pane">${bubbles}</div>
   <div class="input-area">
@@ -258,11 +298,13 @@ function startTimer(){
   }, 1000);
 }
 
+function setDifficulty(k){ S.difficulty = k; render(); }
+
 async function startSession(){
   S.phase='loading'; render();
   try{
     const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'start_dialogue',token:getToken(),scenario_id:SCENARIO_ID})});
+      body:JSON.stringify({action:'start_dialogue',token:getToken(),scenario_id:SCENARIO_ID,difficulty:S.difficulty})});
     const d = await res.json();
     if (d.error) { S.errorMsg=d.error; S.phase='error'; render(); return; }
     S.scenario = d.scenario;
@@ -270,6 +312,9 @@ async function startSession(){
     S.maxTurns = d.scenario.max_turns;
     S.charLimit = d.scenario.char_limit;
     S.timeLimit = d.scenario.time_limit_seconds;
+    S.conviction = d.conviction;
+    S.winAt = d.win_at;
+    S.loseAt = d.lose_at;
     S.messages = [{ role:'figure', content: d.opening }];
     S.turn = 0;
     S.startedAt = Date.now();
@@ -293,7 +338,6 @@ async function sendMessage(){
       body:JSON.stringify({action:'dialogue_turn',session_id:S.sessionId,message:text})});
     const d = await res.json();
     if (d.error) {
-      // Pop the player message back so they can edit, surface error inline
       S.awaitingReply = false;
       alert(d.error);
       render();
@@ -301,11 +345,13 @@ async function sendMessage(){
     }
     S.messages.push({ role:'figure', content: d.reply });
     S.turn = d.turn;
+    S.conviction = d.conviction;
+    S.endReason = d.end_reason;
     S.awaitingReply = false;
     render();
-    if (d.turns_left <= 0) {
-      // Auto-judge after a beat
-      setTimeout(endAudience, 1500);
+    if (d.end_reason) {
+      // Auto-judge after a short beat so the player sees the final reply + bar shift
+      setTimeout(endAudience, 1800);
     }
   } catch(e){
     S.awaitingReply = false;
@@ -334,9 +380,10 @@ async function endAudience(){
 function resetIntro(){
   if (S.timerInterval) { clearInterval(S.timerInterval); S.timerInterval=null; }
   S = {
-    phase:'intro', scenario:null, sessionId:null, messages:[], turn:0,
-    maxTurns:8, charLimit:500, timeLimit:300, startedAt:null,
-    timerInterval:null, awaitingReply:false, result:null, errorMsg:null
+    phase:'intro', difficulty:S.difficulty||'medium', scenario:null, sessionId:null, messages:[], turn:0,
+    maxTurns:8, charLimit:300, timeLimit:900, startedAt:null,
+    timerInterval:null, awaitingReply:false, conviction:25, winAt:90, loseAt:0,
+    result:null, errorMsg:null, endReason:null
   };
   render();
 }
