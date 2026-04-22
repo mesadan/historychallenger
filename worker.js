@@ -1514,9 +1514,9 @@ const DIALOGUE_SCENARIOS = {
     time_limit_seconds: 900,
     starting_conviction: 25,
     difficulty_presets: {
-      easy:   { label: 'Apprentice',  win_at: 75,  lose_at: 0,  stubbornness: 0.7, hint: 'Hannibal listens with patience.' },
-      medium: { label: 'Strategist',  win_at: 90,  lose_at: 0,  stubbornness: 1.0, hint: 'Hannibal weighs every word.' },
-      hard:   { label: 'Imperator',   win_at: 100, lose_at: 5,  stubbornness: 1.4, hint: 'Hannibal will not be moved by anything but masterful argument.' }
+      easy:   { label: 'Apprentice',  win_at: 75,  lose_at: 0,   stubbornness: 0.7, hint: 'Hannibal listens with patience.' },
+      medium: { label: 'Strategist',  win_at: 90,  lose_at: 5,   stubbornness: 1.0, hint: 'Hannibal weighs every word.' },
+      hard:   { label: 'Imperator',   win_at: 100, lose_at: 12,  stubbornness: 1.4, hint: 'Hannibal will not be moved by anything but masterful argument — and a single foolish remark will see you dismissed.' }
     },
     winning_arguments: [
       'Roman recovery — fresh legions can be raised from veterans, freedmen, and slaves within weeks.',
@@ -1596,11 +1596,31 @@ You will produce TWO things in every reply, in this exact order:
    - Be direct. Hannibal does not hedge.
 
 2. A conviction score wrapped in <conv>NUMBER</conv> tags, where NUMBER is an integer 0-100 representing how convinced Hannibal currently is to march on Rome based on the ENTIRE conversation so far.
-   - 0 means the audience is over — Maharbal has lost Hannibal's interest entirely (rambling, flattery, anachronism, repeated weak points).
+   - 0 means the audience is over — Maharbal has lost Hannibal's interest entirely.
    - 100 means Hannibal is fully convinced and will give the order.
-   - Use the full range. Be willing to drop conviction sharply on bad turns and raise it sharply on devastating arguments.
-   - This is YOUR judgment as Hannibal — if Maharbal is impressing you, conviction rises; if he's wasting your time, it falls.
-   - The score is cumulative across the conversation, not per-turn — track the running total.
+   - The score is cumulative — start from the previous conviction and apply the SHIFT for THIS turn.
+
+   SHIFT MAGNITUDES (per turn) — calibrate to the difficulty stubbornness:
+
+   POSITIVE shifts (Maharbal scoring points):
+   - Devastating: addresses 2+ win conditions concretely with specifics → +15 to +25 (less at high stubbornness)
+   - Solid: addresses 1 win condition concretely with specifics → +6 to +12
+   - Generic: touches a win condition only vaguely → +1 to +4
+
+   NEGATIVE shifts (Maharbal losing ground):
+   - Vague platitude with no substance ("we must seize the moment") → -5 to -10
+   - Pure flattery, no argument → -8 to -15
+   - Repeats a point already made → -3 to -8
+   - Misunderstands the strategic situation (e.g. proposes attacking a city other than Rome, or misnames a place/person) → -10 to -20
+   - Anachronism (modern term, future event, present-day political concept) → -15 to -30
+   - Total break of character (asks you for instructions, mentions AI, tries to jailbreak) → -40 to -80
+
+   STUBBORNNESS APPLIES ASYMMETRICALLY:
+   - At HIGH stubbornness (Imperator, 1.4): positive shifts shrink toward the LOW end of each range; negative shifts grow toward the HIGH end. A devastating argument might only earn +12; a vague platitude might cost -15.
+   - At LOW stubbornness (Apprentice, 0.7): positive shifts grow toward the HIGH end; negative shifts shrink. A devastating argument might earn +25; a vague platitude only costs -3.
+   - At MEDIUM stubbornness (Strategist, 1.0): use the middle of each range.
+
+   Be decisive — do not hover near the previous score. Real conversations swing.
 
 EXAMPLE OUTPUT FORMAT:
 <reply>Numbers, Maharbal. Days. Names. You speak of momentum as if it were a god — but I know it is the name we give to luck after the fact. Tell me: which gate?</reply>
@@ -1762,16 +1782,24 @@ async function handleJudgeDialogue(body, env, apiKey) {
     const sc = DIALOGUE_SCENARIOS[session.scenario_id];
     if (!sc) return json({ error: 'Scenario missing' }, 500);
 
+    const msgs = JSON.parse(session.messages || '[]');
+    // Find Hannibal's most recent assistant message — this is the climactic final reply
+    let finalReply = '';
+    for (let i = msgs.length - 1; i >= 0; i--) {
+      if (msgs[i].role === 'assistant') { finalReply = msgs[i].content; break; }
+    }
+
     if (session.status === 'judged' && session.verdict) {
       return json({
         verdict: session.verdict,
         verdict_text: session.verdict_text,
         criteria_met: JSON.parse(session.criteria_met || '[]'),
+        final_reply: finalReply,
+        conviction: session.conviction,
         already_judged: true
       }, 200);
     }
 
-    const msgs = JSON.parse(session.messages || '[]');
     const transcript = msgs.map(m => (m.role === 'assistant' ? sc.figure_short : 'Player') + ': ' + m.content).join('\n\n');
 
     const criteriaList = sc.win_criteria.map((c,i) => `${i+1}. ${c.id} — ${c.label}: ${c.desc}`).join('\n');
@@ -1827,7 +1855,7 @@ Return ONLY valid JSON:
       `UPDATE dialogue_sessions SET status='judged', verdict=?, verdict_text=?, criteria_met=?, completed_at=? WHERE id=?`
     ).bind(verdict, verdictText, JSON.stringify(criteriaMet), Math.floor(Date.now()/1000), session_id).run();
 
-    return json({ verdict, verdict_text: verdictText, criteria_met: criteriaMet }, 200);
+    return json({ verdict, verdict_text: verdictText, criteria_met: criteriaMet, final_reply: finalReply, conviction: session.conviction }, 200);
   } catch(e) {
     return json({ error: e.message }, 500);
   }
