@@ -1510,7 +1510,7 @@ const DIALOGUE_SCENARIOS = {
     goal: 'Convince Hannibal to march on Rome immediately.',
     char_limit: 500,
     max_turns: 8,
-    time_limit_seconds: 300,
+    time_limit_seconds: 900,
     opening_line: `Maharbal. Sit. The flies are intolerable. You have ridden through the dead Romans to find me, so I assume you have not come to praise the day's work. Speak.`,
     win_criteria: [
       { id:'urgency',   label:'Time pressure',   desc:'You convinced him that delay = Roman recovery (fresh legions from veterans, freedmen, slaves).' },
@@ -1737,7 +1737,10 @@ async function callClaudeChat(apiKey, messages, system, maxTokens) {
     body: JSON.stringify(body)
   });
   const data = await res.json();
-  if (data.error || !data.content) throw new Error(data.error?.message || 'API error');
+  if (data.error || !data.content) {
+    const detail = data.error?.message || data.error?.type || JSON.stringify(data).slice(0, 300);
+    throw new Error('Anthropic[' + res.status + ']: ' + detail);
+  }
   return data.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
 }
 
