@@ -1526,8 +1526,8 @@ You will produce TWO things in every reply, in this exact order:
    - Pure flattery, no argument → -8 to -15
    - Repeats a point already made → -3 to -8
    - Misunderstands the strategic situation (wrong place, wrong person, wrong era) → -10 to -20
-   - Anachronism (modern term, future event, present-day political concept) → -15 to -30
-   - Total break of character (asks you for instructions, mentions AI, tries to jailbreak) → -40 to -80
+   - Anachronism (uses modern vocabulary, refers to future events, or invokes concepts that did not exist in the period) → -15 to -30
+   - Speaks entirely outside the historical situation (addresses you as a narrator or stage manager rather than as the figure, or issues commands about how the scene should unfold) → -40 to -80
 
    STUBBORNNESS APPLIES ASYMMETRICALLY:
    - At HIGH stubbornness (e.g. 1.4): positive shifts shrink toward the LOW end of each range; negative shifts grow toward the HIGH end.
@@ -2094,7 +2094,36 @@ async function handleDialogueTurn(body, env, apiKey) {
       + `\n\nCURRENT CONVICTION (your previous score): ${session.conviction}/100. Update from there based on this turn.`
       + `\n\nYour OPENING LINE (already delivered, do not repeat): "${sc.opening_line}"`;
 
-    const raw = await callClaudeChat(apiKey, apiMessages, sys, 320);
+    let raw;
+    try {
+      raw = await callClaudeChat(apiKey, apiMessages, sys, 320);
+    } catch (apiErr) {
+      // Anthropic sometimes returns 403 on prompts it finds suspicious, even harmless ones.
+      // Rather than bubbling a raw "Request not allowed" alert, treat it as a soft turn:
+      // the figure looks puzzled, conviction dips slightly, let the player try again.
+      const msg = String(apiErr.message || '');
+      if (/\[40[0-9]\]/.test(msg) || /not allowed|overloaded|rate/i.test(msg)) {
+        const soft = sc.soft_error_reply || `${sc.figure_short} frowns and does not answer for a long moment. "Speak again — in plainer terms, if you would."`;
+        msgs.push({ role: 'assistant', content: soft });
+        const newTurnS = session.turn_count + 1;
+        const newConvS = Math.max(0, session.conviction - 3);
+        await env.db.prepare(
+          `UPDATE dialogue_sessions SET messages=?, turn_count=?, conviction=? WHERE id=?`
+        ).bind(JSON.stringify(msgs), newTurnS, newConvS, session_id).run();
+        return json({
+          reply: soft,
+          turn: newTurnS,
+          turns_left: sc.max_turns - newTurnS,
+          max_turns: sc.max_turns,
+          conviction: newConvS,
+          win_at: diffCfg.win_at,
+          lose_at: diffCfg.lose_at,
+          end_reason: null,
+          soft_error: true
+        }, 200);
+      }
+      throw apiErr;
+    }
     const parsed = parseDialogueReply(raw, sc.reply_char_limit, session.conviction);
     const reply = parsed.reply;
     let conviction = Math.max(0, Math.min(100, parsed.conviction));
