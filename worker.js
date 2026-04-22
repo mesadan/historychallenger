@@ -1636,10 +1636,14 @@ async function handleStartDialogue(body, env) {
   const now = Math.floor(Date.now()/1000);
   const messages = [{ role: 'assistant', content: sc.opening_line }];
 
-  await env.db.prepare(
-    `INSERT INTO dialogue_sessions (id, user_id, scenario_id, messages, turn_count, status, started_at, conviction, difficulty)
-     VALUES (?, ?, ?, ?, 0, 'active', ?, ?, ?)`
-  ).bind(sessionId, userId, scenario_id, JSON.stringify(messages), now, sc.starting_conviction, diffKey).run();
+  try {
+    await env.db.prepare(
+      `INSERT INTO dialogue_sessions (id, user_id, scenario_id, messages, turn_count, status, started_at, conviction, difficulty)
+       VALUES (?, ?, ?, ?, 0, 'active', ?, ?, ?)`
+    ).bind(sessionId, userId, scenario_id, JSON.stringify(messages), now, sc.starting_conviction, diffKey).run();
+  } catch(e) {
+    return json({ error: 'DB insert failed: ' + e.message + ' — did you run the conviction/difficulty ALTER TABLE migration?' }, 500);
+  }
 
   const { character_sheet, ...publicScenario } = sc;
   publicScenario.difficulty = diffKey;
