@@ -1408,8 +1408,17 @@ async function updateHQQ(id, difficulty, level){
 async function loadAudienceScenarios(){
   const el = document.getElementById('audience-scenarios');
   el.innerHTML = '<span style="color:#555;font-size:12px">Loading…</span>';
-  // Currently only one scenario — we hit get_dialogue_scenario directly with the known id.
-  const ids = ['hannibal-cannae'];
+  let ids = [];
+  try {
+    const listRes = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'list_dialogue_scenarios'})});
+    const listD = await listRes.json();
+    if (listD.error) { el.innerHTML = `<div class="err">${listD.error}</div>`; return; }
+    ids = (listD.scenarios||[]).map(s => s.id);
+  } catch(e) {
+    el.innerHTML = `<div class="err">${e.message}</div>`;
+    return;
+  }
   let html = '';
   for (const id of ids) {
     try {

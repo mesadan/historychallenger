@@ -9,7 +9,21 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Crimson Text',Georgia,serif;background:#f0e6cc;color:#1a150e;min-height:100vh;font-size:17px;line-height:1.6}
 a{color:#8a6208;text-decoration:none}
-.page{max-width:760px;margin:0 auto;padding:1.5rem 1rem 4rem}
+.page{max-width:880px;margin:0 auto;padding:1.5rem 1rem 4rem}
+
+/* PICKER */
+.pick-header{margin:1rem 0 1.5rem}
+.pick-eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#8a6208;margin-bottom:.4rem;font-family:'Crimson Text',serif}
+.pick-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:400;color:#1a150e;line-height:1.1}
+.pick-sub{font-size:15px;color:#5a3e1a;font-style:italic;margin-top:.4rem}
+.pick-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+.pick-card{background:#faf4e4;border:1.5px solid #c8b888;border-radius:4px;padding:1.25rem 1.25rem 1rem;cursor:pointer;transition:all .15s;text-align:left;display:flex;flex-direction:column}
+.pick-card:hover{border-color:#8a6208;box-shadow:0 3px 12px rgba(26,21,14,.08);transform:translateY(-2px)}
+.pick-date{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#8a6208;margin-bottom:.4rem;font-family:'Crimson Text',serif}
+.pick-figure{font-family:'Playfair Display',serif;font-size:1.35rem;color:#1a150e;line-height:1.15;margin-bottom:.4rem}
+.pick-role{font-size:13px;color:#5a3e1a;font-style:italic;margin-bottom:.75rem;line-height:1.45}
+.pick-goal{font-size:14px;color:#3a2e1e;line-height:1.5;flex:1;margin-bottom:.85rem}
+.pick-cta{font-family:'Playfair Display',serif;font-style:italic;font-size:13px;color:#8a6208;align-self:flex-start;border-top:1px solid #c8b888;padding-top:.5rem;width:100%}
 
 /* INTRO */
 .intro-card{background:#faf4e4;border:1.5px solid #c8b888;border-radius:6px;padding:2rem 1.75rem;margin-top:1rem}
@@ -28,9 +42,12 @@ a{color:#8a6208;text-decoration:none}
 .diff-btn.sel{border-color:#8a6208;background:#f0e6cc;color:#1a150e}
 .diff-name{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:#1a150e;display:block;margin-bottom:.15rem}
 .diff-hint{font-size:11px;color:#7a6040;line-height:1.4}
-.start-btn{background:#8a6208;color:#f5edd8;border:1.5px solid #c8a028;border-radius:3px;padding:14px 28px;font-family:'Playfair Display',serif;font-style:italic;font-size:16px;cursor:pointer;width:100%}
+.intro-actions{display:flex;gap:.75rem;flex-wrap:wrap}
+.start-btn{background:#8a6208;color:#f5edd8;border:1.5px solid #c8a028;border-radius:3px;padding:14px 28px;font-family:'Playfair Display',serif;font-style:italic;font-size:16px;cursor:pointer;flex:1;min-width:200px}
 .start-btn:hover{background:#b88a18}
 .start-btn:disabled{opacity:.5;cursor:not-allowed}
+.back-btn{background:none;border:1.5px solid #c8b888;color:#5a3e1a;border-radius:3px;padding:10px 18px;font-family:'Playfair Display',serif;font-style:italic;font-size:14px;cursor:pointer}
+.back-btn:hover{border-color:#8a6208;color:#1a150e}
 
 /* CHAT */
 .chat-top{display:flex;align-items:center;justify-content:space-between;background:#1a150e;color:#f5edd8;padding:.6rem 1rem;border-radius:6px 6px 0 0;border:1px solid #3a2a14;border-bottom:none;font-size:13px}
@@ -40,7 +57,6 @@ a{color:#8a6208;text-decoration:none}
 .timer.warn strong{color:#cc8844}
 .timer.crit strong{color:#cc4444}
 
-/* CONVICTION BAR */
 .conv-bar-wrap{background:#0d0d0d;border-left:1px solid #3a2a14;border-right:1px solid #3a2a14;padding:.55rem 1rem .6rem;color:#bbb;font-family:-apple-system,sans-serif}
 .conv-bar-top{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#888;margin-bottom:.3rem}
 .conv-bar-top strong{color:#c8903a;font-family:Georgia,serif;font-size:13px}
@@ -83,14 +99,6 @@ a{color:#8a6208;text-decoration:none}
 .final-quote{background:#1a150e;color:#e8d8b8;border-left:3px solid #c8903a;padding:1rem 1.25rem;margin:0 auto 1.5rem;max-width:540px;text-align:left;font-family:Georgia,serif;font-style:italic;line-height:1.65;font-size:15px;border-radius:0 4px 4px 0}
 .final-quote-attr{font-size:11px;color:#7a6040;letter-spacing:.12em;text-transform:uppercase;margin-top:.6rem;font-family:'Crimson Text',serif;font-style:normal}
 .final-quote-attr strong{color:#c8903a;font-style:italic}
-.criteria-list{text-align:left;background:#f0e6cc;border:1px solid #c8b888;border-radius:4px;padding:.75rem 1rem;margin-bottom:1.5rem}
-.crit-item{display:flex;gap:.6rem;padding:.4rem 0;font-size:14px;color:#5a3e1a;line-height:1.5}
-.crit-item.met{color:#1a150e}
-.crit-mark{flex-shrink:0;font-size:14px;width:18px}
-.crit-mark.yes{color:#3a7a3a}
-.crit-mark.no{color:#aa6644}
-.crit-label{font-weight:600;color:#3a2e1e}
-.crit-item.met .crit-label{color:#1a150e}
 .result-actions{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
 .btn-secondary{background:none;border:1.5px solid #c8b888;color:#5a3e1a;border-radius:3px;padding:10px 20px;font-family:'Playfair Display',serif;font-style:italic;font-size:14px;cursor:pointer}
 .btn-secondary:hover{border-color:#8a6208;color:#1a150e}
@@ -102,6 +110,7 @@ a{color:#8a6208;text-decoration:none}
   .scenario-figure{font-size:1.6rem}
   .verdict-label{font-size:1.8rem}
   .diff-btn{min-width:100%}
+  .pick-grid{grid-template-columns:1fr}
 }
 </style>
 <script src="/nav.js?v=3" defer></script>
@@ -112,18 +121,13 @@ a{color:#8a6208;text-decoration:none}
 
 <script>
 const WORKER = 'https://histroychallenger-api.maletethan.workers.dev';
-const SCENARIO_ID = 'hannibal-cannae';
-
-const DIFFICULTIES = [
-  { key:'easy',   label:'Apprentice',  hint:'Hannibal listens with patience.' },
-  { key:'medium', label:'Strategist',  hint:'Hannibal weighs every word.' },
-  { key:'hard',   label:'Imperator',   hint:'Hannibal will not be moved by anything but masterful argument.' }
-];
 
 let S = {
-  phase:'intro', // intro | loading | chat | judging | result | error
-  difficulty:'medium',
+  phase:'pick', // pick | loading | intro | chat | judging | result | error
+  scenarios:[],
+  scenarioId:null,
   scenario:null,
+  difficulty:'medium',
   sessionId:null,
   messages:[],
   turn:0,
@@ -145,43 +149,68 @@ function getToken(){return localStorage.getItem('hc_token');}
 
 function render(){
   const p=document.getElementById('page');
+  if(S.phase==='pick')    p.innerHTML=renderPick();
+  if(S.phase==='loading') p.innerHTML=renderLoading('Preparing the audience…');
   if(S.phase==='intro')   p.innerHTML=renderIntro();
-  if(S.phase==='loading') p.innerHTML=renderLoading('Preparing your audience…');
   if(S.phase==='chat')    p.innerHTML=renderChat();
-  if(S.phase==='judging') p.innerHTML=renderLoading(`${S.scenario.figure_short} weighs your words…`);
+  if(S.phase==='judging') p.innerHTML=renderLoading(`${S.scenario?.figure_short||'They'} weigh${S.scenario?.figure_short?'':'s'} your words…`);
   if(S.phase==='result')  p.innerHTML=renderResult();
   if(S.phase==='error')   p.innerHTML=renderError();
   if(S.phase==='chat'){ scrollChat(); attachInputHandlers(); startTimer(); }
 }
 
-function renderIntro(){
-  const diffHtml = DIFFICULTIES.map(d => `
-    <div class="diff-btn ${S.difficulty===d.key?'sel':''}" onclick="setDifficulty('${d.key}')">
-      <span class="diff-name">${d.label}</span>
-      <span class="diff-hint">${d.hint}</span>
+function renderPick(){
+  if (!S.scenarios.length) {
+    return `<div class="intro-card" style="text-align:center"><div style="color:#5a3e1a;font-style:italic;font-size:15px;padding:2rem">Loading audiences…</div></div>`;
+  }
+  const cards = S.scenarios.map(s => `
+    <div class="pick-card" onclick="pickScenario('${s.id}')">
+      <div class="pick-date">${escapeHtml(s.date_label)}</div>
+      <div class="pick-figure">${escapeHtml(s.figure)}</div>
+      <div class="pick-role">${escapeHtml(s.player_role)}</div>
+      <div class="pick-goal">${escapeHtml(s.goal)}</div>
+      <div class="pick-cta">Enter the room →</div>
     </div>`).join('');
-
-  return `<div class="intro-card">
-    <div class="scenario-date">Field of Cannae · August, 216 BC</div>
-    <h1 class="scenario-figure">An Audience with Hannibal Barca</h1>
-    <div class="scenario-role">You are Maharbal, commander of the Numidian cavalry</div>
-    <div class="scenario-setting">Two days ago you and Hannibal annihilated eight Roman legions in the dust of Apulia. The flies are thick. Hannibal's slaves are still walking the field, prying signet rings from the dead — three pecks of gold so far. Rome lies four days' march to the north, defenceless, panicking. You have just dismounted in front of his command tent and demanded an audience.
-
-You believe Carthage will never have this chance again.</div>
-    <div class="scenario-goal"><strong>Your goal:</strong> Convince Hannibal to march on Rome immediately.</div>
-    <div class="rules">
-      <div class="rules-row"><span class="rules-icon">⏱</span> 15 minutes total</div>
-      <div class="rules-row"><span class="rules-icon">💬</span> Up to 8 exchanges — but the audience can end sooner</div>
-      <div class="rules-row"><span class="rules-icon">✍</span> 300 characters per message</div>
-      <div class="rules-row"><span class="rules-icon">📈</span> A conviction bar tracks how close you are. Fill it to win — empty it and you're dismissed.</div>
-    </div>
-    <div class="diff-row">${diffHtml}</div>
-    <button class="start-btn" onclick="startSession()">Enter the tent →</button>
-  </div>`;
+  return `<div class="pick-header">
+    <div class="pick-eyebrow">Audience</div>
+    <h1 class="pick-title">Choose your audience</h1>
+    <p class="pick-sub">Five historical figures. Five decisions. Convince them — or be dismissed.</p>
+  </div>
+  <div class="pick-grid">${cards}</div>`;
 }
 
 function renderLoading(msg){
-  return `<div class="intro-card" style="text-align:center"><div style="color:#5a3e1a;font-style:italic;font-size:15px;padding:2rem">${msg}</div></div>`;
+  return `<div class="intro-card" style="text-align:center"><div style="color:#5a3e1a;font-style:italic;font-size:15px;padding:2rem">${escapeHtml(msg)}</div></div>`;
+}
+
+function renderIntro(){
+  const sc = S.scenario;
+  if (!sc) return renderLoading('Preparing the audience…');
+
+  const diffs = (sc.difficulty_presets ? Object.entries(sc.difficulty_presets) : []).map(([k,v]) => `
+    <div class="diff-btn ${S.difficulty===k?'sel':''}" onclick="setDifficulty('${k}')">
+      <span class="diff-name">${escapeHtml(v.label)}</span>
+      <span class="diff-hint">${escapeHtml(v.hint)}</span>
+    </div>`).join('');
+
+  return `<div class="intro-card">
+    <div class="scenario-date">${escapeHtml(sc.date_label)}</div>
+    <h1 class="scenario-figure">An Audience with ${escapeHtml(sc.figure)}</h1>
+    <div class="scenario-role">You are ${escapeHtml(sc.player_role)}</div>
+    <div class="scenario-setting">${escapeHtml(sc.setting)}</div>
+    <div class="scenario-goal"><strong>Your goal:</strong> ${escapeHtml(sc.goal)}</div>
+    <div class="rules">
+      <div class="rules-row"><span class="rules-icon">⏱</span> ${Math.round((sc.time_limit_seconds||900)/60)} minutes total</div>
+      <div class="rules-row"><span class="rules-icon">💬</span> Up to ${sc.max_turns||8} exchanges — but the audience can end sooner</div>
+      <div class="rules-row"><span class="rules-icon">✍</span> ${sc.char_limit||300} characters per message</div>
+      <div class="rules-row"><span class="rules-icon">📈</span> A conviction bar tracks how close you are. Fill it to win — empty it and you're dismissed.</div>
+    </div>
+    <div class="diff-row">${diffs}</div>
+    <div class="intro-actions">
+      <button class="back-btn" onclick="goPicker()">← Back</button>
+      <button class="start-btn" onclick="startSession()">Enter the room →</button>
+    </div>
+  </div>`;
 }
 
 function renderChat(){
@@ -193,24 +222,24 @@ function renderChat(){
 
   const bubbles = S.messages.map(m =>
     `<div class="bubble ${m.role}">
-      <div class="bubble-name">${m.role==='figure'?S.scenario.figure_short:'You'}</div>
+      <div class="bubble-name">${m.role==='figure'?escapeHtml(S.scenario.figure_short):'You'}</div>
       <div class="bubble-text">${escapeHtml(m.content)}</div>
     </div>`
-  ).join('') + (S.awaitingReply ? `<div class="thinking">${S.scenario.figure_short} considers…</div>` : '');
+  ).join('') + (S.awaitingReply ? `<div class="thinking">${escapeHtml(S.scenario.figure_short)} considers…</div>` : '');
 
   const turnsLeft = S.maxTurns - S.turn;
   const convPct = Math.max(0, Math.min(100, S.conviction));
   const winPct  = Math.max(0, Math.min(100, S.winAt));
 
   return `<div class="chat-top">
-    <div class="chat-figure">${S.scenario.figure}</div>
+    <div class="chat-figure">${escapeHtml(S.scenario.figure)}</div>
     <div class="chat-meta">
       <div>Turn <strong>${S.turn}</strong> / ${S.maxTurns}</div>
       <div class="timer ${timerCls}"><strong id="timer">${mins}:${String(secs).padStart(2,'0')}</strong></div>
     </div>
   </div>
   <div class="conv-bar-wrap">
-    <div class="conv-bar-top"><span>Hannibal's resolve to march</span><strong>${convPct} / ${winPct}</strong></div>
+    <div class="conv-bar-top"><span>${escapeHtml(S.scenario.figure_short)}'s resolve</span><strong>${convPct} / ${winPct}</strong></div>
     <div class="conv-bar"><div class="conv-fill" style="width:${convPct}%"></div><div class="conv-mark" style="left:${winPct}%"></div></div>
   </div>
   <div class="chat-pane" id="chat-pane">${bubbles}</div>
@@ -233,26 +262,27 @@ function renderResult(){
   else if (r.verdict==='Firm') cls='fail';
 
   const finalReply = r.final_reply || '';
-  const figureName = S.scenario?.figure_short || 'Hannibal';
+  const figureName = S.scenario?.figure_short || 'They';
   const finalQuoteHtml = finalReply
     ? `<div class="final-quote">"${escapeHtml(finalReply)}"<div class="final-quote-attr">— <strong>${escapeHtml(figureName)}</strong>, the last words of the audience</div></div>`
     : '';
 
   return `<div class="result-card">
     <div class="verdict-eyebrow">${escapeHtml(figureName)}'s verdict</div>
-    <h1 class="verdict-label ${cls}">${label}</h1>
+    <h1 class="verdict-label ${cls}">${escapeHtml(label)}</h1>
     ${finalQuoteHtml}
     <p class="verdict-text">${escapeHtml(r.verdict_text||'')}</p>
     <div class="result-actions">
       <button class="btn-secondary" onclick="resetIntro()">Try again</button>
+      <button class="btn-secondary" onclick="goPicker()">Another audience</button>
       <a class="btn-secondary" href="/">Home</a>
     </div>
   </div>`;
 }
 
 function renderError(){
-  return `<div class="error-box">${S.errorMsg||'Something went wrong.'}</div>
-    <div style="text-align:center;margin-top:1rem"><button class="btn-secondary" onclick="resetIntro()">Back</button></div>`;
+  return `<div class="error-box">${escapeHtml(S.errorMsg||'Something went wrong.')}</div>
+    <div style="text-align:center;margin-top:1rem"><button class="btn-secondary" onclick="goPicker()">Back</button></div>`;
 }
 
 function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -300,11 +330,63 @@ function startTimer(){
 
 function setDifficulty(k){ S.difficulty = k; render(); }
 
+async function loadScenarios(){
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'list_dialogue_scenarios'})});
+    const d = await res.json();
+    if (d.error) { S.errorMsg = d.error; S.phase='error'; render(); return; }
+    S.scenarios = d.scenarios || [];
+    render();
+  } catch(e) {
+    S.errorMsg = 'Network error: '+e.message;
+    S.phase='error';
+    render();
+  }
+}
+
+async function pickScenario(id){
+  S.scenarioId = id;
+  S.phase = 'loading';
+  render();
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'get_dialogue_scenario',scenario_id:id})});
+    const d = await res.json();
+    if (d.error) { S.errorMsg = d.error; S.phase='error'; render(); return; }
+    S.scenario = d.scenario;
+    S.charLimit = d.scenario.char_limit || 300;
+    S.timeLimit = d.scenario.time_limit_seconds || 900;
+    S.maxTurns = d.scenario.max_turns || 8;
+    S.phase = 'intro';
+    render();
+  } catch(e) {
+    S.errorMsg = 'Network error: '+e.message;
+    S.phase='error';
+    render();
+  }
+}
+
+function goPicker(){
+  if (S.timerInterval) { clearInterval(S.timerInterval); S.timerInterval=null; }
+  S.phase = 'pick';
+  S.scenarioId = null;
+  S.scenario = null;
+  S.sessionId = null;
+  S.messages = [];
+  S.turn = 0;
+  S.conviction = 25;
+  S.result = null;
+  S.endReason = null;
+  S.awaitingReply = false;
+  render();
+}
+
 async function startSession(){
   S.phase='loading'; render();
   try{
     const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'start_dialogue',token:getToken(),scenario_id:SCENARIO_ID,difficulty:S.difficulty})});
+      body:JSON.stringify({action:'start_dialogue',token:getToken(),scenario_id:S.scenarioId,difficulty:S.difficulty})});
     const d = await res.json();
     if (d.error) { S.errorMsg=d.error; S.phase='error'; render(); return; }
     S.scenario = d.scenario;
@@ -349,8 +431,6 @@ async function sendMessage(){
     S.awaitingReply = false;
 
     if (d.end_reason) {
-      // Don't push the final reply into the chat — it would only flash by.
-      // Go straight to judging; the result screen will quote Hannibal's last words prominently.
       endAudience();
       return;
     }
@@ -383,16 +463,28 @@ async function endAudience(){
 
 function resetIntro(){
   if (S.timerInterval) { clearInterval(S.timerInterval); S.timerInterval=null; }
-  S = {
-    phase:'intro', difficulty:S.difficulty||'medium', scenario:null, sessionId:null, messages:[], turn:0,
-    maxTurns:8, charLimit:300, timeLimit:900, startedAt:null,
-    timerInterval:null, awaitingReply:false, conviction:25, winAt:90, loseAt:0,
-    result:null, errorMsg:null, endReason:null
-  };
+  // Restart with same scenario
+  S.sessionId = null;
+  S.messages = [];
+  S.turn = 0;
+  S.conviction = 25;
+  S.result = null;
+  S.endReason = null;
+  S.awaitingReply = false;
+  S.phase = 'intro';
   render();
 }
 
-render();
+// Boot — check for ?scenario=... URL param to skip the picker
+(function init(){
+  const params = new URLSearchParams(window.location.search);
+  const scenario = params.get('scenario');
+  if (scenario) {
+    pickScenario(scenario);
+  } else {
+    loadScenarios();
+  }
+})();
 </script>
 
 </body>
