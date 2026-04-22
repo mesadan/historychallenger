@@ -169,7 +169,7 @@ function renderPick(){
       <div class="pick-figure">${escapeHtml(s.figure)}</div>
       <div class="pick-role">${escapeHtml(s.player_role)}</div>
       <div class="pick-goal">${escapeHtml(s.goal)}</div>
-      <div class="pick-cta">Enter the room →</div>
+      <div class="pick-cta">Proceed to the audience →</div>
     </div>`).join('');
   return `<div class="pick-header">
     <div class="pick-eyebrow">Audience</div>
@@ -208,7 +208,7 @@ function renderIntro(){
     <div class="diff-row">${diffs}</div>
     <div class="intro-actions">
       <button class="back-btn" onclick="goPicker()">← Back</button>
-      <button class="start-btn" onclick="startSession()">Enter the room →</button>
+      <button class="start-btn" onclick="startSession()">Proceed to the audience →</button>
     </div>
   </div>`;
 }
