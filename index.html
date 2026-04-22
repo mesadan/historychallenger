@@ -249,7 +249,7 @@ footer{
   .footer-links{gap:14px}
 }
 </style>
-<script src="/nav.js?v=2" defer></script>
+<script src="/nav.js?v=3" defer></script>
 </head>
 <body>
 
@@ -307,6 +307,13 @@ footer{
         <span class="game-tag" id="t-hqtag">Adaptive Knowledge Test</span>
         <div class="game-desc" id="t-hqdesc">30 questions, 5 difficulty levels. The algorithm adjusts in real time. Earn a score from 0 to 990 that reflects your true depth of historical knowledge.</div>
         <span class="game-cta ghost" id="t-hqcta">Test your HQ &#8594;</span>
+      </a>
+      <a href="/dialogue.html" class="game-card">
+        <span class="game-icon"><svg width="36" height="36" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle"><path d="M8 14 Q8 10 12 10 L44 10 Q48 10 48 14 L48 36 Q48 40 44 40 L24 40 L16 48 L16 40 L12 40 Q8 40 8 36 Z" fill="#e8cc80" stroke="#c8a050" stroke-width="1.5"/><circle cx="20" cy="25" r="2" fill="#8a6a10"/><circle cx="28" cy="25" r="2" fill="#8a6a10"/><circle cx="36" cy="25" r="2" fill="#8a6a10"/></svg></span>
+        <div class="game-name" id="t-aut">Audience</div>
+        <span class="game-tag" id="t-autag">Talk to a Historical Figure</span>
+        <div class="game-desc" id="t-audesc">Eight messages. Five minutes. Convince Hannibal to march on Rome before the moment is lost. He has no patience for vague flattery — only specifics will move him.</div>
+        <span class="game-cta ghost" id="t-aucta">Enter the tent &#8594;</span>
       </a>
     </div>
   </div>
@@ -392,10 +399,10 @@ const T = {
   en: {
     eyebrow:'Free · No account required · AI-powered',
     title:'How well do you <span>know history?</span>',
-    sub:'Five games. Every era. Completely free.',
+    sub:'Six games. Every era. Completely free.',
     cta1:'Choose a game', cta2:'See the games',
     note:'No download · Plays in your browser · Mobile friendly',
-    gamesLabel:'Five games',
+    gamesLabel:'Six games',
     gamesTitle:'Pick your challenge',
     gamesSub:'Each game tests a different kind of historical knowledge. All free, all generated fresh by AI.',
     newBadge:'New',
@@ -403,9 +410,10 @@ const T = {
     s1t:'History Challenger', g2tag:'Timeline Placement', s1d:'Place five historical events on a timeline as accurately as possible. Score points for correct order and precise spacing. From the Bronze Age to the Cold War.',
     s2t:'Did They Overlap?', g3tag:'Civilizations Quiz', s2d:'Given a civilization and its era, which of four options actually coexisted with it? The Assyrians and Carthage? The Han Dynasty and Rome? History is stranger than you think.',
     hqt:'History Quotient', hqtag:'Adaptive Knowledge Test', hqdesc:'30 questions, 5 difficulty levels. The algorithm adjusts in real time. Earn a score from 0 to 990 that reflects your true depth of historical knowledge.', hqcta:'Test your HQ →',
+    aut:'Audience', autag:'Talk to a Historical Figure', audesc:'Eight messages. Five minutes. Convince Hannibal to march on Rome before the moment is lost. He has no patience for vague flattery — only specifics will move him.', aucta:'Enter the tent →',
     play:'Play →',
     lblAbout:'About',
-    aboutTitle:'Five games. One obsession.',
+    aboutTitle:'Six games. One obsession.',
     aboutText:'<p>Most history quizzes test recognition, not knowledge. Multiple choice lets you guess. We wanted something harder.</p><p>Four games. Each one tests a different kind of historical thinking — decisions under pressure, precision on a timeline, the shape of time itself, the profile of a leader. No right answers shown until the end. No account required.</p><p>Every game is generated fresh by AI. Free to play. Sign in with Google to track scores and streaks.</p>',
     lblFaq:'FAQ', faqTitle:'Questions',
     faqs:[
@@ -420,10 +428,10 @@ const T = {
   fr: {
     eyebrow:'Gratuit · Sans inscription · Propulsé par IA',
     title:'Connaissez-vous bien <span>l\'histoire ?</span>',
-    sub:'Cinq jeux. Toutes les époques. Entièrement gratuit.',
+    sub:'Six jeux. Toutes les époques. Entièrement gratuit.',
     cta1:'Choisir un jeu', cta2:'Voir les jeux',
     note:'Sans téléchargement · Dans le navigateur · Compatible mobile',
-    gamesLabel:'Cinq jeux',
+    gamesLabel:'Six jeux',
     gamesTitle:'Choisissez votre défi',
     gamesSub:'Chaque jeu teste un type différent de connaissance historique. Tous gratuits, tous générés par IA.',
     newBadge:'Nouveau',
@@ -447,10 +455,10 @@ const T = {
   de: {
     eyebrow:'Kostenlos · Keine Anmeldung · KI-gestützt',
     title:'Wie gut kennen Sie <span>die Geschichte?</span>',
-    sub:'Fünf Spiele. Alle Epochen. Völlig kostenlos.',
+    sub:'Sechs Spiele. Alle Epochen. Völlig kostenlos.',
     cta1:'Spiel wählen', cta2:'Spiele ansehen',
     note:'Kein Download · Im Browser · Mobilfreundlich',
-    gamesLabel:'Fünf Spiele',
+    gamesLabel:'Sechs Spiele',
     gamesTitle:'Wählen Sie Ihre Herausforderung',
     gamesSub:'Jedes Spiel testet eine andere Art historischen Wissens. Alle kostenlos, alle frisch von KI generiert.',
     newBadge:'Neu',
@@ -474,10 +482,10 @@ const T = {
   es: {
     eyebrow:'Gratis · Sin registro · Con IA',
     title:'¿Cuánto sabes de <span>historia?</span>',
-    sub:'Cinco juegos. Todas las épocas. Completamente gratis.',
+    sub:'Seis juegos. Todas las épocas. Completamente gratis.',
     cta1:'Elegir un juego', cta2:'Ver los juegos',
     note:'Sin descarga · En el navegador · Compatible con móvil',
-    gamesLabel:'Cinco juegos',
+    gamesLabel:'Seis juegos',
     gamesTitle:'Elige tu desafío',
     gamesSub:'Cada juego prueba un tipo diferente de conocimiento histórico. Todos gratuitos, todos generados por IA.',
     newBadge:'Nuevo',
@@ -521,6 +529,7 @@ function applyLang(){
   st('t-s2t', t.s2t); st('t-g3tag', t.g3tag); st('t-s2d', t.s2d);
   st('t-play', t.play); st('t-play2', t.play); st('t-play3', t.play);
   st('t-hqt', t.hqt||'History Quotient'); st('t-hqtag', t.hqtag||'Adaptive Knowledge Test'); st('t-hqdesc', t.hqdesc||''); st('t-hqcta', t.hqcta||'Test your HQ →');
+  st('t-aut', t.aut||'Audience'); st('t-autag', t.autag||'Talk to a Historical Figure'); st('t-audesc', t.audesc||''); st('t-aucta', t.aucta||'Enter the tent →');
   st('t-lbl-about', t.lblAbout);
   st('t-about-title', t.aboutTitle);
   s('t-about-text', t.aboutText);

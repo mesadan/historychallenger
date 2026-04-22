@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audience — History Challenger</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Crimson Text',Georgia,serif;background:#f0e6cc;color:#1a150e;min-height:100vh;font-size:17px;line-height:1.6}
+a{color:#8a6208;text-decoration:none}
+.page{max-width:760px;margin:0 auto;padding:1.5rem 1rem 4rem}
+
+/* INTRO */
+.intro-card{background:#faf4e4;border:1.5px solid #c8b888;border-radius:6px;padding:2rem 1.75rem;margin-top:1rem}
+.scenario-date{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#8a6208;margin-bottom:.5rem;font-family:'Crimson Text',serif}
+.scenario-figure{font-family:'Playfair Display',serif;font-size:2rem;color:#1a150e;line-height:1.1;margin-bottom:.4rem}
+.scenario-role{font-size:14px;color:#5a3e1a;font-style:italic;margin-bottom:1.25rem}
+.scenario-setting{font-size:16px;color:#3a2e1e;line-height:1.7;margin-bottom:1.25rem;white-space:pre-wrap}
+.scenario-goal{background:#f0e6cc;border-left:3px solid #8a6208;padding:.75rem 1rem;margin-bottom:1.5rem;font-size:15px;color:#1a150e}
+.scenario-goal strong{color:#7a0a0a}
+.rules{font-size:13px;color:#5a3e1a;line-height:1.7;margin-bottom:1.5rem}
+.rules-row{display:flex;gap:.5rem;margin-bottom:.4rem}
+.rules-icon{width:20px;text-align:center;flex-shrink:0}
+.start-btn{background:#8a6208;color:#f5edd8;border:1.5px solid #c8a028;border-radius:3px;padding:14px 28px;font-family:'Playfair Display',serif;font-style:italic;font-size:16px;cursor:pointer;width:100%}
+.start-btn:hover{background:#b88a18}
+.start-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* CHAT */
+.chat-top{display:flex;align-items:center;justify-content:space-between;background:#1a150e;color:#f5edd8;padding:.6rem 1rem;border-radius:6px 6px 0 0;border:1px solid #3a2a14;border-bottom:none;font-size:13px}
+.chat-figure{font-family:'Playfair Display',serif;font-size:15px;color:#c8a028}
+.chat-meta{display:flex;gap:1rem;align-items:center;font-family:-apple-system,sans-serif;font-size:12px;color:#bbb}
+.chat-meta strong{color:#f5edd8}
+.timer.warn strong{color:#cc8844}
+.timer.crit strong{color:#cc4444}
+.chat-pane{background:#0d0d0d;border:1px solid #3a2a14;border-top:none;padding:1rem;min-height:340px;max-height:55vh;overflow-y:auto}
+.bubble{margin-bottom:.85rem;max-width:85%;line-height:1.55;font-size:15px}
+.bubble.figure{margin-right:auto}
+.bubble.player{margin-left:auto;text-align:right}
+.bubble-name{font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem;font-family:'Crimson Text',serif}
+.bubble.figure .bubble-name{color:#c8a028}
+.bubble.player .bubble-name{color:#5acc8a}
+.bubble-text{background:#1a1a1a;border:1px solid #2a2a2a;color:#ddd;border-radius:10px;padding:.7rem .9rem;display:inline-block;text-align:left;font-family:Georgia,serif;white-space:pre-wrap}
+.bubble.figure .bubble-text{background:#1a1408;border-color:#3a2a14;color:#e8d8b8}
+.bubble.player .bubble-text{background:#0d2a1a;border-color:#2a4a2a;color:#d8f0d8}
+.thinking{color:#888;font-style:italic;font-size:14px;padding:.4rem .2rem}
+.input-area{background:#0d0d0d;border:1px solid #3a2a14;border-top:none;border-radius:0 0 6px 6px;padding:.75rem}
+.input-row{display:flex;gap:.5rem;align-items:flex-end}
+.input-box{flex:1;background:#1a1a1a;border:1px solid #2a2a2a;color:#fff;border-radius:6px;padding:.6rem .8rem;font-family:'Crimson Text',Georgia,serif;font-size:15px;resize:vertical;min-height:60px;max-height:160px}
+.input-box:focus{outline:none;border-color:#c8903a}
+.input-box:disabled{opacity:.5}
+.send-btn{background:#c8903a;color:#000;border:none;border-radius:6px;padding:0 1.2rem;font-weight:700;cursor:pointer;height:40px;align-self:flex-end;font-family:-apple-system,sans-serif;font-size:14px}
+.send-btn:hover:not(:disabled){background:#b07828}
+.send-btn:disabled{opacity:.4;cursor:not-allowed}
+.input-foot{display:flex;justify-content:space-between;align-items:center;margin-top:.4rem;font-size:11px;color:#888;font-family:-apple-system,sans-serif}
+.char-count.warn{color:#cc8844}
+.end-btn{background:none;border:1px solid #5a2a2a;color:#cc6644;border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:-apple-system,sans-serif}
+.end-btn:hover{background:#2a0a0a;color:#cc8844}
+
+/* RESULT */
+.result-card{background:#faf4e4;border:1.5px solid #c8b888;border-radius:6px;padding:2rem 1.75rem;margin-top:1rem;text-align:center}
+.verdict-eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#8a6208;margin-bottom:.6rem}
+.verdict-label{font-family:'Playfair Display',serif;font-size:2.25rem;line-height:1.1;margin-bottom:1rem}
+.verdict-label.win{color:#3a7a3a}
+.verdict-label.mid{color:#a07828}
+.verdict-label.fail{color:#7a0a0a}
+.verdict-text{font-size:16px;color:#3a2e1e;line-height:1.7;margin:0 auto 1.75rem;max-width:540px;font-style:italic}
+.criteria-list{text-align:left;background:#f0e6cc;border:1px solid #c8b888;border-radius:4px;padding:.75rem 1rem;margin-bottom:1.5rem}
+.crit-item{display:flex;gap:.6rem;padding:.4rem 0;font-size:14px;color:#5a3e1a;line-height:1.5}
+.crit-item.met{color:#1a150e}
+.crit-mark{flex-shrink:0;font-size:14px;width:18px}
+.crit-mark.yes{color:#3a7a3a}
+.crit-mark.no{color:#aa6644}
+.crit-label{font-weight:600;color:#3a2e1e}
+.crit-item.met .crit-label{color:#1a150e}
+.result-actions{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+.btn-secondary{background:none;border:1.5px solid #c8b888;color:#5a3e1a;border-radius:3px;padding:10px 20px;font-family:'Playfair Display',serif;font-style:italic;font-size:14px;cursor:pointer}
+.btn-secondary:hover{border-color:#8a6208;color:#1a150e}
+
+.error-box{background:#2a0808;color:#cc6644;border:1px solid #5a2a2a;border-radius:6px;padding:.8rem 1rem;margin-top:1rem;font-size:14px}
+
+@media(max-width:600px){
+  .chat-pane{min-height:280px}
+  .scenario-figure{font-size:1.6rem}
+  .verdict-label{font-size:1.8rem}
+}
+</style>
+<script src="/nav.js?v=3" defer></script>
+</head>
+<body>
+
+<div class="page" id="page"></div>
+
+<script>
+const WORKER = 'https://histroychallenger-api.maletethan.workers.dev';
+const SCENARIO_ID = 'hannibal-cannae';
+
+let S = {
+  phase:'intro', // intro | chat | judging | result | error
+  scenario:null,
+  sessionId:null,
+  messages:[], // {role:'figure'|'player', content}
+  turn:0,
+  maxTurns:8,
+  charLimit:500,
+  timeLimit:300,
+  startedAt:null,
+  timerInterval:null,
+  awaitingReply:false,
+  result:null,
+  errorMsg:null
+};
+
+function getToken(){return localStorage.getItem('hc_token');}
+
+function render(){
+  const p=document.getElementById('page');
+  if(S.phase==='intro')   p.innerHTML=renderIntro();
+  if(S.phase==='loading') p.innerHTML=renderLoading('Preparing your audience…');
+  if(S.phase==='chat')    p.innerHTML=renderChat();
+  if(S.phase==='judging') p.innerHTML=renderLoading(`${S.scenario.figure_short} weighs your words…`);
+  if(S.phase==='result')  p.innerHTML=renderResult();
+  if(S.phase==='error')   p.innerHTML=renderError();
+  if(S.phase==='chat'){ scrollChat(); attachInputHandlers(); startTimer(); }
+}
+
+function renderIntro(){
+  return `<div class="intro-card">
+    <div class="scenario-date">Field of Cannae · August, 216 BC</div>
+    <h1 class="scenario-figure">An Audience with Hannibal Barca</h1>
+    <div class="scenario-role">You are Maharbal, commander of the Numidian cavalry</div>
+    <div class="scenario-setting">Two days ago you and Hannibal annihilated eight Roman legions in the dust of Apulia. The flies are thick. Hannibal's slaves are still walking the field, prying signet rings from the dead — three pecks of gold so far. Rome lies four days' march to the north, defenceless, panicking. You have just dismounted in front of his command tent and demanded an audience.
+
+You believe Carthage will never have this chance again.</div>
+    <div class="scenario-goal"><strong>Your goal:</strong> Convince Hannibal to march on Rome immediately.</div>
+    <div class="rules">
+      <div class="rules-row"><span class="rules-icon">⏱</span> 5 minutes total</div>
+      <div class="rules-row"><span class="rules-icon">💬</span> 8 message exchanges maximum</div>
+      <div class="rules-row"><span class="rules-icon">✍</span> 500 characters per message</div>
+      <div class="rules-row"><span class="rules-icon">⚖</span> Hannibal will judge you afterwards. He has no patience for vagueness, flattery, or anachronism.</div>
+    </div>
+    <button class="start-btn" onclick="startSession()">Enter the tent →</button>
+  </div>`;
+}
+
+function renderLoading(msg){
+  return `<div class="intro-card" style="text-align:center"><div style="color:#5a3e1a;font-style:italic;font-size:15px;padding:2rem">${msg}</div></div>`;
+}
+
+function renderChat(){
+  const remaining = Math.max(0, S.timeLimit - Math.floor((Date.now() - S.startedAt) / 1000));
+  const mins = Math.floor(remaining/60), secs = remaining%60;
+  let timerCls = '';
+  if (remaining < 30) timerCls = 'crit';
+  else if (remaining < 90) timerCls = 'warn';
+
+  const bubbles = S.messages.map(m =>
+    `<div class="bubble ${m.role}">
+      <div class="bubble-name">${m.role==='figure'?S.scenario.figure_short:'You'}</div>
+      <div class="bubble-text">${escapeHtml(m.content)}</div>
+    </div>`
+  ).join('') + (S.awaitingReply ? `<div class="thinking">${S.scenario.figure_short} considers…</div>` : '');
+
+  const turnsLeft = S.maxTurns - S.turn;
+
+  return `<div class="chat-top">
+    <div class="chat-figure">${S.scenario.figure}</div>
+    <div class="chat-meta">
+      <div>Turn <strong>${S.turn}</strong> / ${S.maxTurns}</div>
+      <div class="timer ${timerCls}"><strong id="timer">${mins}:${String(secs).padStart(2,'0')}</strong></div>
+    </div>
+  </div>
+  <div class="chat-pane" id="chat-pane">${bubbles}</div>
+  <div class="input-area">
+    <div class="input-row">
+      <textarea id="msg-input" class="input-box" placeholder="${turnsLeft>0?'Speak your case…':'No turns remaining — end the audience.'}" maxlength="${S.charLimit}" ${turnsLeft<=0||S.awaitingReply?'disabled':''}></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()" ${turnsLeft<=0||S.awaitingReply?'disabled':''}>Send</button>
+    </div>
+    <div class="input-foot">
+      <span><span class="char-count" id="char-count">0</span> / ${S.charLimit}</span>
+      <button class="end-btn" onclick="endAudience()">End audience</button>
+    </div>
+  </div>`;
+}
+
+function renderResult(){
+  const r = S.result;
+  let cls='mid', label=r.verdict;
+  if (r.verdict==='Convinced') cls='win';
+  else if (r.verdict==='Firm') cls='fail';
+
+  const metSet = new Set(r.criteria_met||[]);
+  const critsHtml = (S.scenario.win_criteria||[]).map(c => {
+    const met = metSet.has(c.id);
+    return `<div class="crit-item ${met?'met':''}">
+      <span class="crit-mark ${met?'yes':'no'}">${met?'✓':'·'}</span>
+      <div><span class="crit-label">${c.label}</span> — ${c.desc}</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="result-card">
+    <div class="verdict-eyebrow">Hannibal's verdict</div>
+    <h1 class="verdict-label ${cls}">${label}</h1>
+    <p class="verdict-text">${escapeHtml(r.verdict_text||'')}</p>
+    <div class="criteria-list">${critsHtml}</div>
+    <div class="result-actions">
+      <button class="btn-secondary" onclick="resetIntro()">Try again</button>
+      <a class="btn-secondary" href="/">Home</a>
+    </div>
+  </div>`;
+}
+
+function renderError(){
+  return `<div class="error-box">${S.errorMsg||'Something went wrong.'}</div>
+    <div style="text-align:center;margin-top:1rem"><button class="btn-secondary" onclick="resetIntro()">Back</button></div>`;
+}
+
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function scrollChat(){
+  const el=document.getElementById('chat-pane');
+  if(el) el.scrollTop = el.scrollHeight;
+}
+
+function attachInputHandlers(){
+  const input=document.getElementById('msg-input');
+  const cnt=document.getElementById('char-count');
+  if(!input||!cnt) return;
+  input.focus();
+  input.addEventListener('input', ()=>{
+    cnt.textContent = input.value.length;
+    cnt.className = 'char-count' + (input.value.length > S.charLimit*0.9 ? ' warn' : '');
+  });
+  input.addEventListener('keydown', e=>{
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+}
+
+function startTimer(){
+  if (S.timerInterval) return;
+  S.timerInterval = setInterval(()=>{
+    if (S.phase!=='chat') { clearInterval(S.timerInterval); S.timerInterval=null; return; }
+    const remaining = Math.max(0, S.timeLimit - Math.floor((Date.now() - S.startedAt) / 1000));
+    const el = document.getElementById('timer');
+    if (el) {
+      const m=Math.floor(remaining/60), s=remaining%60;
+      el.textContent = m+':'+String(s).padStart(2,'0');
+      const wrap = el.parentElement;
+      wrap.className = 'timer' + (remaining < 30 ? ' crit' : remaining < 90 ? ' warn' : '');
+    }
+    if (remaining <= 0) {
+      clearInterval(S.timerInterval); S.timerInterval=null;
+      endAudience();
+    }
+  }, 1000);
+}
+
+async function startSession(){
+  S.phase='loading'; render();
+  try{
+    const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'start_dialogue',token:getToken(),scenario_id:SCENARIO_ID})});
+    const d = await res.json();
+    if (d.error) { S.errorMsg=d.error; S.phase='error'; render(); return; }
+    S.scenario = d.scenario;
+    S.sessionId = d.session_id;
+    S.maxTurns = d.scenario.max_turns;
+    S.charLimit = d.scenario.char_limit;
+    S.timeLimit = d.scenario.time_limit_seconds;
+    S.messages = [{ role:'figure', content: d.opening }];
+    S.turn = 0;
+    S.startedAt = Date.now();
+    S.phase = 'chat'; render();
+  } catch(e){ S.errorMsg='Network error: '+e.message; S.phase='error'; render(); }
+}
+
+async function sendMessage(){
+  if (S.awaitingReply) return;
+  const input = document.getElementById('msg-input');
+  if (!input) return;
+  const text = input.value.trim();
+  if (!text) return;
+
+  S.messages.push({ role:'player', content:text });
+  S.awaitingReply = true;
+  render();
+
+  try{
+    const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'dialogue_turn',session_id:S.sessionId,message:text})});
+    const d = await res.json();
+    if (d.error) {
+      // Pop the player message back so they can edit, surface error inline
+      S.awaitingReply = false;
+      alert(d.error);
+      render();
+      return;
+    }
+    S.messages.push({ role:'figure', content: d.reply });
+    S.turn = d.turn;
+    S.awaitingReply = false;
+    render();
+    if (d.turns_left <= 0) {
+      // Auto-judge after a beat
+      setTimeout(endAudience, 1500);
+    }
+  } catch(e){
+    S.awaitingReply = false;
+    alert('Network error. Try again.');
+    render();
+  }
+}
+
+async function endAudience(){
+  if (S.phase==='judging' || S.phase==='result') return;
+  if (S.timerInterval) { clearInterval(S.timerInterval); S.timerInterval=null; }
+  S.phase='judging'; render();
+  try{
+    const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'judge_dialogue',session_id:S.sessionId})});
+    const d = await res.json();
+    if (d.error) { S.errorMsg='Judge error: '+d.error; S.phase='error'; render(); return; }
+    S.result = d;
+    S.phase='result'; render();
+  } catch(e){
+    S.errorMsg='Network error during judging.';
+    S.phase='error'; render();
+  }
+}
+
+function resetIntro(){
+  if (S.timerInterval) { clearInterval(S.timerInterval); S.timerInterval=null; }
+  S = {
+    phase:'intro', scenario:null, sessionId:null, messages:[], turn:0,
+    maxTurns:8, charLimit:500, timeLimit:300, startedAt:null,
+    timerInterval:null, awaitingReply:false, result:null, errorMsg:null
+  };
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>

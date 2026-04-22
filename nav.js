@@ -76,6 +76,7 @@ function injectNav(){
     {href:'/overlap.html',  label:'Overlap',       key:'overlap'},
     {href:'/persona.html',  label:'Who Are You?',  key:'persona'},
     {href:'/hq.html',       label:'HQ Test',       key:'hq'},
+    {href:'/dialogue.html', label:'Audience',      key:'dialogue'},
   ];
   const linksHtml = links.map(l=>{
     const active = path.includes(l.key) ? ' active' : '';
@@ -152,6 +153,7 @@ function render(user){
         <hr class="hcn-hr">
         <a href="/profile.html" class="hcn-item">📊 My profile</a>
         <a href="/hq.html" class="hcn-item">🧠 HQ Test</a>
+        <a href="/dialogue.html" class="hcn-item">🎭 Audience</a>
         <hr class="hcn-hr">
         <a href="/dispatch.html" class="hcn-item">⚔ Dispatch</a>
         <a href="/play.html" class="hcn-item">🧭 History Challenger</a>
