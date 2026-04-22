@@ -1819,24 +1819,33 @@ async function handleJudgeDialogue(body, env, apiKey) {
 DIFFICULTY: ${diffCfg.label}. Win threshold: ${diffCfg.win_at}/100. Floor: ${diffCfg.lose_at}/100.
 ${verdictHint}
 
-You will read the transcript and judge which of the WIN CRITERIA the player addressed. A criterion counts as MET only if the player raised it themselves AND made a substantive case (not just mentioning the topic).
+INTERNAL ASSESSMENT (do not expose to player):
+You will read the transcript and judge which of the WIN CRITERIA the player addressed. A criterion counts as MET only if the player raised it themselves AND made a substantive case.
 
-WIN CRITERIA:
+WIN CRITERIA (these are SECRET — never name them, never list them, never hint at the rubric structure):
 ${criteriaList}
 
 Verdict label rules:
 - "Convinced" — player succeeded; ${sc.figure} agrees to act.
-- "Wavered" — short of agreement but not dismissed; ${sc.figure} grants more time.
+- "Wavered" — short of agreement but not dismissed.
 - "Firm" — ${sc.figure} dismisses or remains unmoved.
+
+VERDICT TEXT (the only thing the player will see):
+- 3 to 5 sentences in narrative voice, in period.
+- Describe what ${sc.figure} decides and what happens next.
+- Reflect what the player ACTUALLY DID — speak to the texture of their argument (its sharpness, its emptiness, its courage, its evasion). On wins, validate what worked. On losses, convey ${sc.figure}'s disappointment or contempt.
+- ABSOLUTELY DO NOT name, list, or hint at the win criteria above. Do not say "you should have argued X" or "you missed Y" or "if only you had mentioned Z". Do not give a rubric breakdown. The player must reflect on their own performance, not be handed a checklist.
+- It is fine to be thematic ("you spoke much of glory but little of the road") as long as you are not naming the criteria.
+- Match the tone to the verdict: triumphant on Convinced, conflicted on Wavered, cold or contemptuous on Firm.
 
 Return ONLY valid JSON:
 {
   "verdict": "Convinced" | "Wavered" | "Firm",
   "criteria_met": ["id1", "id2", ...],
-  "verdict_text": "2-3 sentences in narrative voice describing what ${sc.figure} decides and what happens next. Stay in period."
+  "verdict_text": "3-5 sentence narrative as described above"
 }`;
 
-    const userPrompt = `TRANSCRIPT:\n\n${transcript}\n\nFinal conviction: ${finalConv}/100 (target ${diffCfg.win_at}). Judge now. Return only JSON.`;
+    const userPrompt = `TRANSCRIPT:\n\n${transcript}\n\nFinal conviction: ${finalConv}/100 (target ${diffCfg.win_at}). Judge now. Return only JSON. Remember: the verdict_text must NEVER reveal the win criteria.`;
 
     const raw = await callClaudeChat(apiKey, [{ role:'user', content: userPrompt }], SYS, 1200);
     let parsed;

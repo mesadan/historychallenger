@@ -232,15 +232,6 @@ function renderResult(){
   if (r.verdict==='Convinced') cls='win';
   else if (r.verdict==='Firm') cls='fail';
 
-  const metSet = new Set(r.criteria_met||[]);
-  const critsHtml = (S.scenario.win_criteria||[]).map(c => {
-    const met = metSet.has(c.id);
-    return `<div class="crit-item ${met?'met':''}">
-      <span class="crit-mark ${met?'yes':'no'}">${met?'✓':'·'}</span>
-      <div><span class="crit-label">${c.label}</span> — ${c.desc}</div>
-    </div>`;
-  }).join('');
-
   const finalReply = r.final_reply || '';
   const figureName = S.scenario?.figure_short || 'Hannibal';
   const finalQuoteHtml = finalReply
@@ -252,7 +243,6 @@ function renderResult(){
     <h1 class="verdict-label ${cls}">${label}</h1>
     ${finalQuoteHtml}
     <p class="verdict-text">${escapeHtml(r.verdict_text||'')}</p>
-    <div class="criteria-list">${critsHtml}</div>
     <div class="result-actions">
       <button class="btn-secondary" onclick="resetIntro()">Try again</button>
       <a class="btn-secondary" href="/">Home</a>
