@@ -1575,7 +1575,7 @@ CONVERSATIONAL HABITS:
 
 OUTPUT FORMAT:
 - Respond only in character as Hannibal, in first person.
-- 1 to 3 short paragraphs. Never longer.
+- HARD LIMIT: under 800 characters. Aim for tight, weighty responses — 1 short paragraph, occasionally 2 if a turn truly demands it. Hannibal speaks economically. Long speeches break the rhythm of an audience.
 - No stage directions, no narrator voice, no "[thinks]" or "*pauses*" — speech only.
 - Be direct. Hannibal does not hedge.`
   }
@@ -1644,7 +1644,7 @@ async function handleDialogueTurn(body, env, apiKey) {
 
     const sys = sc.character_sheet + `\n\nYour OPENING LINE (already delivered, do not repeat): "${sc.opening_line}"`;
 
-    const replyText = await callClaudeChat(apiKey, apiMessages, sys, 600);
+    const replyText = await callClaudeChat(apiKey, apiMessages, sys, 280);
     const reply = replyText.trim();
 
     msgs.push({ role: 'assistant', content: reply });
