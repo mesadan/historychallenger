@@ -64,6 +64,16 @@ export default {
       } catch(e) { return json({ error: e.message }, 500); }
     }
 
+    if (action === 'list_event_sets') {
+      if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
+      return handleListEventSets(body, env);
+    }
+
+    if (action === 'qc_event_sets') {
+      if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
+      return handleQCEventSets(body, env, apiKey);
+    }
+
     if (action === 'get_overlap_sets')  return handleGetOverlapSets(body, env);
     if (action === 'seed_overlap') {
       if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
@@ -345,6 +355,166 @@ ${exclusionNote}`;
     return json({ saved, total: count?.n || 0 }, 200);
   } catch (err) {
     return json({ error: err.message }, 500);
+  }
+}
+
+// ── TIMELINE ADMIN: browse + QC ────────────────────────────────────────
+
+async function handleListEventSets(body, env) {
+  const { diff, lang, theme_slug, limit } = body;
+  try {
+    const clauses = [];
+    const binds = [];
+    if (diff) { clauses.push('diff=?'); binds.push(diff); }
+    if (lang) { clauses.push('lang=?'); binds.push(lang); }
+    if (theme_slug === '__none__') {
+      clauses.push('(theme_slug IS NULL OR theme_slug=\'\')');
+    } else if (theme_slug) {
+      clauses.push('theme_slug=?');
+      binds.push(theme_slug);
+    }
+    const where = clauses.length ? 'WHERE ' + clauses.join(' AND ') : '';
+    const cap = Math.min(Math.max(parseInt(limit, 10) || 100, 10), 500);
+
+    const rows = await env.db.prepare(
+      `SELECT id, diff, lang, theme_slug, events, created_at, play_count, last_used
+       FROM event_sets ${where}
+       ORDER BY created_at DESC
+       LIMIT ${cap}`
+    ).bind(...binds).all();
+
+    const sets = (rows.results || []).map(r => ({
+      id: r.id,
+      diff: r.diff,
+      lang: r.lang,
+      theme_slug: r.theme_slug,
+      events: typeof r.events === 'string' ? JSON.parse(r.events) : r.events,
+      created_at: r.created_at,
+      play_count: r.play_count || 0,
+      last_used: r.last_used
+    }));
+
+    const totalRow = await env.db.prepare(
+      `SELECT COUNT(*) as n FROM event_sets ${where}`
+    ).bind(...binds).first();
+
+    // Also return the list of unique themes for the filter dropdown
+    const themeRows = await env.db.prepare(
+      `SELECT theme_slug, COUNT(*) as n FROM event_sets
+       WHERE theme_slug IS NOT NULL AND theme_slug!=''
+       GROUP BY theme_slug ORDER BY theme_slug`
+    ).all();
+
+    return json({
+      sets,
+      total: totalRow?.n || 0,
+      shown: sets.length,
+      themes: (themeRows.results || [])
+    }, 200);
+  } catch(e) {
+    return json({ error: e.message }, 500);
+  }
+}
+
+async function handleQCEventSets(body, env, apiKey) {
+  const { diff, lang, theme_slug, limit } = body;
+  try {
+    const clauses = [];
+    const binds = [];
+    if (diff) { clauses.push('diff=?'); binds.push(diff); }
+    if (lang) { clauses.push('lang=?'); binds.push(lang); }
+    if (theme_slug === '__none__') {
+      clauses.push('(theme_slug IS NULL OR theme_slug=\'\')');
+    } else if (theme_slug) {
+      clauses.push('theme_slug=?');
+      binds.push(theme_slug);
+    }
+    const where = clauses.length ? 'WHERE ' + clauses.join(' AND ') : '';
+    const cap = Math.min(Math.max(parseInt(limit, 10) || 80, 10), 200);
+
+    const rows = await env.db.prepare(
+      `SELECT id, diff, theme_slug, events FROM event_sets ${where} ORDER BY created_at DESC LIMIT ${cap}`
+    ).bind(...binds).all();
+
+    const sets = (rows.results || []).map(r => ({
+      id: r.id,
+      diff: r.diff,
+      theme_slug: r.theme_slug,
+      events: typeof r.events === 'string' ? JSON.parse(r.events) : r.events
+    }));
+
+    if (!sets.length) return json({ wrongYears: [], duplicates: [], total: 0 }, 200);
+
+    // Flatten for Claude: each event tagged with its set index
+    const compact = sets.map((s, i) => ({
+      idx: i,
+      diff: s.diff,
+      events: (s.events || []).map(e => ({ name: e.name, year: e.year }))
+    }));
+
+    const SYS = `You are a rigorous history QA checker. Analyse the provided TIMELINE event sets for two issues:
+
+1. WRONG_YEAR - an event whose year is wrong by more than a plausible margin. Flag only clear factual errors, not debatable ones. "Battle of Hastings, 1067" is wrong; "Battle of Hastings, 1066" is right. For BC events, negative integers (-480 = 480 BC).
+
+2. DUPLICATES - the same event name (or very close paraphrase) appearing across two or more sets. Example: "Fall of Constantinople" in set 0 and "The Fall of Constantinople" in set 3 is a duplicate.
+
+Return ONLY valid JSON, no markdown:
+{
+  "wrongYears":[{"setIdx":0,"eventName":"...","givenYear":0,"correctYear":0,"reason":"..."}, ...],
+  "duplicates":[{"setIdxs":[0,3],"eventName":"..."}, ...]
+}`;
+
+    const BATCH = 20;
+    let wrongYears = [];
+    let duplicates = [];
+
+    for (let i = 0; i < compact.length; i += BATCH) {
+      const batch = compact.slice(i, i + BATCH);
+      const prompt = `Analyse these ${batch.length} timeline sets. Each has an "idx" (index in this batch), a "diff", and 5 "events" with name+year.
+
+${JSON.stringify(batch, null, 2)}
+
+Return JSON with "wrongYears" and "duplicates" arrays as described. Use the idx values from this batch.`;
+
+      try {
+        const raw = await callClaude(apiKey, prompt, 4000, SYS);
+        let parsed;
+        try { parsed = JSON.parse(raw); }
+        catch {
+          const m = raw.match(/\{[\s\S]*\}/);
+          if (!m) continue;
+          parsed = JSON.parse(m[0]);
+        }
+
+        for (const w of (parsed.wrongYears || [])) {
+          const src = sets[i + (w.setIdx ?? w.idx ?? -1)];
+          if (src) {
+            wrongYears.push({
+              set_id: src.id,
+              diff: src.diff,
+              theme_slug: src.theme_slug,
+              event_name: w.eventName,
+              given_year: w.givenYear,
+              correct_year: w.correctYear,
+              reason: w.reason
+            });
+          }
+        }
+        for (const d of (parsed.duplicates || [])) {
+          const items = (d.setIdxs || []).map(bi => sets[i + bi]).filter(Boolean);
+          if (items.length >= 2) {
+            duplicates.push({
+              event_name: d.eventName,
+              items: items.map(x => ({ id: x.id, diff: x.diff, theme_slug: x.theme_slug }))
+            });
+          }
+        }
+      } catch(e) { /* skip batch on failure */ }
+    }
+
+    return json({ wrongYears, duplicates, total: sets.length }, 200);
+  } catch(e) {
+    return json({ error: e.message }, 500);
   }
 }
 

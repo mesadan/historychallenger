@@ -68,8 +68,9 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
 
 <div class="tabs">
   <button class="tab active" onclick="switchTab('seeder')">🌱 Seeder</button>
+  <button class="tab" onclick="switchTab('timeline')">🧭 Timeline</button>
   <button class="tab" onclick="switchTab('dashboard')">📊 Dashboard</button>
-  <button class="tab" onclick="switchTab('qc')">🔍 QC</button>
+  <button class="tab" onclick="switchTab('qc')">🔍 Overlap QC</button>
   <button class="tab" onclick="switchTab('dispatch')">⚔ Dispatch</button>
   <button class="tab" onclick="switchTab('hq')">📊 HQ</button>
   <button class="tab" onclick="switchTab('audience')">🎭 Audience</button>
@@ -130,6 +131,84 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
 </div>
 <div class="log" id="log"></div>
 </div><!-- end seeder tab -->
+
+<!-- TIMELINE TAB -->
+<div id="tab-timeline" class="tab-content">
+  <div class="row" style="display:flex;justify-content:space-between;align-items:center">
+    <span style="color:#c8903a;font-size:14px;font-weight:700">🧭 Timeline (History Challenger) — Event Sets</span>
+    <button onclick="loadTLStats()" style="font-size:12px;padding:5px 14px">↻ Refresh stats</button>
+  </div>
+
+  <div id="tl-stats" style="margin-bottom:1.25rem"><span style="color:#555">Click Refresh to load stats</span></div>
+
+  <div class="row" style="border-top:1px solid #1a1a1a;padding-top:1rem;margin-top:.5rem">
+    <strong style="color:#c8903a;font-size:13px">🤖 AI Quality Check</strong>
+    <span style="color:#555;font-size:11px;margin-left:auto">Claude flags wrong dates and duplicates across sets</span>
+  </div>
+  <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <label style="color:#555;font-size:13px">Diff:</label>
+    <select id="tl-qc-diff" style="padding:4px 8px;background:#0d0d0d;color:#ddd;border:1px solid #333">
+      <option value="">All</option>
+      <option value="disciple">Disciple</option>
+      <option value="master">Master</option>
+      <option value="keeper">Keeper</option>
+    </select>
+    <label style="color:#555;font-size:13px">Lang:</label>
+    <select id="tl-qc-lang" style="padding:4px 8px;background:#0d0d0d;color:#ddd;border:1px solid #333">
+      <option value="en">en</option>
+      <option value="fr">fr</option>
+      <option value="de">de</option>
+      <option value="es">es</option>
+      <option value="">All</option>
+    </select>
+    <label style="color:#555;font-size:13px">Theme:</label>
+    <select id="tl-qc-theme" style="padding:4px 8px;background:#0d0d0d;color:#ddd;border:1px solid #333">
+      <option value="">Any</option>
+      <option value="__none__">(random, no theme)</option>
+    </select>
+    <label style="color:#555;font-size:13px">Max sets:</label>
+    <input type="number" id="tl-qc-limit" value="80" min="10" max="200" style="width:70px">
+    <button id="tl-qc-btn" onclick="runTLQC()">🔬 Run QC</button>
+    <span id="tl-qc-status" style="color:#555;font-size:12px;margin-left:auto"></span>
+  </div>
+  <div id="tl-qc-results" style="margin-top:.75rem"></div>
+
+  <div class="row" style="border-top:1px solid #1a1a1a;padding-top:1rem;margin-top:1rem">
+    <strong style="color:#c8903a;font-size:13px">🔍 Browse Event Sets</strong>
+    <span style="color:#555;font-size:11px;margin-left:auto">Click a set to expand its 5 events</span>
+  </div>
+  <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <label style="color:#555;font-size:13px">Diff:</label>
+    <select id="tl-br-diff" style="padding:4px 8px;background:#0d0d0d;color:#ddd;border:1px solid #333">
+      <option value="">All</option>
+      <option value="disciple">Disciple</option>
+      <option value="master">Master</option>
+      <option value="keeper">Keeper</option>
+    </select>
+    <label style="color:#555;font-size:13px">Lang:</label>
+    <select id="tl-br-lang" style="padding:4px 8px;background:#0d0d0d;color:#ddd;border:1px solid #333">
+      <option value="en">en</option>
+      <option value="fr">fr</option>
+      <option value="de">de</option>
+      <option value="es">es</option>
+      <option value="">All</option>
+    </select>
+    <label style="color:#555;font-size:13px">Theme:</label>
+    <select id="tl-br-theme" style="padding:4px 8px;background:#0d0d0d;color:#ddd;border:1px solid #333">
+      <option value="">Any</option>
+      <option value="__none__">(random, no theme)</option>
+    </select>
+    <label style="color:#555;font-size:13px">Limit:</label>
+    <input type="number" id="tl-br-limit" value="100" min="10" max="500" style="width:70px">
+    <button onclick="loadTLSets()">Load</button>
+    <span id="tl-br-count" style="color:#555;font-size:12px;margin-left:auto"></span>
+  </div>
+  <div id="tl-sets" style="max-height:560px;overflow-y:auto;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;padding:.5rem;margin-top:.5rem"></div>
+
+  <div style="margin-top:1.25rem;padding:.8rem 1rem;background:#1a1a0a;border:1px solid #2a2a10;border-radius:6px;font-size:12px;color:#888;line-height:1.6">
+    <strong style="color:#c8903a">Add more sets:</strong> switch to the <a href="#" onclick="switchTab('seeder');return false" style="color:#c8903a">🌱 Seeder tab</a>. Pick Random pool or Theme pool, set difficulty and language, choose the number of batches (each batch = 5 sets), click Start.
+  </div>
+</div><!-- end timeline tab -->
 
 <!-- DASHBOARD TAB -->
 <div id="tab-dashboard" class="tab-content">
@@ -653,8 +732,10 @@ function switchTab(name){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
-  event.target.classList.add('active');
+  if (typeof event !== 'undefined' && event.target) event.target.classList.add('active');
+  else document.querySelector(`.tab[onclick*="'${name}'"]`)?.classList.add('active');
   if(name==='dashboard') loadDashboard();
+  if(name==='timeline') loadTLStats();
 }
 
 // ── DASHBOARD ────────────────────────────────────────────────────
@@ -1194,6 +1275,228 @@ async function deleteHQQCItem(id){
     if (d.error) { alert('Error: '+d.error); return; }
     document.querySelectorAll(`[data-qc-id="${id}"]`).forEach(el=>el.remove());
   } catch(e) { alert('Network error'); }
+}
+
+// ── TIMELINE ADMIN ───────────────────────────────────────────────────
+const THEME_LABELS = {
+  'bronze-age':'Bronze Age','iron-age':'Iron Age','ancient-world':'Ancient World',
+  'medieval':'Medieval','early-modern':'Early Modern','revolutions':'Revolutions',
+  '19th-century':'19th Century','world-wars':'World Wars','cold-war':'Cold War',
+  'aviation':'Aviation','medicine':'Medicine','technology':'Technology',
+  'ancient-asia':'Ancient Asia','science':'Science'
+};
+function themeLabel(slug){
+  if(!slug) return '(random)';
+  // slug is "[diff]_theme_[name]"
+  const parts = String(slug).split('_theme_');
+  const base = parts[1] || slug;
+  return (THEME_LABELS[base] || base) + (parts[0] ? ' ['+parts[0]+']' : '');
+}
+
+async function loadTLStats(){
+  const el = document.getElementById('tl-stats');
+  el.innerHTML = '<span style="color:#555">Loading…</span>';
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'get_stats',admin_key:ADMIN_KEY})});
+    const d = await res.json();
+    if (d.error) { el.innerHTML='<span class="err">'+d.error+'</span>'; return; }
+    const hc = d.hc || {};
+    const byDiff = {}; (hc.byDiff||[]).forEach(r=>byDiff[r.diff]=r.n);
+    const byLang = {}; (hc.byLang||[]).forEach(r=>byLang[r.lang]=r.n);
+    const randomByDiff = {}; (hc.random||[]).forEach(r=>randomByDiff[r.diff]=r.n);
+    const themesGrouped = {};
+    (hc.themes||[]).forEach(r=>{
+      const base = String(r.theme_slug||'').split('_theme_')[1] || r.theme_slug;
+      const label = THEME_LABELS[base] || base;
+      if (!themesGrouped[label]) themesGrouped[label] = { disciple:0, master:0, keeper:0, total:0 };
+      themesGrouped[label][r.diff] = r.n;
+      themesGrouped[label].total += r.n;
+    });
+
+    const themeRows = Object.entries(themesGrouped).sort((a,b)=>b[1].total-a[1].total).map(([lbl,c])=>`
+      <tr><td style="color:#ddd">${lbl}</td>
+        <td style="text-align:right;color:#5acc8a">${c.disciple||0}</td>
+        <td style="text-align:right;color:#c8903a">${c.master||0}</td>
+        <td style="text-align:right;color:#cc6644">${c.keeper||0}</td>
+        <td style="text-align:right;color:#fff;font-weight:700">${c.total}</td></tr>`).join('');
+
+    el.innerHTML = `
+      <div class="dash-grid" style="margin-bottom:.75rem">
+        <div class="dash-card"><div class="dash-val">${hc.total||0}</div><div class="dash-lbl">Total sets</div></div>
+        <div class="dash-card"><div class="dash-val">${byDiff.disciple||0}</div><div class="dash-lbl">Disciple</div></div>
+        <div class="dash-card"><div class="dash-val">${byDiff.master||0}</div><div class="dash-lbl">Master</div></div>
+        <div class="dash-card"><div class="dash-val">${byDiff.keeper||0}</div><div class="dash-lbl">Keeper</div></div>
+        <div class="dash-card"><div class="dash-val">${hc.played||0}</div><div class="dash-lbl">Plays (cumulative)</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
+        <div>
+          <div style="color:#c8903a;font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem">By language</div>
+          <table class="dash-table"><tbody>
+            ${['en','fr','de','es'].map(l=>`<tr><td style="color:#555">${l}</td><td style="color:#fff;text-align:right">${byLang[l]||0}</td></tr>`).join('')}
+          </tbody></table>
+        </div>
+        <div>
+          <div style="color:#c8903a;font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem">Random (no theme)</div>
+          <table class="dash-table"><tbody>
+            <tr><td style="color:#555">Disciple</td><td style="color:#fff;text-align:right">${randomByDiff.disciple||0}</td></tr>
+            <tr><td style="color:#555">Master</td><td style="color:#fff;text-align:right">${randomByDiff.master||0}</td></tr>
+            <tr><td style="color:#555">Keeper</td><td style="color:#fff;text-align:right">${randomByDiff.keeper||0}</td></tr>
+          </tbody></table>
+        </div>
+      </div>
+      <div style="margin-top:1rem">
+        <div style="color:#c8903a;font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem">By theme</div>
+        <table class="dash-table">
+          <thead><tr><th>Theme</th><th style="text-align:right">Disc</th><th style="text-align:right">Mstr</th><th style="text-align:right">Kpr</th><th style="text-align:right">Total</th></tr></thead>
+          <tbody>${themeRows || '<tr><td colspan="5" style="color:#555">No themed sets yet</td></tr>'}</tbody>
+        </table>
+      </div>`;
+
+    populateThemeDropdowns(hc.themes || []);
+  } catch(e) { el.innerHTML='<span class="err">'+e.message+'</span>'; }
+}
+
+function populateThemeDropdowns(themeRows){
+  const seen = new Set();
+  const opts = [];
+  themeRows.forEach(r=>{
+    const base = String(r.theme_slug||'').split('_theme_')[1] || r.theme_slug;
+    if (!seen.has(base)) {
+      seen.add(base);
+      opts.push({ slug_base: base, label: THEME_LABELS[base] || base });
+    }
+  });
+  opts.sort((a,b)=>a.label.localeCompare(b.label));
+  ['tl-qc-theme','tl-br-theme'].forEach(id=>{
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const current = sel.value;
+    sel.innerHTML = `<option value="">Any</option><option value="__none__">(random, no theme)</option>` +
+      opts.map(o=>`<option value="${o.slug_base}">${o.label}</option>`).join('');
+    if (current) sel.value = current;
+  });
+}
+
+async function loadTLSets(){
+  const diff  = document.getElementById('tl-br-diff').value;
+  const lang  = document.getElementById('tl-br-lang').value;
+  const themeBase = document.getElementById('tl-br-theme').value;
+  const limit = parseInt(document.getElementById('tl-br-limit').value) || 100;
+  const box = document.getElementById('tl-sets');
+  const cnt = document.getElementById('tl-br-count');
+  box.innerHTML = '<div style="color:#555;padding:1rem;text-align:center">Loading…</div>';
+  cnt.textContent = '';
+  const payload = { action:'list_event_sets', admin_key:ADMIN_KEY, limit };
+  if (diff) payload.diff = diff;
+  if (lang) payload.lang = lang;
+  if (themeBase === '__none__') payload.theme_slug = '__none__';
+  else if (themeBase) payload.theme_slug = (diff || 'disciple') + '_theme_' + themeBase;
+  try {
+    const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d = await res.json();
+    if (d.error) { box.innerHTML = '<div class="err">'+d.error+'</div>'; return; }
+    cnt.textContent = `Showing ${d.shown} of ${d.total}`;
+    if (!d.sets.length) { box.innerHTML = '<div style="color:#555;padding:1rem;text-align:center">No sets match.</div>'; return; }
+
+    const diffColor = { disciple:'#5acc8a', master:'#c8903a', keeper:'#cc6644' };
+    box.innerHTML = d.sets.map(s => {
+      const dColor = diffColor[s.diff] || '#888';
+      const dt = s.created_at ? new Date(s.created_at*1000).toISOString().slice(0,10) : '';
+      const evs = (s.events||[]).map(e => {
+        const y = e.year < 0 ? Math.abs(e.year)+' BC' : e.year;
+        return `<div style="display:flex;gap:.8rem;padding:.35rem 0;border-bottom:1px solid #111;font-size:12px">
+          <span style="color:#c8903a;font-family:Georgia,serif;min-width:60px">${y}</span>
+          <span style="color:#ddd;flex:1">${(e.name||'').replace(/</g,'&lt;')}</span>
+          <span style="color:#555;font-size:11px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${(e.desc||'').replace(/"/g,'&quot;')}">${(e.desc||'').replace(/</g,'&lt;')}</span>
+        </div>`;
+      }).join('');
+      return `<details style="border:1px solid #1a1a1a;border-radius:4px;margin-bottom:.4rem;background:#0d0d0d" data-tl-id="${s.id}">
+        <summary style="padding:.5rem .75rem;cursor:pointer;display:flex;gap:.7rem;align-items:center;font-size:12px;font-family:-apple-system,sans-serif">
+          <span style="color:${dColor};font-weight:700;min-width:58px">${s.diff}</span>
+          <span style="color:#888;min-width:22px">${s.lang||'en'}</span>
+          <span style="color:#ddd;flex:1">${themeLabel(s.theme_slug)}</span>
+          <span style="color:#555;font-size:11px">${dt} · ${s.play_count||0} plays</span>
+          <button onclick="deleteTLSet(event,'${s.id}')" style="padding:2px 9px;font-size:11px;background:#2a0a0a;color:#cc6644;border:1px solid #442020;border-radius:3px;cursor:pointer">🗑</button>
+        </summary>
+        <div style="padding:.3rem .75rem .75rem">${evs}</div>
+      </details>`;
+    }).join('');
+  } catch(e) { box.innerHTML = '<div class="err">'+e.message+'</div>'; }
+}
+
+async function deleteTLSet(ev, id){
+  ev.stopPropagation(); ev.preventDefault();
+  if (!confirm('Delete this event set?')) return;
+  try {
+    const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'delete_set',admin_key:ADMIN_KEY,table:'timeline',id})});
+    const d = await res.json();
+    if (d.error) { alert('Error: '+d.error); return; }
+    document.querySelectorAll(`[data-tl-id="${id}"]`).forEach(el=>el.remove());
+  } catch(e) { alert('Network error'); }
+}
+
+async function runTLQC(){
+  const diff  = document.getElementById('tl-qc-diff').value;
+  const lang  = document.getElementById('tl-qc-lang').value;
+  const themeBase = document.getElementById('tl-qc-theme').value;
+  const limit = parseInt(document.getElementById('tl-qc-limit').value) || 80;
+  const btn = document.getElementById('tl-qc-btn');
+  const status = document.getElementById('tl-qc-status');
+  const out = document.getElementById('tl-qc-results');
+  btn.disabled = true; btn.textContent = 'Analyzing…';
+  status.textContent = 'This can take 30-60s depending on sample size.';
+  out.innerHTML = '';
+  const payload = { action:'qc_event_sets', admin_key:ADMIN_KEY, limit };
+  if (diff) payload.diff = diff;
+  if (lang) payload.lang = lang;
+  if (themeBase === '__none__') payload.theme_slug = '__none__';
+  else if (themeBase) payload.theme_slug = (diff || 'disciple') + '_theme_' + themeBase;
+  try {
+    const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d = await res.json();
+    if (d.error) { out.innerHTML = '<div class="err">'+d.error+'</div>'; status.textContent=''; return; }
+    status.textContent = `Scanned ${d.total} sets · ${d.wrongYears.length} wrong year${d.wrongYears.length===1?'':'s'} · ${d.duplicates.length} duplicate event${d.duplicates.length===1?'':'s'}`;
+
+    let html = '';
+    if (d.wrongYears.length) {
+      html += '<div style="margin-bottom:1rem"><div style="color:#cc6644;font-size:13px;font-weight:700;margin-bottom:.5rem">⚠ Wrong years ('+d.wrongYears.length+')</div>';
+      html += '<div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;padding:.5rem;max-height:360px;overflow-y:auto">';
+      for (const w of d.wrongYears) {
+        html += `<div style="padding:.5rem;border-bottom:1px solid #111;font-size:12px">
+          <div style="color:#ddd;margin-bottom:.2rem"><strong>${w.event_name}</strong></div>
+          <div style="color:#cc6644;font-size:11px">Given: <strong>${w.given_year}</strong> · Correct: <strong>${w.correct_year}</strong> · ${w.diff}</div>
+          <div style="color:#888;font-size:11px;margin-top:.15rem">${w.reason||''}</div>
+          <button onclick="deleteTLSet(event,'${w.set_id}')" style="margin-top:.3rem;padding:2px 9px;font-size:11px;background:#2a0a0a;color:#cc6644;border:1px solid #442020;border-radius:3px;cursor:pointer">🗑 Delete set</button>
+        </div>`;
+      }
+      html += '</div></div>';
+    } else {
+      html += '<div style="color:#5acc8a;font-size:12px;margin-bottom:1rem">✓ No wrong years flagged</div>';
+    }
+
+    if (d.duplicates.length) {
+      html += '<div><div style="color:#cc8844;font-size:13px;font-weight:700;margin-bottom:.5rem">⚠ Events appearing in multiple sets ('+d.duplicates.length+')</div>';
+      html += '<div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;padding:.5rem;max-height:360px;overflow-y:auto">';
+      for (const g of d.duplicates) {
+        html += `<div style="padding:.5rem;border-bottom:1px solid #111;font-size:12px">
+          <div style="color:#ddd;margin-bottom:.3rem"><strong>${g.event_name}</strong> (appears in ${g.items.length} sets)</div>
+          ${g.items.map(it=>`<div style="display:flex;gap:.5rem;align-items:center;padding:.15rem 0">
+            <span style="color:#888">${it.diff}</span>
+            <span style="color:#555;flex:1;font-size:11px">${themeLabel(it.theme_slug)}</span>
+            <button onclick="deleteTLSet(event,'${it.id}')" style="padding:2px 9px;font-size:11px;background:#2a0a0a;color:#cc6644;border:1px solid #442020;border-radius:3px;cursor:pointer">🗑</button>
+          </div>`).join('')}
+        </div>`;
+      }
+      html += '</div></div>';
+    } else {
+      html += '<div style="color:#5acc8a;font-size:12px">✓ No duplicate events found</div>';
+    }
+
+    out.innerHTML = html;
+  } catch(e) { out.innerHTML = '<div class="err">'+e.message+'</div>'; status.textContent=''; }
+  finally { btn.disabled = false; btn.textContent = '🔬 Run QC'; }
 }
 
 // ── AUTO-GROW POOL ────────────────────────────────────────────────────
