@@ -81,6 +81,30 @@ a{color:#c8903a;text-decoration:none}
 .rs-lbl{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.06em;margin-top:.2rem}
 .result-actions{display:flex;flex-direction:column;gap:.75rem}
 .result-link{font-size:14px;color:#c8903a;font-weight:600;padding:.75rem}
+.review-btn{background:#1a1a1a;color:#c8903a;border:1px solid #c8903a;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:600;cursor:pointer;width:100%}
+.review-btn:hover{background:#221a0a}
+
+/* REVIEW */
+.review-wrap{max-width:680px;margin:0 auto;padding-top:1rem}
+.review-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem}
+.review-title{font-family:Georgia,serif;font-size:1.5rem;font-weight:700;color:#c8903a}
+.review-back{background:transparent;border:1px solid #c8903a55;color:#c8903a;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer}
+.review-back:hover{background:#1a1a1a}
+.review-empty{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:14px;padding:2rem;text-align:center;color:#aaa}
+.review-card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:12px;padding:1.25rem;margin-bottom:.85rem}
+.review-meta{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;display:flex;justify-content:space-between}
+.review-q{font-family:Georgia,serif;font-size:1.05rem;line-height:1.5;color:#fff;margin-bottom:.85rem}
+.review-opts{display:flex;flex-direction:column;gap:.4rem}
+.review-opt{display:flex;align-items:center;gap:.6rem;border-radius:8px;padding:.6rem .85rem;font-size:13.5px;border:1px solid #2a2a2a;background:#111;color:#bbb}
+.review-opt-letter{font-weight:700;min-width:18px;color:#888;font-size:12px}
+.review-opt-text{flex:1;line-height:1.4}
+.review-tag{font-size:10px;font-weight:700;letter-spacing:.05em;padding:2px 7px;border-radius:4px;text-transform:uppercase}
+.review-opt.your-pick{background:#2a0d0d;border-color:#cc4444;color:#fff}
+.review-opt.your-pick .review-opt-letter{color:#cc6666}
+.review-opt.your-pick .review-tag{background:#cc4444;color:#000}
+.review-opt.right-ans{background:#0d2a1a;border-color:#5acc8a;color:#fff}
+.review-opt.right-ans .review-opt-letter{color:#5acc8a}
+.review-opt.right-ans .review-tag{background:#5acc8a;color:#000}
 
 /* LOADING */
 .loading-wrap{display:flex;justify-content:center;align-items:center;min-height:300px}
@@ -136,6 +160,7 @@ let S = {
   lastResult:null,
   userHQ:null,
   answered:false,
+  history:[],
 };
 
 function render(){
@@ -144,6 +169,7 @@ function render(){
   if(S.phase==='loading')  p.innerHTML=renderLoading();
   if(S.phase==='quiz')     p.innerHTML=renderQuiz();
   if(S.phase==='result')   p.innerHTML=renderResult();
+  if(S.phase==='review')   p.innerHTML=renderReview();
 }
 
 function renderIntro(){
@@ -216,14 +242,53 @@ function renderResult(){
     </div>
     <div class="result-actions">
       <button class="start-btn" onclick="startSession()">Retake Assessment</button>
+      ${wrong>0?`<button class="review-btn" onclick="showReview()">Review your ${wrong} wrong answer${wrong===1?'':'s'}</button>`:''}
       <a href="/profile.html" class="result-link">View Profile →</a>
     </div>
     ${!getToken()?`<p class="guest-note" style="margin-top:1rem">Sign in to save this score to your profile.</p>`:''}
   </div></div>`;
 }
 
+function renderReview(){
+  const wrongs = S.history.filter(h => !h.correct);
+  const labels = ['A','B','C','D'];
+  const cards = wrongs.map(h => {
+    const opts = h.answers.map((txt, i) => {
+      const isCorrect = i === h.correct_idx;
+      const isPicked  = i === h.chosen_idx;
+      const cls = isCorrect ? 'right-ans' : (isPicked ? 'your-pick' : '');
+      const tag = isCorrect ? '<span class="review-tag">Correct</span>'
+                : (isPicked  ? '<span class="review-tag">Your answer</span>' : '');
+      return `<div class="review-opt ${cls}">
+        <span class="review-opt-letter">${labels[i]}</span>
+        <span class="review-opt-text">${txt}</span>
+        ${tag}
+      </div>`;
+    }).join('');
+    return `<div class="review-card">
+      <div class="review-meta"><span>Question ${h.num}</span>${h.topic?`<span>${h.topic}</span>`:''}</div>
+      <div class="review-q">${h.question}</div>
+      <div class="review-opts">${opts}</div>
+    </div>`;
+  }).join('');
+
+  return `<div class="review-wrap">
+    <div class="review-header">
+      <div class="review-title">Review · ${wrongs.length} wrong answer${wrongs.length===1?'':'s'}</div>
+      <button class="review-back" onclick="backToResult()">← Back to result</button>
+    </div>
+    ${wrongs.length ? cards : '<div class="review-empty">A clean run — nothing to review.</div>'}
+    <div style="text-align:center;margin-top:1.5rem">
+      <button class="review-back" onclick="backToResult()">← Back to result</button>
+    </div>
+  </div>`;
+}
+
+function showReview(){ S.phase='review'; render(); window.scrollTo(0,0); }
+function backToResult(){ S.phase='result'; render(); window.scrollTo(0,0); }
+
 async function startSession(){
-  S.phase='loading'; S.questionNum=0; S.hq=400; S.correctCount=0; S.lastResult=null; S.answered=false;
+  S.phase='loading'; S.questionNum=0; S.hq=400; S.correctCount=0; S.lastResult=null; S.answered=false; S.history=[];
   render();
   try{
     const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
@@ -247,6 +312,15 @@ async function submitAnswer(chosenIdx){
     S.lastResult={...d, chosen:chosenIdx};
     S.hq=d.new_hq;
     if(d.correct) S.correctCount++;
+    S.history.push({
+      num: S.questionNum,
+      topic: S.question.topic,
+      question: S.question.question,
+      answers: S.question.answers,
+      correct_idx: d.correct_idx,
+      chosen_idx: chosenIdx,
+      correct: d.correct
+    });
     if(d.completed){
       S.phase='result';
     } else {

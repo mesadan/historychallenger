@@ -113,6 +113,31 @@ a{color:#8a6208;text-decoration:none}
 
 .error-box{background:#2a0808;color:#cc6644;border:1px solid #5a2a2a;border-radius:6px;padding:.8rem 1rem;margin-top:1rem;font-size:14px}
 
+/* CLUES (notes) */
+.clues-wrap{background:#0d0d0d;border-left:1px solid #3a2a14;border-right:1px solid #3a2a14;padding:.55rem 1rem .7rem;color:#bbb;font-family:-apple-system,sans-serif;border-bottom:1px dashed #2a2a2a}
+.clues-head{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#888;margin-bottom:.5rem}
+.clues-head strong{color:#c8a028;font-family:Georgia,serif;font-size:13px}
+.clues-meta{font-size:11px;color:#888}
+.clues-meta b{color:#c8a028}
+.clues-list{display:flex;flex-direction:column;gap:.4rem}
+.clue-card{background:#15110a;border:1px solid #3a2a14;border-radius:6px;padding:.5rem .7rem;font-family:'Crimson Text',Georgia,serif}
+.clue-row{display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.clue-title{color:#e8d8b8;font-size:14px;line-height:1.3;flex:1}
+.clue-reveal{background:#3a2a14;color:#e8d8b8;border:1px solid #c8903a55;border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:-apple-system,sans-serif;letter-spacing:.04em;flex-shrink:0}
+.clue-reveal:hover:not(:disabled){background:#5a3e1a;border-color:#c8903a}
+.clue-reveal:disabled{opacity:.4;cursor:not-allowed}
+.clue-card.revealed{background:#1a1408;border-color:#c8903a55}
+.clue-body{color:#d8c8a8;font-size:13.5px;line-height:1.55;margin-top:.5rem;padding-top:.5rem;border-top:1px dashed #3a2a14}
+.clues-empty{color:#7a6040;font-size:12px;font-style:italic}
+
+/* RESULT — XP block */
+.xp-block{background:#1a150e;color:#e8d8b8;border:1px solid #3a2a14;border-radius:6px;padding:1rem 1.25rem;margin:0 auto 1.5rem;max-width:540px;font-family:-apple-system,sans-serif;text-align:left}
+.xp-row{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:#bbb;padding:3px 0}
+.xp-row.total{border-top:1px solid #3a2a14;margin-top:.4rem;padding-top:.6rem;font-weight:700;color:#c8903a;font-size:15px}
+.xp-row strong{color:#e8d8b8;font-family:Georgia,serif}
+.xp-row.total strong{color:#c8a028;font-size:18px}
+.xp-row.penalty strong{color:#cc8844}
+
 @media(max-width:600px){
   .chat-pane{min-height:280px;max-height:45vh}
   .scenario-figure{font-size:1.6rem}
@@ -150,7 +175,11 @@ let S = {
   loseAt:0,
   result:null,
   errorMsg:null,
-  endReason:null
+  endReason:null,
+  clues:[],          // [{id,title,body?}], body present after reveal
+  cluesAllowed:0,
+  cluesUsed:0,
+  revealingIdx:null  // idx currently mid-flight to prevent double click
 };
 
 function getToken(){return localStorage.getItem('hc_token');}
@@ -250,6 +279,7 @@ function renderChat(){
     <div class="conv-bar-top"><span>${escapeHtml(S.scenario.figure_short)}'s resolve</span><strong>${convPct} / ${winPct}</strong></div>
     <div class="conv-bar"><div class="conv-fill" style="width:${convPct}%"></div><div class="conv-mark" style="left:${winPct}%"></div></div>
   </div>
+  ${renderCluesPanel()}
   <div class="chat-pane" id="chat-pane">${bubbles}</div>
   <div class="input-area">
     <div class="input-row">
@@ -261,6 +291,51 @@ function renderChat(){
       <button class="end-btn" onclick="endAudience()">End audience</button>
     </div>
   </div>`;
+}
+
+function renderCluesPanel(){
+  if (!S.clues.length || !S.cluesAllowed) return '';
+  const left = Math.max(0, S.cluesAllowed - S.cluesUsed);
+  const cards = S.clues.map((c, i) => {
+    const revealed = !!c.body;
+    const busy = S.revealingIdx === i;
+    const disabled = revealed || left <= 0 || busy || S.awaitingReply;
+    const btnLabel = revealed ? 'Revealed' : (busy ? '…' : (left>0 ? `Reveal (−25 XP)` : 'No notes left'));
+    return `<div class="clue-card ${revealed?'revealed':''}">
+      <div class="clue-row">
+        <div class="clue-title">${escapeHtml(c.title)}</div>
+        <button class="clue-reveal" onclick="revealClue(${i})" ${disabled?'disabled':''}>${btnLabel}</button>
+      </div>
+      ${revealed ? `<div class="clue-body">${escapeHtml(c.body)}</div>` : ''}
+    </div>`;
+  }).join('');
+  return `<div class="clues-wrap">
+    <div class="clues-head">
+      <strong>Your notes</strong>
+      <span class="clues-meta">Reveals used <b>${S.cluesUsed}</b> / ${S.cluesAllowed} · each costs 25 XP</span>
+    </div>
+    <div class="clues-list">${cards}</div>
+  </div>`;
+}
+
+async function revealClue(idx){
+  if (S.revealingIdx !== null) return;
+  if (S.cluesUsed >= S.cluesAllowed) return;
+  if (S.clues[idx]?.body) return;
+  S.revealingIdx = idx; render();
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'reveal_dialogue_clue', session_id: S.sessionId, clue_idx: idx })});
+    const d = await res.json();
+    if (d.error) { alert(d.error); S.revealingIdx = null; render(); return; }
+    S.clues[idx].body = d.clue.body;
+    S.cluesUsed = d.clues_used;
+  } catch(e) {
+    alert('Network error revealing clue.');
+  } finally {
+    S.revealingIdx = null;
+    render();
+  }
 }
 
 function renderResult(){
@@ -275,11 +350,26 @@ function renderResult(){
     ? `<div class="final-quote">"${escapeHtml(finalReply)}"<div class="final-quote-attr">— <strong>${escapeHtml(figureName)}</strong>, the last words of the audience</div></div>`
     : '';
 
+  const xp = (r.xp_earned != null) ? r.xp_earned : null;
+  const cluesUsed = r.clues_used != null ? r.clues_used : S.cluesUsed;
+  const diffLabel = ({easy:'Apprentice',medium:'Strategist',hard:'Imperator'})[r.difficulty || S.difficulty] || S.difficulty;
+  const baseByVerdict = { Convinced: 200, Wavered: 75, Firm: 25 };
+  const diffMultMap = { easy: 1.0, medium: 1.5, hard: 2.0 };
+  const diffMult = diffMultMap[r.difficulty || S.difficulty] || 1.0;
+  const baseXp = (baseByVerdict[r.verdict] || 0) * diffMult;
+  const cluePenalty = cluesUsed * 25;
+  const xpHtml = xp == null ? '' : `<div class="xp-block">
+    <div class="xp-row"><span>Verdict bonus (${escapeHtml(r.verdict||'')} × ${diffLabel})</span><strong>+${Math.round(baseXp)}</strong></div>
+    ${cluesUsed>0 ? `<div class="xp-row penalty"><span>Clues revealed (${cluesUsed} × 25)</span><strong>−${cluePenalty}</strong></div>` : ''}
+    <div class="xp-row total"><span>XP earned</span><strong>+${xp}</strong></div>
+  </div>`;
+
   return `<div class="result-card">
     <div class="verdict-eyebrow">${escapeHtml(figureName)}'s verdict</div>
     <h1 class="verdict-label ${cls}">${escapeHtml(label)}</h1>
     ${finalQuoteHtml}
     <p class="verdict-text">${escapeHtml(r.verdict_text||'')}</p>
+    ${xpHtml}
     <div class="result-actions">
       <button class="btn-secondary" onclick="resetIntro()">Try again</button>
       <button class="btn-secondary" onclick="goPicker()">Another audience</button>
@@ -387,6 +477,7 @@ function goPicker(){
   S.result = null;
   S.endReason = null;
   S.awaitingReply = false;
+  S.clues = []; S.cluesAllowed = 0; S.cluesUsed = 0; S.revealingIdx = null;
   render();
 }
 
@@ -405,6 +496,10 @@ async function startSession(){
     S.conviction = d.conviction;
     S.winAt = d.win_at;
     S.loseAt = d.lose_at;
+    S.clues = (d.clues || []).map(c => ({ id:c.id, title:c.title }));
+    S.cluesAllowed = d.clues_allowed || 0;
+    S.cluesUsed = d.clues_used || 0;
+    S.revealingIdx = null;
     S.messages = [{ role:'figure', content: d.opening }];
     S.turn = 0;
     S.startedAt = Date.now();
@@ -479,6 +574,7 @@ function resetIntro(){
   S.result = null;
   S.endReason = null;
   S.awaitingReply = false;
+  S.clues = []; S.cluesAllowed = 0; S.cluesUsed = 0; S.revealingIdx = null;
   S.phase = 'intro';
   render();
 }

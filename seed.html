@@ -1004,33 +1004,26 @@ function logHQ(msg, color) {
   <div id="hq-stats" style="margin-bottom:1.25rem"><span style="color:#555">Click Refresh to load stats</span></div>
 
   <div class="row" style="border-top:1px solid #1a1a1a;padding-top:1rem;margin-top:.5rem">
-    <strong style="color:#c8903a;font-size:13px">Seed All Levels</strong>
+    <strong style="color:#c8903a;font-size:13px">🤖 AI Quality Check</strong>
+    <span style="color:#555;font-size:11px;margin-left:auto">Scans for leaky answers, semantic duplicates, and pop-culture trivia</span>
   </div>
   <div class="row">
-    <label style="color:#555;font-size:13px">Questions per level:</label>
-    <input type="number" id="hq-count-all" value="5" min="1" max="10" style="width:60px">
-    <button id="hq-btn-all" onclick="seedHQAll()">🌱 Seed All Levels</button>
+    <label style="color:#555;font-size:13px">Scope:</label>
+    <select id="hq-qc-level" style="padding:4px 8px;background:#0d0d0d;color:#ddd;border:1px solid #333">
+      <option value="">All levels</option>
+      <option value="1">L1 only</option>
+      <option value="2">L2 only</option>
+      <option value="3">L3 only</option>
+      <option value="4">L4 only</option>
+      <option value="5">L5 only</option>
+    </select>
+    <button id="hq-qc-btn" onclick="runHQQC()">🔬 Run QC Analysis</button>
+    <span id="hq-qc-status" style="color:#555;font-size:12px;margin-left:auto"></span>
   </div>
-
-  <div class="row" style="border-top:1px solid #1a1a1a;padding-top:1rem;margin-top:.25rem">
-    <strong style="color:#c8903a;font-size:13px">Seed Individual Level</strong>
-  </div>
-  <div class="row">
-    <label style="color:#555;font-size:13px">Count:</label>
-    <input type="number" id="hq-count-single" value="5" min="1" max="10" style="width:60px">
-  </div>
-  <div class="row">
-    <button id="hq-btn-lvl-1" onclick="seedHQLevel(1)">L1 Very Easy</button>
-    <button id="hq-btn-lvl-2" onclick="seedHQLevel(2)">L2 Easy</button>
-    <button id="hq-btn-lvl-3" onclick="seedHQLevel(3)">L3 Medium</button>
-    <button id="hq-btn-lvl-4" onclick="seedHQLevel(4)">L4 Hard</button>
-    <button id="hq-btn-lvl-5" onclick="seedHQLevel(5)">L5 Expert</button>
-  </div>
-
-  <div class="log" id="hq-log" style="height:220px"><span style="color:#555">— ready —</span></div>
+  <div id="hq-qc-results" style="margin-top:.75rem"></div>
 
   <div class="row" style="border-top:1px solid #1a1a1a;padding-top:1rem;margin-top:1rem">
-    <strong style="color:#c8903a;font-size:13px">🔍 Browse & QC Questions</strong>
+    <strong style="color:#c8903a;font-size:13px">🔍 Browse Questions</strong>
   </div>
   <div class="row">
     <label style="color:#555;font-size:13px">Filter level:</label>
@@ -1047,36 +1040,50 @@ function logHQ(msg, color) {
   </div>
   <div id="hq-browse" style="max-height:500px;overflow-y:auto;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;padding:.5rem"></div>
 
-  <div class="row" style="border-top:2px solid #2a1a0a;padding-top:1rem;margin-top:1rem">
-    <strong style="color:#e8b060;font-size:13px">🚀 Auto-Grow Pool</strong>
-    <span style="color:#555;font-size:11px;margin-left:auto">Seed → QC → prune → repeat until every level hits target</span>
-  </div>
-  <div class="row">
-    <label style="color:#555;font-size:13px">Target per level:</label>
-    <input type="number" id="hq-grow-target" value="50" min="10" max="300" style="width:70px">
-    <button id="hq-grow-btn" onclick="autoGrowPool()" style="background:#2a1a0a;border-color:#c8903a;color:#c8903a">🚀 Auto-Grow Pool</button>
-    <button id="hq-grow-stop" onclick="AG.stop=true" style="display:none;background:#2a0a0a;border-color:#cc4444;color:#cc6644" disabled>⏹ Stop</button>
-  </div>
-  <div class="log" id="hq-grow-log" style="height:260px"><span style="color:#555">— ready —</span></div>
+  <details style="margin-top:1.25rem;border-top:1px solid #1a1a1a;padding-top:1rem">
+    <summary style="color:#666;font-size:12px;cursor:pointer;font-weight:600">⚙ Legacy AI seeding (top-up tool, only if pool drops below target)</summary>
+    <div style="margin-top:1rem;padding:1rem;background:#080808;border:1px solid #1a1a1a;border-radius:6px">
+      <p style="color:#666;font-size:12px;line-height:1.5;margin-bottom:1rem">The 1500 hand-curated questions are the canonical pool. These tools are kept only as a safety net if QC deletes a chunk and you need to refill a level fast. Quality will be lower than the curated set.</p>
 
-  <div class="row" style="border-top:1px solid #1a1a1a;padding-top:1rem;margin-top:1rem">
-    <strong style="color:#c8903a;font-size:13px">🤖 AI Quality Check</strong>
-    <span style="color:#555;font-size:11px;margin-left:auto">Uses Claude — scans for leaky answers & semantic duplicates</span>
-  </div>
-  <div class="row">
-    <label style="color:#555;font-size:13px">Scope:</label>
-    <select id="hq-qc-level" style="padding:4px 8px;background:#0d0d0d;color:#ddd;border:1px solid #333">
-      <option value="">All levels</option>
-      <option value="1">L1 only</option>
-      <option value="2">L2 only</option>
-      <option value="3">L3 only</option>
-      <option value="4">L4 only</option>
-      <option value="5">L5 only</option>
-    </select>
-    <button id="hq-qc-btn" onclick="runHQQC()">🔬 Run QC Analysis</button>
-    <span id="hq-qc-status" style="color:#555;font-size:12px;margin-left:auto"></span>
-  </div>
-  <div id="hq-qc-results" style="margin-top:.75rem"></div>
+      <div class="row">
+        <strong style="color:#888;font-size:13px">Seed All Levels</strong>
+      </div>
+      <div class="row">
+        <label style="color:#555;font-size:13px">Questions per level:</label>
+        <input type="number" id="hq-count-all" value="5" min="1" max="10" style="width:60px">
+        <button id="hq-btn-all" onclick="seedHQAll()">🌱 Seed All Levels</button>
+      </div>
+
+      <div class="row" style="border-top:1px solid #1a1a1a;padding-top:1rem;margin-top:.25rem">
+        <strong style="color:#888;font-size:13px">Seed Individual Level</strong>
+      </div>
+      <div class="row">
+        <label style="color:#555;font-size:13px">Count:</label>
+        <input type="number" id="hq-count-single" value="5" min="1" max="10" style="width:60px">
+      </div>
+      <div class="row">
+        <button id="hq-btn-lvl-1" onclick="seedHQLevel(1)">L1 Very Easy</button>
+        <button id="hq-btn-lvl-2" onclick="seedHQLevel(2)">L2 Easy</button>
+        <button id="hq-btn-lvl-3" onclick="seedHQLevel(3)">L3 Medium</button>
+        <button id="hq-btn-lvl-4" onclick="seedHQLevel(4)">L4 Hard</button>
+        <button id="hq-btn-lvl-5" onclick="seedHQLevel(5)">L5 Expert</button>
+      </div>
+
+      <div class="log" id="hq-log" style="height:180px"><span style="color:#555">— ready —</span></div>
+
+      <div class="row" style="border-top:1px solid #1a1a1a;padding-top:1rem;margin-top:1rem">
+        <strong style="color:#888;font-size:13px">🚀 Auto-Grow Pool</strong>
+        <span style="color:#555;font-size:11px;margin-left:auto">Seed → QC → prune → repeat until each level hits target</span>
+      </div>
+      <div class="row">
+        <label style="color:#555;font-size:13px">Target per level:</label>
+        <input type="number" id="hq-grow-target" value="50" min="10" max="300" style="width:70px">
+        <button id="hq-grow-btn" onclick="autoGrowPool()" style="background:#2a1a0a;border-color:#c8903a;color:#c8903a">🚀 Auto-Grow Pool</button>
+        <button id="hq-grow-stop" onclick="AG.stop=true" style="display:none;background:#2a0a0a;border-color:#cc4444;color:#cc6644" disabled>⏹ Stop</button>
+      </div>
+      <div class="log" id="hq-grow-log" style="height:200px"><span style="color:#555">— ready —</span></div>
+    </div>
+  </details>
 </div>
 
 <script>
@@ -1094,7 +1101,8 @@ async function runHQQC(){
     const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const d = await res.json();
     if (d.error) { out.innerHTML = '<div class="err">'+d.error+'</div>'; status.textContent=''; return; }
-    status.textContent = 'Scanned '+d.total+' questions · '+d.leaky.length+' leaky · '+d.duplicates.length+' duplicate group'+(d.duplicates.length===1?'':'s');
+    const popN = (d.popCulture||[]).length;
+    status.textContent = 'Scanned '+d.total+' questions · '+d.leaky.length+' leaky · '+d.duplicates.length+' duplicate group'+(d.duplicates.length===1?'':'s')+' · '+popN+' pop-culture';
     renderHQQC(d);
   } catch(e) { out.innerHTML = '<div class="err">'+e.message+'</div>'; status.textContent=''; }
   finally { btn.disabled = false; btn.textContent = '🔬 Run QC Analysis'; }
@@ -1124,6 +1132,26 @@ function renderHQQC(d){
     html += '</div></div>';
   } else {
     html += '<div style="color:#5acc8a;font-size:12px;margin-bottom:1rem">✓ No leaky answers found</div>';
+  }
+
+  const popList = d.popCulture || [];
+  if (popList.length) {
+    html += '<div style="margin-bottom:1rem"><div style="color:#cc88cc;font-size:13px;font-weight:700;margin-bottom:.5rem">🎤 Pop-culture / non-history ('+popList.length+')</div>';
+    html += '<div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;padding:.5rem;max-height:400px;overflow-y:auto">';
+    for (const p of popList) {
+      html += `<div style="padding:.6rem .5rem;border-bottom:1px solid #111;font-size:12px" data-qc-id="${p.id}">
+        <div style="display:flex;gap:.5rem;align-items:start">
+          <span style="color:${lvlColor[p.level]};font-size:10px;font-weight:700;padding:1px 5px;border:1px solid ${lvlColor[p.level]}55;border-radius:2px;flex-shrink:0">L${p.level}</span>
+          <div style="flex:1;min-width:0">
+            <div style="color:#ddd;margin-bottom:.2rem">${p.question}</div>
+            <div style="color:#5acc8a;font-size:11px;margin-bottom:.2rem">✓ ${p.correct}</div>
+            <div style="color:#cc88cc;font-size:11px;font-style:italic;margin-bottom:.3rem">${p.reason}</div>
+            <button style="padding:2px 8px;font-size:11px;background:#2a0a2a;color:#cc88cc;border:1px solid #442044" onclick="deleteHQQCItem('${p.id}')">🗑 Delete</button>
+          </div>
+        </div>
+      </div>`;
+    }
+    html += '</div></div>';
   }
 
   if (d.duplicates.length) {
@@ -1276,13 +1304,14 @@ async function autoGrowPool(){
         try { qc = await agQCLevel(lvl); }
         catch(e) { logAG('    QC error: '+e.message+' (skipping QC this round)', '#cc6644'); continue; }
 
-        // Collect IDs to delete: all leaky + all but first of each dup group
+        // Collect IDs to delete: all leaky + all pop-culture + all but first of each dup group
         const toDelete = new Set();
         for (const l of (qc.leaky||[])) toDelete.add(l.id);
+        for (const p of (qc.popCulture||[])) toDelete.add(p.id);
         for (const g of (qc.duplicates||[])) {
           for (let i = 1; i < g.items.length; i++) toDelete.add(g.items[i].id);
         }
-        logAG('    leaky: '+(qc.leaky||[]).length+' · dup groups: '+(qc.duplicates||[]).length+' · will delete '+toDelete.size, toDelete.size?'#cc8844':'#5acc8a');
+        logAG('    leaky: '+(qc.leaky||[]).length+' · pop: '+(qc.popCulture||[]).length+' · dup groups: '+(qc.duplicates||[]).length+' · will delete '+toDelete.size, toDelete.size?'#cc8844':'#5acc8a');
 
         for (const id of toDelete) {
           if (AG.stop) break;

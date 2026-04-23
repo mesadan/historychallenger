@@ -137,6 +137,7 @@ Events: ${JSON.stringify(events)}`;
     if (action === 'start_dialogue')          return handleStartDialogue(body, env);
     if (action === 'dialogue_turn')           return handleDialogueTurn(body, env, apiKey);
     if (action === 'judge_dialogue')          return handleJudgeDialogue(body, env, apiKey);
+    if (action === 'reveal_dialogue_clue')    return handleRevealDialogueClue(body, env);
 
     const { theme, diff, rounds, lang } = body;
     if (!diff) return json({ error: 'Missing difficulty.' }, 400);
@@ -1435,7 +1436,7 @@ async function handleQCHQQuestions(body, env, apiKey) {
       correct: q.answers[q.correct_idx]
     }));
 
-    const SYS = `You are a rigorous QA checker for a history quiz. Analyse the provided questions for two issues:
+    const SYS = `You are a rigorous QA checker for a history quiz. Analyse the provided questions for THREE issues:
 
 1. LEAKY — the correct answer can be inferred from the question text itself without knowing the historical fact. Typical patterns:
    - A proper noun (place, person, empire) appears in both the question and the correct answer (e.g. question asks about "Alexandria", correct answer is "Lighthouse of Alexandria").
@@ -1445,15 +1446,26 @@ async function handleQCHQQuestions(body, env, apiKey) {
 
 2. DUPLICATES — groups of two or more questions that test essentially the same historical fact, person, or event, even if worded differently. A group must have at least 2 questions.
 
+3. POP_CULTURE — questions that are NOT real political/military/social/economic/scientific history but instead test:
+   - Pop music or singers (Beatles, Elvis, Madonna, Beyoncé, etc.)
+   - Film, TV, or actors (Hollywood, Oscars, sitcoms, streaming shows)
+   - Sports celebrities, championships, or records (Olympics medal counts, World Cup trivia, athlete biographies)
+   - Video games, comics, anime, fictional characters
+   - Fashion, supermodels, brand histories, advertising slogans
+   - Pop trivia / general culture not tied to a real historical event, treaty, ruler, war, discovery, or institution
+   Do NOT flag questions about classical composers (Mozart, Bach), pre-1900 literature (Shakespeare, Tolstoy), classical art (Michelangelo, Rembrandt), early cinema pioneers as a technological/political milestone, or genuine cultural history (printing press, Renaissance patronage). The line is: "would a serious history textbook cover this?" If no → flag.
+
 Return ONLY valid JSON, no markdown:
 {
   "leaky":[{"idx":0,"reason":"..."}, ...],
-  "duplicates":[{"idxs":[0,5,12],"reason":"all ask about X"}, ...]
+  "duplicates":[{"idxs":[0,5,12],"reason":"all ask about X"}, ...],
+  "popCulture":[{"idx":3,"reason":"..."}, ...]
 }`;
 
     const BATCH = 40;
     let leaky = [];
     let duplicates = [];
+    let popCulture = [];
 
     for (let i = 0; i < compact.length; i += BATCH) {
       const batch = compact.slice(i, i + BATCH);
@@ -1461,7 +1473,7 @@ Return ONLY valid JSON, no markdown:
 
 ${JSON.stringify(batch, null, 2)}
 
-Return JSON with "leaky" and "duplicates" arrays as described. Use the idx values from this batch.`;
+Return JSON with "leaky", "duplicates", and "popCulture" arrays as described. Use the idx values from this batch.`;
 
       try {
         const raw = await callClaude(apiKey, prompt, 4000, SYS);
@@ -1489,10 +1501,17 @@ Return JSON with "leaky" and "duplicates" arrays as described. Use the idx value
             });
           }
         }
+        for (const p of (parsed.popCulture || [])) {
+          const q = batch[p.idx];
+          if (q) {
+            const src = questions[i + p.idx];
+            popCulture.push({ id: src.id, level: src.level, topic: src.topic, question: q.q, correct: q.correct, reason: p.reason });
+          }
+        }
       } catch(e) { /* skip batch on failure */ }
     }
 
-    return json({ leaky, duplicates, total: questions.length }, 200);
+    return json({ leaky, duplicates, popCulture, total: questions.length }, 200);
   } catch(e) {
     return json({ error: e.message }, 500);
   }
@@ -1543,9 +1562,9 @@ EXAMPLE FORMAT (yours will differ):
 Both tags MUST be present. The player only sees the <reply>; the conviction is between you and me.`;
 
 const DIALOGUE_DIFFICULTY_PRESETS = {
-  easy:   { label: 'Apprentice',  win_at: 75,  lose_at: 0,   stubbornness: 0.7, hint: 'Listens with patience.' },
-  medium: { label: 'Strategist',  win_at: 90,  lose_at: 5,   stubbornness: 1.0, hint: 'Weighs every word.' },
-  hard:   { label: 'Imperator',   win_at: 100, lose_at: 12,  stubbornness: 1.4, hint: 'Will not be moved by anything but masterful argument — and a single foolish remark will see you dismissed.' }
+  easy:   { label: 'Apprentice',  win_at: 75,  lose_at: 0,   stubbornness: 0.7, clues_allowed: 3, hint: 'Listens with patience. Three clue cards available.' },
+  medium: { label: 'Strategist',  win_at: 90,  lose_at: 5,   stubbornness: 1.0, clues_allowed: 2, hint: 'Weighs every word. Two clue cards available.' },
+  hard:   { label: 'Imperator',   win_at: 100, lose_at: 12,  stubbornness: 1.4, clues_allowed: 1, hint: 'Will not be moved by anything but masterful argument. Only one clue card available.' }
 };
 
 const DIALOGUE_SCENARIOS = {
@@ -1568,6 +1587,11 @@ const DIALOGUE_SCENARIOS = {
       'Siege without engines — psychological terror, panicked sympathisers opening gates, fifth column inside the city.',
       'Italian defection requires a fall — pillaging alone will not flip the allies; only a fallen Rome will.',
       'Concrete plan — name a route, a gate, a date, a contingent. Vagueness will lose Hannibal.'
+    ],
+    clues: [
+      { id:'urgency', title:'Roman recovery is rapid', body:'Within weeks Rome will raise fresh legions from veterans, freedmen, even slaves. Press that delay is the enemy — every day of rest favours the city, not the army.' },
+      { id:'siege',   title:'A city falls without engines', body:'Argue that conventional siege is not required: psychological terror, panicked sympathisers, fifth column within the walls, gates opened from inside. Hannibal needs to see how it can be done.' },
+      { id:'allies',  title:'Italy waits for Rome to fall', body:'Pillaging alone will not flip the Italian allies. Only the actual fall of Rome itself will trigger mass defection from the Latin League. Half-measures will not break the alliance.' }
     ],
     opening_line: `Maharbal. Sit. The flies are intolerable. You have ridden through the dead Romans to find me, so I assume you have not come to praise the day's work. Speak.`,
     win_criteria: [
@@ -1656,6 +1680,11 @@ You are Coenus, son of Polemocrates. You have led a phalanx in every great battl
       'Empire unconsolidated — Bactria stirs, Persia is restless, Egypt waits for its pharaoh.',
       'A specific route home — name the road (down the Indus to the Ocean, then westward), the season, the destination.'
     ],
+    clues: [
+      { id:'veterans', title:'Speak for the men by name', body:'Name those who have followed since the Granicus — their losses, their years, their families left behind in Macedonia. Alexander loves his Companions and reacts to particulars, not abstractions.' },
+      { id:'glory',    title:'Frame the return as triumph', body:'Going home is not retreat — it is completing a feat no Greek has ever matched. Argue that glory already won is glory enough; that fighting beyond the known world risks unmaking what has been done.' },
+      { id:'empire',   title:'The empire behind him stirs', body:'Bactria smoulders, Persia is restless, Egypt waits for its pharaoh. A king who marches further loses what he already holds. Name the conquests requiring a king present, not absent.' }
+    ],
     win_criteria: [
       { id:'veterans', label:'The Veterans',     desc:'You spoke for the men who have followed since the Granicus — their exhaustion, their losses, the years they have given.' },
       { id:'glory',    label:'Glory Already Won',desc:'You framed the return as completing a feat unmatched in history, not as a retreat.' },
@@ -1741,6 +1770,11 @@ Kublai has spent the six years since rebuilding. Two fleets are now assembled at
       'The fleet itself — Korean shipwrights work under coercion and shortcut their joints; ships built for the river will not survive the open sea.',
       'The samurai — they fought you to a draw on the first day with no warning. Six years on, they have walls, fresh levies, and prepared positions.',
       'Strategic priority — Yuan rule of China is barely a decade old, the Song loyalists still stir in the south, Japan offers no tribute worth the cost.'
+    ],
+    clues: [
+      { id:'wind',     title:'The typhoon coast', body:'Hakata Bay is a death-trap in late summer and early autumn. The same storms that wrecked the first fleet will wreck the second. Argue that the calendar itself has decided the campaign.' },
+      { id:'fleet',    title:'Korean ships will not survive', body:'The conscripted Korean shipwrights cut corners under duress, and river-vessels were never built for open sea. Speak to the engineering — the fleet will sink before it lands.' },
+      { id:'priority', title:'China comes first', body:'Yuan rule of newly conquered China is barely a decade old; Song loyalists still stir in the south. Argue Japan is a distraction the Khaganate cannot afford while its core remains unconsolidated.' }
     ],
     win_criteria: [
       { id:'wind',     label:'The Wind',         desc:'You named the typhoon season and the proven hostility of that coast.' },
@@ -1830,6 +1864,11 @@ You are Theodora. You have walked into the chamber unbidden.`,
       'No safe haven — every city in the East would denounce a fugitive emperor; the Persians would imprison him; there is nowhere to flee TO.',
       'Forces still loyal — Belisarius, Mundus, the Excubitors and the Heruli are here, in the palace, willing to fight; the mob has no general.',
       'A specific tactical plan — split the mob in the Hippodrome (Narses with gold to the Blues, Belisarius and Mundus with steel to the Greens at the gates).'
+    ],
+    clues: [
+      { id:'honour', title:'The purple is a fine shroud', body:'Death as emperor outweighs life as fugitive. Better to die in the city than rule nowhere. The historical line — that the purple makes a fine winding-sheet — is the lever.' },
+      { id:'forces', title:'Loyal steel still stands', body:'Belisarius, Mundus, the Excubitors and the Heruli are still in the palace. Justinian needs reminding that the city has not yet fallen — he commands an army, the mob does not.' },
+      { id:'plan',   title:'Split the mob in the Hippodrome', body:'A concrete tactic beats abstract resolve: Narses with gold to bribe the Blue faction away, Belisarius and Mundus with steel against the Greens at the gates. Name the men, name the plan.' }
     ],
     win_criteria: [
       { id:'honour',   label:'The Throne is Worth Dying For', desc:'You named that flight is a death of a different kind — that the purple is itself a shroud.' },
@@ -1926,6 +1965,11 @@ You have come with the marshals — Berthier, Lefebvre, Macdonald, Oudinot — b
       'The Empress and the King of Rome — Marie Louise and his son are in Vienna; only a clean abdication preserves any chance of seeing them again, and any future for the dynasty.',
       'A specific terms — abdicate in favour of his son, retain title, retire to Elba; this is what the Allies will offer if he asks now.'
     ],
+    clues: [
+      { id:'army',      title:'The marshals will not march', body:'They have decided collectively. The soldiers will not turn their muskets on Paris and on their own countrymen. Speak for the marshals as a body — Napoleon trusts numbers and names.' },
+      { id:'coalition', title:'Eight hundred thousand bayonets', body:'Russia, Austria, Prussia, Britain — the combined Allied force in Europe makes any tactical victory on the road to Paris irrelevant within weeks. Name the totals.' },
+      { id:'family',    title:'Marie Louise and the King of Rome', body:'They are in Vienna. Only a clean abdication preserves any chance of seeing them again — and any future at all for the Bonapartist dynasty. Invoke the empress and the boy by name.' }
+    ],
     win_criteria: [
       { id:'army',     label:'The Army Will Not March', desc:'You spoke for the marshals as a body and for the soldiers — they will not turn their muskets on Paris.' },
       { id:'coalition',label:'The Coalition\'s Weight', desc:'You named the numbers — Russia, Austria, Prussia, Britain — eight hundred thousand under arms. A victory would not change this.' },
@@ -2015,6 +2059,11 @@ She has read it. Now she has summoned you to her chamber in the Mingtang. The Ta
       'Her sons are weak — both Zhongzong and Ruizong have proven they cannot govern. To leave the Tang line nominal is to leave it as a rallying point for plotters.',
       'Concrete plan — name the era (Tianshou), found the dynasty in honour of the ancient Zhou, appoint Wu kinsmen and trusted Buddhists to the great offices, send tokens of accession to every prefecture.'
     ],
+    clues: [
+      { id:'sutra', title:'The Great Cloud Sutra', body:'No Tang sovereign has ever held explicit Buddhist prophetic sanction. The Maitreya prophecy is hers alone. Argue this is sacred legitimacy of a kind no past dynasty could claim.' },
+      { id:'sons',  title:'Zhongzong and Ruizong cannot rule', body:'Both have proven incapable. To leave the Tang line nominal is to leave it as a rallying point for plotters and pretenders. Argue that half-rule is a standing invitation to civil war.' },
+      { id:'plan',  title:'A specific sequence of accession', body:'Name the era (Tianshou), proclaim the new Zhou, appoint Wu kinsmen and trusted Buddhists to the great offices, send tokens of accession to every prefecture. Empress Wu trusts plans, not auguries alone.' }
+    ],
     win_criteria: [
       { id:'sutra',      label:'Sacred Mandate',      desc:'You invoked the Great Cloud Sutra and the Maitreya prophecy as religious legitimacy no Tang sovereign ever possessed.' },
       { id:'fact',       label:'Rule Already Hers',   desc:'You named the truth — that she has ruled for seven years and the formal title only acknowledges what is.' },
@@ -2101,6 +2150,11 @@ But the warrant has not been sent. For ten days the Queen has paced the Long Gal
       'Continuing danger — Mary has been the focus of Throckmorton, Ridolfi, and Babington. As long as she lives the next plot is being drafted in some Catholic seminary tonight.',
       'The Spanish are coming regardless — Philip\'s preparations for the Armada are already known; sparing Mary will not soften him, dispatching her will not enrage him further.',
       'A specific sequence — the warrant goes from Davison to the Lord Chancellor for the Great Seal, then by trusted courier to the Earls of Shrewsbury and Kent at Fotheringhay, the deed done before the news outpaces it.'
+    ],
+    clues: [
+      { id:'evidence', title:'The Babington letters', body:'Mary\'s own ciphered hand approves the assassination of an anointed queen. There is no sovereign immunity for that act. Argue the evidence itself has already settled the question of guilt.' },
+      { id:'danger',   title:'The plots will continue', body:'Throckmorton, Ridolfi, Babington — name them. As long as Mary lives, the next plot is being drafted tonight in some Catholic seminary. The threat does not end with a reprieve.' },
+      { id:'sequence', title:'The warrant\'s safe path', body:'Davison to the Lord Chancellor for the Great Seal, then by trusted courier to Shrewsbury and Kent at Fotheringhay — the deed done before the news outruns it. Elizabeth needs a concrete chain of custody, not an abstract decision.' }
     ],
     win_criteria: [
       { id:'evidence',  label:'The Evidence is Damning', desc:'You named the Babington letters, the cipher, Mary\'s own hand approving regicide.' },
@@ -2211,17 +2265,19 @@ async function handleStartDialogue(body, env) {
 
   try {
     await env.db.prepare(
-      `INSERT INTO dialogue_sessions (id, user_id, scenario_id, messages, turn_count, status, started_at, conviction, difficulty)
-       VALUES (?, ?, ?, ?, 0, 'active', ?, ?, ?)`
+      `INSERT INTO dialogue_sessions (id, user_id, scenario_id, messages, turn_count, status, started_at, conviction, difficulty, clues_used)
+       VALUES (?, ?, ?, ?, 0, 'active', ?, ?, ?, 0)`
     ).bind(sessionId, userId, scenario_id, JSON.stringify(messages), now, sc.starting_conviction, diffKey).run();
   } catch(e) {
-    return json({ error: 'DB insert failed: ' + e.message + ' — did you run the conviction/difficulty ALTER TABLE migration?' }, 500);
+    return json({ error: 'DB insert failed: ' + e.message + ' — run: ALTER TABLE dialogue_sessions ADD COLUMN clues_used INTEGER DEFAULT 0;' }, 500);
   }
 
   const { character_sheet, ...publicScenario } = sc;
   publicScenario.difficulty = diffKey;
   publicScenario.difficulty_cfg = diffCfg;
   publicScenario.conviction = sc.starting_conviction;
+  // Send clue titles only — bodies are revealed via reveal_dialogue_clue
+  const clueList = (sc.clues || []).map(c => ({ id: c.id, title: c.title }));
 
   return json({
     session_id: sessionId,
@@ -2230,8 +2286,40 @@ async function handleStartDialogue(body, env) {
     started_at: now,
     conviction: sc.starting_conviction,
     win_at: diffCfg.win_at,
-    lose_at: diffCfg.lose_at
+    lose_at: diffCfg.lose_at,
+    clues: clueList,
+    clues_allowed: diffCfg.clues_allowed || 0,
+    clues_used: 0
   }, 200);
+}
+
+async function handleRevealDialogueClue(body, env) {
+  const { session_id, clue_idx } = body;
+  if (!session_id || clue_idx == null) return json({ error: 'Missing fields' }, 400);
+  try {
+    const session = await env.db.prepare(`SELECT * FROM dialogue_sessions WHERE id=?`).bind(session_id).first();
+    if (!session) return json({ error: 'Session not found' }, 404);
+    if (session.status !== 'active') return json({ error: 'Session no longer active' }, 400);
+
+    const sc = DIALOGUE_SCENARIOS[session.scenario_id];
+    if (!sc || !Array.isArray(sc.clues)) return json({ error: 'No clues for this scenario' }, 400);
+
+    const idx = parseInt(clue_idx, 10);
+    if (isNaN(idx) || idx < 0 || idx >= sc.clues.length) return json({ error: 'Invalid clue index' }, 400);
+
+    const diffKey = sc.difficulty_presets[session.difficulty] ? session.difficulty : 'medium';
+    const allowed = sc.difficulty_presets[diffKey].clues_allowed || 0;
+    const used = session.clues_used || 0;
+    if (used >= allowed) return json({ error: 'No clue reveals remaining' }, 400);
+
+    const newUsed = used + 1;
+    await env.db.prepare(`UPDATE dialogue_sessions SET clues_used=? WHERE id=?`).bind(newUsed, session_id).run();
+
+    const clue = sc.clues[idx];
+    return json({ clue: { id: clue.id, title: clue.title, body: clue.body }, clues_used: newUsed, clues_allowed: allowed }, 200);
+  } catch(e) {
+    return json({ error: e.message }, 500);
+  }
 }
 
 async function handleDialogueTurn(body, env, apiKey) {
@@ -2378,6 +2466,7 @@ async function handleJudgeDialogue(body, env, apiKey) {
         criteria_met: JSON.parse(session.criteria_met || '[]'),
         final_reply: finalReply,
         conviction: session.conviction,
+        clues_used: session.clues_used || 0,
         already_judged: true
       }, 200);
     }
@@ -2442,11 +2531,36 @@ Return ONLY valid JSON:
     const criteriaMet = Array.isArray(parsed.criteria_met) ? parsed.criteria_met : [];
     const verdictText = parsed.verdict_text || '';
 
+    // ── XP scoring ───────────────────────────────────────────────
+    const cluesUsed = session.clues_used || 0;
+    const cluesAllowed = diffCfg.clues_allowed || 0;
+    const baseByVerdict = { Convinced: 200, Wavered: 75, Firm: 25 };
+    const diffMult     = { easy: 1.0, medium: 1.5, hard: 2.0 }[diffKey] || 1.0;
+    const cluePenalty  = cluesUsed * 25;
+    const xpEarned     = Math.max(0, Math.round((baseByVerdict[verdict] || 0) * diffMult - cluePenalty));
+
     await env.db.prepare(
       `UPDATE dialogue_sessions SET status='judged', verdict=?, verdict_text=?, criteria_met=?, completed_at=? WHERE id=?`
     ).bind(verdict, verdictText, JSON.stringify(criteriaMet), Math.floor(Date.now()/1000), session_id).run();
 
-    return json({ verdict, verdict_text: verdictText, criteria_met: criteriaMet, final_reply: finalReply, conviction: session.conviction }, 200);
+    // Persist XP to user account if authenticated
+    if (session.user_id && xpEarned > 0) {
+      try {
+        await env.db.prepare(`UPDATE users SET total_xp = COALESCE(total_xp,0) + ? WHERE id=?`).bind(xpEarned, session.user_id).run();
+      } catch(e) { /* non-fatal */ }
+    }
+
+    return json({
+      verdict,
+      verdict_text: verdictText,
+      criteria_met: criteriaMet,
+      final_reply: finalReply,
+      conviction: session.conviction,
+      xp_earned: xpEarned,
+      clues_used: cluesUsed,
+      clues_allowed: cluesAllowed,
+      difficulty: diffKey
+    }, 200);
   } catch(e) {
     return json({ error: e.message }, 500);
   }
