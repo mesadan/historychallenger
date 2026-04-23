@@ -23,9 +23,10 @@ s.textContent=`
   font-family:'Playfair Display',Georgia,serif;
   font-size:17px;font-weight:700;font-style:italic;
   color:#f5edd8;text-decoration:none;letter-spacing:.02em;
-  display:flex;align-items:center;gap:8px;
+  display:flex;align-items:center;gap:10px;
 }
-#hc-nav .hc-logo span{color:#c49020;}
+#hc-nav .hc-logo .hc-wordmark{color:#f5edd8}
+#hc-nav .hc-logo .hc-wordmark > span{color:#c49020}
 #hc-nav .hc-logo-mark{width:22px;height:30px;color:#c49020;flex-shrink:0;display:block}
 #hc-nav .hc-links{display:flex;align-items:center;gap:6px;}
 #hc-nav .hc-link{
@@ -97,7 +98,7 @@ function injectNav(){
   nav.innerHTML = `
     <a href="/" class="hc-logo" aria-label="History Challenger home">
       ${hourglassSvg}
-      <span style="color:#f5edd8">History</span>&nbsp;<span>Challenger</span>
+      <span class="hc-wordmark">History <span>Challenger</span></span>
     </a>
     <div class="hc-links">
       ${linksHtml}
