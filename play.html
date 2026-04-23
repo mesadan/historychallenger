@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Timeline Challenge — Place Historical Events Correctly | History Challenger</title>
+<title>Timeline Challenge, Place Historical Events Correctly | History Challenger</title>
 <meta name="description" content="Place five historical events on a timeline as accurately as possible. From the Bronze Age to the Cold War. Score for order and precision. Free, no signup, always fresh.">
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="Timeline Challenge — Place History in Order">
+<meta property="og:title" content="Timeline Challenge, Place History in Order">
 <meta property="og:description" content="Five historical events, one timeline. How precise can you be across 5,000 years of history?">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://historychallenger.com/play.html">
@@ -263,8 +263,8 @@ html,body{background:#f0e6cc !important;color:#1a150e !important}
 <div class="wrap">
   <div class="card">
     <div class="mets" id="mets" style="display:none;justify-content:flex-end;gap:8px;margin-bottom:1rem">
-      <div class="met"><div class="mv" id="sc">—</div><div class="ml" id="lbl-avg">Avg</div></div>
-      <div class="met"><div class="mv" id="rn">—</div><div class="ml" id="lbl-round">Round</div></div>
+      <div class="met"><div class="mv" id="sc">-</div><div class="ml" id="lbl-avg">Avg</div></div>
+      <div class="met"><div class="mv" id="rn">-</div><div class="ml" id="lbl-round">Round</div></div>
     </div>
     <div id="guest-banner-area"></div>
     <div id="body"></div>
@@ -287,7 +287,7 @@ function setToken(t){localStorage.setItem('hc_token',t);}
 function clearToken(){localStorage.removeItem('hc_token');}
 
 async function initAuth(){
-  // Use token directly — nav.js handles UI. We just need _user for session saving.
+  // Use token directly, nav.js handles UI. We just need _user for session saving.
   const token=getToken();
   if(token){
     try{
@@ -344,7 +344,7 @@ document.addEventListener('click',e=>{
 });
 
 function checkGuestLimit(){
-  return true; // never block — always allow play
+  return true; // never block, always allow play
 }
 
 function recordGuestGame(){
@@ -376,19 +376,19 @@ const T={
   en:{
     subtitle:'Prove your historical mastery',
     avg:'Avg',round:'Round',
-    secI:'I — Difficulty',chooseLevel:'Choose your level',
+    secI:'I, Difficulty',chooseLevel:'Choose your level',
     levelSub:'Three levels based on how events are mixed across historical eras.',
     pathTitle:'How do you want to play?',
     pathRandomTitle:'Random Challenge',pathRandomDesc:'Events are curated and mixed across eras. Your difficulty level controls how they are spread across history.',
-    pathThemeTitle:'Choose a Theme',pathThemeDesc:'Pick an era or type your own theme. AI generates focused events. Difficulty is variable — determined by how much history that theme spans.',
+    pathThemeTitle:'Choose a Theme',pathThemeDesc:'Pick an era or type your own theme. AI generates focused events. Difficulty is variable, determined by how much history that theme spans.',
     pathDisclaimer:'When playing with a theme, difficulty reflects the nature of the topic rather than a fixed setting.',
     secRounds:'Rounds',
-    howToPlay:`<strong style="color:#c8903a">How to play:</strong> You have 5 events. First, identify which is <strong>Earliest</strong> and which is <strong>Most Recent</strong> — drag or tap them into those anchor boxes. This is important: those two events define the full time scale of the round. The bar between them becomes a proportional ruler — if Earliest is 500 BC and Most Recent is 1900 AD, the midpoint of the bar represents roughly 700 AD. Place the remaining 3 events at the correct proportional position along that ruler. Scoring is 50% for getting the order right, 50% for accurate spacing.`,
-    secII:'II — Theme',chooseTheme:'Choose a theme',
-    themeOptional:'— optional, AI generates focused events',
-    themeSub:'Pick an era or topic, or type your own — "Punic Wars", "Space Race", "The Black Death". Without a theme, curated event sets are used.',
+    howToPlay:`<strong style="color:#c8903a">How to play:</strong> You have 5 events. First, identify which is <strong>Earliest</strong> and which is <strong>Most Recent</strong>, drag or tap them into those anchor boxes. This is important: those two events define the full time scale of the round. The bar between them becomes a proportional ruler, if Earliest is 500 BC and Most Recent is 1900 AD, the midpoint of the bar represents roughly 700 AD. Place the remaining 3 events at the correct proportional position along that ruler. Scoring is 50% for getting the order right, 50% for accurate spacing.`,
+    secII:'II, Theme',chooseTheme:'Choose a theme',
+    themeOptional:'(optional, AI generates focused events)',
+    themeSub:'Pick an era or topic, or type your own, "Punic Wars", "Space Race", "The Black Death". Without a theme, curated event sets are used.',
     typePlaceholder:'Or type any theme...',clearBtn:'Clear',
-    secIII:'III — Rounds',
+    secIII:'III, Rounds',
     genStart:'Generate & Start →',startBtn:'Start →',
     earliest:'Earliest',mostRecent:'Most recent',
     tapHint:'Tap a card to select it, then tap where to place it',
@@ -397,8 +397,8 @@ const T={
     barInstr:'Select a card above, then tap the bar to place it',
     placeEvents:'Events to place',allPlaced:'All placed',
     step1:'Step 1 of 2',step2:'Step 2 of 2',
-    step1Instr:'Find the <strong style="color:#c8903a">Earliest</strong> and <strong style="color:#c8903a">Most Recent</strong> events — drag them into the anchor boxes. These two events define the time scale for the round.',
-    step2Instr:'The timeline is now set. Drag the remaining 3 events onto the bar. <em>While dragging, the bracket at your cursor updates live — drop in the right bracket for full marks.</em>',
+    step1Instr:'Find the <strong style="color:#c8903a">Earliest</strong> and <strong style="color:#c8903a">Most Recent</strong> events, drag them into the anchor boxes. These two events define the time scale for the round.',
+    step2Instr:'The timeline is now set. Drag the remaining 3 events onto the bar. <em>While dragging, the bracket at your cursor updates live, drop in the right bracket for full marks.</em>',
     confirmAnchors:'Confirm Anchors →',
     anchorScore:'Anchor score',pts:'pts',
     submitBtn:'Submit',clearAll:'Clear all',menuBtn:'← Menu',
@@ -406,14 +406,14 @@ const T={
     spacing:'Spacing',
     nextRound:'Next round →',finalScore:'Final score →',playAgain:'Play again',
     generatingMsg:'Sourcing events for',generatingWait:'This may take a moment...',
-    connError:'Connection error — please try again.',
-    noSets:'Could not generate events for this theme — try rephrasing it.',
+    connError:'Connection error, please try again.',
+    noSets:'Could not generate events for this theme, try rephrasing it.',
     curatedSets:'Curated sets',
     medals:{90:'🏆 Keeper of Time',70:'⚔️ Master',50:'🕯️ Disciple',0:'📜 Initiate'},
     diffs:{
-      disciple:{label:'Disciple',tag:'Famous events · Wide spans',desc:'A real challenge, but any history buff should feel at home. Events span millennia — forgiving scoring, broad historical knowledge rewarded.'},
+      disciple:{label:'Disciple',tag:'Famous events · Wide spans',desc:'A real challenge, but any history buff should feel at home. Events span millennia, forgiving scoring, broad historical knowledge rewarded.'},
       master:{label:'Master',tag:'Mixed eras · Real knowledge required',desc:'3 events clustered in one era mixed with 2 from very different times. Requires genuine historical knowledge beyond headlines.'},
-      keeper:{label:'Keeper of Time',tag:'Precision · Expert level',desc:'All 5 events from the same tight era — same war, same reign, same decade. Expert precision required.'}
+      keeper:{label:'Keeper of Time',tag:'Precision · Expert level',desc:'All 5 events from the same tight era, same war, same reign, same decade. Expert precision required.'}
     },
     themes:[
       {label:'Bronze Age',q:'the Bronze Age civilizations: Mesopotamia, Egypt, Mycenae, Hittites, Indus Valley'},
@@ -435,19 +435,19 @@ const T={
   fr:{
     subtitle:'Prouvez votre maîtrise historique',
     avg:'Moy.',round:'Manche',
-    secI:'I — Difficulté',chooseLevel:'Choisissez votre niveau',
+    secI:'I, Difficulté',chooseLevel:'Choisissez votre niveau',
     levelSub:'Trois niveaux basés sur la façon dont les événements sont mélangés entre les époques.',
     pathTitle:'Comment voulez-vous jouer ?',
-    pathRandomTitle:'Défi aléatoire',pathRandomDesc:'Les événements sont sélectionnés et mélangés entre époques. Choisissez votre niveau — il contrôle comment les événements sont répartis dans l\'histoire.',
+    pathRandomTitle:'Défi aléatoire',pathRandomDesc:'Les événements sont sélectionnés et mélangés entre époques. Choisissez votre niveau, il contrôle comment les événements sont répartis dans l\'histoire.',
     pathThemeTitle:'Choisir un thème',pathThemeDesc:'Choisissez une époque ou tapez votre propre thème. L\'IA génère des événements ciblés. La difficulté est variable selon l\'étendue historique du thème.',
     pathDisclaimer:'Avec un thème, la difficulté reflète la nature du sujet plutôt qu\'un réglage fixe.',
     secRounds:'Manches',
-    howToPlay:`<strong style="color:#c8903a">Comment jouer :</strong> Vous avez 5 événements. D'abord, identifiez lequel est le <strong>plus ancien</strong> et lequel est le <strong>plus récent</strong> — faites-les glisser dans les cases d'ancrage. Ces deux événements définissent l'échelle de temps du round. La barre entre eux devient une règle proportionnelle — si le plus ancien est en 500 av. J.-C. et le plus récent en 1900, le milieu de la barre représente environ 700 apr. J.-C. Placez les 3 autres événements à la bonne position proportionnelle. Le score est 50% pour l'ordre, 50% pour l'espacement.`,
-    secII:'II — Thème',chooseTheme:'Choisissez un thème',
-    themeOptional:'— facultatif, l\'IA génère des événements ciblés',
-    themeSub:'Choisissez une époque ou tapez votre propre thème — "Guerres puniques", "Course spatiale", "La Peste noire". Sans thème, des séries présélectionnées sont utilisées.',
+    howToPlay:`<strong style="color:#c8903a">Comment jouer :</strong> Vous avez 5 événements. D'abord, identifiez lequel est le <strong>plus ancien</strong> et lequel est le <strong>plus récent</strong>, faites-les glisser dans les cases d'ancrage. Ces deux événements définissent l'échelle de temps du round. La barre entre eux devient une règle proportionnelle, si le plus ancien est en 500 av. J.-C. et le plus récent en 1900, le milieu de la barre représente environ 700 apr. J.-C. Placez les 3 autres événements à la bonne position proportionnelle. Le score est 50% pour l'ordre, 50% pour l'espacement.`,
+    secII:'II, Thème',chooseTheme:'Choisissez un thème',
+    themeOptional:'(facultatif, l\'IA génère des événements ciblés)',
+    themeSub:'Choisissez une époque ou tapez votre propre thème, "Guerres puniques", "Course spatiale", "La Peste noire". Sans thème, des séries présélectionnées sont utilisées.',
     typePlaceholder:'Ou tapez un thème...',clearBtn:'Effacer',
-    secIII:'III — Manches',
+    secIII:'III, Manches',
     genStart:'Générer & Commencer →',startBtn:'Commencer →',
     earliest:'Le plus ancien',mostRecent:'Le plus récent',
     tapHint:'Appuyez sur une carte pour la sélectionner, puis appuyez où la placer',
@@ -456,8 +456,8 @@ const T={
     barInstr:'Sélectionnez une carte, puis appuyez sur la barre',
     placeEvents:'Événements à placer',allPlaced:'Tout placé',
     step1:'Étape 1 sur 2',step2:'Étape 2 sur 2',
-    step1Instr:'Trouvez l\'événement le plus <strong style="color:#c8903a">ancien</strong> et le plus <strong style="color:#c8903a">récent</strong> — faites-les glisser dans les cases. Ces deux événements définissent l\'échelle de temps de la manche.',
-    step2Instr:'La ligne du temps est définie. Faites glisser les 3 événements restants sur la barre. <em>En faisant glisser, l\'intervalle se met à jour en direct — déposez dans le bon intervalle pour les points complets.</em>',
+    step1Instr:'Trouvez l\'événement le plus <strong style="color:#c8903a">ancien</strong> et le plus <strong style="color:#c8903a">récent</strong>, faites-les glisser dans les cases. Ces deux événements définissent l\'échelle de temps de la manche.',
+    step2Instr:'La ligne du temps est définie. Faites glisser les 3 événements restants sur la barre. <em>En faisant glisser, l\'intervalle se met à jour en direct, déposez dans le bon intervalle pour les points complets.</em>',
     confirmAnchors:'Confirmer les ancres →',
     anchorScore:'Score des ancres',pts:'pts',
     submitBtn:'Valider',clearAll:'Tout effacer',menuBtn:'← Menu',
@@ -465,14 +465,14 @@ const T={
     spacing:'Espacement',
     nextRound:'Manche suivante →',finalScore:'Score final →',playAgain:'Rejouer',
     generatingMsg:'Recherche d\'événements pour',generatingWait:'Cela peut prendre un moment...',
-    connError:'Erreur de connexion — veuillez réessayer.',
-    noSets:'Impossible de générer des événements — essayez de reformuler le thème.',
+    connError:'Erreur de connexion, veuillez réessayer.',
+    noSets:'Impossible de générer des événements, essayez de reformuler le thème.',
     curatedSets:'Séries présélectionnées',
     medals:{90:'🏆 Gardien du Temps',70:'⚔️ Maître',50:'🕯️ Disciple',0:'📜 Initié'},
     diffs:{
-      disciple:{label:'Disciple',tag:'Époques mixtes · Événements célèbres',desc:"Un vrai défi, mais tout passionné d'histoire devrait s'y retrouver. Les événements couvrent des millénaires — scoring généreux, culture historique large récompensée."},
+      disciple:{label:'Disciple',tag:'Époques mixtes · Événements célèbres',desc:"Un vrai défi, mais tout passionné d'histoire devrait s'y retrouver. Les événements couvrent des millénaires, scoring généreux, culture historique large récompensée."},
       master:{label:'Maître',tag:'Défi mixte · Vraie connaissance requise',desc:"3 événements groupés dans une même époque, mélangés à 2 d'époques très différentes. Vraies connaissances historiques requises."},
-      keeper:{label:'Gardien du Temps',tag:'Précision · Niveau expert',desc:"Les 5 événements de la même période étroite — même guerre, même règne, même décennie. Précision d'expert requise."}
+      keeper:{label:'Gardien du Temps',tag:'Précision · Niveau expert',desc:"Les 5 événements de la même période étroite, même guerre, même règne, même décennie. Précision d'expert requise."}
     },
     themes:[
       {label:'Âge du Bronze',q:'les civilizations de l\'Âge du Bronze: Mésopotamie, Égypte, Mycènes, Hittites, Vallée de l\'Indus'},
@@ -494,19 +494,19 @@ const T={
   de:{
     subtitle:'Beweisen Sie Ihr historisches Wissen',
     avg:'Ø',round:'Runde',
-    secI:'I — Schwierigkeit',chooseLevel:'Wählen Sie Ihr Niveau',
+    secI:'I, Schwierigkeit',chooseLevel:'Wählen Sie Ihr Niveau',
     levelSub:'Drei Stufen basierend darauf, wie Ereignisse über historische Epochen gemischt werden.',
     pathTitle:'Wie möchten Sie spielen?',
-    pathRandomTitle:'Zufällige Herausforderung',pathRandomDesc:'Ereignisse sind kuratiert und epochengemischt. Wählen Sie Ihren Schwierigkeitsgrad — er bestimmt, wie Ereignisse über die Geschichte verteilt sind.',
+    pathRandomTitle:'Zufällige Herausforderung',pathRandomDesc:'Ereignisse sind kuratiert und epochengemischt. Wählen Sie Ihren Schwierigkeitsgrad, er bestimmt, wie Ereignisse über die Geschichte verteilt sind.',
     pathThemeTitle:'Thema wählen',pathThemeDesc:'Wählen Sie eine Epoche oder geben Sie Ihr eigenes Thema ein. KI generiert gezielte Ereignisse. Die Schwierigkeit variiert je nach historischer Reichweite des Themas.',
     pathDisclaimer:'Mit einem Thema spiegelt der Schwierigkeitsgrad die Natur des Themas wider, keine feste Einstellung.',
     secRounds:'Runden',
-    howToPlay:`<strong style="color:#c8903a">Spielanleitung:</strong> Sie haben 5 Ereignisse. Bestimmen Sie zuerst, welches das <strong>früheste</strong> und welches das <strong>neueste</strong> ist — ziehen Sie diese in die Ankerboxen. Diese zwei Ereignisse definieren den Zeitmaßstab der Runde. Die Leiste wird zur proportionalen Skala — liegt das früheste bei 500 v. Chr. und das neueste bei 1900, entspricht die Mitte etwa 700 n. Chr. Platzieren Sie die restlichen 3 Ereignisse proportional korrekt. 50% der Punkte für die Reihenfolge, 50% für den Abstand.`,
-    secII:'II — Thema',chooseTheme:'Wählen Sie ein Thema',
-    themeOptional:'— optional, KI generiert gezielte Ereignisse',
-    themeSub:'Wählen Sie eine Epoche oder geben Sie Ihr eigenes Thema ein — "Punische Kriege", "Wettlauf ins All". Ohne Thema werden kuratierte Ereignissets verwendet.',
+    howToPlay:`<strong style="color:#c8903a">Spielanleitung:</strong> Sie haben 5 Ereignisse. Bestimmen Sie zuerst, welches das <strong>früheste</strong> und welches das <strong>neueste</strong> ist, ziehen Sie diese in die Ankerboxen. Diese zwei Ereignisse definieren den Zeitmaßstab der Runde. Die Leiste wird zur proportionalen Skala, liegt das früheste bei 500 v. Chr. und das neueste bei 1900, entspricht die Mitte etwa 700 n. Chr. Platzieren Sie die restlichen 3 Ereignisse proportional korrekt. 50% der Punkte für die Reihenfolge, 50% für den Abstand.`,
+    secII:'II, Thema',chooseTheme:'Wählen Sie ein Thema',
+    themeOptional:'(optional, KI generiert gezielte Ereignisse)',
+    themeSub:'Wählen Sie eine Epoche oder geben Sie Ihr eigenes Thema ein, "Punische Kriege", "Wettlauf ins All". Ohne Thema werden kuratierte Ereignissets verwendet.',
     typePlaceholder:'Oder Thema eingeben...',clearBtn:'Löschen',
-    secIII:'III — Runden',
+    secIII:'III, Runden',
     genStart:'Generieren & Starten →',startBtn:'Starten →',
     earliest:'Frühestes',mostRecent:'Neuestes',
     tapHint:'Tippen Sie eine Karte an, dann tippen Sie wo sie platziert werden soll',
@@ -515,8 +515,8 @@ const T={
     barInstr:'Karte auswählen, dann auf die Leiste tippen',
     placeEvents:'Zu platzierende Ereignisse',allPlaced:'Alle platziert',
     step1:'Schritt 1 von 2',step2:'Schritt 2 von 2',
-    step1Instr:'Finden Sie das <strong style="color:#c8903a">früheste</strong> und das <strong style="color:#c8903a">neueste</strong> Ereignis — ziehen Sie sie in die Ankerboxen. Diese zwei Ereignisse legen den Zeitmaßstab der Runde fest.',
-    step2Instr:'Die Zeitlinie ist festgelegt. Ziehen Sie die verbleibenden 3 Ereignisse auf die Leiste. <em>Beim Ziehen aktualisiert sich das Intervall live — lassen Sie im richtigen Intervall los für volle Punkte.</em>',
+    step1Instr:'Finden Sie das <strong style="color:#c8903a">früheste</strong> und das <strong style="color:#c8903a">neueste</strong> Ereignis, ziehen Sie sie in die Ankerboxen. Diese zwei Ereignisse legen den Zeitmaßstab der Runde fest.',
+    step2Instr:'Die Zeitlinie ist festgelegt. Ziehen Sie die verbleibenden 3 Ereignisse auf die Leiste. <em>Beim Ziehen aktualisiert sich das Intervall live, lassen Sie im richtigen Intervall los für volle Punkte.</em>',
     confirmAnchors:'Anker bestätigen →',
     anchorScore:'Ankerpunkte',pts:'Pkt',
     submitBtn:'Einreichen',clearAll:'Alles löschen',menuBtn:'← Menü',
@@ -524,14 +524,14 @@ const T={
     spacing:'Abstand',
     nextRound:'Nächste Runde →',finalScore:'Endergebnis →',playAgain:'Nochmal spielen',
     generatingMsg:'Ereignisse werden gesucht für',generatingWait:'Dies kann einen Moment dauern...',
-    connError:'Verbindungsfehler — bitte erneut versuchen.',
-    noSets:'Keine Ereignisse für dieses Thema gefunden — bitte anders formulieren.',
+    connError:'Verbindungsfehler, bitte erneut versuchen.',
+    noSets:'Keine Ereignisse für dieses Thema gefunden, bitte anders formulieren.',
     curatedSets:'Kuratierte Sets',
     medals:{90:'🏆 Hüter der Zeit',70:'⚔️ Meister',50:'🕯️ Schüler',0:'📜 Novize'},
     diffs:{
-      disciple:{label:'Schüler',tag:'Epochenmix · Bekannte Ereignisse',desc:'Eine echte Herausforderung, aber wer Geschichtsbegeistert ist, sollte sich wohlfühlen. Ereignisse über Jahrtausende — großzügige Wertung, breites Wissen belohnt.'},
+      disciple:{label:'Schüler',tag:'Epochenmix · Bekannte Ereignisse',desc:'Eine echte Herausforderung, aber wer Geschichtsbegeistert ist, sollte sich wohlfühlen. Ereignisse über Jahrtausende, großzügige Wertung, breites Wissen belohnt.'},
       master:{label:'Meister',tag:'Gemischte Herausforderung · Echtes Wissen nötig',desc:'3 Ereignisse aus einer Epoche gemischt mit 2 aus sehr unterschiedlichen Zeiten. Echtes historisches Wissen erforderlich.'},
-      keeper:{label:'Hüter der Zeit',tag:'Präzision · Expertenniveau',desc:'Alle 5 Ereignisse aus derselben engen Periode — gleicher Krieg, gleiche Herrschaft, gleiche Dekade. Nur für Experten.'}
+      keeper:{label:'Hüter der Zeit',tag:'Präzision · Expertenniveau',desc:'Alle 5 Ereignisse aus derselben engen Periode, gleicher Krieg, gleiche Herrschaft, gleiche Dekade. Nur für Experten.'}
     },
     themes:[
       {label:'Bronzezeit',q:'die Bronzezeit-Zivilisationen: Mesopotamien, Ägypten, Mykene, Hethiter, Indus-Tal'},
@@ -553,19 +553,19 @@ const T={
   es:{
     subtitle:'Demuestra tu dominio histórico',
     avg:'Prom.',round:'Ronda',
-    secI:'I — Dificultad',chooseLevel:'Elige tu nivel',
+    secI:'I, Dificultad',chooseLevel:'Elige tu nivel',
     levelSub:'Tres niveles basados en cómo se mezclan los eventos entre épocas históricas.',
     pathTitle:'¿Cómo quieres jugar?',
-    pathRandomTitle:'Desafío aleatorio',pathRandomDesc:'Los eventos son seleccionados y mezclados entre épocas. Elige tu nivel de dificultad — controla cómo se distribuyen los eventos en la historia.',
+    pathRandomTitle:'Desafío aleatorio',pathRandomDesc:'Los eventos son seleccionados y mezclados entre épocas. Elige tu nivel de dificultad, controla cómo se distribuyen los eventos en la historia.',
     pathThemeTitle:'Elegir un tema',pathThemeDesc:'Elige una época o escribe tu propio tema. La IA genera eventos enfocados. La dificultad es variable según el alcance histórico del tema.',
     pathDisclaimer:'Con un tema, la dificultad refleja la naturaleza del tema en lugar de un ajuste fijo.',
     secRounds:'Rondas',
-    howToPlay:`<strong style="color:#c8903a">Cómo jugar:</strong> Tienes 5 eventos. Primero identifica cuál es el <strong>más antiguo</strong> y cuál es el <strong>más reciente</strong> — arrástralos a las casillas de anclaje. Esos dos eventos definen la escala de tiempo de la ronda. La barra entre ellos se convierte en una regla proporcional — si el más antiguo es 500 a.C. y el más reciente es 1900, el punto medio de la barra representa aproximadamente el año 700. Coloca los 3 eventos restantes en la posición proporcional correcta. 50% de puntos por el orden, 50% por el espaciado.`,
-    secII:'II — Tema',chooseTheme:'Elige un tema',
-    themeOptional:'— opcional, la IA genera eventos enfocados',
-    themeSub:'Elige una época o escribe tu propio tema — "Guerras púnicas", "Carrera espacial", "La Peste Negra". Sin tema, se usan conjuntos seleccionados.',
+    howToPlay:`<strong style="color:#c8903a">Cómo jugar:</strong> Tienes 5 eventos. Primero identifica cuál es el <strong>más antiguo</strong> y cuál es el <strong>más reciente</strong>, arrástralos a las casillas de anclaje. Esos dos eventos definen la escala de tiempo de la ronda. La barra entre ellos se convierte en una regla proporcional, si el más antiguo es 500 a.C. y el más reciente es 1900, el punto medio de la barra representa aproximadamente el año 700. Coloca los 3 eventos restantes en la posición proporcional correcta. 50% de puntos por el orden, 50% por el espaciado.`,
+    secII:'II, Tema',chooseTheme:'Elige un tema',
+    themeOptional:'(opcional, la IA genera eventos enfocados)',
+    themeSub:'Elige una época o escribe tu propio tema, "Guerras púnicas", "Carrera espacial", "La Peste Negra". Sin tema, se usan conjuntos seleccionados.',
     typePlaceholder:'O escribe cualquier tema...',clearBtn:'Borrar',
-    secIII:'III — Rondas',
+    secIII:'III, Rondas',
     genStart:'Generar & Empezar →',startBtn:'Empezar →',
     earliest:'El más antiguo',mostRecent:'El más reciente',
     tapHint:'Toca una carta para seleccionarla, luego toca donde colocarla',
@@ -574,8 +574,8 @@ const T={
     barInstr:'Selecciona una carta, luego toca la barra para colocarla',
     placeEvents:'Eventos a colocar',allPlaced:'Todo colocado',
     step1:'Paso 1 de 2',step2:'Paso 2 de 2',
-    step1Instr:'Encuentra el evento más <strong style="color:#c8903a">antiguo</strong> y el más <strong style="color:#c8903a">reciente</strong> — arrástralos a las casillas. Estos dos eventos definen la escala de tiempo de la ronda.',
-    step2Instr:'La línea de tiempo está establecida. Arrastra los 3 eventos restantes a la barra. <em>Al arrastrar, el intervalo en tu cursor se actualiza en vivo — suelta en el intervalo correcto para los puntos completos.</em>',
+    step1Instr:'Encuentra el evento más <strong style="color:#c8903a">antiguo</strong> y el más <strong style="color:#c8903a">reciente</strong>, arrástralos a las casillas. Estos dos eventos definen la escala de tiempo de la ronda.',
+    step2Instr:'La línea de tiempo está establecida. Arrastra los 3 eventos restantes a la barra. <em>Al arrastrar, el intervalo en tu cursor se actualiza en vivo, suelta en el intervalo correcto para los puntos completos.</em>',
     confirmAnchors:'Confirmar anclajes →',
     anchorScore:'Puntuación de anclajes',pts:'pts',
     submitBtn:'Enviar',clearAll:'Borrar todo',menuBtn:'← Menú',
@@ -583,14 +583,14 @@ const T={
     spacing:'Espaciado',
     nextRound:'Siguiente ronda →',finalScore:'Puntuación final →',playAgain:'Jugar de nuevo',
     generatingMsg:'Buscando eventos para',generatingWait:'Esto puede tardar un momento...',
-    connError:'Error de conexión — por favor inténtalo de nuevo.',
-    noSets:'No se pudieron generar eventos para este tema — intenta reformularlo.',
+    connError:'Error de conexión, por favor inténtalo de nuevo.',
+    noSets:'No se pudieron generar eventos para este tema, intenta reformularlo.',
     curatedSets:'Conjuntos seleccionados',
     medals:{90:'🏆 Guardián del Tiempo',70:'⚔️ Maestro',50:'🕯️ Discípulo',0:'📜 Iniciado'},
     diffs:{
-      disciple:{label:'Discípulo',tag:'Épocas mixtas · Eventos famosos',desc:'Un verdadero desafío, pero cualquier apasionado de la historia debería sentirse cómodo. Eventos a lo largo de milenios — puntuación generosa, amplia cultura histórica recompensada.'},
+      disciple:{label:'Discípulo',tag:'Épocas mixtas · Eventos famosos',desc:'Un verdadero desafío, pero cualquier apasionado de la historia debería sentirse cómodo. Eventos a lo largo de milenios, puntuación generosa, amplia cultura histórica recompensada.'},
       master:{label:'Maestro',tag:'Desafío mixto · Conocimiento real requerido',desc:'3 eventos agrupados en una época mezclados con 2 de tiempos muy diferentes. Se requiere conocimiento histórico genuino.'},
-      keeper:{label:'Guardián del Tiempo',tag:'Precisión · Nivel experto',desc:'Los 5 eventos del mismo período estrecho — misma guerra, mismo reinado, misma década. Solo para expertos.'}
+      keeper:{label:'Guardián del Tiempo',tag:'Precisión · Nivel experto',desc:'Los 5 eventos del mismo período estrecho, misma guerra, mismo reinado, misma década. Solo para expertos.'}
     },
     themes:[
       {label:'Edad del Bronce',q:'las civilizaciones de la Edad del Bronce: Mesopotamia, Egipto, Micenas, Hititas, Valle del Indo'},
@@ -624,16 +624,16 @@ function setLang(l){
   document.getElementById('ttl-sub').textContent=t('subtitle');
   document.getElementById('lbl-avg').textContent=t('avg');
   document.getElementById('lbl-round').textContent=t('round');
-  // Reset everything when language changes — events must be regenerated in new language
+  // Reset everything when language changes, events must be regenerated in new language
   S.path=null;S.theme=null;S.customTheme='';S.generatedSets=[];S.diff=null;
   renderSetup();
 }
 
 /* ── GAME DATA ── */
-// All events generated fresh by AI — no preset data
+// All events generated fresh by AI, no preset data
 
 // Returns the 50-year grid bucket a year falls into
-// Difficulty multipliers — Disciple is more forgiving, Keeper is strict
+// Difficulty multipliers, Disciple is more forgiving, Keeper is strict
 function diffMult(diff){return diff==='disciple'?3:diff==='master'?1.5:1;}
 
 // Dynamic bracket size based on timeline span and difficulty
@@ -646,7 +646,7 @@ function bracketSize(span,diff){
   if(s>20)return 5*m;
   return Math.max(1,m);
 }
-// Max error before score hits zero — scales with difficulty
+// Max error before score hits zero, scales with difficulty
 function maxErr(span,diff){
   const m=diffMult(diff||S.diff||'keeper');
   return Math.max(2,Math.round(span*0.25*m));
@@ -735,8 +735,8 @@ function hideOverlay(){
 }
 
 function renderSetup(){
-  document.getElementById('rn').textContent='—';
-  document.getElementById('sc').textContent='—';
+  document.getElementById('rn').textContent='-';
+  document.getElementById('sc').textContent='-';
   const m=document.getElementById('mets');if(m)m.style.display='none';
   const diffKeys=['disciple','master','keeper'];
   const roundOpts=[1,3,5,8];
@@ -881,13 +881,13 @@ async function startSeries(){
     const isPreset=S.theme!==null&&!S.customTheme;
     showOverlay(t('generatingMsg')+' <strong style="color:#fff">'+activeLabel()+'</strong><br><br>'+t('generatingWait'));
     if(isPreset){
-      // Preset theme chip — try pool first, fall back to live
+      // Preset theme chip, try pool first, fall back to live
       const themeSlug=diff+'_theme_'+S.theme;
       const ok=await loadFromPool(diff,Math.min(S.rounds,10),themeSlug,themeQ);
       hideOverlay();
       if(!ok)return;
     } else {
-      // Custom text theme — always live
+      // Custom text theme, always live
       const ok=await callGenerate({theme:themeQ,diff,rounds:Math.min(S.rounds,10),lang:LANG});
       hideOverlay();
       if(!ok)return;
@@ -918,7 +918,7 @@ async function loadFromPool(diff, needed, themeSlug, themeQ){
   try{
     const token=getToken();
     const seenIds=[..._seenSetIds];
-    // Pool is always stored in English — request English sets then translate
+    // Pool is always stored in English, request English sets then translate
     const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({action:'get_sets',diff,lang:'en',needed,token,seen_ids:seenIds,theme_slug:themeSlug||null})});
     const data=await res.json();
@@ -940,7 +940,7 @@ async function loadFromPool(diff, needed, themeSlug, themeQ){
       return true;
     }
 
-    // Need more — generate the rest live (in correct language)
+    // Need more, generate the rest live (in correct language)
     const stillNeeded=data.needs_more;
     if(themeSlug&&themeQ){
       const liveRes=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
@@ -1030,7 +1030,7 @@ function startRound(){
   renderStep1();
 }
 
-function updSc(){document.getElementById('sc').textContent=S.roundsPlayed>0?Math.round(S.totalPct/S.roundsPlayed)+'%':'—';}
+function updSc(){document.getElementById('sc').textContent=S.roundsPlayed>0?Math.round(S.totalPct/S.roundsPlayed)+'%':'-';}
 function isMobile(){return window.innerWidth<600;}
 
 /* ── STEP 1: ANCHOR PHASE ── */
@@ -1287,7 +1287,7 @@ function doSubmit(){
   const middle=sorted.slice(1,4);
   const iP={};middle.forEach(e=>{iP[e.id]=(e.year-minY)/range;});
 
-  // Dynamic scoring — bracket and max error scale with timeline span and difficulty
+  // Dynamic scoring, bracket and max error scale with timeline span and difficulty
   const ME=maxErr(range,S.diff);
   const bs=Math.round(bracketSize(range,S.diff));
   let spacingPts=0;const sPer={};const bracketOk={};
@@ -1322,7 +1322,7 @@ function doSubmit(){
   const anchorRows=sorted.filter((_,i)=>i===0||i===4).map((ev,i)=>{
     const ok=i===0?lCorrect:rCorrect;
     const label=i===0?t('earliest'):t('mostRecent');
-    return `<div class="res-row"><div class="dot ${ok?'ok':'bad'}">${ok?'✓':'✗'}</div><div><span style="font-weight:700;color:#ffffff">${yr(ev.year)} — ${ev.name}</span><br><span style="color:#666;font-size:12px">${ev.desc}</span><br><span style="font-size:12px;color:#444">${label} · ${ok?20:0}/20 ${t('pts')}</span></div></div>`;
+    return `<div class="res-row"><div class="dot ${ok?'ok':'bad'}">${ok?'✓':'✗'}</div><div><span style="font-weight:700;color:#ffffff">${yr(ev.year)}, ${ev.name}</span><br><span style="color:#666;font-size:12px">${ev.desc}</span><br><span style="font-size:12px;color:#444">${label} · ${ok?20:0}/20 ${t('pts')}</span></div></div>`;
   }).join('');
 
   const middleRows=middle.map(ev=>{
@@ -1334,7 +1334,7 @@ function doSubmit(){
     const unitLabel=bs===1?'yr':(bs<20?'yrs':'yr');
     const bracketLabel=bs===1?`±1 ${unitLabel}`:`±${bs} ${unitLabel} brackets`;
     const errStr=errYears===0?'Spot on':(ok?`Within ${bracketLabel} ✓`:`~${errYears} yr off`);
-    return `<div class="res-row"><div class="dot ${ok?'ok':sp>0?'ok':'bad'}">${sp===20?'✓':sp>0?'~':'✗'}</div><div><span style="font-weight:700;color:#ffffff">${yr(ev.year)} — ${ev.name}</span><br><span style="color:#666;font-size:12px">${ev.desc}</span><br><span style="font-size:12px;color:#444">${sp}/20 ${t('pts')} · ${ok?'Correct bracket ('+bracket+')':errStr+' · Correct: '+bracket}</span></div></div>`;
+    return `<div class="res-row"><div class="dot ${ok?'ok':sp>0?'ok':'bad'}">${sp===20?'✓':sp>0?'~':'✗'}</div><div><span style="font-weight:700;color:#ffffff">${yr(ev.year)}, ${ev.name}</span><br><span style="color:#666;font-size:12px">${ev.desc}</span><br><span style="font-size:12px;color:#444">${sp}/20 ${t('pts')} · ${ok?'Correct bracket ('+bracket+')':errStr+' · Correct: '+bracket}</span></div></div>`;
   }).join('');
 
   const isLast=S.round+1>=S.rounds;

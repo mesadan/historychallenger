@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>History Quotient — Test Your Depth of Historical Knowledge | History Challenger</title>
+<title>History Quotient | Test Your Depth of Historical Knowledge</title>
 <meta name="description" content="An adaptive history quiz: 30 questions, 5 difficulty levels. Questions adjust to your level in real time. Earn a score from 0 to 990 that reflects how much history you really know.">
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="History Quotient — Test Your Depth of Historical Knowledge">
-<meta property="og:description" content="Thirty adaptive questions across every era. Your score reflects not what you remember — but what you really know.">
+<meta property="og:title" content="History Quotient | Test Your Depth of Historical Knowledge">
+<meta property="og:description" content="Thirty adaptive questions across every era. Your score reflects not what you remember, but what you really know.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://historychallenger.com/hq.html">
 <meta name="twitter:card" content="summary_large_image">
@@ -139,13 +139,13 @@ const FEEDBACK_MS = 1800;
 
 const HQ_BANDS = [
   {min:950,label:'Master Historian',desc:'An extraordinary command of history spanning all eras and regions. Truly exceptional.',color:'#e8d060'},
-  {min:850,label:'Expert Historian', desc:'Deep specialist knowledge — you would hold your own in academic discussion.',color:'#c8903a'},
+  {min:850,label:'Expert Historian', desc:'Deep specialist knowledge. You would hold your own in academic discussion.',color:'#c8903a'},
   {min:750,label:'Historian',        desc:'Exceptional breadth and depth well beyond the typical enthusiast.',color:'#a07828'},
   {min:650,label:'Scholar',          desc:'Serious history buff with strong command of detail across many periods.',color:'#5acc8a'},
   {min:500,label:'Knowledgeable',    desc:'A genuine history enthusiast with solid knowledge across multiple eras.',color:'#4a9a6a'},
   {min:350,label:'Informed',         desc:'Above-average knowledge with good grounding in major historical events.',color:'#6888cc'},
   {min:200,label:'Apprentice',       desc:'Basic history knowledge with clear room to grow.',color:'#8888aa'},
-  {min:0,  label:'Novice',           desc:'Just starting your history journey — keep exploring!',color:'#888'},
+  {min:0,  label:'Novice',           desc:'Just starting your history journey. Keep exploring.',color:'#888'},
 ];
 function getBand(hq){return HQ_BANDS.find(b=>hq>=b.min)||HQ_BANDS[HQ_BANDS.length-1];}
 function getToken(){return localStorage.getItem('hc_token');}
@@ -277,7 +277,7 @@ function renderReview(){
       <div class="review-title">Review · ${wrongs.length} wrong answer${wrongs.length===1?'':'s'}</div>
       <button class="review-back" onclick="backToResult()">← Back to result</button>
     </div>
-    ${wrongs.length ? cards : '<div class="review-empty">A clean run — nothing to review.</div>'}
+    ${wrongs.length ? cards : '<div class="review-empty">A clean run. Nothing to review.</div>'}
     <div style="text-align:center;margin-top:1.5rem">
       <button class="review-back" onclick="backToResult()">← Back to result</button>
     </div>

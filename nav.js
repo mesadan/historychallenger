@@ -1,5 +1,5 @@
 /**
- * History Challenger — Shared Auth + Parchment Nav
+ * History Challenger, Shared Auth + Parchment Nav
  */
 (function(){
 const WORKER='https://histroychallenger-api.maletethan.workers.dev';
@@ -21,10 +21,12 @@ s.textContent=`
 }
 #hc-nav .hc-logo{
   font-family:'Playfair Display',Georgia,serif;
-  font-size:17px;font-weight:400;font-style:italic;
+  font-size:17px;font-weight:700;font-style:italic;
   color:#f5edd8;text-decoration:none;letter-spacing:.02em;
+  display:flex;align-items:center;gap:8px;
 }
 #hc-nav .hc-logo span{color:#c49020;}
+#hc-nav .hc-logo-mark{width:22px;height:30px;color:#c49020;flex-shrink:0;display:block}
 #hc-nav .hc-links{display:flex;align-items:center;gap:6px;}
 #hc-nav .hc-link{
   color:#9a8060;font-size:14px;text-decoration:none;
@@ -82,8 +84,21 @@ function injectNav(){
     const active = path.includes(l.key) ? ' active' : '';
     return `<a href="${l.href}" class="hc-link${active}">${l.label}</a>`;
   }).join('');
+  const hourglassSvg = `
+    <svg class="hc-logo-mark" viewBox="0 0 80 110" aria-hidden="true" focusable="false">
+      <g transform="skewX(-10) translate(8,0)">
+        <rect x="6" y="6" width="60" height="5" rx="1" fill="currentColor"/>
+        <path d="M 9 12 L 63 12 L 38 55 Z" fill="currentColor"/>
+        <path d="M 38 55 L 63 98 L 9 98 Z" fill="currentColor"/>
+        <rect x="6" y="99" width="60" height="5" rx="1" fill="currentColor"/>
+        <rect x="37" y="48" width="2" height="14" fill="currentColor" opacity=".4"/>
+      </g>
+    </svg>`;
   nav.innerHTML = `
-    <a href="/" class="hc-logo">History <span>Challenger</span></a>
+    <a href="/" class="hc-logo" aria-label="History Challenger home">
+      ${hourglassSvg}
+      <span style="color:#f5edd8">History</span>&nbsp;<span>Challenger</span>
+    </a>
     <div class="hc-links">
       ${linksHtml}
       <div id="nav-auth-area"></div>
@@ -147,7 +162,7 @@ function render(user){
       <div class="hcn-menu" id="hcn-menu">
         <div class="hcn-menu-stats">
           <div><span class="hcn-sv">${user.total_games||0}</span><span class="hcn-sl">Games</span></div>
-          <div><span class="hcn-sv">${user.avg_score?Math.round(user.avg_score)+'%':'—'}</span><span class="hcn-sl">Avg</span></div>
+          <div><span class="hcn-sv">${user.avg_score?Math.round(user.avg_score)+'%':'-'}</span><span class="hcn-sl">Avg</span></div>
           <div><span class="hcn-sv">${user.current_streak||0}</span><span class="hcn-sl">Streak</span></div>
         </div>
         <hr class="hcn-hr">

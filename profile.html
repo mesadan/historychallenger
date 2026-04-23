@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Profile — History Challenger</title>
+<title>My Profile | History Challenger</title>
 <meta name="robots" content="noindex">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -205,7 +205,7 @@ async function saveProfileAvatar(){
       body:JSON.stringify({action:'update_profile',token:getToken(),avatar})});
     const d=await res.json();
     if(d.ok){
-      msg.textContent='Picture updated — reload to see it.';
+      msg.textContent='Picture updated. Reload to see it.';
       setTimeout(()=>{msg.textContent='';},3000);
     } else { msg.textContent=d.error||'Error saving'; }
   }catch(e){ msg.textContent='Network error'; }
@@ -268,7 +268,7 @@ function renderProfile(data){
   const {user, sessions, history, breakdown} = data;
   const avg = user.avg_score || 0;
 
-  // Chart — 10 most recent, displayed oldest → newest (left → right)
+  // Chart: 10 most recent, displayed oldest to newest (left to right)
   const chartItems = [...(history||[])].slice(0,10).reverse();
   let chartHTML = '';
   if(chartItems.length===0){
@@ -337,7 +337,7 @@ function renderProfile(data){
     </div>
   </div>` : '';
 
-  // Sessions — last 10
+  // Sessions: last 10
   const recentSessions = (sessions||[]).slice(0,10);
   const sessionsHTML = recentSessions.length===0
     ? `<div class="empty-state">No games yet. <a href="/play.html">Play your first game →</a></div>`
@@ -448,7 +448,7 @@ function renderProfile(data){
 
     <!-- CHART -->
     <div class="chart-section">
-      <div class="section-title">Score history — last ${chartItems.length} games</div>
+      <div class="section-title">Score history, last ${chartItems.length} games</div>
       <div class="chart-wrap">${chartHTML}</div>
     </div>
 

@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Audience — Talk to Historical Figures with AI | History Challenger</title>
-<meta name="description" content="Five historical figures, five decisions. Convince Hannibal to march on Rome, Alexander to turn back from India, Justinian to hold Constantinople. AI-driven historical roleplay powered by Claude.">
+<title>Audience | Talk to Historical Figures with AI | History Challenger</title>
+<meta name="description" content="Seven historical figures, seven decisions. Convince Hannibal to march on Rome, Alexander to turn back from India, Justinian to hold Constantinople. AI-driven historical roleplay powered by Claude.">
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="Audience — Talk to Historical Figures with AI">
-<meta property="og:description" content="Eight messages. Fifteen minutes. Convince Hannibal, Alexander, Kublai, Justinian, or Napoleon — one audience at a time.">
+<meta property="og:title" content="Audience | Talk to Historical Figures with AI">
+<meta property="og:description" content="Eight messages. Fifteen minutes. Convince Hannibal, Alexander, Kublai, Justinian, or Napoleon, one audience at a time.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://historychallenger.com/dialogue.html">
 <meta name="twitter:card" content="summary_large_image">
@@ -130,7 +130,7 @@ a{color:#8a6208;text-decoration:none}
 .clue-body{color:#d8c8a8;font-size:13.5px;line-height:1.55;margin-top:.5rem;padding-top:.5rem;border-top:1px dashed #3a2a14}
 .clues-empty{color:#7a6040;font-size:12px;font-style:italic}
 
-/* RESULT — XP block */
+/* RESULT: XP block */
 .xp-block{background:#1a150e;color:#e8d8b8;border:1px solid #3a2a14;border-radius:6px;padding:1rem 1.25rem;margin:0 auto 1.5rem;max-width:540px;font-family:-apple-system,sans-serif;text-align:left}
 .xp-row{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:#bbb;padding:3px 0}
 .xp-row.total{border-top:1px solid #3a2a14;margin-top:.4rem;padding-top:.6rem;font-weight:700;color:#c8903a;font-size:15px}
@@ -211,7 +211,7 @@ function renderPick(){
   return `<div class="pick-header">
     <div class="pick-eyebrow">Audience</div>
     <h1 class="pick-title">Choose your audience</h1>
-    <p class="pick-sub">Seven historical figures. Seven decisions. Convince them — or be dismissed.</p>
+    <p class="pick-sub">Seven historical figures. Seven decisions. Convince them, or be dismissed.</p>
   </div>
   <div class="pick-grid">${cards}</div>`;
 }
@@ -238,9 +238,9 @@ function renderIntro(){
     <div class="scenario-goal"><strong>Your goal:</strong> ${escapeHtml(sc.goal)}</div>
     <div class="rules">
       <div class="rules-row"><span class="rules-icon">⏱</span> ${Math.round((sc.time_limit_seconds||900)/60)} minutes total</div>
-      <div class="rules-row"><span class="rules-icon">💬</span> Up to ${sc.max_turns||8} exchanges — but the audience can end sooner</div>
+      <div class="rules-row"><span class="rules-icon">💬</span> Up to ${sc.max_turns||8} exchanges, but the audience can end sooner</div>
       <div class="rules-row"><span class="rules-icon">✍</span> ${sc.char_limit||300} characters per message</div>
-      <div class="rules-row"><span class="rules-icon">📈</span> A conviction bar tracks how close you are. Fill it to win — empty it and you're dismissed.</div>
+      <div class="rules-row"><span class="rules-icon">📈</span> A conviction bar tracks how close you are. Fill it to win, empty it and you're dismissed.</div>
     </div>
     <div class="diff-row">${diffs}</div>
     <div class="intro-actions">
@@ -283,7 +283,7 @@ function renderChat(){
   <div class="chat-pane" id="chat-pane">${bubbles}</div>
   <div class="input-area">
     <div class="input-row">
-      <textarea id="msg-input" class="input-box" placeholder="${turnsLeft>0?'Speak your case…':'No turns remaining — end the audience.'}" maxlength="${S.charLimit}" ${turnsLeft<=0||S.awaitingReply?'disabled':''}></textarea>
+      <textarea id="msg-input" class="input-box" placeholder="${turnsLeft>0?'Speak your case…':'No turns remaining. End the audience.'}" maxlength="${S.charLimit}" ${turnsLeft<=0||S.awaitingReply?'disabled':''}></textarea>
       <button class="send-btn" id="send-btn" onclick="sendMessage()" ${turnsLeft<=0||S.awaitingReply?'disabled':''}>Send</button>
     </div>
     <div class="input-foot">
@@ -347,7 +347,7 @@ function renderResult(){
   const finalReply = r.final_reply || '';
   const figureName = S.scenario?.figure_short || 'They';
   const finalQuoteHtml = finalReply
-    ? `<div class="final-quote">"${escapeHtml(finalReply)}"<div class="final-quote-attr">— <strong>${escapeHtml(figureName)}</strong>, the last words of the audience</div></div>`
+    ? `<div class="final-quote">"${escapeHtml(finalReply)}"<div class="final-quote-attr"><strong>${escapeHtml(figureName)}</strong>, the last words of the audience</div></div>`
     : '';
 
   const xp = (r.xp_earned != null) ? r.xp_earned : null;
@@ -579,7 +579,7 @@ function resetIntro(){
   render();
 }
 
-// Boot — check for ?scenario=... URL param to skip the picker
+// Boot: check for ?scenario=... URL param to skip the picker
 (function init(){
   const params = new URLSearchParams(window.location.search);
   const scenario = params.get('scenario');

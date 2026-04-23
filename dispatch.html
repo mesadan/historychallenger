@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dispatch — Make the Decisions of History's Commanders | History Challenger</title>
-<meta name="description" content="Receive the same dispatches as Caesar, Saladin, and Kennedy. Five decisions per campaign. No right answers revealed until the end — what would you have ruled?">
+<title>Dispatch, Make the Decisions of History's Commanders | History Challenger</title>
+<meta name="description" content="Receive the same dispatches as Caesar, Saladin, and Kennedy. Five decisions per campaign. No right answers revealed until the end, what would you have ruled?">
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="Dispatch — Make the Decisions of History's Commanders">
+<meta property="og:title" content="Dispatch, Make the Decisions of History's Commanders">
 <meta property="og:description" content="The same dispatches that reached Caesar, Saladin, Kennedy. Five choices. No right answers until the end.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://historychallenger.com/dispatch.html">
@@ -32,7 +32,7 @@ body{background:var(--page-bg);color:var(--ink);font-family:'Crimson Text',Georg
   justify-content:center;padding:3rem 2rem;text-align:center;
   background:radial-gradient(ellipse at 50% 35%,#2e1e0a 0%,#0a0806 100%);
 }
-/* Title never hides — remove from screen system */
+/* Title never hides, remove from screen system */
 #s-title.screen{ display:flex !important; }
 .orn{color:var(--gold-light);letter-spacing:.5em;margin-bottom:2rem;opacity:.65;font-size:20px;}
 h1.disp-title{font-family:'Playfair Display',serif;font-size:clamp(44px,7vw,76px);font-weight:400;color:var(--parchment);letter-spacing:.04em;line-height:1.1;margin-bottom:.3rem;}
@@ -262,7 +262,7 @@ let cur = 0;
 
 // ── SCREENS ──────────────────────────────────────────────────────────
 function show(id){
-  // Title and era are always visible — only game/reveal are full-page replacements
+  // Title and era are always visible, only game/reveal are full-page replacements
   if(id === 'title' || id === 'era'){
     // Hide game/reveal, show title+era
     document.getElementById('s-game').classList.remove('active');
@@ -331,7 +331,7 @@ function selectEra(era){
   hdEl.textContent = eraNames[era]+' campaigns';
 
   if(camps.length===0){
-    itemsEl.innerHTML = '<div class="camp-loading">No campaigns available yet — check back soon.</div>';
+    itemsEl.innerHTML = '<div class="camp-loading">No campaigns available yet, check back soon.</div>';
   } else {
     itemsEl.innerHTML = camps.sort((a,b)=>a.sort_order-b.sort_order).map(c=>`
       <div class="camp-item" onclick="loadCampaign('${c.id}')">
@@ -393,7 +393,7 @@ function renderNode(){
 
   let divNote='';
   if(cur>0 && !answers[cur-1].isHist){
-    divNote=`<div class="div-note">Your decision diverged from history — but events did not wait. What follows is what actually unfolded.</div>`;
+    divNote=`<div class="div-note">Your decision diverged from history, but events did not wait. What follows is what actually unfolded.</div>`;
   }
 
   document.getElementById('nwrap').innerHTML=`
@@ -574,7 +574,7 @@ function showReveal(){
 
 function playAgain(){answers=[];cur=0;startGame();}
 
-// Add get_campaign endpoint support — load on init
+// Add get_campaign endpoint support, load on init
 window.addEventListener('DOMContentLoaded',()=>{
   loadCampaigns();
 });

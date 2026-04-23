@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Did They Overlap? — A Quiz on Coexisting Civilizations | History Challenger</title>
+<title>Did They Overlap?, A Quiz on Coexisting Civilizations | History Challenger</title>
 <meta name="description" content="Given a civilization, which of four options actually coexisted with it? The Assyrians and Carthage? The Han Dynasty and Rome? History is stranger than you think.">
 <meta name="robots" content="index, follow">
-<meta property="og:title" content="Did They Overlap? — A Quiz on Coexisting Civilizations">
+<meta property="og:title" content="Did They Overlap?, A Quiz on Coexisting Civilizations">
 <meta property="og:description" content="The Han Dynasty and Rome traded silk. Aztecs and Tudors shared the world. Test what you actually know about who was alive when.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://historychallenger.com/overlap.html">
@@ -179,8 +179,8 @@ html,body{background:#f0e6cc !important;color:#1a150e !important}
 <div class="wrap">
   <div class="card">
     <div class="mets" id="mets" style="display:none;justify-content:flex-end;gap:8px;margin-bottom:1rem">
-      <div class="met"><div class="mv" id="sc">—</div><div class="ml">Score</div></div>
-      <div class="met"><div class="mv" id="rn">—</div><div class="ml">Round</div></div>
+      <div class="met"><div class="mv" id="sc">-</div><div class="ml">Score</div></div>
+      <div class="met"><div class="mv" id="rn">-</div><div class="ml">Round</div></div>
     </div>
     <div id="guest-banner-area"></div>
     <div id="body"></div>
@@ -237,7 +237,7 @@ function renderSetup(){
   S.phase = 'setup';
   document.getElementById('mets').style.display = 'none';
   const diffs = [
-    { k:'disciple', icon:'🕯', name:'Disciple', tag:'Famous civilizations · Clear gaps', desc:'One correct answer with a long clear overlap. Wrong options are from distant eras — a real challenge for any history buff.' },
+    { k:'disciple', icon:'🕯', name:'Disciple', tag:'Famous civilizations · Clear gaps', desc:'One correct answer with a long clear overlap. Wrong options are from distant eras, a real challenge for any history buff.' },
     { k:'master', icon:'⚔️', name:'Master', tag:'Mixed eras · Real knowledge', desc:'Wrong options are from the same broad era as the anchor. You need to actually know whether they coexisted.' },
     { k:'keeper', icon:'🏆', name:'Keeper of Time', tag:'Same era · Expert precision', desc:'All four options are from roughly the same era as the anchor. Only precise date knowledge will save you.' }
   ];
@@ -245,7 +245,7 @@ function renderSetup(){
 
   document.getElementById('body').innerHTML = `
     <div class="sf">
-      <div class="section-num">I — Difficulty</div>
+      <div class="section-num">I, Difficulty</div>
       <div class="diff-grid">
         ${diffs.map(d => `
           <div class="dc ${S.diff===d.k?'sel':''}" onclick="selDiff('${d.k}')">
@@ -256,7 +256,7 @@ function renderSetup(){
           </div>`).join('')}
       </div>
       <div class="divider"></div>
-      <div class="section-num">II — Rounds</div>
+      <div class="section-num">II, Rounds</div>
       <div class="round-row">
         ${rounds.map(r => `<div class="rc ${S.rounds===r?'sel':''}" onclick="selRounds(${r})">${r} rounds</div>`).join('')}
       </div>
@@ -312,14 +312,14 @@ function renderRound(){
   document.getElementById('sc').textContent = S.score;
   document.getElementById('rn').textContent = (S.round + 1) + '/' + S.sets.length;
 
-  // Anchor timeline — just show anchor bar in gold, clean and simple
+  // Anchor timeline, just show anchor bar in gold, clean and simple
   document.getElementById('body').innerHTML = `
     <div>
       <div class="round-label">Round ${S.round + 1} of ${S.sets.length} · ${S.diff.charAt(0).toUpperCase()+S.diff.slice(1)}</div>
 
       <div class="anchor-block">
         <div class="anchor-name">${set.anchor.name}</div>
-        <div class="anchor-dates">${formatYear(set.anchor.start)} — ${formatYear(set.anchor.end)}</div>
+        <div class="anchor-dates">${formatYear(set.anchor.start)}, ${formatYear(set.anchor.end)}</div>
         <div class="single-tl">
           <div class="single-tl-bar">
             <div class="single-tl-fill gold"></div>
@@ -359,7 +359,7 @@ function answer(idx){
   const chosenBtn = document.getElementById('opt-' + idx);
   if(chosenBtn) chosenBtn.classList.add(chosen.correct ? 'correct' : 'wrong');
 
-  // Build the resolution — all timelines sorted chronologically
+  // Build the resolution, all timelines sorted chronologically
   const allCivs = [
     { name: set.anchor.name, start: set.anchor.start, end: set.anchor.end, role: 'anchor' },
     ...set.options.map(o => ({
@@ -390,7 +390,7 @@ function answer(idx){
     return `
       <div class="res-civ">
         <div class="res-civ-name" style="color:${color}">${c.name}
-          <span class="res-civ-dates">${formatYear(c.start)} — ${formatYear(c.end)}</span>
+          <span class="res-civ-dates">${formatYear(c.start)}, ${formatYear(c.end)}</span>
         </div>
         <div class="res-track">
           <div class="res-fill" style="left:${left}%;width:${width}%;background:${color}"></div>
@@ -403,7 +403,7 @@ function answer(idx){
   if(set.overlap_start != null && set.overlap_end != null){
     const yrs = Math.abs(set.overlap_end - set.overlap_start);
     const correctOpt = set.options.find(o => o.correct);
-    overlapNote = `<div class="overlap-note">✦ ${set.anchor.name} and ${correctOpt ? correctOpt.name : ''} coexisted from ${formatYear(set.overlap_start)} to ${formatYear(set.overlap_end)} — ${yrs} years</div>`;
+    overlapNote = `<div class="overlap-note">✦ ${set.anchor.name} and ${correctOpt ? correctOpt.name : ''} coexisted from ${formatYear(set.overlap_start)} to ${formatYear(set.overlap_end)}, ${yrs} years</div>`;
   }
 
   const resArea = document.getElementById('resolution-area');
@@ -411,7 +411,7 @@ function answer(idx){
     resArea.innerHTML = `
       <div class="resolution-box">
         <div class="res-result ${chosen.correct?'res-correct':'res-wrong'}">
-          ${chosen.correct ? '✓ Correct' : '✗ Wrong'} — +${pts} pts
+          ${chosen.correct ? '✓ Correct' : '✗ Wrong'}, +${pts} pts
         </div>
         ${overlapNote}
         ${set.explanation ? `<div class="res-explanation">${set.explanation}</div>` : ''}
