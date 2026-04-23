@@ -508,7 +508,7 @@ async function handleGetProfile(body, env) {
     const userId = payload.sub;
     const user = await env.db.prepare('SELECT * FROM users WHERE id=?').bind(userId).first();
     if (!user) return json({ error: 'User not found' }, 404);
-    const sessions = await env.db.prepare(`SELECT id, diff, rounds, avg_score, game_type, completed_at FROM game_sessions WHERE user_id=? ORDER BY completed_at DESC LIMIT 20`).bind(userId).all();
+    const sessions = await env.db.prepare(`SELECT id, diff, rounds, avg_score, scores, game_type, completed_at FROM game_sessions WHERE user_id=? ORDER BY completed_at DESC LIMIT 20`).bind(userId).all();
     const history = await env.db.prepare(`SELECT avg_score, completed_at, diff, game_type FROM game_sessions WHERE user_id=? ORDER BY completed_at DESC LIMIT 30`).bind(userId).all();
     const breakdown = await env.db.prepare(`SELECT diff, game_type, COUNT(*) as games, ROUND(AVG(avg_score),1) as avg, MAX(avg_score) as best FROM game_sessions WHERE user_id=? GROUP BY diff, game_type`).bind(userId).all();
     return json({ user, sessions: sessions.results, history: history.results, breakdown: breakdown.results }, 200);
@@ -2539,15 +2539,43 @@ Return ONLY valid JSON:
     const cluePenalty  = cluesUsed * 25;
     const xpEarned     = Math.max(0, Math.round((baseByVerdict[verdict] || 0) * diffMult - cluePenalty));
 
+    const now = Math.floor(Date.now()/1000);
     await env.db.prepare(
       `UPDATE dialogue_sessions SET status='judged', verdict=?, verdict_text=?, criteria_met=?, completed_at=? WHERE id=?`
-    ).bind(verdict, verdictText, JSON.stringify(criteriaMet), Math.floor(Date.now()/1000), session_id).run();
+    ).bind(verdict, verdictText, JSON.stringify(criteriaMet), now, session_id).run();
 
-    // Persist XP to user account if authenticated
-    if (session.user_id && xpEarned > 0) {
+    // Log the audience as a game_sessions row + update user stats
+    if (session.user_id) {
       try {
-        await env.db.prepare(`UPDATE users SET total_xp = COALESCE(total_xp,0) + ? WHERE id=?`).bind(xpEarned, session.user_id).run();
-      } catch(e) { /* non-fatal */ }
+        const sessionScores = JSON.stringify({
+          verdict,
+          xp_earned: xpEarned,
+          clues_used: cluesUsed,
+          clues_allowed: cluesAllowed,
+          scenario_id: session.scenario_id,
+          figure_short: sc.figure_short,
+          conviction: session.conviction
+        });
+        await env.db.prepare(
+          `INSERT INTO game_sessions (id, user_id, diff, rounds, scores, avg_score, game_type, completed_at) VALUES (?, ?, ?, ?, ?, ?, 'dialogue', ?)`
+        ).bind(crypto.randomUUID(), session.user_id, diffKey, session.turn_count || 0, sessionScores, session.conviction || 0, now).run();
+
+        const user = await env.db.prepare('SELECT * FROM users WHERE id=?').bind(session.user_id).first();
+        if (user) {
+          const newGames = (user.total_games || 0) + 1;
+          const today = new Date().toISOString().split('T')[0];
+          const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+          const yStr = yesterday.toISOString().split('T')[0];
+          let streak = user.current_streak || 0;
+          if (user.last_streak_date === today) { /* same-day: no streak change */ }
+          else if (user.last_streak_date === yStr) { streak++; }
+          else { streak = 1; }
+          const newXp = (user.total_xp || 0) + xpEarned;
+          await env.db.prepare(
+            `UPDATE users SET total_games=?, current_streak=?, longest_streak=?, last_streak_date=?, last_played=?, total_rounds=total_rounds+?, total_xp=? WHERE id=?`
+          ).bind(newGames, streak, Math.max(user.longest_streak || 0, streak), today, now, session.turn_count || 0, newXp, session.user_id).run();
+        }
+      } catch(e) { /* non-fatal: judge result still returned */ }
     }
 
     return json({

@@ -225,8 +225,10 @@ async function deleteAccount(){
 
 function diffLabel(d){return{disciple:'🕯 Disciple',master:'⚔️ Master',keeper:'🏆 Keeper'}[d]||d;}
 function diffColor(d){return{disciple:'#5acc8a',master:'#c8903a',keeper:'#e0a84a'}[d]||'#888';}
-function gameLabel(g){return{overlap:'🏛 Did They Overlap?',dispatch:'⚔️ Dispatch',timeline:'🧭 History Challenger'}[g]||'🧭 History Challenger';}
-function gameTag(g){return{overlap:'Overlap',dispatch:'Dispatch',timeline:'Timeline'}[g]||'Timeline';}
+function gameLabel(g){return{overlap:'🏛 Did They Overlap?',dispatch:'⚔️ Dispatch',timeline:'🧭 History Challenger',dialogue:'🎭 Audience'}[g]||'🧭 History Challenger';}
+function gameTag(g){return{overlap:'Overlap',dispatch:'Dispatch',timeline:'Timeline',dialogue:'Audience'}[g]||'Timeline';}
+function audienceDiffLabel(d){return{easy:'Apprentice',medium:'Strategist',hard:'Imperator'}[d]||d;}
+function verdictBadge(v){return{Convinced:{icon:'✓',cls:'ok',label:'Convinced'},Wavered:{icon:'~',cls:'good',label:'Wavered'},Firm:{icon:'✗',cls:'fail',label:'Firm'}}[v]||{icon:'·',cls:'ok',label:v||'—'};}
 function eraLabel(e){return{antiquity:'Antiquity',medieval:'Medieval',modern:'Modern'}[e]||(e||'Campaign');}
 function scoreColor(s){return s>=80?'great':s>=50?'good':'ok';}
 function hqColor(hq){
@@ -337,6 +339,32 @@ function renderProfile(data){
     </div>
   </div>` : '';
 
+  // Audience breakdown: total from the grouped breakdown query, verdict split from recent sessions
+  const dialogueTotal = (breakdown||[]).filter(b=>b.game_type==='dialogue').reduce((s,b)=>s+(b.games||0),0);
+  let dialogueBreakdown = '';
+  if (dialogueTotal > 0) {
+    const dialogueSessions = (sessions||[]).filter(s=>s.game_type==='dialogue');
+    let won=0, wavered=0, firm=0, xpFromAudiences=0;
+    dialogueSessions.forEach(s=>{
+      let m={}; try{ m=JSON.parse(s.scores||'{}'); }catch(e){}
+      if(m.verdict==='Convinced') won++;
+      else if(m.verdict==='Wavered') wavered++;
+      else if(m.verdict==='Firm') firm++;
+      xpFromAudiences += (m.xp_earned||0);
+    });
+    const shown = dialogueSessions.length;
+    const winPct = shown>0 ? Math.round((won/shown)*100) : 0;
+    dialogueBreakdown = `<div style="margin-bottom:1.5rem">
+      <div style="font-size:12px;color:#3a2e1e;font-family:-apple-system,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem">${gameLabel('dialogue')}</div>
+      <div class="dispatch-card">
+        <div class="breakdown-row"><span class="breakdown-key">Audiences granted</span><span class="breakdown-val">${dialogueTotal}</span></div>
+        ${shown>0?`<div class="breakdown-row"><span class="breakdown-key">Convinced / Wavered / Firm <span style="font-size:10px;color:#888">(last ${shown})</span></span><span class="breakdown-val">${won} / ${wavered} / ${firm}</span></div>
+        <div class="breakdown-row"><span class="breakdown-key">Recent win rate</span><span class="breakdown-val">${winPct}%</span></div>
+        <div class="breakdown-row"><span class="breakdown-key">XP from recent audiences</span><span class="breakdown-val">${xpFromAudiences.toLocaleString()}</span></div>`:''}
+      </div>
+    </div>`;
+  }
+
   // Sessions: last 10
   const recentSessions = (sessions||[]).slice(0,10);
   const sessionsHTML = recentSessions.length===0
@@ -350,6 +378,20 @@ function renderProfile(data){
             <div class="session-date">${formatDate(s.completed_at)}</div>
           </div>
           <div class="session-rounds">${s.rounds} decision${s.rounds!==1?'s':''}</div>
+        </div>`;
+      }
+      if(s.game_type==='dialogue'){
+        let meta={}; try{ meta = JSON.parse(s.scores||'{}'); }catch(e){}
+        const v = verdictBadge(meta.verdict);
+        const figure = meta.figure_short||'Audience';
+        const xp = meta.xp_earned!=null ? meta.xp_earned : null;
+        return `<div class="session-row">
+          <div class="session-score ${v.cls}" style="font-size:1rem">${v.icon}</div>
+          <div class="session-meta">
+            <div class="session-diff">${figure} <span style="font-size:11px;color:#888;font-weight:400">· ${audienceDiffLabel(s.diff)} · Audience</span></div>
+            <div class="session-date">${formatDate(s.completed_at)}${xp!=null?` · +${xp} XP`:''}</div>
+          </div>
+          <div class="session-rounds">${v.label}</div>
         </div>`;
       }
       return `<div class="session-row">
@@ -454,7 +496,7 @@ function renderProfile(data){
 
     <!-- BREAKDOWN -->
     <div class="section-title" style="margin-bottom:1rem">Performance by game</div>
-    ${scoredBreakdown + dispatchBreakdown}
+    ${scoredBreakdown + dispatchBreakdown + dialogueBreakdown}
 
     <!-- SESSIONS -->
     <div class="section-title" style="margin-bottom:1rem">Recent games</div>
