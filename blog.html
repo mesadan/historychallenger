@@ -59,6 +59,14 @@ nav{position:sticky;top:0;z-index:100;background:rgba(0,0,0,0.92);backdrop-filte
 .tl-mark.accent .tl-year{color:#6fa4dc}
 .tl-mark.label-left .tl-label,.tl-mark.label-left .tl-year{left:auto;right:-8px;transform:translateX(0)}
 .tl-mark.label-right .tl-label,.tl-mark.label-right .tl-year{left:-8px;transform:translateX(0)}
+.tl-mark.lane2 .tl-label{top:-60px}
+.tl-mark.lane2 .tl-year{top:34px}
+.tl-range{position:absolute;top:50%;transform:translateY(-50%);height:18px;border-radius:3px;box-sizing:border-box;z-index:1}
+.tl-range.gold{background:rgba(224,168,74,.25);border:1px solid rgba(224,168,74,.7)}
+.tl-range.dim{background:rgba(170,170,170,.22);border:1px solid rgba(170,170,170,.6)}
+.tl-range.accent{background:rgba(58,111,168,.3);border:1px solid rgba(58,111,168,.7)}
+.tl-range-label{position:absolute;left:50%;top:-32px;transform:translateX(-50%);white-space:nowrap;font-size:13px;font-style:italic;font-family:'Crimson Text',Georgia,serif;font-weight:700;color:#ddd}
+.tl-range-year{position:absolute;left:50%;top:20px;transform:translateX(-50%);white-space:nowrap;font-size:11px;font-family:Georgia,serif;font-weight:700;color:#aaa}
 .tl-gaps{position:relative;margin-top:2.75rem;height:20px}
 .tl-gap{position:absolute;top:0;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;color:#888;font-family:-apple-system,sans-serif;letter-spacing:.02em;border-top:1px dashed #333;padding-top:6px;box-sizing:border-box}
 .tl-gap::before,.tl-gap::after{content:'';position:absolute;top:0;height:6px;width:1px;background:#444}
@@ -152,13 +160,12 @@ footer{border-top:1px solid #1a1a1a;padding:2rem 1.5rem;text-align:center}
   <h2>Woolly mammoths were still alive when the pyramids were being built</h2>
   <div class="timeline-single">
     <div class="tl-track">
+      <div class="tl-range dim" style="left:88%;width:6%"><div class="tl-range-label">Pyramids being built</div><div class="tl-range-year">2686 to 2181 BC</div></div>
       <div class="tl-mark gold" style="left:0%"><div class="tl-label">Most mammoths extinct</div><div class="tl-dot"></div><div class="tl-year">10,000 BC</div></div>
-      <div class="tl-mark dim label-left" style="left:89%"><div class="tl-label">Pyramids built</div><div class="tl-dot"></div><div class="tl-year">2560 BC</div></div>
       <div class="tl-mark accent" style="left:100%"><div class="tl-label">Last mammoths die</div><div class="tl-dot"></div><div class="tl-year">1650 BC</div></div>
     </div>
     <div class="tl-gaps">
-      <div class="tl-gap" style="left:0%;width:89%"><span>7,440 years</span></div>
-      <div class="tl-gap" style="left:89%;width:11%"><span>910 yrs</span></div>
+      <div class="tl-gap" style="left:0%;width:100%"><span>Mammoths still alive on Wrangel Island while Egyptians built the pyramids</span></div>
     </div>
   </div>
   <div class="fact-body">
@@ -263,10 +270,10 @@ footer{border-top:1px solid #1a1a1a;padding:2rem 1.5rem;text-align:center}
   <div class="timeline-single">
     <div class="tl-track">
       <div class="tl-mark gold" style="left:0%"><div class="tl-label">Star Wars released</div><div class="tl-dot"></div><div class="tl-year">May 1977</div></div>
-      <div class="tl-mark dim label-left" style="left:9%"><div class="tl-label">Last guillotine execution</div><div class="tl-dot"></div><div class="tl-year">Sept 1977</div></div>
-      <div class="tl-mark accent" style="left:100%"><div class="tl-label">France abolishes death penalty</div><div class="tl-dot"></div><div class="tl-year">1981</div></div>
+      <div class="tl-mark dim lane2" style="left:9%"><div class="tl-label">Last guillotine execution</div><div class="tl-dot"></div><div class="tl-year">Sept 1977</div></div>
+      <div class="tl-mark accent label-left" style="left:100%"><div class="tl-label">France abolishes death penalty</div><div class="tl-dot"></div><div class="tl-year">1981</div></div>
     </div>
-    <div class="tl-gaps">
+    <div class="tl-gaps" style="margin-top:3.25rem">
       <div class="tl-gap" style="left:0%;width:9%"><span>4 mo</span></div>
       <div class="tl-gap" style="left:9%;width:91%"><span>about 4 years</span></div>
     </div>
@@ -308,10 +315,10 @@ footer{border-top:1px solid #1a1a1a;padding:2rem 1.5rem;text-align:center}
   <div class="timeline-single">
     <div class="tl-track">
       <div class="tl-mark gold" style="left:0%"><div class="tl-label">Civil War ends</div><div class="tl-dot"></div><div class="tl-year">1865</div></div>
-      <div class="tl-mark dim" style="left:88%"><div class="tl-label">Trinity nuclear test</div><div class="tl-dot"></div><div class="tl-year">1945</div></div>
+      <div class="tl-mark dim lane2" style="left:88%"><div class="tl-label">Trinity nuclear test</div><div class="tl-dot"></div><div class="tl-year">1945</div></div>
       <div class="tl-mark accent label-left" style="left:100%"><div class="tl-label">Last verified veteran dies</div><div class="tl-dot"></div><div class="tl-year">1956</div></div>
     </div>
-    <div class="tl-gaps">
+    <div class="tl-gaps" style="margin-top:3.25rem">
       <div class="tl-gap" style="left:0%;width:88%"><span>80 years</span></div>
       <div class="tl-gap" style="left:88%;width:12%"><span>11 yrs</span></div>
     </div>
@@ -326,23 +333,23 @@ footer{border-top:1px solid #1a1a1a;padding:2rem 1.5rem;text-align:center}
 <!-- FACT 10 -->
 <div class="fact">
   <div class="fact-num">№ 10</div>
-  <h2>We are closer in time to Tyrannosaurus Rex than T-Rex was to the formation of the Rocky Mountains</h2>
+  <h2>Vikings landed in North America almost five centuries before Columbus sailed</h2>
   <div class="timeline-single">
     <div class="tl-track">
-      <div class="tl-mark gold" style="left:0%"><div class="tl-label">Rocky Mtns form</div><div class="tl-dot"></div><div class="tl-year">80M yrs ago</div></div>
-      <div class="tl-mark dim" style="left:15%"><div class="tl-label">T-Rex exists</div><div class="tl-dot"></div><div class="tl-year">68M yrs ago</div></div>
-      <div class="tl-mark accent" style="left:100%"><div class="tl-label">Today</div><div class="tl-dot"></div><div class="tl-year">Present</div></div>
+      <div class="tl-mark gold" style="left:0%"><div class="tl-label">Vikings reach Vinland</div><div class="tl-dot"></div><div class="tl-year">c. 1000 AD</div></div>
+      <div class="tl-mark dim" style="left:81%"><div class="tl-label">Columbus sails</div><div class="tl-dot"></div><div class="tl-year">1492</div></div>
+      <div class="tl-mark accent label-left" style="left:100%"><div class="tl-label">Jamestown founded</div><div class="tl-dot"></div><div class="tl-year">1607</div></div>
     </div>
     <div class="tl-gaps">
-      <div class="tl-gap" style="left:0%;width:15%"><span>12M yrs</span></div>
-      <div class="tl-gap" style="left:15%;width:85%"><span>68 million years</span></div>
+      <div class="tl-gap" style="left:0%;width:81%"><span>492 years</span></div>
+      <div class="tl-gap" style="left:81%;width:19%"><span>115 yrs</span></div>
     </div>
   </div>
   <div class="fact-body">
-    <p>The Rocky Mountains began forming around <strong>80 million years ago</strong>. T-Rex appeared about <strong>68 million years ago</strong>. That's only a 12-million-year gap. T-Rex and the Rockies were practically contemporaries.</p>
-    <p>We are <em>66 million years</em> away from T-Rex. The Rockies are only 12 million years older than T-Rex. Those mountains, which we think of as immovably ancient, are only slightly older than the most famous dinosaur that ever lived.</p>
+    <p>Around <strong>1000 AD</strong>, the Norse navigator Leif Erikson landed at what is now L'Anse aux Meadows in Newfoundland. A small Viking settlement stood there for a few years. By <strong>1492</strong>, when Columbus set sail, nearly five centuries had passed. And the first permanent English colony at Jamestown did not follow until <strong>1607</strong>, another 115 years later.</p>
+    <p>Norse sagas described the voyages, but European memory of them faded. The continent had to be "discovered" again. <em>The gap between the first and second European arrivals in the Americas is longer than the entire gap between Columbus and the American Civil War.</em></p>
   </div>
-  <div class="mind-blown">"The Rocky Mountains are young enough that dinosaurs watched them form."</div>
+  <div class="mind-blown">"Europeans reached America, forgot they had reached America, then reached it again five centuries later."</div>
 </div>
 
 <!-- CTA -->
