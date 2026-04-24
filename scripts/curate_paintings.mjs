@@ -297,6 +297,19 @@ async function main(){
   await ensureDir(path.join(outDir, 'images'));
   await ensureDir(path.join(outDir, 'thumbs'));
 
+  // Resume support: load existing manifest if present
+  const manifestPath = path.join(outDir, 'manifest.json');
+  let resumed = [];
+  try {
+    const existing = await fs.readFile(manifestPath, 'utf8');
+    resumed = JSON.parse(existing);
+    if (Array.isArray(resumed) && resumed.length > 0){
+      log(`\nResuming from existing manifest: ${resumed.length} items already saved`, 'c');
+    } else {
+      resumed = [];
+    }
+  } catch(e) { /* no existing manifest, fresh start */ }
+
   // Gather candidate IDs
   log('\nGathering candidate IDs from Met departments...', 'c');
   const candidateIds = new Set();
@@ -310,11 +323,21 @@ async function main(){
       log(`  ${dept.name}: FAILED ${e.message.slice(0,120)}`, 'r');
     }
   }
-  const candidates = shuffle(Array.from(candidateIds));
-  log(`Total unique candidates: ${candidates.length}`, 'c');
+  const allCandidates = shuffle(Array.from(candidateIds));
+  // Drop any already in the resumed manifest
+  const resumedIds = new Set(resumed.map(r => r.source_id));
+  const candidates = allCandidates.filter(id => !resumedIds.has(id));
+  log(`Total unique candidates: ${allCandidates.length}  (${resumedIds.size} skipped from resume)`, 'c');
 
-  const manifest = [];
+  const manifest = resumed.slice();                // start from resumed items
   const counters = { ancient: 0, medieval: 0, modern: 0 };
+  // Recount buckets from resumed items
+  for (const r of resumed){
+    if (counters.hasOwnProperty(r.depicted_era)) counters[r.depicted_era]++;
+  }
+  if (resumed.length){
+    log(`Resume counters: A:${counters.ancient} M:${counters.medieval} Mo:${counters.modern}`, 'c');
+  }
   let processed = 0, rejectedMet = 0, rejectedClaude = 0, rejectedBucket = 0, errored = 0;
 
   for (const id of candidates){
