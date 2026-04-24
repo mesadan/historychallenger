@@ -135,7 +135,7 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
 <!-- TIMELINE TAB -->
 <div id="tab-timeline" class="tab-content">
   <div class="row" style="display:flex;justify-content:space-between;align-items:center">
-    <span style="color:#c8903a;font-size:14px;font-weight:700">🧭 Timeline (History Challenger) — Event Sets</span>
+    <span style="color:#c8903a;font-size:14px;font-weight:700">🧭 Timeline (History Challenger) Event Sets</span>
     <button onclick="loadTLStats()" style="font-size:12px;padding:5px 14px">↻ Refresh stats</button>
   </div>
 
@@ -172,6 +172,22 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
     <span id="tl-qc-status" style="color:#555;font-size:12px;margin-left:auto"></span>
   </div>
   <div id="tl-qc-results" style="margin-top:.75rem"></div>
+
+  <div class="row" style="border-top:1px solid #1a1a1a;padding-top:1rem;margin-top:1rem">
+    <strong style="color:#c8903a;font-size:13px">🅰 Style QC (em dashes &amp; US English)</strong>
+    <span style="color:#555;font-size:11px;margin-left:auto">Scans English-language event names + descriptions, no AI cost</span>
+  </div>
+  <div class="row" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+    <label style="color:#555;font-size:13px">Table:</label>
+    <select id="tl-style-table" style="padding:4px 8px;background:#0d0d0d;color:#ddd;border:1px solid #333">
+      <option value="event_sets">event_sets (Timeline)</option>
+      <option value="overlap">overlap_sets</option>
+    </select>
+    <button onclick="runStyleScan()">🔍 Scan</button>
+    <button id="tl-style-fix-btn" onclick="runStyleFix()" style="display:none;background:#2a1a0a;border-color:#c8903a;color:#c8903a">🛠 Fix all flagged</button>
+    <span id="tl-style-status" style="color:#555;font-size:12px;margin-left:auto"></span>
+  </div>
+  <div id="tl-style-results" style="margin-top:.5rem"></div>
 
   <div class="row" style="border-top:1px solid #1a1a1a;padding-top:1rem;margin-top:1rem">
     <strong style="color:#c8903a;font-size:13px">🔍 Browse Event Sets</strong>
@@ -1435,6 +1451,62 @@ async function deleteTLSet(ev, id){
     if (d.error) { alert('Error: '+d.error); return; }
     document.querySelectorAll(`[data-tl-id="${id}"]`).forEach(el=>el.remove());
   } catch(e) { alert('Network error'); }
+}
+
+let _styleFlaggedIds = [];
+async function runStyleScan(){
+  const table = document.getElementById('tl-style-table').value;
+  const out = document.getElementById('tl-style-results');
+  const status = document.getElementById('tl-style-status');
+  const fixBtn = document.getElementById('tl-style-fix-btn');
+  out.innerHTML = '<div style="color:#555;padding:.5rem">Scanning...</div>';
+  status.textContent = '';
+  fixBtn.style.display = 'none';
+  _styleFlaggedIds = [];
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'style_qc_scan', admin_key:ADMIN_KEY, table })});
+    const d = await res.json();
+    if (d.error) { out.innerHTML = '<div class="err">'+d.error+'</div>'; return; }
+    status.textContent = `Scanned ${d.total} rows in ${d.table} - ${d.flagged_count} flagged`;
+    if (!d.flagged_count) { out.innerHTML = '<div style="color:#5acc8a;font-size:12px;padding:.5rem">Clean. No em dashes or UK spellings found.</div>'; return; }
+    _styleFlaggedIds = d.flagged.map(f => f.id);
+    fixBtn.style.display = '';
+    let html = '<div style="background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;padding:.5rem;max-height:480px;overflow-y:auto;font-size:12px">';
+    for (const row of d.flagged) {
+      html += `<div style="padding:.5rem;border-bottom:1px solid #111">
+        <div style="color:#c8903a;font-size:11px;margin-bottom:.25rem">${row.diff||''} - ${row.lang||'en'} - ${(row.theme_slug||'(random)').replace(/_/g,' ')}</div>`;
+      for (const iss of row.issues) {
+        html += `<div style="padding:.25rem 0;border-bottom:1px dashed #1a1a1a">
+          <div style="color:#888;font-size:11px">event ${iss.event_idx} - ${iss.field}</div>
+          <div style="color:#cc6644;text-decoration:line-through">${(iss.before||'').replace(/</g,'&lt;')}</div>
+          <div style="color:#5acc8a">${(iss.after||'').replace(/</g,'&lt;')}</div>
+        </div>`;
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+    out.innerHTML = html;
+  } catch(e) { out.innerHTML = '<div class="err">'+e.message+'</div>'; }
+}
+
+async function runStyleFix(){
+  if (!_styleFlaggedIds.length) return;
+  const table = document.getElementById('tl-style-table').value;
+  const status = document.getElementById('tl-style-status');
+  const fixBtn = document.getElementById('tl-style-fix-btn');
+  if (!confirm(`Apply fixes to ${_styleFlaggedIds.length} rows in ${table}? This rewrites event names and descriptions in place.`)) return;
+  fixBtn.disabled = true; fixBtn.textContent = 'Fixing...';
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'style_qc_fix', admin_key:ADMIN_KEY, table, ids: _styleFlaggedIds })});
+    const d = await res.json();
+    if (d.error) { alert('Error: '+d.error); fixBtn.disabled=false; fixBtn.textContent='🛠 Fix all flagged'; return; }
+    status.textContent = `Fixed ${d.fixed} of ${d.scanned} rows`;
+    fixBtn.style.display = 'none';
+    _styleFlaggedIds = [];
+    setTimeout(runStyleScan, 400); // re-scan to confirm
+  } catch(e) { alert('Network error'); fixBtn.disabled=false; fixBtn.textContent='🛠 Fix all flagged'; }
 }
 
 async function runTLQC(){

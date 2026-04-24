@@ -228,7 +228,7 @@ function diffColor(d){return{disciple:'#5acc8a',master:'#c8903a',keeper:'#e0a84a
 function gameLabel(g){return{overlap:'🏛 Did They Overlap?',dispatch:'⚔️ Dispatch',timeline:'🧭 History Challenger',dialogue:'🎭 Audience'}[g]||'🧭 History Challenger';}
 function gameTag(g){return{overlap:'Overlap',dispatch:'Dispatch',timeline:'Timeline',dialogue:'Audience'}[g]||'Timeline';}
 function audienceDiffLabel(d){return{easy:'Apprentice',medium:'Strategist',hard:'Imperator'}[d]||d;}
-function verdictBadge(v){return{Convinced:{icon:'✓',cls:'ok',label:'Convinced'},Wavered:{icon:'~',cls:'good',label:'Wavered'},Firm:{icon:'✗',cls:'fail',label:'Firm'}}[v]||{icon:'·',cls:'ok',label:v||'—'};}
+function verdictBadge(v){return{Convinced:{icon:'✓',cls:'ok',label:'Convinced'},Wavered:{icon:'~',cls:'good',label:'Wavered'},Firm:{icon:'✗',cls:'fail',label:'Firm'}}[v]||{icon:'·',cls:'ok',label:v||'-'};}
 function eraLabel(e){return{antiquity:'Antiquity',medieval:'Medieval',modern:'Modern'}[e]||(e||'Campaign');}
 function scoreColor(s){return s>=80?'great':s>=50?'good':'ok';}
 function hqColor(hq){

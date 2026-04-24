@@ -377,7 +377,7 @@ async function proceedFromIntro(){
       S.evidencePicked = [];
       S.phase = 'loadout'; render();
     } else {
-      // No evidence for this scenario — straight to chat
+      // No evidence for this scenario: straight to chat
       startSession();
     }
   } catch(e) {
