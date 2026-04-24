@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painting ID | History Challenger</title>
+<meta name="description" content="Look at a historical artwork, guess what it depicts. Five rounds per session. Clue cards for hints. Sharpen your eye for period, subject, and style.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Painting ID | History Challenger">
+<meta property="og:description" content="Five historical artworks, five scenes to identify. Clues available at a cost.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://historychallenger.com/paintings.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://historychallenger.com/paintings.html">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Crimson Text',Georgia,serif;background:#f0e6cc;color:#1a150e;min-height:100vh;font-size:17px;line-height:1.6}
+a{color:#8a6208;text-decoration:none}
+.page{max-width:960px;margin:0 auto;padding:1.5rem 1rem 4rem}
+
+/* INTRO */
+.intro-card{background:#faf4e4;border:1.5px solid #c8b888;border-radius:6px;padding:2rem 1.75rem;margin-top:1rem}
+.eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#8a6208;margin-bottom:.5rem;font-family:'Crimson Text',serif}
+.title{font-family:'Playfair Display',serif;font-size:2rem;color:#1a150e;line-height:1.15;margin-bottom:.4rem}
+.sub{font-size:15px;color:#5a3e1a;font-style:italic;margin-bottom:1.25rem}
+.rules{font-size:14px;color:#3a2e1e;line-height:1.75;margin-bottom:1.25rem}
+.rules-row{display:flex;gap:.5rem;margin-bottom:.3rem}
+.rules-icon{width:22px;text-align:center;flex-shrink:0}
+.diff-row{display:flex;gap:.6rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.diff-btn{flex:1;min-width:140px;background:#fff8e8;border:1.5px solid #c8b888;border-radius:4px;padding:.7rem .8rem;cursor:pointer;text-align:center;transition:all .15s;font-family:'Crimson Text',serif}
+.diff-btn:hover{border-color:#8a6208;background:#fdf4dc}
+.diff-btn.sel{border-color:#8a6208;background:#f0e6cc;color:#1a150e}
+.diff-name{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:#1a150e;display:block;margin-bottom:.15rem}
+.diff-hint{font-size:11px;color:#7a6040;line-height:1.4}
+.start-btn{background:#8a6208;color:#f5edd8;border:1.5px solid #c8a028;border-radius:3px;padding:14px 28px;font-family:'Playfair Display',serif;font-style:italic;font-size:16px;cursor:pointer;min-width:240px}
+.start-btn:hover{background:#b88a18}
+.start-btn:disabled{opacity:.5;cursor:not-allowed}
+.back-btn{background:none;border:1.5px solid #c8b888;color:#5a3e1a;border-radius:3px;padding:10px 18px;font-family:'Playfair Display',serif;font-style:italic;font-size:14px;cursor:pointer}
+.back-btn:hover{border-color:#8a6208;color:#1a150e}
+.actions{display:flex;gap:.75rem;flex-wrap:wrap}
+
+/* ROUND */
+.round-top{display:flex;justify-content:space-between;align-items:center;background:#1a150e;color:#f5edd8;padding:.6rem 1rem;border-radius:6px 6px 0 0;font-size:13px;font-family:-apple-system,sans-serif}
+.round-top strong{color:#c8a028}
+.round-card{background:#0d0d0d;border:1px solid #3a2a14;border-top:none;padding:1rem;margin-bottom:1rem}
+.img-frame{display:flex;justify-content:center;align-items:center;background:#000;border:1px solid #2a2a2a;border-radius:4px;margin-bottom:1rem;min-height:280px;overflow:hidden}
+.img-frame img{max-width:100%;max-height:540px;display:block}
+.q{font-family:'Playfair Display',serif;font-size:1.2rem;color:#f5edd8;margin-bottom:.8rem;text-align:center;font-style:italic}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+@media(max-width:600px){.options{grid-template-columns:1fr}}
+.opt{background:#15110a;border:1px solid #3a2a14;color:#e8d8b8;border-radius:6px;padding:.85rem 1rem;cursor:pointer;text-align:left;font-family:'Crimson Text',Georgia,serif;font-size:15px;line-height:1.35;transition:all .12s}
+.opt:hover:not(:disabled){background:#241a0e;border-color:#c8903a}
+.opt:disabled{cursor:default}
+.opt.picked{background:#2a1a0a;border-color:#c8903a;color:#fff}
+.opt.reveal-correct{background:#0d2a1a;border-color:#5acc8a;color:#fff}
+.opt.reveal-wrong{background:#2a0d0d;border-color:#cc4444;color:#fff}
+
+/* CLUES */
+.clues-wrap{background:#0d0d0d;border:1px solid #3a2a14;border-top:none;padding:.55rem 1rem .7rem;border-radius:0 0 6px 6px;color:#bbb;font-family:-apple-system,sans-serif}
+.clues-head{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#888;margin-bottom:.5rem}
+.clues-head strong{color:#c8a028;font-family:Georgia,serif;font-size:13px}
+.clues-list{display:flex;flex-direction:column;gap:.4rem}
+.clue-card{background:#15110a;border:1px solid #3a2a14;border-radius:6px;padding:.5rem .7rem;font-family:'Crimson Text',Georgia,serif;display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.clue-name{color:#e8d8b8;font-size:14px;flex:1;font-style:italic}
+.clue-value{color:#c8a028;font-size:13px;font-weight:700}
+.clue-reveal{background:#3a2a14;color:#e8d8b8;border:1px solid #c8903a55;border-radius:4px;padding:4px 12px;font-size:11px;cursor:pointer;font-family:-apple-system,sans-serif;letter-spacing:.04em;flex-shrink:0;font-weight:700}
+.clue-reveal:hover:not(:disabled){background:#5a3e1a;border-color:#c8903a}
+.clue-reveal:disabled{opacity:.4;cursor:not-allowed}
+
+/* REVEAL */
+.reveal-card{background:#faf4e4;border:1.5px solid #c8b888;border-radius:6px;padding:1.25rem 1.5rem;margin-top:1rem}
+.reveal-status{font-family:'Playfair Display',serif;font-size:1.4rem;margin-bottom:.5rem}
+.reveal-status.win{color:#3a7a3a}
+.reveal-status.fail{color:#7a0a0a}
+.reveal-scene{font-family:'Playfair Display',serif;font-size:1.15rem;color:#1a150e;margin-bottom:.3rem}
+.reveal-long{font-size:14px;color:#3a2e1e;line-height:1.6;font-style:italic;margin-bottom:.75rem}
+.reveal-meta{font-size:13px;color:#5a3e1a;margin-bottom:.25rem}
+.reveal-xp{margin-top:.75rem;padding-top:.75rem;border-top:1px solid #c8b888;font-size:13px;color:#8a6208;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+
+/* FINAL */
+.final-card{background:#faf4e4;border:1.5px solid #c8b888;border-radius:6px;padding:2rem 1.75rem;margin-top:1rem;text-align:center}
+.final-score{font-family:'Playfair Display',serif;font-size:3rem;color:#8a6208;margin-bottom:.25rem}
+.final-score-lbl{font-size:12px;color:#5a3e1a;letter-spacing:.2em;text-transform:uppercase;margin-bottom:1.25rem}
+.final-xp{background:#1a150e;color:#e8d8b8;padding:1rem 1.25rem;margin:0 auto 1.5rem;max-width:360px;border-radius:4px;font-family:-apple-system,sans-serif;text-align:left}
+.final-xp-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0}
+.final-xp-row.total{border-top:1px solid #3a2a14;margin-top:.4rem;padding-top:.6rem;font-weight:700;color:#c8a028;font-size:15px}
+.final-actions{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+
+.error-box{background:#2a0808;color:#cc6644;border:1px solid #5a2a2a;border-radius:6px;padding:.8rem 1rem;margin-top:1rem;font-size:14px}
+.loading{color:#5a3e1a;font-style:italic;text-align:center;padding:2rem}
+</style>
+<script src="/nav.js?v=3" defer></script>
+</head>
+<body>
+
+<div class="page" id="page"></div>
+
+<script>
+const WORKER = 'https://histroychallenger-api.maletethan.workers.dev';
+
+let S = {
+  phase: 'intro',            // intro | loading | round | final | error
+  difficulty: 'medium',
+  sessionId: null,
+  round: null,               // {round, total, artwork_id, image_url, options}
+  answered: false,
+  lastReveal: null,
+  pickedOption: null,
+  clues: {},                 // {medium?: string, culture?: string, creation_year?: string}
+  cluesUsedThisRound: 0,
+  revealingClue: null,
+  final: null,
+  errorMsg: null,
+};
+
+function getToken(){ return localStorage.getItem('hc_token'); }
+
+function render(){
+  const p = document.getElementById('page');
+  if (S.phase === 'intro')   p.innerHTML = renderIntro();
+  if (S.phase === 'loading') p.innerHTML = `<div class="loading">Preparing the gallery...</div>`;
+  if (S.phase === 'round')   p.innerHTML = renderRound();
+  if (S.phase === 'final')   p.innerHTML = renderFinal();
+  if (S.phase === 'error')   p.innerHTML = `<div class="error-box">${escapeHtml(S.errorMsg || 'Something went wrong.')}</div>
+    <div style="text-align:center;margin-top:1rem"><button class="back-btn" onclick="goIntro()">Back</button></div>`;
+}
+
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function renderIntro(){
+  const diffs = [
+    { key:'easy',   label:'Apprentice', hint:'Famous scenes, iconic artworks.' },
+    { key:'medium', label:'Strategist', hint:'Well-known but not universal.' },
+    { key:'hard',   label:'Imperator',  hint:'Obscure works, specialist eye.' },
+  ];
+  return `<div class="intro-card">
+    <div class="eyebrow">Painting ID</div>
+    <h1 class="title">Look, think, identify</h1>
+    <p class="sub">You are shown a painting or artefact. Your job: figure out what it depicts, not when it was made.</p>
+    <div class="rules">
+      <div class="rules-row"><span class="rules-icon">🖼</span> Five rounds. One painting or artefact each.</div>
+      <div class="rules-row"><span class="rules-icon">🎯</span> Pick the correct scene from four options.</div>
+      <div class="rules-row"><span class="rules-icon">🔍</span> Three clue cards per round: medium, culture, creation year. Each costs XP.</div>
+      <div class="rules-row"><span class="rules-icon">🏆</span> Score on accuracy plus difficulty. More clues revealed, less XP.</div>
+    </div>
+    <div class="diff-row">
+      ${diffs.map(d => `<div class="diff-btn ${S.difficulty===d.key?'sel':''}" onclick="setDiff('${d.key}')">
+        <span class="diff-name">${d.label}</span>
+        <span class="diff-hint">${d.hint}</span>
+      </div>`).join('')}
+    </div>
+    <div class="actions">
+      <button class="start-btn" onclick="startSession()">Begin the gallery</button>
+    </div>
+  </div>`;
+}
+
+function renderRound(){
+  const r = S.round;
+  const labels = ['A','B','C','D'];
+  const reveal = S.lastReveal;
+
+  const optsHtml = r.options.map((o, i) => {
+    let cls = 'opt';
+    if (S.answered){
+      if (o === reveal.correct_scene) cls += ' reveal-correct';
+      else if (i === S.pickedOption) cls += ' reveal-wrong';
+    } else if (S.pickedOption === i) {
+      cls += ' picked';
+    }
+    return `<button class="${cls}" ${S.answered ? 'disabled' : ''} onclick="submitAnswer(${i})">
+      <strong style="color:#c8a028">${labels[i]}.</strong> ${escapeHtml(o)}
+    </button>`;
+  }).join('');
+
+  const clueCards = [
+    { key:'medium', name:'Medium' },
+    { key:'culture', name:'Culture / period' },
+    { key:'creation_year', name:'Creation year' },
+  ].map(c => {
+    const v = S.clues[c.key];
+    const busy = S.revealingClue === c.key;
+    const disabled = S.answered || !!v || busy;
+    return `<div class="clue-card">
+      <span class="clue-name">${c.name}${v ? ': <span class="clue-value">'+escapeHtml(v)+'</span>' : ''}</span>
+      ${!v ? `<button class="clue-reveal" onclick="revealClue('${c.key}')" ${disabled ? 'disabled' : ''}>${busy ? '...' : 'Reveal (-15 XP)'}</button>` : ''}
+    </div>`;
+  }).join('');
+
+  const revealBlock = reveal ? `<div class="reveal-card">
+    <div class="reveal-status ${reveal.correct ? 'win' : 'fail'}">${reveal.correct ? '✓ Correct' : '✗ Not quite'}</div>
+    <div class="reveal-scene">${escapeHtml(reveal.correct_scene)}</div>
+    <div class="reveal-long">${escapeHtml(reveal.scene_long || '')}</div>
+    ${reveal.title ? `<div class="reveal-meta"><strong>${escapeHtml(reveal.title)}</strong>${reveal.artist ? ' &middot; '+escapeHtml(reveal.artist) : ''}</div>` : ''}
+    ${reveal.creation_year != null ? `<div class="reveal-meta">Created ${reveal.creation_year < 0 ? Math.abs(reveal.creation_year)+' BC' : reveal.creation_year+' AD'}${reveal.museum ? ' &middot; '+escapeHtml(reveal.museum) : ''}</div>` : ''}
+    <div class="reveal-xp">
+      <span>+${reveal.round_xp} XP this round</span>
+      <button class="start-btn" style="padding:8px 20px;font-size:14px;min-width:0" onclick="nextRound()">${S.round.round < S.round.total ? 'Next round' : 'See results'} →</button>
+    </div>
+  </div>` : '';
+
+  return `<div class="round-top">
+    <div>Round <strong>${r.round}</strong> / ${r.total}</div>
+    <div>Clues used: <strong>${S.cluesUsedThisRound}</strong> / 3</div>
+  </div>
+  <div class="round-card">
+    <div class="img-frame"><img src="${r.image_url}" alt="Artwork" onerror="this.style.opacity=.3"></div>
+    <div class="q">What does this depict?</div>
+    <div class="options">${optsHtml}</div>
+  </div>
+  <div class="clues-wrap">
+    <div class="clues-head"><strong>Clue cards</strong><span>Each reveal costs 15 XP</span></div>
+    <div class="clues-list">${clueCards}</div>
+  </div>
+  ${revealBlock}`;
+}
+
+function renderFinal(){
+  const f = S.final;
+  return `<div class="final-card">
+    <div class="final-score-lbl">Gallery run complete</div>
+    <div class="final-score">${f.score} / ${f.total}</div>
+    <div class="final-xp">
+      <div class="final-xp-row"><span>Difficulty</span><strong>${escapeHtml(f.difficulty_label || f.difficulty)}</strong></div>
+      <div class="final-xp-row"><span>Rounds correct</span><strong>${f.score}</strong></div>
+      <div class="final-xp-row total"><span>XP earned</span><strong>+${f.xp_earned}</strong></div>
+    </div>
+    <div class="final-actions">
+      <button class="start-btn" onclick="goIntro()">Play again</button>
+      <a class="back-btn" href="/">Home</a>
+    </div>
+  </div>`;
+}
+
+function setDiff(d){ S.difficulty = d; render(); }
+
+function goIntro(){
+  S.phase = 'intro'; S.sessionId = null; S.round = null; S.answered = false;
+  S.lastReveal = null; S.pickedOption = null; S.clues = {}; S.cluesUsedThisRound = 0;
+  S.revealingClue = null; S.final = null; S.errorMsg = null;
+  render();
+}
+
+async function startSession(){
+  S.phase = 'loading'; render();
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'start_painting_session', token: getToken(), difficulty: S.difficulty })});
+    const d = await res.json();
+    if (d.error) { S.errorMsg = d.error; S.phase = 'error'; render(); return; }
+    S.sessionId = d.session_id;
+    S.round = d.round;
+    S.answered = false; S.pickedOption = null;
+    S.clues = {}; S.cluesUsedThisRound = 0; S.lastReveal = null;
+    S.phase = 'round'; render();
+  } catch(e) { S.errorMsg = 'Network error: '+e.message; S.phase='error'; render(); }
+}
+
+async function submitAnswer(optIdx){
+  if (S.answered) return;
+  S.pickedOption = optIdx;
+  S.answered = true;
+  const chosen = S.round.options[optIdx];
+  render();
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'submit_painting_answer', session_id: S.sessionId, chosen_option: chosen, clues_used: S.cluesUsedThisRound })});
+    const d = await res.json();
+    if (d.error) { S.errorMsg = d.error; S.phase='error'; render(); return; }
+    S.lastReveal = d.reveal;
+    if (d.completed) {
+      S.final = d.final;
+    } else {
+      // Stash next round, will transition on "Next round" click
+      S._nextRound = d.next_round;
+    }
+    render();
+  } catch(e) { S.errorMsg = 'Network error: '+e.message; S.phase='error'; render(); }
+}
+
+function nextRound(){
+  if (S.final) { S.phase = 'final'; render(); return; }
+  S.round = S._nextRound;
+  S._nextRound = null;
+  S.answered = false;
+  S.pickedOption = null;
+  S.lastReveal = null;
+  S.clues = {};
+  S.cluesUsedThisRound = 0;
+  render();
+}
+
+async function revealClue(key){
+  if (S.clues[key] || S.answered || S.revealingClue) return;
+  S.revealingClue = key; render();
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'reveal_painting_clue', session_id: S.sessionId, clue_type: key })});
+    const d = await res.json();
+    if (d.error) { alert(d.error); S.revealingClue = null; render(); return; }
+    S.clues[key] = d.value;
+    S.cluesUsedThisRound++;
+  } catch(e) { alert('Network error'); }
+  finally { S.revealingClue = null; render(); }
+}
+
+render();
+</script>
+
+</body>
+</html>

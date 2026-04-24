@@ -160,6 +160,11 @@ Events: ${JSON.stringify(events)}`;
     if (action === 'reveal_dialogue_clue')    return handleRevealDialogueClue(body, env);
     if (action === 'get_dialogue_evidence')   return handleGetDialogueEvidence(body, env);
 
+    // ── PAINTING ID ──────────────────────────────────────────────
+    if (action === 'start_painting_session')  return handleStartPaintingSession(body, env);
+    if (action === 'submit_painting_answer')  return handleSubmitPaintingAnswer(body, env);
+    if (action === 'reveal_painting_clue')    return handleRevealPaintingClue(body, env);
+
     const { theme, diff, rounds, lang } = body;
     if (!diff) return json({ error: 'Missing difficulty.' }, 400);
 
@@ -3146,6 +3151,238 @@ Return ONLY valid JSON:
       evidence_loadout: evidenceLoadout,
       evidence_used_count: evidenceUsedIds.length,
       difficulty: diffKey
+    }, 200);
+  } catch(e) {
+    return json({ error: e.message }, 500);
+  }
+}
+
+// ── PAINTING ID GAME ──────────────────────────────────────────
+
+const PAINTING_DIFFICULTY = {
+  easy:   { label: 'Apprentice', diffRange: [1, 2], multiplier: 1.0, cluePenalty: 15 },
+  medium: { label: 'Strategist', diffRange: [3, 3], multiplier: 1.5, cluePenalty: 15 },
+  hard:   { label: 'Imperator',  diffRange: [4, 5], multiplier: 2.0, cluePenalty: 15 },
+};
+const PAINTING_ROUNDS = 5;
+
+function paintingImageUrl(env, key){
+  const base = (env.R2_PAINTINGS_BASE_URL || '').replace(/\/$/, '');
+  return base + '/' + key;
+}
+
+function shuffleArray(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildPaintingRound(artwork, roundNum, env){
+  let distractors = [];
+  try { distractors = JSON.parse(artwork.distractors || '[]'); } catch(e) { distractors = []; }
+  const options = shuffleArray([artwork.scene, ...distractors.slice(0, 3)]);
+  return {
+    round: roundNum,
+    total: PAINTING_ROUNDS,
+    artwork_id: artwork.id,
+    image_url: paintingImageUrl(env, artwork.image_key),
+    thumb_url: paintingImageUrl(env, artwork.thumb_key),
+    options,
+  };
+}
+
+async function handleStartPaintingSession(body, env) {
+  const { token, difficulty } = body;
+  const diffKey = PAINTING_DIFFICULTY[difficulty] ? difficulty : 'medium';
+  const cfg = PAINTING_DIFFICULTY[diffKey];
+
+  let userId = null;
+  if (token) {
+    try { const p = await verifyJWT(token, env.JWT_SECRET); userId = p.sub; } catch(e) {}
+  }
+
+  try {
+    // Pick 5 random artworks in the requested difficulty range
+    const rows = await env.db.prepare(
+      `SELECT * FROM artworks
+       WHERE difficulty BETWEEN ? AND ?
+       ORDER BY RANDOM()
+       LIMIT ?`
+    ).bind(cfg.diffRange[0], cfg.diffRange[1], PAINTING_ROUNDS).all();
+
+    const picks = rows.results || [];
+    if (picks.length < PAINTING_ROUNDS) {
+      return json({ error: 'Not enough artworks in this difficulty range. Seed more first.' }, 500);
+    }
+
+    const sessionId = crypto.randomUUID();
+    const now = Math.floor(Date.now()/1000);
+    const artworkIds = picks.map(p => p.id);
+
+    await env.db.prepare(
+      `INSERT INTO painting_sessions (id, user_id, difficulty, round_num, artwork_ids, answers, status, started_at)
+       VALUES (?, ?, ?, 0, ?, '[]', 'active', ?)`
+    ).bind(sessionId, userId, diffKey, JSON.stringify(artworkIds), now).run();
+
+    // Return round 1
+    const first = picks[0];
+    return json({
+      session_id: sessionId,
+      difficulty: diffKey,
+      difficulty_label: cfg.label,
+      total_rounds: PAINTING_ROUNDS,
+      round: buildPaintingRound(first, 1, env)
+    }, 200);
+  } catch(e) {
+    return json({ error: 'DB error: ' + e.message + ' — did you create the artworks and painting_sessions tables? See scripts/paintings_schema.sql.' }, 500);
+  }
+}
+
+async function handleRevealPaintingClue(body, env) {
+  const { session_id, clue_type } = body;  // 'medium' | 'culture' | 'creation_year'
+  if (!session_id || !clue_type) return json({ error: 'Missing fields' }, 400);
+  try {
+    const session = await env.db.prepare(`SELECT * FROM painting_sessions WHERE id=?`).bind(session_id).first();
+    if (!session || session.status !== 'active') return json({ error: 'Session not active' }, 400);
+
+    const artworkIds = JSON.parse(session.artwork_ids || '[]');
+    const currentIdx = session.round_num;
+    if (currentIdx >= artworkIds.length) return json({ error: 'No active round' }, 400);
+    const artId = artworkIds[currentIdx];
+
+    const art = await env.db.prepare(`SELECT * FROM artworks WHERE id=?`).bind(artId).first();
+    if (!art) return json({ error: 'Artwork missing' }, 500);
+
+    let value = null;
+    if (clue_type === 'medium')        value = art.medium || 'Unknown medium';
+    else if (clue_type === 'culture')  value = art.culture || art.classification || 'Unknown culture';
+    else if (clue_type === 'creation_year') {
+      if (art.creation_year == null) value = 'Date unknown';
+      else if (art.creation_year < 0) value = `Created around ${Math.abs(art.creation_year)} BC`;
+      else value = `Created around ${art.creation_year} AD`;
+    }
+    else return json({ error: 'Unknown clue type' }, 400);
+
+    return json({ clue_type, value }, 200);
+  } catch(e) {
+    return json({ error: e.message }, 500);
+  }
+}
+
+async function handleSubmitPaintingAnswer(body, env) {
+  const { session_id, chosen_option, clues_used } = body;
+  if (!session_id || chosen_option == null) return json({ error: 'Missing fields' }, 400);
+  try {
+    const session = await env.db.prepare(`SELECT * FROM painting_sessions WHERE id=?`).bind(session_id).first();
+    if (!session || session.status !== 'active') return json({ error: 'Session not active' }, 400);
+
+    const artworkIds = JSON.parse(session.artwork_ids || '[]');
+    const answers = JSON.parse(session.answers || '[]');
+    const roundIdx = session.round_num;
+    if (roundIdx >= artworkIds.length) return json({ error: 'Session complete' }, 400);
+
+    const artId = artworkIds[roundIdx];
+    const art = await env.db.prepare(`SELECT * FROM artworks WHERE id=?`).bind(artId).first();
+    if (!art) return json({ error: 'Artwork missing' }, 500);
+
+    // Score: correct if chosen_option matches scene exactly
+    const correct = (String(chosen_option) === String(art.scene));
+    const cluesUsed = Math.max(0, Math.min(3, parseInt(clues_used, 10) || 0));
+
+    const cfg = PAINTING_DIFFICULTY[session.difficulty] || PAINTING_DIFFICULTY.medium;
+    const basePoints = correct ? 50 : 0;
+    const roundXp = Math.max(0, Math.round(basePoints * cfg.multiplier - cluesUsed * cfg.cluePenalty));
+
+    answers.push({ artwork_id: artId, chosen: chosen_option, correct, clues_used: cluesUsed, round_xp: roundXp });
+
+    // Increment play_count on the artwork
+    await env.db.prepare(`UPDATE artworks SET play_count = play_count + 1 WHERE id=?`).bind(artId).run();
+
+    const newRoundNum = roundIdx + 1;
+    const isComplete = newRoundNum >= PAINTING_ROUNDS;
+    const now = Math.floor(Date.now()/1000);
+
+    // Build reveal payload for the just-answered round
+    const reveal = {
+      correct,
+      correct_scene: art.scene,
+      scene_long: art.scene_long,
+      title: art.title,
+      artist: art.artist,
+      creation_year: art.creation_year,
+      museum: art.museum,
+      source_url: art.source_url,
+      round_xp: roundXp
+    };
+
+    if (!isComplete) {
+      // Build next round
+      const nextArt = await env.db.prepare(`SELECT * FROM artworks WHERE id=?`).bind(artworkIds[newRoundNum]).first();
+      if (!nextArt) return json({ error: 'Next artwork missing' }, 500);
+
+      await env.db.prepare(
+        `UPDATE painting_sessions SET round_num=?, answers=? WHERE id=?`
+      ).bind(newRoundNum, JSON.stringify(answers), session_id).run();
+
+      return json({
+        reveal,
+        next_round: buildPaintingRound(nextArt, newRoundNum + 1, env),
+        completed: false
+      }, 200);
+    }
+
+    // Final round: complete the session and award XP
+    const totalXp = answers.reduce((s, a) => s + (a.round_xp || 0), 0);
+    const score = answers.filter(a => a.correct).length;
+
+    await env.db.prepare(
+      `UPDATE painting_sessions SET round_num=?, answers=?, status='complete', completed_at=?, xp_earned=?, score=? WHERE id=?`
+    ).bind(newRoundNum, JSON.stringify(answers), now, totalXp, score, session_id).run();
+
+    // Log to game_sessions + update user stats if logged in
+    if (session.user_id) {
+      try {
+        const sessionScores = JSON.stringify({
+          xp_earned: totalXp,
+          score,
+          difficulty: session.difficulty,
+          rounds: answers.map(a => ({ correct: a.correct, clues_used: a.clues_used, round_xp: a.round_xp }))
+        });
+        await env.db.prepare(
+          `INSERT INTO game_sessions (id, user_id, diff, rounds, scores, avg_score, game_type, completed_at) VALUES (?, ?, ?, ?, ?, ?, 'paintings', ?)`
+        ).bind(crypto.randomUUID(), session.user_id, session.difficulty, PAINTING_ROUNDS, sessionScores, Math.round((score / PAINTING_ROUNDS) * 100), now).run();
+
+        const user = await env.db.prepare('SELECT * FROM users WHERE id=?').bind(session.user_id).first();
+        if (user) {
+          const newGames = (user.total_games || 0) + 1;
+          const today = new Date().toISOString().split('T')[0];
+          const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+          const yStr = yesterday.toISOString().split('T')[0];
+          let streak = user.current_streak || 0;
+          if (user.last_streak_date === today) {}
+          else if (user.last_streak_date === yStr) { streak++; }
+          else { streak = 1; }
+          const newXp = (user.total_xp || 0) + totalXp;
+          await env.db.prepare(
+            `UPDATE users SET total_games=?, current_streak=?, longest_streak=?, last_streak_date=?, last_played=?, total_rounds=total_rounds+?, total_xp=? WHERE id=?`
+          ).bind(newGames, streak, Math.max(user.longest_streak || 0, streak), today, now, PAINTING_ROUNDS, newXp, session.user_id).run();
+        }
+      } catch(e) { /* non-fatal */ }
+    }
+
+    return json({
+      reveal,
+      completed: true,
+      final: {
+        score,
+        total: PAINTING_ROUNDS,
+        xp_earned: totalXp,
+        difficulty: session.difficulty,
+        difficulty_label: cfg.label
+      }
     }, 200);
   } catch(e) {
     return json({ error: e.message }, 500);
