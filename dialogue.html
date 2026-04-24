@@ -130,6 +130,36 @@ a{color:#8a6208;text-decoration:none}
 .clue-body{color:#d8c8a8;font-size:13.5px;line-height:1.55;margin-top:.5rem;padding-top:.5rem;border-top:1px dashed #3a2a14}
 .clues-empty{color:#7a6040;font-size:12px;font-style:italic}
 
+/* LOADOUT picker */
+.loadout-card{background:#faf4e4;border:1.5px solid #c8b888;border-radius:6px;padding:1.5rem 1.5rem 1.25rem;margin-top:1rem}
+.loadout-head{font-family:'Playfair Display',serif;font-size:1.5rem;color:#1a150e;line-height:1.15;margin-bottom:.4rem}
+.loadout-sub{font-size:14px;color:#5a3e1a;font-style:italic;margin-bottom:1.25rem}
+.loadout-counter{font-size:13px;color:#8a6208;font-family:-apple-system,sans-serif;letter-spacing:.04em;font-weight:700;margin-bottom:.75rem}
+.loadout-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.6rem;margin-bottom:1.25rem}
+.loadout-item{background:#fff8e8;border:1.5px solid #c8b888;border-radius:4px;padding:.7rem .85rem;cursor:pointer;transition:all .15s;font-family:'Crimson Text',serif;text-align:left}
+.loadout-item:hover{border-color:#8a6208;background:#fdf4dc}
+.loadout-item.sel{border-color:#8a6208;background:#f0e6cc;box-shadow:inset 0 0 0 1px #8a6208}
+.loadout-item.disabled{opacity:.45;cursor:not-allowed}
+.loadout-name{font-family:'Playfair Display',serif;font-style:italic;font-size:14.5px;color:#1a150e;display:block;margin-bottom:.25rem;line-height:1.25}
+.loadout-hint{font-size:12px;color:#5a3e1a;line-height:1.4}
+.loadout-item.sel .loadout-hint{color:#3a2e1e}
+
+/* EVIDENCE in-chat panel */
+.evi-wrap{background:#0d0d0d;border-left:1px solid #3a2a14;border-right:1px solid #3a2a14;padding:.55rem 1rem .7rem;color:#bbb;font-family:-apple-system,sans-serif;border-bottom:1px dashed #2a2a2a}
+.evi-head{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#888;margin-bottom:.5rem}
+.evi-head strong{color:#c8a028;font-family:Georgia,serif;font-size:13px}
+.evi-meta{font-size:11px;color:#888}
+.evi-meta b{color:#c8a028}
+.evi-list{display:flex;flex-direction:column;gap:.4rem}
+.evi-card{background:#15110a;border:1px solid #3a2a14;border-radius:6px;padding:.5rem .7rem;font-family:'Crimson Text',Georgia,serif;display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.evi-name{color:#e8d8b8;font-size:14px;line-height:1.3;flex:1;font-style:italic;font-weight:700}
+.evi-used{color:#7a6040;font-size:11px;font-style:italic;font-family:-apple-system,sans-serif}
+.evi-deploy{background:#3a2a14;color:#e8d8b8;border:1px solid #c8903a55;border-radius:4px;padding:3px 12px;font-size:11px;cursor:pointer;font-family:-apple-system,sans-serif;letter-spacing:.04em;flex-shrink:0;font-weight:700}
+.evi-deploy:hover:not(:disabled){background:#5a3e1a;border-color:#c8903a}
+.evi-deploy:disabled{opacity:.4;cursor:not-allowed}
+.evi-deploy.armed{background:#c8903a;color:#1a150e;border-color:#e0a84a}
+.evi-armed-hint{font-size:11px;color:#c8903a;text-align:center;padding:.4rem;font-family:-apple-system,sans-serif;font-style:italic}
+
 /* RESULT: XP block */
 .xp-block{background:#1a150e;color:#e8d8b8;border:1px solid #3a2a14;border-radius:6px;padding:1rem 1.25rem;margin:0 auto 1.5rem;max-width:540px;font-family:-apple-system,sans-serif;text-align:left}
 .xp-row{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:#bbb;padding:3px 0}
@@ -179,7 +209,13 @@ let S = {
   clues:[],          // [{id,title,body?}], body present after reveal
   cluesAllowed:0,
   cluesUsed:0,
-  revealingIdx:null  // idx currently mid-flight to prevent double click
+  revealingIdx:null, // idx currently mid-flight to prevent double click
+  // Evidence loadout system (currently Hannibal only)
+  evidencePool:[],   // [{id,name,hint}] available to pick from on intro
+  evidenceSlots:0,   // how many to pick (0 = scenario has none)
+  evidenceLoadout:[],// player's chosen 3 [{id,name,hint,used?}]
+  evidencePicked:[], // [id,id,id] picks during loadout phase
+  evidenceArmed:null // id armed for next message, or null
 };
 
 function getToken(){return localStorage.getItem('hc_token');}
@@ -189,6 +225,7 @@ function render(){
   if(S.phase==='pick')    p.innerHTML=renderPick();
   if(S.phase==='loading') p.innerHTML=renderLoading('Preparing the audience…');
   if(S.phase==='intro')   p.innerHTML=renderIntro();
+  if(S.phase==='loadout') p.innerHTML=renderLoadout();
   if(S.phase==='chat')    p.innerHTML=renderChat();
   if(S.phase==='judging') p.innerHTML=renderLoading(`${S.scenario?.figure_short||'They'} weigh${S.scenario?.figure_short?'':'s'} your words…`);
   if(S.phase==='result')  p.innerHTML=renderResult();
@@ -245,7 +282,7 @@ function renderIntro(){
     <div class="diff-row">${diffs}</div>
     <div class="intro-actions">
       <button class="back-btn" onclick="goPicker()">← Back</button>
-      <button class="start-btn" onclick="startSession()">Proceed to the audience →</button>
+      <button class="start-btn" onclick="proceedFromIntro()">Proceed to the audience →</button>
     </div>
   </div>`;
 }
@@ -280,6 +317,7 @@ function renderChat(){
     <div class="conv-bar"><div class="conv-fill" style="width:${convPct}%"></div><div class="conv-mark" style="left:${winPct}%"></div></div>
   </div>
   ${renderCluesPanel()}
+  ${renderEvidencePanel()}
   <div class="chat-pane" id="chat-pane">${bubbles}</div>
   <div class="input-area">
     <div class="input-row">
@@ -291,6 +329,65 @@ function renderChat(){
       <button class="end-btn" onclick="endAudience()">End audience</button>
     </div>
   </div>`;
+}
+
+function renderLoadout(){
+  if (!S.evidencePool.length) return renderLoading('Preparing the audience…');
+  const slots = S.evidenceSlots || 3;
+  const picked = S.evidencePicked || [];
+  const cards = S.evidencePool.map(e => {
+    const isSel = picked.includes(e.id);
+    const disabled = !isSel && picked.length >= slots;
+    return `<div class="loadout-item ${isSel?'sel':''} ${disabled?'disabled':''}" onclick="toggleLoadoutPick('${e.id}')">
+      <span class="loadout-name">${escapeHtml(e.name)}</span>
+      <span class="loadout-hint">${escapeHtml(e.hint||'')}</span>
+    </div>`;
+  }).join('');
+  return `<div class="loadout-card">
+    <div class="loadout-head">Choose your evidence</div>
+    <p class="loadout-sub">You may carry three artefacts into the tent. Each may be produced once during the audience. ${escapeHtml(S.scenario?.figure_short||'')} will react to what you place before him &mdash; choose what you think will move <em>this</em> figure.</p>
+    <div class="loadout-counter">${picked.length} / ${slots} chosen</div>
+    <div class="loadout-grid">${cards}</div>
+    <div class="intro-actions">
+      <button class="back-btn" onclick="S.phase='intro';render()">← Back</button>
+      <button class="start-btn" ${picked.length===slots?'':'disabled'} onclick="confirmLoadout()">Proceed to the audience →</button>
+    </div>
+  </div>`;
+}
+
+function toggleLoadoutPick(id){
+  const idx = S.evidencePicked.indexOf(id);
+  if (idx >= 0) { S.evidencePicked.splice(idx,1); render(); return; }
+  if (S.evidencePicked.length >= S.evidenceSlots) return;
+  S.evidencePicked.push(id);
+  render();
+}
+
+async function proceedFromIntro(){
+  // If the scenario has an evidence pool, fetch it and route to loadout picker.
+  S.phase = 'loading'; render();
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'get_dialogue_evidence', scenario_id: S.scenarioId })});
+    const d = await res.json();
+    if (d.error) { S.errorMsg=d.error; S.phase='error'; render(); return; }
+    if (Array.isArray(d.evidence) && d.evidence.length > 0) {
+      S.evidencePool = d.evidence;
+      S.evidenceSlots = d.slots || 3;
+      S.evidencePicked = [];
+      S.phase = 'loadout'; render();
+    } else {
+      // No evidence for this scenario — straight to chat
+      startSession();
+    }
+  } catch(e) {
+    S.errorMsg = 'Network error: '+e.message; S.phase='error'; render();
+  }
+}
+
+function confirmLoadout(){
+  if (S.evidencePicked.length !== S.evidenceSlots) return;
+  startSession();
 }
 
 function renderCluesPanel(){
@@ -316,6 +413,46 @@ function renderCluesPanel(){
     </div>
     <div class="clues-list">${cards}</div>
   </div>`;
+}
+
+function renderEvidencePanel(){
+  if (!S.evidenceLoadout || !S.evidenceLoadout.length) return '';
+  const used = S.evidenceLoadout.filter(e => e.used).length;
+  const total = S.evidenceLoadout.length;
+  const cards = S.evidenceLoadout.map(e => {
+    if (e.used) {
+      return `<div class="evi-card" style="opacity:.55">
+        <span class="evi-name">${escapeHtml(e.name)}</span>
+        <span class="evi-used">deployed</span>
+      </div>`;
+    }
+    const armed = S.evidenceArmed === e.id;
+    const disabled = S.awaitingReply || (S.maxTurns - S.turn) <= 0;
+    return `<div class="evi-card">
+      <span class="evi-name">${escapeHtml(e.name)}</span>
+      <button class="evi-deploy ${armed?'armed':''}" onclick="armEvidence('${e.id}')" ${disabled?'disabled':''}>${armed?'Armed':'Deploy with next message'}</button>
+    </div>`;
+  }).join('');
+  const armedHint = S.evidenceArmed
+    ? `<div class="evi-armed-hint">Your next message will produce: <strong>${escapeHtml((S.evidenceLoadout.find(x=>x.id===S.evidenceArmed)||{}).name||'')}</strong> &middot; <a href="#" onclick="armEvidence(null);return false" style="color:#cc6644">cancel</a></div>`
+    : '';
+  return `<div class="evi-wrap">
+    <div class="evi-head">
+      <strong>Your evidence</strong>
+      <span class="evi-meta">Deployed <b>${used}</b> / ${total} &middot; deploy attaches the artefact to your next message</span>
+    </div>
+    <div class="evi-list">${cards}</div>
+    ${armedHint}
+  </div>`;
+}
+
+function armEvidence(id){
+  if (S.evidenceArmed === id || id === null) { S.evidenceArmed = null; render(); return; }
+  const item = (S.evidenceLoadout||[]).find(e => e.id === id);
+  if (!item || item.used) return;
+  if (S.awaitingReply) return;
+  S.evidenceArmed = id;
+  render();
 }
 
 async function revealClue(idx){
@@ -363,6 +500,17 @@ function renderResult(){
     ${cluesUsed>0 ? `<div class="xp-row penalty"><span>Clues revealed (${cluesUsed} × 25)</span><strong>−${cluePenalty}</strong></div>` : ''}
     <div class="xp-row total"><span>XP earned</span><strong>+${xp}</strong></div>
   </div>`;
+  const evidence = (r.evidence_loadout || S.evidenceLoadout || []);
+  const evidenceHtml = evidence.length ? `<div class="xp-block" style="margin-top:.75rem">
+    <div class="xp-row" style="border-bottom:1px solid #3a2a14;padding-bottom:.4rem;margin-bottom:.4rem">
+      <span style="font-weight:700;color:#e8d8b8">Evidence carried into the tent</span>
+      <strong>${evidence.filter(e=>e.used).length} / ${evidence.length} deployed</strong>
+    </div>
+    ${evidence.map(e => `<div class="xp-row" style="font-style:italic">
+      <span>${escapeHtml(e.name)}</span>
+      <strong style="color:${e.used?'#5acc8a':'#7a6040'}">${e.used?'deployed':'kept in reserve'}</strong>
+    </div>`).join('')}
+  </div>` : '';
 
   return `<div class="result-card">
     <div class="verdict-eyebrow">${escapeHtml(figureName)}'s verdict</div>
@@ -370,6 +518,7 @@ function renderResult(){
     ${finalQuoteHtml}
     <p class="verdict-text">${escapeHtml(r.verdict_text||'')}</p>
     ${xpHtml}
+    ${evidenceHtml}
     <div class="result-actions">
       <button class="btn-secondary" onclick="resetIntro()">Try again</button>
       <button class="btn-secondary" onclick="goPicker()">Another audience</button>
@@ -478,14 +627,19 @@ function goPicker(){
   S.endReason = null;
   S.awaitingReply = false;
   S.clues = []; S.cluesAllowed = 0; S.cluesUsed = 0; S.revealingIdx = null;
+  S.evidencePool = []; S.evidenceSlots = 0; S.evidenceLoadout = []; S.evidencePicked = []; S.evidenceArmed = null;
   render();
 }
 
 async function startSession(){
   S.phase='loading'; render();
   try{
+    const payload = { action:'start_dialogue', token:getToken(), scenario_id:S.scenarioId, difficulty:S.difficulty };
+    if (S.evidencePicked && S.evidencePicked.length === S.evidenceSlots && S.evidenceSlots > 0) {
+      payload.evidence_loadout = S.evidencePicked.slice();
+    }
     const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'start_dialogue',token:getToken(),scenario_id:S.scenarioId,difficulty:S.difficulty})});
+      body:JSON.stringify(payload)});
     const d = await res.json();
     if (d.error) { S.errorMsg=d.error; S.phase='error'; render(); return; }
     S.scenario = d.scenario;
@@ -500,6 +654,8 @@ async function startSession(){
     S.cluesAllowed = d.clues_allowed || 0;
     S.cluesUsed = d.clues_used || 0;
     S.revealingIdx = null;
+    S.evidenceLoadout = (d.evidence_loadout || []).map(e => ({ id:e.id, name:e.name, hint:e.hint, used:false }));
+    S.evidenceArmed = null;
     S.messages = [{ role:'figure', content: d.opening }];
     S.turn = 0;
     S.startedAt = Date.now();
@@ -514,24 +670,47 @@ async function sendMessage(){
   const text = input.value.trim();
   if (!text) return;
 
-  S.messages.push({ role:'player', content:text });
+  // Optimistically render the player's message (with deploy line if armed)
+  let armedItem = null;
+  if (S.evidenceArmed) {
+    armedItem = (S.evidenceLoadout||[]).find(e => e.id === S.evidenceArmed && !e.used);
+  }
+  const optimisticContent = armedItem
+    ? `*${armedItem.name}*\n\n${text}`
+    : text;
+  S.messages.push({ role:'player', content: optimisticContent });
   S.awaitingReply = true;
+  const armedSnapshot = S.evidenceArmed;
   render();
 
   try{
+    const payload = { action:'dialogue_turn', session_id:S.sessionId, message:text };
+    if (armedSnapshot) payload.evidence_id = armedSnapshot;
     const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'dialogue_turn',session_id:S.sessionId,message:text})});
+      body:JSON.stringify(payload)});
     const d = await res.json();
     if (d.error) {
+      // Roll back the optimistic message and the arm
+      S.messages.pop();
       S.awaitingReply = false;
       alert(d.error);
       render();
       return;
     }
+    // Replace the optimistic message with the canonical composed turn from the server
+    if (d.player_turn && S.messages.length) {
+      S.messages[S.messages.length - 1] = { role:'player', content: d.player_turn };
+    }
     S.turn = d.turn;
     S.conviction = d.conviction;
     S.endReason = d.end_reason;
     S.awaitingReply = false;
+    // Mark the evidence as used (if any was deployed)
+    if (d.deployed_evidence) {
+      const item = (S.evidenceLoadout||[]).find(e => e.id === d.deployed_evidence.id);
+      if (item) item.used = true;
+    }
+    S.evidenceArmed = null;
 
     if (d.end_reason) {
       endAudience();
@@ -541,6 +720,8 @@ async function sendMessage(){
     S.messages.push({ role:'figure', content: d.reply });
     render();
   } catch(e){
+    // Roll back optimistic message
+    S.messages.pop();
     S.awaitingReply = false;
     alert('Network error. Try again.');
     render();
@@ -575,7 +756,9 @@ function resetIntro(){
   S.endReason = null;
   S.awaitingReply = false;
   S.clues = []; S.cluesAllowed = 0; S.cluesUsed = 0; S.revealingIdx = null;
-  S.phase = 'intro';
+  S.evidenceLoadout = []; S.evidencePicked = []; S.evidenceArmed = null;
+  // keep evidencePool + evidenceSlots so user can pick again without refetch
+  S.phase = (S.evidencePool && S.evidencePool.length) ? 'loadout' : 'intro';
   render();
 }
 
