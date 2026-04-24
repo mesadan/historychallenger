@@ -47,8 +47,9 @@ const CONFIG = {
   imageQuality:  82,
   thumbQuality:  75,
 
-  progressEvery: 10,
-  saveEvery:     50,
+  progressEvery: 1,           // log every item for now so we can see hangs
+  saveEvery:     25,
+  fetchTimeoutMs: 30000,      // 30s timeout per HTTP call
 };
 
 // ── UTILITIES ─────────────────────────────────────────────────────────────
@@ -69,15 +70,20 @@ async function rateLimit(key, minMs){
 
 async function fetchRetry(url, opts={}, label='', maxRetries=3){
   for (let attempt = 0; attempt < maxRetries; attempt++){
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), CONFIG.fetchTimeoutMs);
     try {
-      const res = await fetch(url, opts);
+      const res = await fetch(url, { ...opts, signal: controller.signal });
+      clearTimeout(timer);
       if (res.status === 429 || res.status >= 500) throw new Error(`HTTP ${res.status}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text()).slice(0,200)}`);
       return res;
     } catch(e) {
-      if (attempt === maxRetries - 1) throw e;
+      clearTimeout(timer);
+      const msg = (e.name === 'AbortError') ? `timeout after ${CONFIG.fetchTimeoutMs}ms` : e.message;
+      if (attempt === maxRetries - 1) throw new Error(msg);
       const backoff = 1200 * Math.pow(2, attempt);
-      log(`  [${label}] retry ${attempt+1} after ${backoff}ms: ${e.message.slice(0,120)}`, 'y');
+      log(`  [${label}] retry ${attempt+1} after ${backoff}ms: ${msg.slice(0,120)}`, 'y');
       await sleep(backoff);
     }
   }
@@ -322,17 +328,21 @@ async function main(){
 
     processed++;
     const baseName = `met-${id}`;
+    process.stdout.write(`\r[${processed}] ${baseName} ...fetching`);
     try {
       const obj = await metObject(id);
-      if (!metPassesFilter(obj)){ rejectedMet++; continue; }
+      if (!metPassesFilter(obj)){ rejectedMet++; process.stdout.write(` metRej\n`); continue; }
 
+      process.stdout.write(`\r[${processed}] ${baseName} ...downloading image`);
       await downloadAndResize(obj.primaryImage, baseName, outDir);
 
+      process.stdout.write(`\r[${processed}] ${baseName} ...classifying`);
       const cls = await classifyWithClaude(path.join(outDir, 'images', `${baseName}.jpg`), obj, apiKey);
 
       if (!cls.usable){
         rejectedClaude++;
         await cleanImageFiles(baseName, outDir);
+        process.stdout.write(` claudeRej\n`);
         continue;
       }
 
@@ -347,10 +357,12 @@ async function main(){
       if (counters[era] >= CONFIG.quotas[era]){
         rejectedBucket++;
         await cleanImageFiles(baseName, outDir);
+        process.stdout.write(` bucketFull\n`);
         continue;
       }
 
       counters[era]++;
+      process.stdout.write(`\r[${processed}] ${baseName} ${era} diff${cls.difficulty}: ${(cls.scene||'').slice(0,60)}\n`);
       manifest.push({
         id:            baseName,
         source:        'met',
@@ -372,8 +384,8 @@ async function main(){
         source_url:    obj.objectURL || null,
       });
 
-      if (processed % CONFIG.progressEvery === 0){
-        log(`[${processed}] A:${counters.ancient}/${CONFIG.quotas.ancient}  M:${counters.medieval}/${CONFIG.quotas.medieval}  Mo:${counters.modern}/${CONFIG.quotas.modern}  | metRej:${rejectedMet} claudeRej:${rejectedClaude} bucketRej:${rejectedBucket} err:${errored}`, 'g');
+      if (processed % 20 === 0){
+        log(`----- totals: A:${counters.ancient}/${CONFIG.quotas.ancient}  M:${counters.medieval}/${CONFIG.quotas.medieval}  Mo:${counters.modern}/${CONFIG.quotas.modern}  | metRej:${rejectedMet} claudeRej:${rejectedClaude} bucketRej:${rejectedBucket} err:${errored}`, 'g');
       }
 
       if (manifest.length % CONFIG.saveEvery === 0){
@@ -382,7 +394,7 @@ async function main(){
     } catch(e){
       errored++;
       await cleanImageFiles(baseName, outDir);
-      log(`  err on ${id}: ${e.message.slice(0, 140)}`, 'r');
+      process.stdout.write(` ERR: ${e.message.slice(0, 100)}\n`);
     }
   }
 
