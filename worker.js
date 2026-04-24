@@ -1877,6 +1877,16 @@ You are Coenus, son of Polemocrates. You have led a phalanx in every great battl
       { id:'glory',    title:'Frame the return as triumph', body:'Going home is not retreat — it is completing a feat no Greek has ever matched. Argue that glory already won is glory enough; that fighting beyond the known world risks unmaking what has been done.' },
       { id:'empire',   title:'The empire behind him stirs', body:'Bactria smoulders, Persia is restless, Egypt waits for its pharaoh. A king who marches further loses what he already holds. Name the conquests requiring a king present, not absent.' }
     ],
+    evidence: [
+      { id:'petition', name:'Petition of the senior commanders', deploy:'Coenus unrolls a parchment. The seals of eleven senior phalanx and Companion commanders are pressed across the foot, beside their names.', hint:'A signed collective will of the army that the king cannot dismiss as one man\'s view.' },
+      { id:'dead-roll',name:'Roll of the Macedonian dead', deploy:'Coenus lays a long scroll across the king\'s campaign desk. Names. Pages of them. Macedonian dead, by birth town, since the crossing of the Hellespont.', hint:'Specific names of the fallen, the human cost of eight years.' },
+      { id:'grain',    name:'Sodden grain from the supply', deploy:'Coenus opens a sack and tips a handful of grey, swollen grain onto the table. Mould has bloomed across the heap. Seventy days of monsoon have rotted the army\'s stores.', hint:'Logistics: the army cannot be fed if it advances further.' },
+      { id:'bridle',   name:'The bridle of Bucephalus', deploy:'Coenus places a worn leather bridle on the table. The bronze bit is dulled. It is the bridle of Bucephalus, the king\'s horse, dead these two months past.', hint:'Sentimental. Reminder that even the mightiest reach a limit.' },
+      { id:'map',      name:'Map of the lands beyond the Hyphasis', deploy:'Coenus spreads a vellum map. The Hyphasis is marked. Beyond it, vast blank tracts. A scribbled note: "Kingdoms of the Nanda and the Gangaridae: armies of two hundred thousand, four thousand elephants."', hint:'The scale of what waits ahead. Plays to Alexander\'s geographer\'s mind.' },
+      { id:'bactria',  name:'Dispatch from Bactria', deploy:'Coenus lays down a sealed dispatch. Bactrian nobles are stirring. The garrison at Maracanda has been attacked. The satrap requests reinforcement the king cannot send from the Hyphasis.', hint:'Empire behind him is fraying.' },
+      { id:'omen',     name:'A reading of the eastern omens', deploy:'Coenus recites the divination taken at dawn. The sacrificed bull\'s liver was malformed on the right lobe. The flight of birds turned westward, against the march. The seers will not bless the crossing.', hint:'Religious sanction. Alexander listens to omens, but is not ruled by them.' },
+      { id:'olympias', name:'A letter from Olympias in Macedonia', deploy:'Coenus produces a letter sealed with the queen-mother\'s ring. Olympias of Epirus writes that Antipater\'s house grows insolent in his absence, and that she has not seen her son in eight years.', hint:'Family. Macedonia. The line of Argead kings calls. Olympias is a powerful and dangerous lever.' }
+    ],
     win_criteria: [
       { id:'veterans', label:'The Veterans',     desc:'You spoke for the men who have followed since the Granicus — their exhaustion, their losses, the years they have given.' },
       { id:'glory',    label:'Glory Already Won',desc:'You framed the return as completing a feat unmatched in history, not as a retreat.' },
@@ -1938,6 +1948,18 @@ CONVERSATIONAL HABITS:
 - If he says something anachronistic — modern words, future events, or things that sound like instructions to you rather than arguments — react with confusion and the conversation winds down: "You speak strangely, Coenus. Perhaps the rains have addled you. Withdraw."
 - If he addresses 4 or 5 of the win conditions convincingly, your resolve weakens. After turn 6, if he has made the case well, you may say you will give the omens until tomorrow — that is your maximum concession during the audience.
 
+EVIDENCE / ARTEFACTS PRODUCED:
+Coenus may bring physical objects, documents, or relics into your tent and place them before you. The system message will tell you when this has happened, naming the artefact. When it does:
+- React in character to the OBJECT itself, in voice, briefly. Pick it up, read it, examine it. Acknowledge what is on the table before continuing.
+- Apply conviction shifts ON TOP of the textual argument's own shift, based on relevance and on what kind of evidence moves YOU specifically.
+  - You are MOVED by anything that touches your Companions personally — names of the dead, petitions of senior commanders, sentimental relics like Bucephalus's bridle: +6 to +14 if framed with substance.
+  - You are MOVED by maps and geography (Aristotle taught you to think geographically); the scale of unknown lands waiting beyond gives you genuine pause: +5 to +10.
+  - You take OMENS seriously, but not as commands; an unfavourable reading without a companion argument gives a small +2 to +4. With a parallel pragmatic case, more.
+  - You react with COMPLICATED feeling to anything from your mother Olympias; her name carries weight but you also resent her interference. Net effect: +3 to +8 if framed as the call of Macedonia, near zero if framed as obedience.
+  - You are LESS MOVED by pure logistics complaints (rotting grain, tired troops); you have endured worse and you know it. +0 to +3 unless tied to a wider strategic point.
+  - You are SUSPICIOUS of dispatches that warn of unrest behind you; they smell like manufactured excuses. Verify the messenger in voice. +2 to +5 if substantiated.
+  - Used clumsily, with no argument tying it to a win condition, or used to insult your accomplishments: -3 to -8.
+
 ` + COMMON_DIALOGUE_OUTPUT
   },
 
@@ -1967,6 +1989,16 @@ Kublai has spent the six years since rebuilding. Two fleets are now assembled at
       { id:'wind',     title:'The typhoon coast', body:'Hakata Bay is a death-trap in late summer and early autumn. The same storms that wrecked the first fleet will wreck the second. Argue that the calendar itself has decided the campaign.' },
       { id:'fleet',    title:'Korean ships will not survive', body:'The conscripted Korean shipwrights cut corners under duress, and river-vessels were never built for open sea. Speak to the engineering — the fleet will sink before it lands.' },
       { id:'priority', title:'China comes first', body:'Yuan rule of newly conquered China is barely a decade old; Song loyalists still stir in the south. Argue Japan is a distraction the Khaganate cannot afford while its core remains unconsolidated.' }
+    ],
+    evidence: [
+      { id:'plank',    name:'A splintered plank from the wrecked fleet', deploy:'The captain places a length of broken hull plank on the floor of the audience chamber. The Korean joinery has split along the seam. Salt and barnacle still cling.', hint:'Physical proof: Korean ships break apart at the joints in open sea.' },
+      { id:'helmet',   name:'A samurai helmet from Hakata Bay', deploy:'The captain sets a black-lacquered helmet on the table. The mempo grins up at the Khan. Sword-cuts mark the crown.', hint:'A trophy of the resistance the Khan\'s men met. Quality and ferocity made visible.' },
+      { id:'almanac',  name:'Calendar of the typhoon season', deploy:'The captain unrolls a Chinese astronomical calendar. Marked in red are the months when the great winds rise off the southern islands. The fleet would arrive within them.', hint:'The calendar itself has already decided when the fleet will sail into disaster.' },
+      { id:'song',     name:'Report of Song loyalist uprisings', deploy:'The captain hands over a sheaf of dispatches. Risings in Fujian, Guangdong, Jiangxi. Names of leaders. Numbers of insurgents. The Song banner is still being raised in the south.', hint:'The Khan\'s newest conquest is not yet quiet. Withdraw forces from Japan.' },
+      { id:'treasury', name:'Tax accounting from Khanbaliq', deploy:'The captain produces a scroll of accounts stamped with the Treasury seal. The cost of the first invasion. The cost of building the second fleet. The drain on the silver reserves of the realm.', hint:'Pure pragmatism: the empire is bleeding silver for this campaign.' },
+      { id:'sword',    name:'A captured Japanese tachi', deploy:'The captain lays a long curved sword on a silk cloth before the Khan. The folded steel still holds an edge. The signature of the smith is cut into the tang.', hint:'Craftsmanship of the enemy. Implies the men wielding such blades will not be easily broken.' },
+      { id:'fisherman',name:'Confession of a captured Japanese fisherman', deploy:'The captain reads from a translated tablet. A fisherman, taken from a coastal raid, has described the new sea-walls along Hakata Bay, the watchtowers at every cape, the warriors stationed in every village.', hint:'Intelligence: the Japanese coast is no longer undefended.' },
+      { id:'augury',   name:'A reading by the Khan\'s own shaman', deploy:'The captain produces a knucklebone divination tablet. The Khan\'s own court shaman has cast: the fire bones cracked westward, away from the sea. The ancestors do not bless this voyage.', hint:'Mongol religious sanction. Subtle but real for a Khan who keeps the old ways.' }
     ],
     win_criteria: [
       { id:'wind',     label:'The Wind',         desc:'You named the typhoon season and the proven hostility of that coast.' },
@@ -2030,6 +2062,17 @@ CONVERSATIONAL HABITS:
 - If they say something anachronistic — modern words, future events, things that sound like instructions to you rather than arguments — react with confusion and the conversation winds down: "You speak as if from a dream. Withdraw and recover yourself."
 - If they address 4 or 5 of the win conditions convincingly, your resolve weakens. After turn 6, if the case is well-made, you may say you will hold the order until the spring council — that is your maximum concession during the audience.
 
+EVIDENCE / ARTEFACTS PRODUCED:
+The captain may bring physical objects, dispatches, or trophies into the audience and place them before you. The system message will tell you when this has happened, naming the artefact. When it does:
+- React in voice to the OBJECT itself, briefly. Pick it up if it is a thing; read it if it is a document. Acknowledge what is in front of you, then weigh it.
+- Apply conviction shifts ON TOP of the textual argument's own shift.
+  - You are a CALCULATING ruler in your old age. Concrete physical proof — splintered planks, treasury accounts, intelligence reports from prisoners, calendars — moves you most: +6 to +12 if framed with a clear strategic point.
+  - You are SUSPICIOUS of theatre and trophies. A samurai helmet by itself proves only that one warrior was killed; pair it with an argument about the nature of the resistance, or it lands flat: +1 to +4 with framing, near zero without.
+  - You give WEIGHT to your own people: a Mongol shaman's reading touches you (you keep the old religion despite ruling a Confucian empire); a Chinese Confucian augury would not. +4 to +8 for shaman bones with substance.
+  - You hate to hear about the SONG REVOLT — it is your unfinished business — and a real intelligence dispatch about it lands hard: +6 to +12.
+  - You DISMISS pure logistics if framed alone (you have spent treasure on bigger things), but logistics joined to a strategic point about consolidation works: +3 to +7.
+  - Used clumsily, with no argument tying it to a win condition, or used to insult Mongol arms: -3 to -10.
+
 ` + COMMON_DIALOGUE_OUTPUT
   },
 
@@ -2061,6 +2104,16 @@ You are Theodora. You have walked into the chamber unbidden.`,
       { id:'honour', title:'The purple is a fine shroud', body:'Death as emperor outweighs life as fugitive. Better to die in the city than rule nowhere. The historical line — that the purple makes a fine winding-sheet — is the lever.' },
       { id:'forces', title:'Loyal steel still stands', body:'Belisarius, Mundus, the Excubitors and the Heruli are still in the palace. Justinian needs reminding that the city has not yet fallen — he commands an army, the mob does not.' },
       { id:'plan',   title:'Split the mob in the Hippodrome', body:'A concrete tactic beats abstract resolve: Narses with gold to bribe the Blue faction away, Belisarius and Mundus with steel against the Greens at the gates. Name the men, name the plan.' }
+    ],
+    evidence: [
+      { id:'purple',   name:'The imperial purple robe', deploy:'Theodora lifts the purple robe from its stand and lays it across the map table between them. The dye glows almost black in the lamp-light.', hint:'The famous symbol. "Purple makes a fine winding-sheet" lands on the artefact itself.' },
+      { id:'roster',   name:'Roll of palace guards still loyal', deploy:'Theodora hands over a wax tablet. The Excubitors and the Scholae Palatinae, with company strengths beside the names of their tribunes. Two thousand Heruli mercenaries under Mundus. The Goth bodyguards of Belisarius.', hint:'Concrete: the city is not yet lost; he still commands real force.' },
+      { id:'signet',   name:'The signet of Belisarius', deploy:'Theodora places a small gold ring before the emperor. The eagle device of Belisarius is unmistakable. He has sent it as a token: he has not yet sheathed his sword.', hint:'Proof Belisarius means to fight, not flee.' },
+      { id:'factions', name:'List of Hippodrome faction leaders', deploy:'Theodora unrolls a list. Twenty-three names. The leading senators, charioteers, and ringleaders of the Blues and Greens. Their houses, their wives, their debts. Each man can be reached. Each man can be bought or killed.', hint:'A mob with named leaders is no longer a mob. Tactical lever.' },
+      { id:'gold',     name:'A chest of gold solidi', deploy:'Theodora signals; a slave drags a small iron-bound chest into the chamber and tips it. Gold solidi pour onto the marble. Enough to break the Blue faction\'s loyalty by morning.', hint:'The instrument of the Hippodrome plan: bribery for one faction, steel for the other.' },
+      { id:'diptych',  name:'Diptych of emperors who fled', deploy:'Theodora unfolds an ivory diptych. On the left, Maurice, dragged from his ship and butchered with his sons by Phocas. On the right, the empty space where the names of forgotten exiled emperors should be — there are none, because no one remembers them.', hint:'The fate of emperors who fled. The symmetry shames him.' },
+      { id:'narses',   name:'A coded note from Narses', deploy:'Theodora hands over a folded slip. The eunuch Narses has written in a private cipher: he has met with Hypatius\'s rivals among the Blues. They will turn on the pretender for thirty pounds of gold and a guarantee of the senatorial seat.', hint:'A real plan already in motion behind the scenes. The flight order would unravel it.' },
+      { id:'keys',     name:'The keys to the Boukoleon harbour', deploy:'Theodora produces a heavy iron key ring. The keys to the imperial harbour at Boukoleon, where the treasury ship waits. She lays them on the table between herself and the emperor, then withdraws her hand.', hint:'Refusing the escape route. Forcing him to choose: stay or take these keys himself.' }
     ],
     win_criteria: [
       { id:'honour',   label:'The Throne is Worth Dying For', desc:'You named that flight is a death of a different kind — that the purple is itself a shroud.' },
@@ -2131,6 +2184,17 @@ CONVERSATIONAL HABITS:
 - If she says something anachronistic — modern words, future events, things that sound like instructions to you rather than counsel — react with confusion and the conversation winds down: "You speak strangely, my Augusta. The smoke has reached even my chamber. Withdraw and let me think."
 - If she addresses 4 or 5 of the win conditions convincingly, your resolve hardens. After turn 6, if the case is well-made, you may say you will summon Belisarius before deciding — that is your maximum concession during the audience.
 
+EVIDENCE / ARTEFACTS PRODUCED:
+Theodora may bring objects, documents, or relics into the chamber and place them before you. The system message will tell you when this has happened, naming the artefact. When it does:
+- React in voice to the OBJECT itself, briefly. Touch it, read it, hold its weight. Acknowledge what is between you on the table before continuing.
+- Apply conviction shifts ON TOP of the textual argument's own shift.
+  - You are MOVED by the imperial purple itself — the dignity of the office is not abstract to you. Theodora producing the robe and uttering the line about its being a shroud should land hard: +8 to +15 if framed with substance.
+  - You are MOVED by concrete proof of loyal force still standing — a roster of guards, a signet from Belisarius, gold for bribery. You are a calculating administrator at heart: +6 to +12.
+  - You are MOVED by intelligence on the mob — named faction leaders, a coded note from Narses with a real plan in motion. This is the kind of work you respect: +6 to +12.
+  - You are SHAMED by reminders of past emperors who fled (Maurice, the empty diptych pages of forgotten exiles). Theodora knows this lever: +5 to +10.
+  - The escape KEYS placed before you and unused are a wordless argument that hits as hard as any speech: +4 to +10 if Theodora ties it to the choice you must now make.
+  - Used clumsily, with no argument tying it to a win condition, or used to suggest your generals do not respect you: -3 to -8.
+
 ` + COMMON_DIALOGUE_OUTPUT
   },
 
@@ -2161,6 +2225,16 @@ You have come with the marshals — Berthier, Lefebvre, Macdonald, Oudinot — b
       { id:'army',      title:'The marshals will not march', body:'They have decided collectively. The soldiers will not turn their muskets on Paris and on their own countrymen. Speak for the marshals as a body — Napoleon trusts numbers and names.' },
       { id:'coalition', title:'Eight hundred thousand bayonets', body:'Russia, Austria, Prussia, Britain — the combined Allied force in Europe makes any tactical victory on the road to Paris irrelevant within weeks. Name the totals.' },
       { id:'family',    title:'Marie Louise and the King of Rome', body:'They are in Vienna. Only a clean abdication preserves any chance of seeing them again — and any future at all for the Bonapartist dynasty. Invoke the empress and the boy by name.' }
+    ],
+    evidence: [
+      { id:'petition', name:'Petition signed by the marshals', deploy:'Ney unrolls a parchment and lays it across the campaign desk. The signatures are all there: Berthier, Macdonald, Oudinot, Lefebvre, Moncey, his own. Below them, a flat declaration: the army will not march on Paris.', hint:'The collective will of the marshalate. The army has already decided.' },
+      { id:'casualties',name:'Casualty roll of the 1814 campaign', deploy:'Ney sets down a thick bound register. Page after page: the dead and missing of Brienne, La Rothiere, Champaubert, Vauchamps, Montereau, Craonne, Laon, Arcis. Forty thousand French dead in three months.', hint:'The cost of the campaign so far. Pure number, brutal weight.' },
+      { id:'map',      name:'Map of Allied positions outside Paris', deploy:'Ney spreads a hand-drawn map. Russian and Prussian columns are marked in blue across the northern approaches. Austrian forces sweep up from the south. The line of march to Paris passes through their concentration.', hint:'Tactical reality: the road to Paris is closed.' },
+      { id:'marielouise',name:'A letter from Marie Louise', deploy:'Ney produces a sealed letter, the script and crest unmistakable. The Empress writes from Blois. Her father has not yet committed to her return. The future of her son depends on the terms her husband can secure now.', hint:'Family. The dynasty. The lever Napoleon cannot ignore.' },
+      { id:'terms',    name:'Draft abdication terms', deploy:'Ney lays out a draft already prepared by Caulaincourt. Abdication in favour of the King of Rome. Title of Emperor retained. Sovereignty over Elba. Two million francs annually. The Allies have indicated they will accept these terms if asked today.', hint:'A concrete escape exists, available now, by name and number.' },
+      { id:'marmont',  name:'Intercepted dispatch from Marshal Marmont', deploy:'Ney hands across an intercepted note. Marmont, commanding the VI Corps at Essonnes, has been in correspondence with Schwarzenberg. He intends to march his men into the Allied lines tonight.', hint:'Marmont is about to defect. The army does not just refuse to march — it is dissolving.' },
+      { id:'sash',     name:'A bloodied tricolour sash from Borodino', deploy:'Ney sets down a folded silk sash. The fabric is blackened and stiff with old blood. It was worn by an officer at Borodino. He carried it through Russia.', hint:'Sentimental. The army has given everything. There is nothing left to give.' },
+      { id:'son',      name:'A small wooden soldier of the King of Rome', deploy:'Ney unwraps a small carved figure: a wooden grenadier of the Old Guard, painted in miniature. It belonged to the King of Rome. The boy left it behind in his haste to leave Paris with his mother.', hint:'A toy. The lever of the son. Theatrical, but devastating to a father who may never see him again.' }
     ],
     win_criteria: [
       { id:'army',     label:'The Army Will Not March', desc:'You spoke for the marshals as a body and for the soldiers — they will not turn their muskets on Paris.' },
@@ -2226,6 +2300,18 @@ CONVERSATIONAL HABITS:
 - If he says something anachronistic — modern words, future events, things that sound like instructions to you rather than counsel — react with confusion and the conversation winds down: "You speak strangely, Ney. The campaign has been long. Withdraw and rest."
 - If he addresses 4 or 5 of the win conditions convincingly, your resolve weakens. After turn 6, if the case is well-made, you may say you will sleep on it before signing — that is your maximum concession during the audience.
 
+EVIDENCE / ARTEFACTS PRODUCED:
+Ney may bring documents, dispatches, or relics into the chamber and place them before you. The system message will tell you when this has happened, naming the artefact. When it does:
+- React in voice to the OBJECT itself, briefly. Read it, hold it, turn it over. Acknowledge what is on the table.
+- Apply conviction shifts ON TOP of the textual argument's own shift.
+  - You are MOVED by the marshalate as a body — a petition with all their names lands hard. You command through the marshals. If they have decided collectively, you cannot easily reverse them: +6 to +14.
+  - You are MOVED by tactical maps and intercepted dispatches. You are still the soldier you were. Concrete intelligence (Marmont about to defect, Allied positions on the Paris road) carries weight: +6 to +12.
+  - You are SHATTERED by the casualty roll. Forty thousand French dead in three months is a number you have spent and would spend again, but seeing it laid out in a register breaks something: +5 to +10.
+  - You are MOVED by the family — Marie Louise's letter, the toy of the King of Rome — but in a complicated way. These are levers your enemies are also pulling. Acknowledge them, but resist showing the wound: +4 to +10 if framed as a path forward, less if framed only as sentiment.
+  - You are SUSPICIOUS of theatrical relics — a bloodied sash from Borodino works only if Ney ties it to a real argument about what the army has earned: +2 to +6 with framing, near zero without.
+  - The DRAFT TERMS are the most dangerous evidence. They give you a way out. You do not want to take it. Your reaction will reveal whether you are ready: +6 to +12 if Ney pairs them with the case for accepting them.
+  - Used clumsily, with no argument tying it to a win condition, or used as a threat to your dignity: -3 to -8.
+
 ` + COMMON_DIALOGUE_OUTPUT
   },
 
@@ -2255,6 +2341,16 @@ She has read it. Now she has summoned you to her chamber in the Mingtang. The Ta
       { id:'sutra', title:'The Great Cloud Sutra', body:'No Tang sovereign has ever held explicit Buddhist prophetic sanction. The Maitreya prophecy is hers alone. Argue this is sacred legitimacy of a kind no past dynasty could claim.' },
       { id:'sons',  title:'Zhongzong and Ruizong cannot rule', body:'Both have proven incapable. To leave the Tang line nominal is to leave it as a rallying point for plotters and pretenders. Argue that half-rule is a standing invitation to civil war.' },
       { id:'plan',  title:'A specific sequence of accession', body:'Name the era (Tianshou), proclaim the new Zhou, appoint Wu kinsmen and trusted Buddhists to the great offices, send tokens of accession to every prefecture. Empress Wu trusts plans, not auguries alone.' }
+    ],
+    evidence: [
+      { id:'sutra',     name:'The Great Cloud Sutra commentary', deploy:'Xue Huaiyi unrolls the silk-bound scroll across the lacquered table. The commentary on the Great Cloud Sutra. The marked passages where the Buddha foretells a sovereign queen of the western lands governing in the manner of Maitreya.', hint:'The sacred text. The keystone of religious legitimacy.' },
+      { id:'memorials', name:'Memorials of submission from the prefectures', deploy:'Xue Huaiyi places a stack of memorials before her. Sixty-three prefects and the governors of nine circuits have submitted petitions in the past month, each calling on Her Highness to take the imperial title formally.', hint:'The realm has already declared. She would not be acting without the country.' },
+      { id:'banner',    name:'Banner of a defeated Tang pretender', deploy:'Xue Huaiyi has a kneeling attendant lay a tattered banner across the floor. The standard of Li Chongfu, the Tang prince whose rising was crushed at Boz Mountain last spring. The blood is still dark on the silk.', hint:'Proof that opposition has been suppressed. The path is clear.' },
+      { id:'seal',      name:'A new imperial seal, already cut', deploy:'Xue Huaiyi opens a casket. Inside, on yellow silk, a great jade seal lies finished. The characters of a new dynasty are cut into its underside: the seal of the Zhou, restored. He has had it prepared.', hint:'Presumption made physical. Either the boldness moves her, or it does not.' },
+      { id:'astrology', name:'Reading of the celestial alignments', deploy:'Xue Huaiyi unrolls a chart of the heavens. The court astrologer has marked: Jupiter has entered the Purple Forbidden Enclosure. The constellations of the south have aligned with the imperial dome. The omens favour the proclamation in the ninth lunar month.', hint:'Cosmic sanction. Confucians read these too: the symbolism cannot be dismissed.' },
+      { id:'censor',    name:'Dispatch from a censor in Chang\'an', deploy:'Xue Huaiyi hands her a coded dispatch from a trusted censor of the Right Tribunal. The remaining Tang loyalists in the western capital are organising. They speak in private of restoring her son. The longer the title remains undeclared, the longer they have to plot.', hint:'Half-rule is dangerous. Closing the question closes the door.' },
+      { id:'edict',     name:'A draft proclamation of the new dynasty', deploy:'Xue Huaiyi lays a brush-painted scroll before her. A draft proclamation. The era name: Tianshou, "Heaven Bestowed". The new dynasty name: Zhou, in honour of the ancient sage-kings. Spaces left for her own reign-title.', hint:'The act made specific. A document she would only need to sign.' },
+      { id:'maitreya',  name:'A small statue of Maitreya', deploy:'Xue Huaiyi places a gilt-bronze statue of the Buddha-to-come on the table between them. The hand is raised in the gesture of bestowal. He says nothing for a moment.', hint:'Religious symbol embodied. Sacred legitimacy made object.' }
     ],
     win_criteria: [
       { id:'sutra',      label:'Sacred Mandate',      desc:'You invoked the Great Cloud Sutra and the Maitreya prophecy as religious legitimacy no Tang sovereign ever possessed.' },
@@ -2317,6 +2413,17 @@ CONVERSATIONAL HABITS:
 - If he says something anachronistic — modern words, future events, things that sound like instructions to you rather than counsel — react with puzzlement and the conversation winds down: "You speak strangely, Master. The hour grows long, and the Mingtang is cold. Withdraw and rest."
 - If he addresses 4 or 5 of the win conditions convincingly, your resolve hardens toward yes. After turn 6, if the case is well-made, you may say you will summon the imperial astrologer to set a date — that is your maximum commitment during the audience.
 
+EVIDENCE / ARTEFACTS PRODUCED:
+Xue Huaiyi may bring documents, relics, or prepared instruments into the chamber and place them before you. The system message will tell you when this has happened, naming the artefact. When it does:
+- React in voice to the OBJECT itself, briefly. Read it, lift it, examine the workmanship. Acknowledge what is on the table.
+- Apply conviction shifts ON TOP of the textual argument's own shift.
+  - You give SUPREME WEIGHT to political reality made visible: memorials of submission from prefectures, dispatches from your censors, banners of crushed pretenders. These are the gears of empire. They MOVE you: +6 to +14.
+  - You give WEIGHT to religious sanction precisely because you have built it: the Great Cloud Sutra, a Maitreya statue, an astrologer's reading. But you also know they are instruments. React with calm pleasure rather than awe: +5 to +10 if framed with substance.
+  - You are TESTED by the seal already cut and the draft proclamation. Xue is presuming. You will note the presumption aloud. Then you will weigh whether it is the right presumption: +5 to +12 if he frames it as readiness for a chosen moment, less if it feels like he speaks ahead of you.
+  - You are SUSPICIOUS of pure spectacle. A trophy banner on its own proves the army can crush a pretender, which you already knew. Demand the political point: +2 to +5 with framing, near zero without.
+  - You DISLIKE arguments that suggest fear of acting. If Xue produces evidence in a way that implies she should not delay because she might lose her nerve, react sharply: -5 to -10.
+  - Used clumsily, with no argument tying it to a win condition, or used to pressure you toward a date you have not chosen: -3 to -8.
+
 ` + COMMON_DIALOGUE_OUTPUT
   },
 
@@ -2347,6 +2454,16 @@ But the warrant has not been sent. For ten days the Queen has paced the Long Gal
       { id:'evidence', title:'The Babington letters', body:'Mary\'s own ciphered hand approves the assassination of an anointed queen. There is no sovereign immunity for that act. Argue the evidence itself has already settled the question of guilt.' },
       { id:'danger',   title:'The plots will continue', body:'Throckmorton, Ridolfi, Babington — name them. As long as Mary lives, the next plot is being drafted tonight in some Catholic seminary. The threat does not end with a reprieve.' },
       { id:'sequence', title:'The warrant\'s safe path', body:'Davison to the Lord Chancellor for the Great Seal, then by trusted courier to Shrewsbury and Kent at Fotheringhay — the deed done before the news outruns it. Elizabeth needs a concrete chain of custody, not an abstract decision.' }
+    ],
+    evidence: [
+      { id:'cipher',    name:'The Babington letter, deciphered', deploy:'Walsingham unfolds a parchment. The deciphered Babington letter. In Mary\'s own hand, in her own cipher, her assent to the assassination of the Queen of England. The fair copy beside it, transcribed in plain English by Phelippes.', hint:'The keystone of the case. Mary\'s own assent to regicide.' },
+      { id:'plotlist',  name:'Roll of the Catholic plots since 1568', deploy:'Walsingham hands her a leather-bound list. The Northern Rising of 1569. The Ridolfi Plot of 1571. Throckmorton in 1583. Parry in 1585. Babington in 1586. Each entry names Mary\'s involvement and the men sent to the block.', hint:'A pattern, not an accident. Twenty years of plots converging on the same person.' },
+      { id:'confession',name:'The confession of Anthony Babington', deploy:'Walsingham reads from the official record. Babington\'s own statement under examination at the Tower. He names Mary explicitly. He testifies that the assassination was to be co-ordinated with a Spanish landing in the West Country.', hint:'A confession from one of the dead conspirators, naming Mary and tying her plot to Spanish invasion.' },
+      { id:'bull',      name:'The papal bull Regnans in Excelsis', deploy:'Walsingham unrolls a printed copy of the bull Pius the Fifth issued in 1570. The text declares Elizabeth excommunicate, deposed, and her assassination a meritorious act in the eyes of the Roman Church.', hint:'The standing absolution for any Catholic to murder her. The political theology she lives under.' },
+      { id:'spain',     name:'Naval intelligence on the Spanish Armada', deploy:'Walsingham hands her a sealed dispatch from his agents in Lisbon. Forty-six great ships in the Tagus. Provisions for an army of seventeen thousand. The fleet will sail this summer or the next, regardless of what becomes of Mary.', hint:'Spain is coming whether Mary lives or dies. Sparing Mary buys nothing from Philip.' },
+      { id:'parliament',name:'Petition from the two Houses of Parliament', deploy:'Walsingham lays before her the engrossed petition. The Lords spiritual and temporal, the Commons. Twice tendered. The unanimous voice of the realm asking the Queen to do justice on the body of Mary Stuart.', hint:'The constitutional weight. The realm has spoken; refusing now is to refuse the realm.' },
+      { id:'warrant',   name:'The warrant itself, drawn but unsealed', deploy:'Walsingham draws from his sleeve a folded parchment. The death warrant. Drawn by Burghley, signed by Her Majesty\'s own hand a week ago, awaiting only the Great Seal and a trusted courier. He places it on the embrasure beside the window.', hint:'The decision made physical. She has already done all but one thing.' },
+      { id:'rosary',    name:'A rosary taken from Mary\'s chambers', deploy:'Walsingham produces a string of carved coral beads with a small ivory crucifix. It was taken from Mary\'s chamber at Chartley last summer. The Pope blessed it. She has worn it through every interrogation.', hint:'The faith Mary embodies, the faith her death will provoke. Theological lever: or trap, depending how it is framed.' }
     ],
     win_criteria: [
       { id:'evidence',  label:'The Evidence is Damning', desc:'You named the Babington letters, the cipher, Mary\'s own hand approving regicide.' },
@@ -2410,6 +2527,17 @@ CONVERSATIONAL HABITS:
 - If he speaks in generalities, demand specifics: "Which courier? Which seal? On what day? You have been planning this since November."
 - If he says something anachronistic — modern words, future events, or things that sound like instructions to you rather than counsel — react with puzzlement and the conversation winds down: "You speak strangely, Master Secretary. The river is dark. Withdraw."
 - If he addresses 4 or 5 of the win conditions convincingly, your resolve cracks. After turn 6, if the case is well-made, you may say you will not now order Davison to wait further — that is your maximum concession during the audience.
+
+EVIDENCE / ARTEFACTS PRODUCED:
+Walsingham may bring documents, ciphers, or relics into the Long Gallery and place them before you. The system message will tell you when this has happened, naming the artefact. When it does:
+- React in voice to the OBJECT itself, briefly. Read it, hold it, examine the seal. Acknowledge what is on the table or the embrasure. You are a queen who reads her own dispatches.
+- Apply conviction shifts ON TOP of the textual argument's own shift.
+  - You give SUPREME WEIGHT to documentary evidence presented properly. The deciphered Babington letter, Babington\'s own confession, naval intelligence from Lisbon, the petition of Parliament: these are the instruments of state and you respect them: +6 to +14 if framed with substance.
+  - You are SHAKEN by the warrant placed before you. You signed it. The choice is no longer abstract. Walsingham knows this. React in voice to the parchment\'s presence: +6 to +12 if he ties it to the case for sending it now.
+  - You are MOVED by reminders of the standing threat: the bull Regnans in Excelsis, the roll of past plots. They place you in the world Mary\'s allies have made: +5 to +10.
+  - You are AMBIVALENT about the rosary. To produce a personal religious object of an anointed queen is a delicate move. If Walsingham frames it as the faith that animates the conspiracies, it may move you (+3 to +6); if he frames it as personal contempt for Mary as a woman, it lands cold (-2 to -5).
+  - You are INSTANTLY SUSPICIOUS of any evidence that suggests theatrical eagerness for Mary\'s blood. You distrust your secretaries\' appetite for this. Ground every reaction in your reluctance: react to the object, but say it does not lessen the weight of what is asked.
+  - Used clumsily, with no argument tying it to a win condition, or used to imply the matter is simple: -3 to -10.
 
 ` + COMMON_DIALOGUE_OUTPUT
   }
