@@ -24,6 +24,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const DATA_DIR = path.join(PROJECT_ROOT, 'paintings_data');
 
+// Allow overriding the manifest filename via env var (default: manifest.json)
+const MANIFEST_FILE = process.env.MANIFEST_FILE || 'manifest.json';
+// Skip uploading images that already exist in R2 (set SKIP_R2=1 to skip uploads entirely)
+const SKIP_R2 = process.env.SKIP_R2 === '1';
+
 const { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_KEY, R2_BUCKET } = process.env;
 for (const [k, v] of Object.entries({ R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_KEY, R2_BUCKET })){
   if (!v){ console.error(`Missing env var: ${k}`); process.exit(1); }
@@ -59,9 +64,9 @@ async function uploadFile(localPath, r2Key, contentType){
 }
 
 async function main(){
-  const manifestPath = path.join(DATA_DIR, 'manifest.json');
+  const manifestPath = path.join(DATA_DIR, MANIFEST_FILE);
   const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8'));
-  console.log(`Loaded ${manifest.length} artworks from manifest`);
+  console.log(`Loaded ${manifest.length} artworks from ${MANIFEST_FILE}${SKIP_R2 ? ' (R2 uploads disabled)' : ''}`);
 
   let uploaded = 0, skipped = 0, errored = 0;
   const now = Math.floor(Date.now() / 1000);
@@ -86,8 +91,10 @@ async function main(){
     const thumbKey = `thumbs/${art.id}.jpg`;
 
     try {
-      await uploadFile(imgLocal, imgKey, 'image/jpeg');
-      await uploadFile(thumbLocal, thumbKey, 'image/jpeg');
+      if (!SKIP_R2){
+        await uploadFile(imgLocal, imgKey, 'image/jpeg');
+        await uploadFile(thumbLocal, thumbKey, 'image/jpeg');
+      }
       uploaded++;
       if ((i+1) % 10 === 0 || i === manifest.length - 1){
         console.log(`  [${i+1}/${manifest.length}] uploaded ${uploaded} OK, skipped ${skipped}, errored ${errored}`);
