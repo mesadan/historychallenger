@@ -3160,11 +3160,13 @@ Return ONLY valid JSON:
 // ── PAINTING ID GAME ──────────────────────────────────────────
 
 const PAINTING_DIFFICULTY = {
-  easy:   { label: 'Apprentice', diffRange: [1, 2], multiplier: 1.0, cluePenalty: 15 },
-  medium: { label: 'Strategist', diffRange: [3, 3], multiplier: 1.5, cluePenalty: 15 },
+  easy:   { label: 'Apprentice', diffRange: [1, 3], multiplier: 1.0, cluePenalty: 15 },
+  medium: { label: 'Strategist', diffRange: [3, 4], multiplier: 1.5, cluePenalty: 15 },
   hard:   { label: 'Imperator',  diffRange: [4, 5], multiplier: 2.0, cluePenalty: 15 },
 };
 const PAINTING_ROUNDS = 5;
+// Exclude artworks the user has seen in their last N painting sessions
+const PAINTING_RECENT_LOOKBACK = 4;
 
 function paintingImageUrl(env, key){
   const base = (env.R2_PAINTINGS_BASE_URL || '').replace(/\/$/, '');
@@ -3205,15 +3207,57 @@ async function handleStartPaintingSession(body, env) {
   }
 
   try {
-    // Pick 5 random artworks in the requested difficulty range
-    const rows = await env.db.prepare(
-      `SELECT * FROM artworks
-       WHERE difficulty BETWEEN ? AND ?
-       ORDER BY RANDOM()
-       LIMIT ?`
-    ).bind(cfg.diffRange[0], cfg.diffRange[1], PAINTING_ROUNDS).all();
+    // Build exclusion list of artworks this user has seen in their recent sessions
+    let excludedIds = [];
+    if (userId) {
+      try {
+        const recent = await env.db.prepare(
+          `SELECT artwork_ids FROM painting_sessions
+           WHERE user_id = ?
+           ORDER BY started_at DESC
+           LIMIT ?`
+        ).bind(userId, PAINTING_RECENT_LOOKBACK).all();
+        const seen = new Set();
+        for (const row of (recent.results || [])) {
+          try { for (const id of JSON.parse(row.artwork_ids || '[]')) seen.add(id); } catch(e) {}
+        }
+        excludedIds = [...seen];
+      } catch(e) { /* non-fatal — fall through to unfiltered pick */ }
+    }
 
-    const picks = rows.results || [];
+    // Pick 5 random artworks in the requested difficulty range, excluding recently-seen
+    let picks = [];
+    if (excludedIds.length) {
+      const placeholders = excludedIds.map(() => '?').join(',');
+      const rows = await env.db.prepare(
+        `SELECT * FROM artworks
+         WHERE difficulty BETWEEN ? AND ?
+           AND id NOT IN (${placeholders})
+         ORDER BY RANDOM()
+         LIMIT ?`
+      ).bind(cfg.diffRange[0], cfg.diffRange[1], ...excludedIds, PAINTING_ROUNDS).all();
+      picks = rows.results || [];
+    }
+    // Fallback: if exclusion left us short, top up from full pool (still random)
+    if (picks.length < PAINTING_ROUNDS) {
+      const need = PAINTING_ROUNDS - picks.length;
+      const haveIds = picks.map(p => p.id);
+      const allExcluded = [...new Set([...haveIds, ...excludedIds])];
+      const placeholders = allExcluded.length ? allExcluded.map(() => '?').join(',') : null;
+      const sql = placeholders
+        ? `SELECT * FROM artworks WHERE difficulty BETWEEN ? AND ? AND id NOT IN (${placeholders}) ORDER BY RANDOM() LIMIT ?`
+        : `SELECT * FROM artworks WHERE difficulty BETWEEN ? AND ? ORDER BY RANDOM() LIMIT ?`;
+      const args = placeholders ? [cfg.diffRange[0], cfg.diffRange[1], ...allExcluded, need] : [cfg.diffRange[0], cfg.diffRange[1], need];
+      const topUp = await env.db.prepare(sql).bind(...args).all();
+      picks = picks.concat(topUp.results || []);
+    }
+    // Last-resort fallback: if even unfiltered pool is short, allow repeats from anywhere in the range
+    if (picks.length < PAINTING_ROUNDS) {
+      const rows = await env.db.prepare(
+        `SELECT * FROM artworks WHERE difficulty BETWEEN ? AND ? ORDER BY RANDOM() LIMIT ?`
+      ).bind(cfg.diffRange[0], cfg.diffRange[1], PAINTING_ROUNDS).all();
+      picks = rows.results || [];
+    }
     if (picks.length < PAINTING_ROUNDS) {
       return json({ error: 'Not enough artworks in this difficulty range. Seed more first.' }, 500);
     }
