@@ -37,69 +37,155 @@ const CONFIG = {
   // members. Drawn broadly to cover battles, named figures, treaties,
   // coronations, ancient civilizations, and historical events.
   categories: [
-    // Battles + military
+    // ── Battles + military (general) ───────────────────────
     'Category:Battle paintings',
     'Category:Naval battles in art',
     'Category:Sieges in art',
     'Category:Battle scenes in art',
     'Category:Military art',
     'Category:Cavalry charges in art',
+    'Category:Cavalry in art',
+    'Category:Infantry in art',
+    'Category:Artillery in art',
+    'Category:Soldiers in art',
+    'Category:Knights in art',
+    'Category:Naval warfare in art',
+    'Category:Sea battles in art',
 
-    // History painting genre
+    // ── History painting genre ─────────────────────────────
     'Category:History paintings',
-    'Category:History paintings by century',
     'Category:Paintings of historical events',
     'Category:Narrative paintings',
+    'Category:Historical paintings by Eugène Delacroix',
+    'Category:Historical paintings by Jacques-Louis David',
+    'Category:Paintings by John Trumbull',
+    'Category:Paintings by Benjamin West',
+    'Category:Paintings by Jean-Léon Gérôme',
+    'Category:Paintings by Antoine-Jean Gros',
+    'Category:Paintings by Horace Vernet',
 
-    // Specific event types
+    // ── Specific event types ───────────────────────────────
     'Category:Coronations in art',
     'Category:Treaties in art',
     'Category:Surrenders in art',
     'Category:Assassinations in art',
     'Category:Executions in art',
     'Category:Royal court paintings',
+    'Category:Triumphs in art',
+    'Category:Funerals in art',
+    'Category:Diplomatic missions in art',
+    'Category:Royal weddings in art',
 
-    // Named figures (large, recognizable)
-    'Category:Paintings of Napoleon',
+    // ── Named figures, ancient ─────────────────────────────
     'Category:Paintings of Julius Caesar',
     'Category:Paintings of Alexander the Great',
-    'Category:Paintings of George Washington',
-    'Category:Paintings of Joan of Arc',
     'Category:Paintings of Cleopatra',
     'Category:Paintings of Hannibal',
-    'Category:Paintings of Marie Antoinette',
-    'Category:Paintings of Elizabeth I of England',
-    'Category:Paintings of Henry VIII',
+    'Category:Paintings of Roman emperors',
+    'Category:Paintings of Augustus',
+    'Category:Paintings of Nero',
+    'Category:Paintings of Constantine the Great',
+    'Category:Paintings of Pericles',
+    'Category:Paintings of Socrates',
 
-    // Ancient civilizations
+    // ── Named figures, medieval / early modern ────────────
+    'Category:Paintings of Charlemagne',
+    'Category:Paintings of Joan of Arc',
+    'Category:Paintings of Saladin',
+    'Category:Paintings of Genghis Khan',
+    'Category:Paintings of Henry VIII of England',
+    'Category:Paintings of Elizabeth I of England',
+    'Category:Paintings of Mary, Queen of Scots',
+    'Category:Paintings of Louis XIV',
+    'Category:Paintings of Frederick the Great',
+    'Category:Paintings of Peter the Great',
+    'Category:Paintings of Catherine the Great',
+
+    // ── Named figures, modern ──────────────────────────────
+    'Category:Paintings of Napoleon',
+    'Category:Paintings of Marie Antoinette',
+    'Category:Paintings of George Washington',
+    'Category:Paintings of Abraham Lincoln',
+    'Category:Paintings of Thomas Jefferson',
+    'Category:Paintings of Benjamin Franklin',
+    'Category:Paintings of Wellington',
+    'Category:Paintings of Bismarck',
+    'Category:Paintings of Napoleon III',
+
+    // ── Ancient civilizations ──────────────────────────────
     'Category:Ancient Roman scenes in art',
     'Category:Ancient Greek scenes in art',
     'Category:Ancient Egyptian scenes in art',
     'Category:Mesopotamian art',
     'Category:Achaemenid art',
     'Category:Assyrian palace reliefs',
+    'Category:Egyptian tomb paintings',
+    'Category:Egyptian reliefs',
+    'Category:Roman frescoes',
+    'Category:Pompeii frescoes',
+    'Category:Roman mosaics with historical subjects',
+    'Category:Greek vase paintings with mythological subjects',
     'Category:Persian miniatures',
+    'Category:Sassanian art',
+    'Category:Babylonian art',
+    'Category:Hittite art',
+    'Category:Phoenician art',
 
-    // Medieval / early modern scenes
+    // ── Medieval ──────────────────────────────────────────
     'Category:Medieval scenes in paintings',
     'Category:Crusader art',
-    'Category:Renaissance history paintings',
     'Category:Tournaments in art',
+    'Category:Medieval miniatures of battles',
+    'Category:Bayeux Tapestry',
+    'Category:Medieval illuminated manuscripts depicting battles',
 
-    // American + revolutionary scenes
+    // ── Renaissance + early modern ─────────────────────────
+    'Category:Renaissance history paintings',
+    'Category:Paintings of the Italian Wars',
+    'Category:Paintings of the Thirty Years War',
+    'Category:Paintings of the English Civil War',
+    'Category:Paintings of the Hundred Years War',
+    'Category:Paintings of the Wars of the Roses',
+
+    // ── American + revolutionary scenes ────────────────────
     'Category:Paintings of the American Revolutionary War',
     'Category:Paintings of the American Civil War',
     'Category:Paintings of the French Revolution',
     'Category:Paintings of the Napoleonic Wars',
+    'Category:Paintings of the War of 1812',
+    'Category:Paintings of the Crimean War',
+    'Category:Paintings of the Franco-Prussian War',
+    'Category:Paintings of the Mexican-American War',
 
-    // Asian historical
+    // ── Asian historical ───────────────────────────────────
     'Category:Mughal paintings',
+    'Category:Mughal court paintings',
     'Category:Ukiyo-e prints depicting historical events',
+    'Category:Ukiyo-e prints depicting samurai',
     'Category:Chinese history paintings',
+    'Category:Paintings of Chinese emperors',
+    'Category:Paintings of Japanese emperors',
+    'Category:Japanese woodblock prints of historical battles',
+    'Category:Indian miniature paintings',
+
+    // ── Pre-Columbian + African ────────────────────────────
+    'Category:Aztec art',
+    'Category:Inca art',
+    'Category:Maya art',
+    'Category:Olmec art',
+    'Category:Pre-Columbian art',
+    'Category:Benin Bronzes',
+    'Category:Ethiopian art',
+
+    // ── Exploration + science ──────────────────────────────
+    'Category:Paintings of Christopher Columbus',
+    'Category:Paintings of explorers',
+    'Category:Voyages in art',
+    'Category:Paintings of historical scientists',
   ],
 
-  perCategoryLimit: 60,        // up to 60 file titles per category
-  totalTarget: 200,            // stop accepting once we hit this
+  perCategoryLimit: 200,       // up to 200 file titles per category
+  totalTarget: 400,            // stop accepting once we hit this (caps ~$10 budget)
   classifyImageWidth: 500,     // small image fetched for Claude classification
   fullImageWidth:    1400,     // full image fetched after Claude OK
   imageMaxWidth:     1200,     // sharp resize for our R2 image
@@ -110,7 +196,8 @@ const CONFIG = {
   commonsRateMs:  280,
   claudeRateMs:   1500,
   fetchTimeoutMs: 45000,
-  saveEvery:      15,
+  saveEvery:      20,
+  heartbeatEvery: 50,          // print full progress summary every N processed
 };
 
 // ── PUBLIC DOMAIN LICENSE FILTER ─────────────────────────────────────────
@@ -121,11 +208,12 @@ function isPDOrCC0(extmetadata){
   const lic  = (extmetadata?.License?.value || '').toLowerCase();
   const name = (extmetadata?.LicenseShortName?.value || '').toLowerCase();
   const blob = lic + ' ' + name;
-  // Acceptable
-  if (/\b(cc0|cc-0|public domain|pd-?art|pd-?old|pd-?us|pd-?self|pd-?author|pd-?life|publicdomain)\b/.test(blob)) return true;
+  // Strict: REJECT first if any restricted term appears (CC-BY, share-alike,
+  // NC, fair use, copyright symbol, "all rights reserved")
+  if (/cc[- ]?by|share[- ]?alike|noncommercial|non-commercial|fair use|©|all rights reserved/.test(blob)) return false;
+  // Acceptable PD / CC0 / Public Domain Mark variants
+  if (/\b(cc0|cc-0|cc-?pdm|public domain|pd-?art|pd-?old|pd-?us|pd-?self|pd-?author|pd-?life|publicdomain|copyrighted free use)\b/.test(blob)) return true;
   if (lic === 'pd' || name === 'pd') return true;
-  // Anything mentioning "by", "sa", or "nc" is restricted
-  if (/cc[- ]?by|share[- ]?alike|noncommercial|non-commercial|fair use|©/.test(blob)) return false;
   return false;
 }
 
@@ -387,6 +475,7 @@ async function main(){
   log(`Total unique candidates: ${candidates.length}  (${seenSourceIds.size} already done)`, 'c');
 
   const manifest = resumed.slice();
+  const startTime = Date.now();
   let processed = 0, rejectedLicense = 0, rejectedSize = 0, rejectedClaude = 0, errored = 0;
 
   for (const title of candidates){
@@ -476,6 +565,11 @@ async function main(){
       if (manifest.length % CONFIG.saveEvery === 0){
         await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
         log(`----- saved ${manifest.length} total | licRej:${rejectedLicense} sizeRej:${rejectedSize} claudeRej:${rejectedClaude} err:${errored}`, 'g');
+      }
+      if (processed % CONFIG.heartbeatEvery === 0){
+        const elapsedMin = Math.round((Date.now() - startTime) / 60000);
+        const acceptRate = Math.round((manifest.length - resumed.length) * 100 / Math.max(1, processed));
+        log(`heartbeat @ ${processed}/${candidates.length} candidates | ${elapsedMin}min elapsed | ${manifest.length - resumed.length} keepers (${acceptRate}% accept rate)`, 'c');
       }
     } catch(e){
       errored++;
