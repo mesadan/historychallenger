@@ -21,13 +21,18 @@ async function readJsonOrEmpty(file){
 async function main(){
   const clean = await readJsonOrEmpty('manifest_clean.json');
   const hist  = await readJsonOrEmpty('manifest_historical.json');
+  const wm    = await readJsonOrEmpty('manifest_wikimedia.json');
   console.log(`manifest_clean.json:      ${clean.length}`);
   console.log(`manifest_historical.json: ${hist.length}`);
+  console.log(`manifest_wikimedia.json:  ${wm.length}`);
 
   const seen = new Map();
   for (const it of clean) seen.set(it.id, it);
   for (const it of hist){
     if (!seen.has(it.id)) seen.set(it.id, it);   // historical wins on collision
+  }
+  for (const it of wm){
+    if (!seen.has(it.id)) seen.set(it.id, it);   // wikimedia adds, never overrides
   }
   const combined = [...seen.values()];
   console.log(`combined (deduped): ${combined.length}`);
