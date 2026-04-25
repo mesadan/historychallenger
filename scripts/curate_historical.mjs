@@ -29,27 +29,47 @@ const CONFIG = {
     // Battles + military
     'battle of', 'siege of', 'fall of', 'sack of', 'defense of',
     'cavalry charge', 'naval battle', 'crusade', 'conquest',
+    'Battle of Cannae', 'Battle of Hastings', 'Battle of Waterloo',
+    'Battle of Trafalgar', 'Battle of Austerlitz', 'Battle of Yorktown',
+    'Battle of Bunker Hill', 'Siege of Vienna', 'Battle of Lepanto',
 
     // Famous figures by name
     'Napoleon', 'Caesar', 'Alexander the Great', 'Hannibal', 'Cleopatra',
     'Charlemagne', 'Washington', 'Hercules', 'Augustus', 'Constantine',
     'Hadrian', 'Trajan', 'Justinian', 'Saladin', 'Genghis Khan',
     'Akbar', 'Suleiman', 'Cyrus', 'Xerxes', 'Darius',
+    'Marcus Aurelius', 'Brutus', 'Pompey', 'Scipio', 'Mark Antony',
+    'Frederick the Great', 'Peter the Great', 'Catherine the Great',
 
     // Historical events
     'coronation', 'triumph of', 'death of', 'oath of', 'crossing of',
     'signing of treaty', 'surrender of', 'execution of', 'assassination of',
     'meeting of', 'congress of',
+    'Death of Caesar', 'Assassination of Caesar', 'Crossing the Rubicon',
+    'Death of Socrates', 'Oath of the Horatii', 'Coronation of Napoleon',
+    'Crossing the Delaware', 'Surrender at Yorktown', 'Death of Marat',
+    'Death of Wolfe', 'Tennis Court Oath',
 
-    // Civilization-specific scenes
-    'Roman senate', 'Roman triumph', 'Greek hero', 'Egyptian pharaoh court',
+    // Civilization-specific historical scenes
+    'Roman senate', 'Roman triumph', 'Roman forum', 'Roman emperor',
+    'Greek hero', 'Greek warrior', 'Egyptian pharaoh',
     'Persian king', 'Mughal court', 'Ottoman sultan', 'Byzantine emperor',
-    'Gallic warrior', 'Viking', 'samurai battle', 'Aztec',
+    'Gallic warrior', 'Viking', 'samurai', 'Aztec', 'Inca',
+
+    // Ancient Near Eastern reliefs / murals (Assyrian, Egyptian, Persian)
+    'Assyrian relief', 'Assyrian mural', 'Lamassu', 'Nimrud relief',
+    'Nineveh relief', 'Babylonian relief', 'Persian relief',
+    'Egyptian relief', 'Egyptian mural', 'tomb relief',
+    'Battle of Kadesh', 'Ramesses II battle',
+
+    // Medieval narrative scenes
+    'medieval coronation', 'medieval king', 'medieval court',
+    'medieval battle', 'medieval tournament', 'illuminated manuscript battle',
+    'crusader battle', 'knight in combat',
 
     // Famous events / classical narrative scenes
     'Trojan war', 'Odysseus', 'Achilles', 'Trojan horse',
     'fall of Rome', 'fall of Constantinople', 'rape of Sabines',
-    'oath of Horatii', 'crossing the Delaware', 'death of Socrates',
   ],
   resultsPerQuery: 60,
   totalTarget: 300,
@@ -150,23 +170,42 @@ async function classifyWithClaude(imagePath, obj, apiKey){
   await rateLimit('anthropic', CONFIG.claudeRateMs);
   const imgB64 = (await fs.readFile(imagePath)).toString('base64');
 
-  const prompt = `You are classifying an artwork for a HISTORY quiz. The player will be shown the image and asked "what does this depict?" with 4 options. We want SCENES of historical events, battles, named figures in action — NOT decorative objects, NOT generic devotional images, NOT obscure portraits.
+  const prompt = `You are curating a SECULAR HISTORY image library for a quiz. The player will be shown the image and asked "what does this depict?" with 4 options.
 
-REJECT (set usable=false) if any of these apply:
+WHAT WE ARE BUILDING: a broad library of recognizable historical SCENES from the entire secular human past, across all eras (ancient, medieval, modern), all civilizations (European, Asian, African, American, Near Eastern), and all kinds of historical events. The kind of images that appear in serious history textbooks.
+
+EXAMPLES of the flavor we want (this is an illustrative, NON-EXHAUSTIVE list — anything in the same spirit qualifies):
+- The death of Aemilius Paullus at Cannae, the assassination of Julius Caesar, the Tennis Court Oath
+- A Napoleonic battle scene, a Crimean War cavalry charge, an American Civil War engagement
+- An Assyrian palace relief, an Egyptian tomb mural, a Persian procession at Persepolis
+- A Mughal court scene, a Chinese emperor's audience, a samurai battle, an Aztec ceremony
+- A medieval coronation, a knight in tournament, a guild scene, a manuscript battle illumination
+- A Roman senate scene, a triumph, a gladiatorial combat, a forum debate
+- A signing of a treaty, a surrender, an oath, a royal court, a diplomatic mission
+- A historical figure DOING something identifiable (not just a portrait bust)
+- An exploration scene, a pilgrimage, a famous voyage, an embassy
+- A scientific or technological milestone (a printing press, a steam engine, an early balloon flight)
+- A cultural moment with historical weight (an opera premiere, a famous lecture, a salon)
+
+Be GENEROUS with what counts as historical. If a literate adult would say "yes, this depicts a recognizable historical scene from somewhere in the human past", it qualifies. We are pulling from the whole world's history, not just Europe.
+
+REJECT (set usable=false) if any of these apply, even if otherwise beautiful:
+- ANY religious devotional image: Madonna and Child, anonymous saints, generic crucifixion, holy family, angels, cherubs, sacred heart, altarpiece, illuminated bible scenes that test religious knowledge rather than historical knowledge. We want secular history, not theology. The ONLY religious images we keep are those depicting documented historical events (e.g. Council of Nicaea, Coronation of Charlemagne by the Pope, the actual martyrdom of a real bishop attested in non-religious sources).
+- Pure mythology UNLESS it is a famous named scene from a story players might actually know (Death of Socrates is fine; a generic nymph painting is not)
 - Decorative object with no scene (vase, bracelet, mirror, coin, fragment, mask, statuette, pottery)
-- Generic religious devotional with no specific narrative event (random Madonna and Child, anonymous saint, generic crucifixion without distinguishing detail)
-- Anonymous portrait (someone you can't name from the image alone)
+- Anonymous portrait of someone you can't name from the image alone
 - Pure landscape, still life, or decorative pattern with no historical hook
 - Unclear, damaged, abstract, or illegible image
 - Architectural detail or fragment
+- Genre scenes (peasants dancing, market scenes) with no historical hook
 
-KEEP (set usable=true) if:
-- Battle, siege, military scene with identifiable subject
-- Named historical figure shown in identifiable context (Caesar crossing the Rubicon, not just a bust)
-- Coronation, treaty, surrender, execution, royal court scene
-- Famous biblical narrative scene (Last Supper, David and Goliath — recognizable plot)
-- Named mythological scene (Judgment of Paris, Death of Socrates — story-based)
-- Historical event with named participants
+KEEP (set usable=true) ONLY if it is a SECULAR HISTORICAL SCENE such as:
+- Battle, siege, military scene with identifiable historical subject
+- Named historical figure shown in identifiable historical context (not just a bust or portrait)
+- Coronation, treaty, surrender, execution, royal court scene from a documented historical event
+- Ancient relief or mural showing a real historical event (Assyrian campaigns, Egyptian battles, Persian processions)
+- Famous classical historical scene (Death of Socrates, Oath of the Horatii)
+- A documented historical moment with named participants
 
 Then provide:
 - depicted_era: ancient (before 500 AD), medieval (500-1500), or modern (after 1500). Use the era of what is depicted, not when the artwork was made.
