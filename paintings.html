@@ -163,7 +163,7 @@ function renderRound(){
 
   const optsHtml = r.options.map((o, i) => {
     let cls = 'opt';
-    if (S.answered){
+    if (S.answered && reveal){
       if (o === reveal.correct_scene) cls += ' reveal-correct';
       else if (i === S.pickedOption) cls += ' reveal-wrong';
     } else if (S.pickedOption === i) {
