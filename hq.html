@@ -203,6 +203,15 @@ function renderQuiz(){
   const opts=['a','b','c','d'];
   const labels=['A','B','C','D'];
   const pct=Math.round(((S.questionNum-1)/TOTAL)*100);
+  if (window.hcSetReportContext){
+    window.hcSetReportContext({
+      game_type: 'hq',
+      item_type: 'question',
+      item_id: q.id,
+      snapshot_text: q.question.slice(0, 140),
+      snapshot: { question: q.question, answers: q.answers, topic: q.topic, era: q.era, difficulty: q.difficulty },
+    });
+  }
   return `<div class="quiz-wrap">
     <div class="quiz-top">
       <div class="quiz-progress-text">Question ${S.questionNum} of ${TOTAL}</div>

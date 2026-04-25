@@ -655,6 +655,16 @@ function renderQuestion() {
   const q = _gameQuestions[_current];
   const total = _gameQuestions.length;
 
+  if (window.hcSetReportContext){
+    window.hcSetReportContext({
+      game_type: 'persona',
+      item_type: 'question',
+      item_id: q.id,
+      snapshot_text: q.scenario.slice(0, 140),
+      snapshot: { scenario: q.scenario, context: q.context, choices: q.choices, trait_axis: q.trait_axis },
+    });
+  }
+
   const pct = Math.round((_current / total) * 100);
   document.getElementById('q-fill').style.width = `${pct}%`;
   document.getElementById('q-num').textContent = `${_current + 1} / ${total}`;

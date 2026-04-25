@@ -1027,6 +1027,15 @@ function startRound(){
   document.getElementById('rn').textContent=(S.round+1)+'/'+S.rounds;
   const m=document.getElementById('mets');if(m)m.style.display='flex';
   updSc();
+  if (window.hcSetReportContext){
+    window.hcSetReportContext({
+      game_type: 'timeline',
+      item_type: 'set',
+      item_id: 'round-' + (S.round+1) + '-' + (raw[0]?.name || '').slice(0, 40),
+      snapshot_text: 'Timeline round ' + (S.round+1) + ': ' + raw.map(e => `${e.name} (${e.year})`).join(' | ').slice(0, 200),
+      snapshot: { events: raw, diff: S.diff, theme: S.theme, lang: typeof LANG !== 'undefined' ? LANG : 'en' },
+    });
+  }
   renderStep1();
 }
 

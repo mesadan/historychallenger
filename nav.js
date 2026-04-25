@@ -201,4 +201,15 @@ if(document.readyState==='loading'){
 }else{
   injectNav();init();
 }
+
+// Auto-load the report widget on every page that has the nav.
+// The widget self-injects a floating "Report" button that is hidden until
+// a game page calls window.hcSetReportContext({...}).
+if (!document.getElementById('hc-report-loader')){
+  const r = document.createElement('script');
+  r.id = 'hc-report-loader';
+  r.src = '/report.js?v=1';
+  r.defer = true;
+  document.head.appendChild(r);
+}
 })();

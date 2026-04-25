@@ -74,6 +74,7 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
   <button class="tab" onclick="switchTab('dispatch')">⚔ Dispatch</button>
   <button class="tab" onclick="switchTab('hq')">📊 HQ</button>
   <button class="tab" onclick="switchTab('audience')">🎭 Audience</button>
+  <button class="tab" onclick="switchTab('reports')">⚑ Reports</button>
 </div>
 
 <!-- SEEDER TAB -->
@@ -752,6 +753,7 @@ function switchTab(name){
   else document.querySelector(`.tab[onclick*="'${name}'"]`)?.classList.add('active');
   if(name==='dashboard') loadDashboard();
   if(name==='timeline') loadTLStats();
+  if(name==='reports')   loadReports();
 }
 
 // ── DASHBOARD ────────────────────────────────────────────────────
@@ -1808,7 +1810,147 @@ async function updateHQQ(id, difficulty, level){
   <div id="audience-scenarios" style="margin-top:.5rem"><span style="color:#555">Click Refresh to load.</span></div>
 </div>
 
+<!-- REPORTS TAB -->
+<div id="tab-reports" class="tab-content">
+  <style>
+    .rep-counts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .rep-count{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;padding:6px 12px;font-size:12px;color:#aaa}
+    .rep-count strong{color:#c8903a;font-size:14px;display:block}
+    .rep-list{display:flex;flex-direction:column;gap:8px}
+    .rep-card{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:12px 14px;font-size:13px}
+    .rep-card.s-open{border-left:3px solid #c8903a}
+    .rep-card.s-reviewed{border-left:3px solid #5ac8fa}
+    .rep-card.s-fixed{border-left:3px solid #0f0}
+    .rep-card.s-wontfix{border-left:3px solid #555;opacity:.6}
+    .rep-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+    .rep-meta{font-size:11px;color:#555;display:flex;gap:10px;flex-wrap:wrap}
+    .rep-game-tag{color:#c8903a;font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:11px}
+    .rep-when{color:#777}
+    .rep-status{font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:2px 6px;border-radius:3px;background:#1a1a1a;color:#aaa}
+    .rep-status.s-open{background:#3a2a08;color:#c8903a}
+    .rep-status.s-fixed{background:#0a3a0a;color:#0f0}
+    .rep-context{color:#aaa;font-size:12px;margin-bottom:6px;font-style:italic}
+    .rep-comment{background:#000;border-left:2px solid #c8903a;padding:6px 10px;margin:6px 0;color:#fff;font-size:13px}
+    .rep-snapshot{background:#080808;border:1px solid #1a1a1a;border-radius:4px;padding:6px 10px;margin-top:6px;font-size:11px;color:#888;white-space:pre-wrap;font-family:monospace;max-height:140px;overflow-y:auto}
+    .rep-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+    .rep-actions button{font-size:11px;padding:3px 10px;margin:0}
+    .rep-by{color:#666;font-size:11px}
+  </style>
+  <div class="row" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+    <span style="color:#c8903a;font-size:14px;font-weight:700">⚑ User Reports</span>
+    <div>
+      <label style="font-size:12px;color:#888">Game:
+        <select id="rep-game" onchange="loadReports()">
+          <option value="all">All</option>
+          <option value="paintings">Painting ID</option>
+          <option value="hq">HQ</option>
+          <option value="overlap">Overlap</option>
+          <option value="timeline">Timeline</option>
+          <option value="dispatch">Dispatch</option>
+          <option value="dialogue">Audience</option>
+          <option value="persona">Persona</option>
+        </select>
+      </label>
+      &nbsp;
+      <label style="font-size:12px;color:#888">Status:
+        <select id="rep-status" onchange="loadReports()">
+          <option value="open">Open</option>
+          <option value="all">All</option>
+          <option value="reviewed">Reviewed</option>
+          <option value="fixed">Fixed</option>
+          <option value="wontfix">Won't fix</option>
+        </select>
+      </label>
+      &nbsp;
+      <button onclick="loadReports()" style="font-size:12px;padding:5px 14px">↻ Refresh</button>
+    </div>
+  </div>
+  <div id="rep-counts" class="rep-counts"></div>
+  <div id="rep-list" class="rep-list"><span style="color:#555">Click Refresh to load.</span></div>
+</div>
+
 <script>
+// ── REPORTS TAB ──────────────────────────────────────────────
+async function loadReports(){
+  const game = document.getElementById('rep-game').value;
+  const status = document.getElementById('rep-status').value;
+  const list = document.getElementById('rep-list');
+  const counts = document.getElementById('rep-counts');
+  list.innerHTML = '<span style="color:#555;font-size:12px">Loading…</span>';
+  try {
+    const res = await fetch(WORKER, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'list_reports', admin_key: ADMIN_KEY, game_type: game, status, limit: 300 }) });
+    const d = await res.json();
+    if (d.error) { list.innerHTML = `<span class="err">Error: ${d.error}</span>`; return; }
+
+    // Counts grid
+    const summary = {};
+    for (const c of (d.counts || [])){
+      summary[c.game_type] = summary[c.game_type] || { open:0, reviewed:0, fixed:0, wontfix:0, total:0 };
+      summary[c.game_type][c.status] = c.n;
+      summary[c.game_type].total += c.n;
+    }
+    counts.innerHTML = Object.keys(summary).sort().map(g => `<div class="rep-count"><strong>${summary[g].open||0}</strong>${g} open · ${summary[g].total} total</div>`).join('') || '<div class="rep-count">no reports yet</div>';
+
+    if (!d.reports || !d.reports.length){
+      list.innerHTML = '<span style="color:#555;font-size:12px">No reports match these filters.</span>';
+      return;
+    }
+    list.innerHTML = d.reports.map(r => {
+      const when = new Date((r.created_at || 0) * 1000).toLocaleString();
+      const by = r.user_email ? `by ${escapeRep(r.user_email)}` : 'guest';
+      const ctx = r.snapshot_text ? escapeRep(r.snapshot_text) : (r.item_id ? escapeRep(r.item_id) : '(no context)');
+      const snap = r.snapshot ? JSON.stringify(r.snapshot, null, 2) : '';
+      const url = r.page_url ? `<a href="${escapeRep(r.page_url)}" target="_blank" style="color:#5ac8fa;text-decoration:none;font-size:11px">↗ open</a>` : '';
+      return `<div class="rep-card s-${r.status||'open'}">
+        <div class="rep-head">
+          <div>
+            <span class="rep-game-tag">${escapeRep(r.game_type)}</span>
+            <span class="rep-status s-${r.status||'open'}">${r.status||'open'}</span>
+          </div>
+          <div class="rep-meta">
+            <span class="rep-when">${when}</span>
+            <span class="rep-by">${by}</span>
+            ${url}
+          </div>
+        </div>
+        <div class="rep-context">${escapeRep(r.item_type||'')} · ${ctx}</div>
+        <div class="rep-comment">${escapeRep(r.comment)}</div>
+        ${snap ? `<details><summary style="font-size:11px;color:#777;cursor:pointer">snapshot</summary><div class="rep-snapshot">${escapeRep(snap)}</div></details>` : ''}
+        <div class="rep-actions">
+          <button onclick="setReportStatus('${r.id}','reviewed')">Mark reviewed</button>
+          <button onclick="setReportStatus('${r.id}','fixed')" style="background:#0a3a0a;color:#0f0">Fixed</button>
+          <button onclick="setReportStatus('${r.id}','wontfix')" style="background:#2a2a2a;color:#aaa">Won't fix</button>
+          <button onclick="setReportStatus('${r.id}','open')" style="background:#1a1a1a;color:#888">Reopen</button>
+          <button onclick="deleteReport('${r.id}')" style="background:#1a0000;color:#f44;border:1px solid #f44">Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    list.innerHTML = `<span class="err">${e.message}</span>`;
+  }
+}
+function escapeRep(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+async function setReportStatus(id, status){
+  try {
+    const res = await fetch(WORKER, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'update_report_status', admin_key: ADMIN_KEY, id, status }) });
+    const d = await res.json();
+    if (d.error) { alert(d.error); return; }
+    loadReports();
+  } catch(e){ alert(e.message); }
+}
+async function deleteReport(id){
+  if (!confirm('Delete this report?')) return;
+  try {
+    const res = await fetch(WORKER, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'delete_report', admin_key: ADMIN_KEY, id }) });
+    const d = await res.json();
+    if (d.error) { alert(d.error); return; }
+    loadReports();
+  } catch(e){ alert(e.message); }
+}
+
 async function loadAudienceScenarios(){
   const el = document.getElementById('audience-scenarios');
   el.innerHTML = '<span style="color:#555;font-size:12px">Loading…</span>';

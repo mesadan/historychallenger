@@ -165,6 +165,21 @@ Events: ${JSON.stringify(events)}`;
     if (action === 'submit_painting_answer')  return handleSubmitPaintingAnswer(body, env);
     if (action === 'reveal_painting_clue')    return handleRevealPaintingClue(body, env);
 
+    // ── USER REPORTS (any game) ──────────────────────────────────
+    if (action === 'submit_report')           return handleSubmitReport(body, env);
+    if (action === 'list_reports') {
+      if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
+      return handleListReports(body, env);
+    }
+    if (action === 'update_report_status') {
+      if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
+      return handleUpdateReportStatus(body, env);
+    }
+    if (action === 'delete_report') {
+      if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
+      return handleDeleteReport(body, env);
+    }
+
     const { theme, diff, rounds, lang } = body;
     if (!diff) return json({ error: 'Missing difficulty.' }, 400);
 
@@ -3429,6 +3444,149 @@ async function handleSubmitPaintingAnswer(body, env) {
       }
     }, 200);
   } catch(e) {
+    return json({ error: e.message }, 500);
+  }
+}
+
+// ── USER REPORTS ──────────────────────────────────────────────
+
+const REPORT_COMMENT_LIMIT = 280;
+
+async function ensureReportsTable(env){
+  // Idempotent CREATE — the worker auto-provisions the table on first use.
+  await env.db.prepare(
+    `CREATE TABLE IF NOT EXISTS user_reports (
+       id TEXT PRIMARY KEY,
+       game_type TEXT NOT NULL,
+       item_type TEXT,
+       item_id TEXT,
+       snapshot_text TEXT,
+       snapshot_json TEXT,
+       comment TEXT NOT NULL,
+       user_id TEXT,
+       user_email TEXT,
+       page_url TEXT,
+       status TEXT DEFAULT 'open',
+       created_at INTEGER NOT NULL
+     )`
+  ).run();
+  await env.db.prepare(
+    `CREATE INDEX IF NOT EXISTS idx_reports_status_created
+       ON user_reports(status, created_at DESC)`
+  ).run();
+  await env.db.prepare(
+    `CREATE INDEX IF NOT EXISTS idx_reports_game_status
+       ON user_reports(game_type, status)`
+  ).run();
+}
+
+async function handleSubmitReport(body, env){
+  const { token, game_type, item_type, item_id, snapshot, snapshot_text, comment, page_url } = body;
+  if (!game_type || typeof game_type !== 'string') return json({ error: 'Missing game_type' }, 400);
+  if (!comment || typeof comment !== 'string') return json({ error: 'Missing comment' }, 400);
+  const trimmed = comment.trim();
+  if (!trimmed) return json({ error: 'Comment cannot be empty' }, 400);
+  if (trimmed.length > REPORT_COMMENT_LIMIT) return json({ error: `Comment too long (max ${REPORT_COMMENT_LIMIT} chars)` }, 400);
+
+  // Optional auth — capture user identity if a valid token is present.
+  let userId = null, userEmail = null;
+  if (token){
+    try {
+      const p = await verifyJWT(token, env.JWT_SECRET);
+      userId = p.sub;
+      userEmail = p.email || null;
+    } catch(e) { /* ignore — guests can also report */ }
+  }
+
+  try {
+    await ensureReportsTable(env);
+    const id = crypto.randomUUID();
+    const now = Math.floor(Date.now()/1000);
+    const snapshotJson = snapshot ? JSON.stringify(snapshot).slice(0, 4000) : null;
+
+    await env.db.prepare(
+      `INSERT INTO user_reports
+       (id, game_type, item_type, item_id, snapshot_text, snapshot_json, comment, user_id, user_email, page_url, status, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', ?)`
+    ).bind(
+      id,
+      String(game_type).slice(0, 40),
+      item_type ? String(item_type).slice(0, 40) : null,
+      item_id ? String(item_id).slice(0, 200) : null,
+      snapshot_text ? String(snapshot_text).slice(0, 400) : null,
+      snapshotJson,
+      trimmed,
+      userId,
+      userEmail ? String(userEmail).slice(0, 200) : null,
+      page_url ? String(page_url).slice(0, 400) : null,
+      now,
+    ).run();
+    return json({ ok: true, id }, 200);
+  } catch(e){
+    return json({ error: 'DB error: ' + e.message }, 500);
+  }
+}
+
+async function handleListReports(body, env){
+  const { game_type, status, limit } = body;
+  try {
+    await ensureReportsTable(env);
+    const clauses = [];
+    const binds = [];
+    if (game_type && game_type !== 'all'){ clauses.push('game_type = ?'); binds.push(game_type); }
+    if (status && status !== 'all')      { clauses.push('status = ?');    binds.push(status); }
+    const where = clauses.length ? 'WHERE ' + clauses.join(' AND ') : '';
+    const cap = Math.min(Math.max(parseInt(limit, 10) || 200, 10), 500);
+
+    const rows = await env.db.prepare(
+      `SELECT id, game_type, item_type, item_id, snapshot_text, snapshot_json,
+              comment, user_id, user_email, page_url, status, created_at
+       FROM user_reports
+       ${where}
+       ORDER BY created_at DESC
+       LIMIT ${cap}`
+    ).bind(...binds).all();
+
+    const reports = (rows.results || []).map(r => ({
+      ...r,
+      snapshot: r.snapshot_json ? safeParse(r.snapshot_json) : null,
+    }));
+
+    // Per-game open counts for the dashboard
+    const counts = await env.db.prepare(
+      `SELECT game_type, status, COUNT(*) as n FROM user_reports GROUP BY game_type, status`
+    ).all();
+
+    return json({ reports, counts: counts.results || [], total: reports.length }, 200);
+  } catch(e){
+    return json({ error: e.message }, 500);
+  }
+}
+
+function safeParse(s){ try { return JSON.parse(s); } catch(e) { return null; } }
+
+async function handleUpdateReportStatus(body, env){
+  const { id, status } = body;
+  if (!id) return json({ error: 'Missing id' }, 400);
+  const valid = ['open', 'reviewed', 'fixed', 'wontfix'];
+  if (!valid.includes(status)) return json({ error: 'Invalid status' }, 400);
+  try {
+    await ensureReportsTable(env);
+    await env.db.prepare(`UPDATE user_reports SET status = ? WHERE id = ?`).bind(status, id).run();
+    return json({ ok: true }, 200);
+  } catch(e){
+    return json({ error: e.message }, 500);
+  }
+}
+
+async function handleDeleteReport(body, env){
+  const { id } = body;
+  if (!id) return json({ error: 'Missing id' }, 400);
+  try {
+    await ensureReportsTable(env);
+    await env.db.prepare(`DELETE FROM user_reports WHERE id = ?`).bind(id).run();
+    return json({ ok: true }, 200);
+  } catch(e){
     return json({ error: e.message }, 500);
   }
 }

@@ -312,6 +312,16 @@ function renderRound(){
   document.getElementById('sc').textContent = S.score;
   document.getElementById('rn').textContent = (S.round + 1) + '/' + S.sets.length;
 
+  if (window.hcSetReportContext){
+    window.hcSetReportContext({
+      game_type: 'overlap',
+      item_type: 'set',
+      item_id: set.id,
+      snapshot_text: 'Anchor: ' + set.anchor.name + ' · round ' + (S.round + 1),
+      snapshot: { anchor: set.anchor, options: set.options, correct: set.correct, explanation: set.explanation },
+    });
+  }
+
   // Anchor timeline, just show anchor bar in gold, clean and simple
   document.getElementById('body').innerHTML = `
     <div>

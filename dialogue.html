@@ -288,6 +288,16 @@ function renderIntro(){
 }
 
 function renderChat(){
+  if (window.hcSetReportContext && S.scenario){
+    const lastMsg = S.messages[S.messages.length - 1];
+    window.hcSetReportContext({
+      game_type: 'dialogue',
+      item_type: 'turn',
+      item_id: (S.scenario.id || 'scenario') + '-turn-' + S.turn,
+      snapshot_text: S.scenario.figure_short + ' · turn ' + S.turn + (lastMsg ? ' · ' + (lastMsg.role || '') : ''),
+      snapshot: { scenario_id: S.scenario.id, figure: S.scenario.figure, turn: S.turn, conviction: S.conviction, last_message: lastMsg },
+    });
+  }
   const remaining = Math.max(0, S.timeLimit - Math.floor((Date.now() - S.startedAt) / 1000));
   const mins = Math.floor(remaining/60), secs = remaining%60;
   let timerCls = '';

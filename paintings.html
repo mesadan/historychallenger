@@ -161,6 +161,17 @@ function renderRound(){
   const labels = ['A','B','C','D'];
   const reveal = S.lastReveal;
 
+  // Make this round reportable (image quality, scene wrong, distractors weird, etc.)
+  if (window.hcSetReportContext){
+    window.hcSetReportContext({
+      game_type: 'paintings',
+      item_type: 'artwork',
+      item_id: r.artwork_id,
+      snapshot_text: (reveal?.correct_scene || r.options?.[0] || r.artwork_id) + ' (round ' + r.round + ')',
+      snapshot: { artwork_id: r.artwork_id, image_url: r.image_url, options: r.options, reveal: reveal || null },
+    });
+  }
+
   const optsHtml = r.options.map((o, i) => {
     let cls = 'opt';
     if (S.answered && reveal){
@@ -239,6 +250,7 @@ function goIntro(){
   S.phase = 'intro'; S.sessionId = null; S.round = null; S.answered = false;
   S.lastReveal = null; S.pickedOption = null; S.clues = {}; S.cluesUsedThisRound = 0;
   S.revealingClue = null; S.final = null; S.errorMsg = null;
+  if (window.hcClearReportContext) window.hcClearReportContext();
   render();
 }
 
