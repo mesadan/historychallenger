@@ -390,7 +390,8 @@ const CONFIG = {
   ],
 
   perCategoryLimit: 300,       // bigger pool per category for thorough gap-fill
-  totalTarget: 400,            // cap at ~$10
+  totalTarget: 2000,           // effectively no cap on this pool (~$29 max at 27% accept)
+  perCategoryKeepersCap: 15,   // max keepers per category, prevents Bayeux Tapestry from dominating
   classifyImageWidth: 500,
   fullImageWidth:    1400,
   imageMaxWidth:     1200,
@@ -649,20 +650,27 @@ async function main(){
   let resumed = await readJsonOrEmpty(CONFIG.manifestFile);
   if (resumed.length) log(`Resuming: ${resumed.length} v2 items already saved`, 'c');
 
-  // Gather candidates
+  // Gather candidates, remembering which category each title first came from
+  // (so we can enforce a per-category keepers cap to prevent any single
+  // category from dominating the run).
   log('\nGathering candidates from focused categories...', 'c');
-  const allTitles = new Set();
+  const titleToCategory = new Map();
   for (const cat of CONFIG.categories){
     try {
       const titles = await commonsCategoryFiles(cat);
-      titles.forEach(t => allTitles.add(t));
+      for (const t of titles){
+        if (!titleToCategory.has(t)) titleToCategory.set(t, cat);
+      }
       log(`  ${cat}: ${titles.length} files`, 'b');
     } catch(e){
       log(`  ${cat}: FAILED ${e.message.slice(0,80)}`, 'r');
     }
   }
-  const candidates = shuffle([...allTitles]).filter(t => !existing.has(t));
+  const candidates = shuffle([...titleToCategory.keys()]).filter(t => !existing.has(t));
   log(`Total unique new candidates (after dedup): ${candidates.length}`, 'c');
+
+  const categoryKeeperCounts = {};
+  const cap = CONFIG.perCategoryKeepersCap || Infinity;
 
   const manifest = resumed.slice();
   const startTime = Date.now();
@@ -672,6 +680,11 @@ async function main(){
     if (manifest.length - resumed.length >= CONFIG.totalTarget){
       log(`\nTarget +${CONFIG.totalTarget} reached. Stopping.`, 'g');
       break;
+    }
+    // Skip if this title's category has already hit its keepers cap
+    const cat = titleToCategory.get(title);
+    if ((categoryKeeperCounts[cat] || 0) >= cap){
+      continue;
     }
     processed++;
     const baseName = `wm-${shortHash(title)}`;
@@ -724,6 +737,7 @@ async function main(){
       const cleanTitle = title.replace(/^File:/i, '').replace(/\.[a-z0-9]+$/i, '').replace(/_/g, ' ').slice(0, 200);
       const sourceUrl = `https://commons.wikimedia.org/wiki/${encodeURIComponent(title)}`;
 
+      categoryKeeperCounts[cat] = (categoryKeeperCounts[cat] || 0) + 1;
       manifest.push({
         id:            baseName,
         source:        'wikimedia',
