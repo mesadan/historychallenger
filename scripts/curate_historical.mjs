@@ -190,6 +190,7 @@ EXAMPLES of the flavor we want (this is an illustrative, NON-EXHAUSTIVE list —
 Be GENEROUS with what counts as historical. If a literate adult would say "yes, this depicts a recognizable historical scene from somewhere in the human past", it qualifies. We are pulling from the whole world's history, not just Europe.
 
 REJECT (set usable=false) if any of these apply, even if otherwise beautiful:
+- VISIBLE ANSWER-TEXT IN IMAGE: the image has a printed title, caption, or engraved label visible at the bottom or anywhere else that names or describes the scene (common in 17th-19th century engravings). This gives the answer away in the quiz.
 - ANY religious devotional image: Madonna and Child, anonymous saints, generic crucifixion, holy family, angels, cherubs, sacred heart, altarpiece, illuminated bible scenes that test religious knowledge rather than historical knowledge. We want secular history, not theology. The ONLY religious images we keep are those depicting documented historical events (e.g. Council of Nicaea, Coronation of Charlemagne by the Pope, the actual martyrdom of a real bishop attested in non-religious sources).
 - Pure mythology UNLESS it is a famous named scene from a story players might actually know (Death of Socrates is fine; a generic nymph painting is not)
 - Decorative object with no scene (vase, bracelet, mirror, coin, fragment, mask, statuette, pottery)

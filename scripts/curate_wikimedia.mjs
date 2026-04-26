@@ -377,6 +377,7 @@ WHAT WE WANT (broad, generous): recognizable historical SCENES from the entire s
 - Be GENEROUS: if a literate adult would say "yes, this depicts a recognizable historical scene from somewhere in the human past", it qualifies.
 
 REJECT (set usable=false) if any apply:
+- VISIBLE ANSWER-TEXT IN IMAGE: image has a printed title, caption, or engraved label that names or describes the scene (very common in 17th-19th century engravings, where the title is printed under the image). This gives the answer away in the quiz.
 - Generic religious devotional with no specific historical event (Madonna and Child, anonymous saint, generic Annunciation, generic Crucifixion, holy family). Famous biblical narrative scenes (Last Supper, David and Goliath) are fine; anonymous devotional is not.
 - Pure mythological allegory unless a famous named scene (Death of Socrates is fine; a generic nymph painting is not)
 - Decorative pattern, abstract piece, unclear/damaged image
