@@ -22,9 +22,11 @@ async function main(){
   const clean = await readJsonOrEmpty('manifest_clean.json');
   const hist  = await readJsonOrEmpty('manifest_historical.json');
   const wm    = await readJsonOrEmpty('manifest_wikimedia.json');
-  console.log(`manifest_clean.json:      ${clean.length}`);
-  console.log(`manifest_historical.json: ${hist.length}`);
-  console.log(`manifest_wikimedia.json:  ${wm.length}`);
+  const wm2   = await readJsonOrEmpty('manifest_wikimedia_v2.json');
+  console.log(`manifest_clean.json:        ${clean.length}`);
+  console.log(`manifest_historical.json:   ${hist.length}`);
+  console.log(`manifest_wikimedia.json:    ${wm.length}`);
+  console.log(`manifest_wikimedia_v2.json: ${wm2.length}`);
 
   const seen = new Map();
   for (const it of clean) seen.set(it.id, it);
@@ -33,6 +35,9 @@ async function main(){
   }
   for (const it of wm){
     if (!seen.has(it.id)) seen.set(it.id, it);   // wikimedia adds, never overrides
+  }
+  for (const it of wm2){
+    if (!seen.has(it.id)) seen.set(it.id, it);   // v2 adds, never overrides
   }
   const combined = [...seen.values()];
   console.log(`combined (deduped): ${combined.length}`);
