@@ -208,7 +208,7 @@ if(document.readyState==='loading'){
 if (!document.getElementById('hc-report-loader')){
   const r = document.createElement('script');
   r.id = 'hc-report-loader';
-  r.src = '/report.js?v=1';
+  r.src = '/report.js?v=2';
   r.defer = true;
   document.head.appendChild(r);
 }

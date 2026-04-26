@@ -1,23 +1,8 @@
-/**
- * History Challenger, Report widget.
- * Auto-injects a floating "Report" button + modal on any page that loads it.
- *
- * Usage from a game page:
- *   <script src="/report.js?v=1" defer></script>
- *
- * Then whenever the game shows new content the user might want to report,
- * set the current context:
- *   window.hcSetReportContext({
- *     game_type: 'paintings',                // game name
- *     item_type: 'artwork',                  // 'artwork'|'question'|'set'|'campaign'|'turn'|...
- *     item_id:   'met-12345',                // any string identifier
- *     snapshot_text: 'Battle of Cannae · met-12345',  // short label, shown in modal + admin
- *     snapshot:  { /* arbitrary JSON, shown to admin */ }
- *   });
- *   // or hcClearReportContext() to hide the button when there's nothing to report
- *
- * The button only appears when a context is set.
- */
+// History Challenger, Report widget.
+// Auto-injects a floating "Report" button + modal on any page that loads it.
+// A game page sets the current context with window.hcSetReportContext({...})
+// and clears it with window.hcClearReportContext(). The button only appears
+// while a context is set.
 (function(){
 const WORKER = 'https://histroychallenger-api.maletethan.workers.dev';
 const COMMENT_LIMIT = 280;
