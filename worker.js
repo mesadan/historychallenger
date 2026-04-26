@@ -3374,6 +3374,7 @@ async function handleSubmitPaintingAnswer(body, env) {
       creation_year: art.creation_year,
       museum: art.museum,
       source_url: art.source_url,
+      attribution: art.attribution || null,
       round_xp: roundXp
     };
 

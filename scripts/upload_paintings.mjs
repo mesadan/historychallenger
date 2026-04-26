@@ -103,7 +103,7 @@ async function main(){
       // Build SQL insert
       const distractorsJson = JSON.stringify(art.distractors || []);
       inserts.push(
-        `INSERT OR REPLACE INTO artworks (id, source, source_id, image_key, thumb_key, title, artist, creation_year, depicted_era, scene, scene_long, distractors, medium, museum, culture, classification, difficulty, source_url, created_at) VALUES (` +
+        `INSERT OR REPLACE INTO artworks (id, source, source_id, image_key, thumb_key, title, artist, creation_year, depicted_era, scene, scene_long, distractors, medium, museum, culture, classification, difficulty, source_url, attribution, created_at) VALUES (` +
         [
           sqlEscape(art.id),
           sqlEscape(art.source),
@@ -123,6 +123,7 @@ async function main(){
           sqlEscape(art.classification),
           sqlInt(art.difficulty),
           sqlEscape(art.source_url),
+          sqlEscape(art.attribution || null),
           String(now),
         ].join(', ') + ');'
       );

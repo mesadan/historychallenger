@@ -204,6 +204,7 @@ function renderRound(){
     <div class="reveal-long">${escapeHtml(reveal.scene_long || '')}</div>
     ${reveal.title ? `<div class="reveal-meta"><strong>${escapeHtml(reveal.title)}</strong>${reveal.artist ? ' &middot; '+escapeHtml(reveal.artist) : ''}</div>` : ''}
     ${reveal.creation_year != null ? `<div class="reveal-meta">Created ${reveal.creation_year < 0 ? Math.abs(reveal.creation_year)+' BC' : reveal.creation_year+' AD'}${reveal.museum ? ' &middot; '+escapeHtml(reveal.museum) : ''}</div>` : ''}
+    ${reveal.attribution ? `<div class="reveal-meta" style="font-size:11px;color:#7a6040;font-style:italic">Image: ${escapeHtml(reveal.attribution)}</div>` : ''}
     <div class="reveal-xp">
       <span>+${reveal.round_xp} XP this round</span>
       <button class="start-btn" style="padding:8px 20px;font-size:14px;min-width:0" onclick="nextRound()">${S.round.round < S.round.total ? 'Next round' : 'See results'} →</button>
