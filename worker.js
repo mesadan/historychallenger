@@ -3261,8 +3261,11 @@ function shuffleArray(arr){
 // Pick 3 distractor scene strings for one artwork from the session's
 // distractor pool, honoring the difficulty's era/region quotas.
 // pool is an array of {scene, depicted_era, depicted_region}.
+// excludeSceneKeys is a Set of lowercased scene strings already used
+// elsewhere in this session (correct answers + earlier-round distractors)
+// — passed in so the SAME scene never appears twice in one session.
 // Falls back gracefully if the same-era / same-region pool is too small.
-function pickDistractorsForArtwork(artwork, pool, cfg){
+function pickDistractorsForArtwork(artwork, pool, cfg, excludeSceneKeys){
   const era = (artwork.depicted_era || '').toLowerCase();
   const region = (artwork.depicted_region || '').toLowerCase();
   const correctScene = artwork.scene || '';
@@ -3289,7 +3292,9 @@ function pickDistractorsForArtwork(artwork, pool, cfg){
   shuffleArray(differentEra);
 
   const out = [];
-  const seen = new Set([correctSceneKey]);
+  // Seed seen with anything already used in this session + the correct answer
+  const seen = new Set(excludeSceneKeys || []);
+  seen.add(correctSceneKey);
   const tryAdd = (s) => {
     if (!s) return false;
     const k = s.toLowerCase();
@@ -3378,34 +3383,55 @@ async function handleStartPaintingSession(body, env) {
       } catch(e) { /* non-fatal — fall through to unfiltered pick */ }
     }
 
-    // Pick 5 random artworks across ALL difficulties (challenge moved to distractor era/region matching).
-    let picks = [];
+    // Pick artworks across ALL difficulties, OVER-FETCHING (5x) so we can
+    // dedupe by scene afterward (multiple Met/Wikimedia paintings share the
+    // same depicted scene like "Judgment of Paris"; no two rounds in the
+    // same session should reuse a scene).
+    const PICK_OVERFETCH = PAINTING_ROUNDS * 5;
+    let candidates = [];
     if (excludedIds.length) {
       const placeholders = excludedIds.map(() => '?').join(',');
       const rows = await env.db.prepare(
         `SELECT * FROM artworks WHERE id NOT IN (${placeholders}) ORDER BY RANDOM() LIMIT ?`
-      ).bind(...excludedIds, PAINTING_ROUNDS).all();
-      picks = rows.results || [];
+      ).bind(...excludedIds, PICK_OVERFETCH).all();
+      candidates = rows.results || [];
+    } else {
+      const rows = await env.db.prepare(
+        `SELECT * FROM artworks ORDER BY RANDOM() LIMIT ?`
+      ).bind(PICK_OVERFETCH).all();
+      candidates = rows.results || [];
     }
-    // Fallback: top up from full pool (still random) if exclusion left us short
-    if (picks.length < PAINTING_ROUNDS) {
-      const need = PAINTING_ROUNDS - picks.length;
-      const haveIds = picks.map(p => p.id);
+    // Top-up if recently-seen exclusion left us thin
+    if (candidates.length < PAINTING_ROUNDS) {
+      const haveIds = candidates.map(c => c.id);
       const allExcluded = [...new Set([...haveIds, ...excludedIds])];
       const placeholders = allExcluded.length ? allExcluded.map(() => '?').join(',') : null;
       const sql = placeholders
         ? `SELECT * FROM artworks WHERE id NOT IN (${placeholders}) ORDER BY RANDOM() LIMIT ?`
         : `SELECT * FROM artworks ORDER BY RANDOM() LIMIT ?`;
-      const args = placeholders ? [...allExcluded, need] : [need];
+      const args = placeholders ? [...allExcluded, PICK_OVERFETCH] : [PICK_OVERFETCH];
       const topUp = await env.db.prepare(sql).bind(...args).all();
-      picks = picks.concat(topUp.results || []);
+      candidates = candidates.concat(topUp.results || []);
     }
-    // Last-resort: allow repeats from anywhere
+
+    // Dedupe candidates by scene → take the first PAINTING_ROUNDS unique
+    const seenPickScenes = new Set();
+    const picks = [];
+    for (const c of candidates) {
+      const k = (c.scene || '').toLowerCase();
+      if (!k || seenPickScenes.has(k)) continue;
+      seenPickScenes.add(k);
+      picks.push(c);
+      if (picks.length >= PAINTING_ROUNDS) break;
+    }
+    // Last-resort: if scene-dedup left <5, accept duplicates from candidates
     if (picks.length < PAINTING_ROUNDS) {
-      const rows = await env.db.prepare(
-        `SELECT * FROM artworks ORDER BY RANDOM() LIMIT ?`
-      ).bind(PAINTING_ROUNDS).all();
-      picks = rows.results || [];
+      const haveIds = new Set(picks.map(p => p.id));
+      for (const c of candidates) {
+        if (haveIds.has(c.id)) continue;
+        picks.push(c); haveIds.add(c.id);
+        if (picks.length >= PAINTING_ROUNDS) break;
+      }
     }
     if (picks.length < PAINTING_ROUNDS) {
       return json({ error: 'Not enough artworks. Seed more first.' }, 500);
@@ -3419,11 +3445,26 @@ async function handleStartPaintingSession(body, env) {
       `SELECT scene, depicted_era, depicted_region FROM artworks
        WHERE id NOT IN (${pickPlaceholders})`
     ).bind(...pickIds).all();
-    const pool = poolRows.results || [];
+
+    // Dedupe the pool by scene name → one row per unique scene.
+    // Without this, popular scenes (like "Judgment of Paris" with 10+ paintings)
+    // dominate the random shuffle and recur as distractors session after session.
+    const pool = [];
+    const seenPoolScenes = new Set();
+    for (const p of (poolRows.results || [])) {
+      const k = (p.scene || '').toLowerCase();
+      if (!k || seenPoolScenes.has(k)) continue;
+      seenPoolScenes.add(k);
+      pool.push(p);
+    }
 
     // Build options for every round up front and cache them in the session.
+    // sessionUsed accumulates every scene used (correct + distractor) so no
+    // scene appears twice across the 5 rounds of one session.
+    const sessionUsed = new Set(picks.map(p => (p.scene || '').toLowerCase()));
     const roundOptions = picks.map(art => {
-      const distractors = pickDistractorsForArtwork(art, pool, cfg);
+      const distractors = pickDistractorsForArtwork(art, pool, cfg, sessionUsed);
+      for (const d of distractors) sessionUsed.add(d.toLowerCase());
       return shuffleArray([art.scene, ...distractors]);
     });
 
