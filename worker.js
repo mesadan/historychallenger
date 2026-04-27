@@ -3229,10 +3229,16 @@ Return ONLY valid JSON:
 
 // ── PAINTING ID GAME ──────────────────────────────────────────
 
+// The Curator's Eye difficulty model:
+//   sameEraDistractors    how many of the 3 distractors are from the SAME era as the answer
+//   sameRegionDistractors how many of those same-era distractors must ALSO match the region
+// Easy   = 0 same-era distractors (3 different-era → era of painting alone solves it)
+// Medium = 1 same-era distractor  (player must know more than the era)
+// Hard   = 3 same-era distractors AND all 3 must also share the answer's region
 const PAINTING_DIFFICULTY = {
-  easy:   { label: 'Apprentice', diffRange: [1, 3], multiplier: 1.0, cluePenalty: 15 },
-  medium: { label: 'Strategist', diffRange: [3, 4], multiplier: 1.5, cluePenalty: 15 },
-  hard:   { label: 'Imperator',  diffRange: [4, 5], multiplier: 2.0, cluePenalty: 15 },
+  easy:   { label: 'Apprentice', sameEraDistractors: 0, sameRegionDistractors: 0, multiplier: 1.0, cluePenalty: 15 },
+  medium: { label: 'Strategist', sameEraDistractors: 1, sameRegionDistractors: 0, multiplier: 1.5, cluePenalty: 15 },
+  hard:   { label: 'Imperator',  sameEraDistractors: 3, sameRegionDistractors: 3, multiplier: 2.0, cluePenalty: 15 },
 };
 const PAINTING_ROUNDS = 5;
 // Exclude artworks the user has seen in their last N painting sessions
@@ -3252,17 +3258,94 @@ function shuffleArray(arr){
   return a;
 }
 
-function buildPaintingRound(artwork, roundNum, env){
-  let distractors = [];
-  try { distractors = JSON.parse(artwork.distractors || '[]'); } catch(e) { distractors = []; }
-  const options = shuffleArray([artwork.scene, ...distractors.slice(0, 3)]);
+// Pick 3 distractor scene strings for one artwork from the session's
+// distractor pool, honoring the difficulty's era/region quotas.
+// pool is an array of {scene, depicted_era, depicted_region}.
+// Falls back gracefully if the same-era / same-region pool is too small.
+function pickDistractorsForArtwork(artwork, pool, cfg){
+  const era = (artwork.depicted_era || '').toLowerCase();
+  const region = (artwork.depicted_region || '').toLowerCase();
+  const correctScene = artwork.scene || '';
+  const correctSceneKey = correctScene.toLowerCase();
+
+  // Bucket the pool
+  const sameEraSameRegion = [];
+  const sameEraOnly = [];
+  const differentEra = [];
+  for (const p of pool) {
+    const s = p.scene;
+    if (!s || s.toLowerCase() === correctSceneKey) continue;
+    const pEra = (p.depicted_era || '').toLowerCase();
+    const pRegion = (p.depicted_region || '').toLowerCase();
+    if (era && pEra === era) {
+      if (region && pRegion === region) sameEraSameRegion.push(s);
+      else sameEraOnly.push(s);
+    } else {
+      differentEra.push(s);
+    }
+  }
+  shuffleArray(sameEraSameRegion);
+  shuffleArray(sameEraOnly);
+  shuffleArray(differentEra);
+
+  const out = [];
+  const seen = new Set([correctSceneKey]);
+  const tryAdd = (s) => {
+    if (!s) return false;
+    const k = s.toLowerCase();
+    if (seen.has(k)) return false;
+    out.push(s); seen.add(k);
+    return true;
+  };
+
+  // 1. Fill same-era + same-region quota first (Hard mode)
+  for (const s of sameEraSameRegion) {
+    if (out.length >= cfg.sameRegionDistractors) break;
+    tryAdd(s);
+  }
+  // 2. Top up same-era (any region) to reach sameEraDistractors
+  for (const s of sameEraOnly) {
+    if (out.length >= cfg.sameEraDistractors) break;
+    tryAdd(s);
+  }
+  // 3. If we hit the same-era quota target but skipped over usable
+  //    same-era-same-region candidates, push leftovers (Hard fallback)
+  for (const s of sameEraSameRegion) {
+    if (out.length >= cfg.sameEraDistractors) break;
+    tryAdd(s);
+  }
+  // 4. Fill remaining slots with different-era distractors
+  for (const s of differentEra) {
+    if (out.length >= 3) break;
+    tryAdd(s);
+  }
+  // 5. Last-resort: pull from any pool to guarantee 3 distractors
+  if (out.length < 3) {
+    for (const p of pool) {
+      if (out.length >= 3) break;
+      tryAdd(p.scene);
+    }
+  }
+  return out.slice(0, 3);
+}
+
+// buildPaintingRound now takes pre-built options from the session record.
+// Passing options=null falls back to the legacy artwork.distractors field
+// so any in-flight pre-migration session still completes cleanly.
+function buildPaintingRound(artwork, roundNum, env, options){
+  let opts = options;
+  if (!Array.isArray(opts) || opts.length !== 4) {
+    let distractors = [];
+    try { distractors = JSON.parse(artwork.distractors || '[]'); } catch(e) { distractors = []; }
+    opts = shuffleArray([artwork.scene, ...distractors.slice(0, 3)]);
+  }
   return {
     round: roundNum,
     total: PAINTING_ROUNDS,
     artwork_id: artwork.id,
     image_url: paintingImageUrl(env, artwork.image_key),
     thumb_url: paintingImageUrl(env, artwork.thumb_key),
-    options,
+    options: opts,
   };
 }
 
@@ -3295,51 +3378,63 @@ async function handleStartPaintingSession(body, env) {
       } catch(e) { /* non-fatal — fall through to unfiltered pick */ }
     }
 
-    // Pick 5 random artworks in the requested difficulty range, excluding recently-seen
+    // Pick 5 random artworks across ALL difficulties (challenge moved to distractor era/region matching).
     let picks = [];
     if (excludedIds.length) {
       const placeholders = excludedIds.map(() => '?').join(',');
       const rows = await env.db.prepare(
-        `SELECT * FROM artworks
-         WHERE difficulty BETWEEN ? AND ?
-           AND id NOT IN (${placeholders})
-         ORDER BY RANDOM()
-         LIMIT ?`
-      ).bind(cfg.diffRange[0], cfg.diffRange[1], ...excludedIds, PAINTING_ROUNDS).all();
+        `SELECT * FROM artworks WHERE id NOT IN (${placeholders}) ORDER BY RANDOM() LIMIT ?`
+      ).bind(...excludedIds, PAINTING_ROUNDS).all();
       picks = rows.results || [];
     }
-    // Fallback: if exclusion left us short, top up from full pool (still random)
+    // Fallback: top up from full pool (still random) if exclusion left us short
     if (picks.length < PAINTING_ROUNDS) {
       const need = PAINTING_ROUNDS - picks.length;
       const haveIds = picks.map(p => p.id);
       const allExcluded = [...new Set([...haveIds, ...excludedIds])];
       const placeholders = allExcluded.length ? allExcluded.map(() => '?').join(',') : null;
       const sql = placeholders
-        ? `SELECT * FROM artworks WHERE difficulty BETWEEN ? AND ? AND id NOT IN (${placeholders}) ORDER BY RANDOM() LIMIT ?`
-        : `SELECT * FROM artworks WHERE difficulty BETWEEN ? AND ? ORDER BY RANDOM() LIMIT ?`;
-      const args = placeholders ? [cfg.diffRange[0], cfg.diffRange[1], ...allExcluded, need] : [cfg.diffRange[0], cfg.diffRange[1], need];
+        ? `SELECT * FROM artworks WHERE id NOT IN (${placeholders}) ORDER BY RANDOM() LIMIT ?`
+        : `SELECT * FROM artworks ORDER BY RANDOM() LIMIT ?`;
+      const args = placeholders ? [...allExcluded, need] : [need];
       const topUp = await env.db.prepare(sql).bind(...args).all();
       picks = picks.concat(topUp.results || []);
     }
-    // Last-resort fallback: if even unfiltered pool is short, allow repeats from anywhere in the range
+    // Last-resort: allow repeats from anywhere
     if (picks.length < PAINTING_ROUNDS) {
       const rows = await env.db.prepare(
-        `SELECT * FROM artworks WHERE difficulty BETWEEN ? AND ? ORDER BY RANDOM() LIMIT ?`
-      ).bind(cfg.diffRange[0], cfg.diffRange[1], PAINTING_ROUNDS).all();
+        `SELECT * FROM artworks ORDER BY RANDOM() LIMIT ?`
+      ).bind(PAINTING_ROUNDS).all();
       picks = rows.results || [];
     }
     if (picks.length < PAINTING_ROUNDS) {
-      return json({ error: 'Not enough artworks in this difficulty range. Seed more first.' }, 500);
+      return json({ error: 'Not enough artworks. Seed more first.' }, 500);
     }
+
+    // Fetch the distractor pool ONCE: just scene + era + region for every other artwork.
+    // ~120 KB for ~1200 rows. After this, every per-round operation is zero queries.
+    const pickIds = picks.map(p => p.id);
+    const pickPlaceholders = pickIds.map(() => '?').join(',');
+    const poolRows = await env.db.prepare(
+      `SELECT scene, depicted_era, depicted_region FROM artworks
+       WHERE id NOT IN (${pickPlaceholders})`
+    ).bind(...pickIds).all();
+    const pool = poolRows.results || [];
+
+    // Build options for every round up front and cache them in the session.
+    const roundOptions = picks.map(art => {
+      const distractors = pickDistractorsForArtwork(art, pool, cfg);
+      return shuffleArray([art.scene, ...distractors]);
+    });
 
     const sessionId = crypto.randomUUID();
     const now = Math.floor(Date.now()/1000);
     const artworkIds = picks.map(p => p.id);
 
     await env.db.prepare(
-      `INSERT INTO painting_sessions (id, user_id, difficulty, round_num, artwork_ids, answers, status, started_at)
-       VALUES (?, ?, ?, 0, ?, '[]', 'active', ?)`
-    ).bind(sessionId, userId, diffKey, JSON.stringify(artworkIds), now).run();
+      `INSERT INTO painting_sessions (id, user_id, difficulty, round_num, artwork_ids, answers, status, started_at, round_options)
+       VALUES (?, ?, ?, 0, ?, '[]', 'active', ?, ?)`
+    ).bind(sessionId, userId, diffKey, JSON.stringify(artworkIds), now, JSON.stringify(roundOptions)).run();
 
     // Return round 1
     const first = picks[0];
@@ -3348,10 +3443,14 @@ async function handleStartPaintingSession(body, env) {
       difficulty: diffKey,
       difficulty_label: cfg.label,
       total_rounds: PAINTING_ROUNDS,
-      round: buildPaintingRound(first, 1, env)
+      round: buildPaintingRound(first, 1, env, roundOptions[0])
     }, 200);
   } catch(e) {
-    return json({ error: 'DB error: ' + e.message + ' — did you create the artworks and painting_sessions tables? See scripts/paintings_schema.sql.' }, 500);
+    const msg = e.message || '';
+    const hint = /no such column.*round_options/i.test(msg)
+      ? ' — apply scripts/alter_painting_sessions_options.sql in D1 once.'
+      : ' — did you create the artworks and painting_sessions tables? See scripts/paintings_schema.sql.';
+    return json({ error: 'DB error: ' + msg + hint }, 500);
   }
 }
 
@@ -3449,9 +3548,15 @@ async function handleSubmitPaintingAnswer(body, env) {
     };
 
     if (!isComplete) {
-      // Build next round
+      // Build next round, using the pre-cached options from the session if available
       const nextArt = await env.db.prepare(`SELECT * FROM artworks WHERE id=?`).bind(artworkIds[newRoundNum]).first();
       if (!nextArt) return json({ error: 'Next artwork missing' }, 500);
+
+      let nextOpts = null;
+      try {
+        const ro = JSON.parse(session.round_options || 'null');
+        if (Array.isArray(ro) && Array.isArray(ro[newRoundNum])) nextOpts = ro[newRoundNum];
+      } catch(e) {}
 
       await env.db.prepare(
         `UPDATE painting_sessions SET round_num=?, answers=? WHERE id=?`
@@ -3459,7 +3564,7 @@ async function handleSubmitPaintingAnswer(body, env) {
 
       return json({
         reveal,
-        next_round: buildPaintingRound(nextArt, newRoundNum + 1, env),
+        next_round: buildPaintingRound(nextArt, newRoundNum + 1, env, nextOpts),
         completed: false
       }, 200);
     }

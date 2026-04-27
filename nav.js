@@ -80,7 +80,7 @@ function injectNav(){
     {href:'/persona.html',   label:'Who Are You?',  key:'persona'},
     {href:'/hq.html',        label:'HQ Test',       key:'hq'},
     {href:'/dialogue.html',  label:'Audience',      key:'dialogue'},
-    {href:'/paintings.html', label:'Painting ID',   key:'paintings'},
+    {href:'/paintings.html', label:"The Curator's Eye", key:'paintings'},
   ];
   const linksHtml = links.map(l=>{
     const active = path.includes(l.key) ? ' active' : '';

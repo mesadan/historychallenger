@@ -1,0 +1,21 @@
+-- Add round_options column to painting_sessions for the new difficulty
+-- model in The Curator's Eye (formerly Painting ID).
+--
+-- The new difficulty model:
+--   easy   1 of 4 options is from the SAME era as the answer
+--   medium 2 of 4 options are from the SAME era as the answer
+--   hard   all 4 options are from the SAME era AND same region as the answer
+--
+-- Distractors are now built once at session-start (no LLM, no per-round
+-- queries) by sampling other artworks' scene strings, then cached as
+-- JSON in this column for the duration of the session. Each entry is the
+-- shuffled 4-option list for one round; we keep the correct scene
+-- separately because round_num indexes into both arrays.
+--
+-- Format:
+--   [["opt1","opt2","opt3","opt4"], [...], [...], [...], [...]]
+--
+-- D1 ALTER does NOT support IF NOT EXISTS, so run this exactly once.
+-- A re-run gives "duplicate column name" which is harmless to ignore.
+
+ALTER TABLE painting_sessions ADD COLUMN round_options TEXT;
