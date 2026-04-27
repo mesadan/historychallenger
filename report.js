@@ -10,19 +10,23 @@ const COMMENT_LIMIT = 280;
 let _ctx = null;
 
 const css = `
+/* Floating Report button.
+   Positioned bottom-LEFT (z-index 50) so it never sits on top of game
+   action buttons (Submit, Next round, See results) which are right-aligned
+   or full-width and used to live under the bottom-right corner. */
 #hc-report-btn{
-  position:fixed;right:18px;bottom:18px;z-index:9000;
-  background:#1a150e;color:#f5edd8;border:1px solid #c49020;
-  border-radius:24px;padding:9px 16px 9px 12px;
-  font-family:'Crimson Text',Georgia,serif;font-size:13px;
-  cursor:pointer;display:none;align-items:center;gap:6px;
-  box-shadow:0 4px 14px rgba(0,0,0,.35);
-  transition:transform .12s, background .12s;
-  -webkit-tap-highlight-color:transparent;
+  position:fixed;left:14px;bottom:14px;z-index:50;
+  background:#1a150e;color:#a08868;border:1px solid #3a2a14;
+  border-radius:20px;padding:6px 12px 6px 10px;
+  font-family:'Crimson Text',Georgia,serif;font-size:12px;
+  cursor:pointer;display:none;align-items:center;gap:5px;
+  box-shadow:0 3px 10px rgba(0,0,0,.25);
+  transition:transform .12s, background .12s, color .12s, border-color .12s;
+  -webkit-tap-highlight-color:transparent;opacity:.85;
 }
-#hc-report-btn:hover{background:#241a0e;transform:translateY(-1px)}
+#hc-report-btn:hover{background:#241a0e;color:#f5edd8;border-color:#c49020;transform:translateY(-1px);opacity:1}
 #hc-report-btn.show{display:inline-flex}
-#hc-report-btn .hc-flag{font-size:14px;line-height:1}
+#hc-report-btn .hc-flag{font-size:13px;line-height:1}
 #hc-report-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.65);
   z-index:9100;display:none;align-items:center;justify-content:center;
