@@ -1641,9 +1641,14 @@ STRICT RULES:
    - Fix leakage by rephrasing: Q "Which Wonder of the Ancient World guided ships into a Ptolemaic Egyptian harbour?" → A "Lighthouse of Alexandria" is now earned, not given away.
    - If the correct answer shares a key term with the question, rewrite the question to remove that term.
 3. Wrong answers must be plausible distractors from the same era or topic, never absurd, never obviously wrong by category. A knowledgeable person should have to think.
-4. Vary topics AGGRESSIVELY, ancient, medieval, early-modern, modern; different continents; different domains (war, culture, science, religion, politics, technology, economics, exploration).
+4. Vary topics AGGRESSIVELY, ancient, medieval, early-modern, modern; different continents; different domains (war, politics, religion, economics, exploration, social change, technology, scientific discovery).
 5. Questions must be factually accurate and verifiable.
-6. ${STYLE_RULE}${exclusionBlock}
+6. SCOPE OF "HISTORY", this quiz is about political, military, social, economic, religious, exploratory, and broad scientific or technological events. It is NOT a culture or biography quiz. The following are STRICTLY OUT OF SCOPE:
+   a. ANY question whose subject is a composer, musician, singer, writer, novelist, poet, playwright, painter, sculptor, architect, actor, filmmaker, or other cultural figure. No Bach, Mozart, Beethoven, Shakespeare, Tolstoy, Goethe, Cervantes, Dante, Michelangelo, Rembrandt, Picasso, etc., even classical or pre-1900 ones. No questions about their life, works, dates, awards, or movements.
+   b. BIOGRAPHICAL TRIVIA about scientists, inventors, or engineers ("What was Newton's middle name?", "Where did Einstein attend school?", "Who was Edison's first wife?"). Their HISTORICAL IMPACT is fair game (the year the printing press began commercial use, the consequence of the steam engine on industry, the diplomatic effect of Galileo's trial), but biography of the person is not.
+   c. Pop music, film, TV, sports, video games, supermodels, brand histories, or celebrity trivia of any era.
+   You may still ask about historical EVENTS that involved cultural production indirectly (e.g., the printing press's role in the Reformation, the Library of Alexandria's destruction), but never frame the question around the cultural figure or work itself.
+7. ${STYLE_RULE}${exclusionBlock}
 
 Return ONLY valid JSON, no markdown.`;
 
@@ -1882,14 +1887,15 @@ async function handleQCHQQuestions(body, env, apiKey) {
 
 2. DUPLICATES, groups of two or more questions that test essentially the same historical fact, person, or event, even if worded differently. A group must have at least 2 questions.
 
-3. POP_CULTURE, questions that are NOT real political/military/social/economic/scientific history but instead test:
-   - Pop music or singers (Beatles, Elvis, Madonna, Beyoncé, etc.)
-   - Film, TV, or actors (Hollywood, Oscars, sitcoms, streaming shows)
-   - Sports celebrities, championships, or records (Olympics medal counts, World Cup trivia, athlete biographies)
-   - Video games, comics, anime, fictional characters
-   - Fashion, supermodels, brand histories, advertising slogans
-   - Pop trivia / general culture not tied to a real historical event, treaty, ruler, war, discovery, or institution
-   Do NOT flag questions about classical composers (Mozart, Bach), pre-1900 literature (Shakespeare, Tolstoy), classical art (Michelangelo, Rembrandt), early cinema pioneers as a technological/political milestone, or genuine cultural history (printing press, Renaissance patronage). The line is: "would a serious history textbook cover this?" If no → flag.
+3. POP_CULTURE, questions that are out of scope for a political/military/social/economic/religious history quiz. Flag any of the following:
+   a. CULTURAL FIGURES of any era. Composers (Bach, Mozart, Beethoven, Wagner, etc.), classical or contemporary musicians and singers, novelists, poets, playwrights (Shakespeare, Tolstoy, Goethe, Cervantes, Dante, etc.), painters, sculptors, architects, actors, filmmakers. ANY question whose subject is the person, their works, their lifespan, awards, or stylistic movement is FLAG. This includes pre-1900 figures.
+   b. BIOGRAPHICAL TRIVIA about scientists, inventors, or engineers (e.g. "Where did Newton attend school?", "What was Einstein's middle name?", "Who was Edison's first wife?"). Their HISTORICAL IMPACT is fine to ask about (year the printing press began commercial use, consequences of the steam engine, diplomatic effect of Galileo's trial), but biographical trivia about the person is FLAG.
+   c. Pop music or singers (Beatles, Elvis, Madonna, Beyoncé, etc.).
+   d. Film, TV, or actors (Hollywood, Oscars, sitcoms, streaming shows).
+   e. Sports celebrities, championships, or records (Olympics medal counts, World Cup trivia, athlete biographies).
+   f. Video games, comics, anime, fictional characters.
+   g. Fashion, supermodels, brand histories, advertising slogans.
+   The test: would a serious POLITICAL/military/economic history textbook cover this question? If the answer is no, FLAG. Questions about cultural production embedded in a historical event (printing press's role in the Reformation, destruction of the Library of Alexandria, the burning of books during the Qin) are fine; questions that are essentially biography or arts trivia are not.
 
 Return ONLY valid JSON, no markdown:
 {
