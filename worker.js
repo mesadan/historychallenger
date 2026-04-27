@@ -300,8 +300,12 @@ async function handleSeedPool(body, env, apiKey) {
   `).bind(diff, lang||'en', isTheme ? theme_slug : '').all();
 
   const existingNames = new Set();
+  const existingNormalized = new Set();
   (existing.results||[]).forEach(r => {
-    try { JSON.parse(r.events).forEach(ev => existingNames.add(ev.name)); } catch(e) {}
+    try { JSON.parse(r.events).forEach(ev => {
+      existingNames.add(ev.name);
+      existingNormalized.add(normalizeEventName(ev.name));
+    }); } catch(e) {}
   });
 
   const exclusionNote = existingNames.size > 0
@@ -372,9 +376,31 @@ ${exclusionNote}`;
     if (!parsed.sets) return json({ error: 'No sets returned' }, 500);
 
     let saved = 0;
+    let dropped = 0;
+    const dropReasons = [];
+    // Track names accepted this batch so two new sets can't both introduce the same event.
+    const acceptedThisBatch = new Set();
+
     for (let i = 0; i < parsed.sets.length; i++) {
       const s = parsed.sets[i];
-      if (!Array.isArray(s) || s.length !== 5) continue;
+      if (!Array.isArray(s) || s.length !== 5) {
+        dropped++; dropReasons.push(`set ${i}: malformed (not 5 events)`);
+        continue;
+      }
+      // Validate against existing pool + already-accepted sets in this batch
+      const conflict = s.find(ev => {
+        const norm = normalizeEventName(ev?.name || '');
+        if (!norm) return true; // empty name → reject
+        return existingNormalized.has(norm) || acceptedThisBatch.has(norm);
+      });
+      if (conflict) {
+        dropped++;
+        dropReasons.push(`set ${i}: duplicate event "${conflict.name}"`);
+        continue;
+      }
+      // Accept: record names so other sets in this batch can't reuse them
+      for (const ev of s) acceptedThisBatch.add(normalizeEventName(ev.name));
+
       const id = crypto.randomUUID();
       await env.db.prepare(`
         INSERT INTO event_sets (id, diff, lang, era, geo, events, theme_slug, created_at)
@@ -388,10 +414,39 @@ ${exclusionNote}`;
       WHERE diff=? AND lang=? AND (theme_slug ${isTheme ? '=?' : 'IS NULL OR theme_slug=?'})
     `).bind(diff, lang||'en', isTheme ? theme_slug : '').first();
 
-    return json({ saved, total: count?.n || 0 }, 200);
+    return json({ saved, dropped, drop_reasons: dropReasons, total: count?.n || 0 }, 200);
   } catch (err) {
     return json({ error: err.message }, 500);
   }
+}
+
+// Normalize an event name for fuzzy duplicate detection.
+// Lowercases, strips common prefixes ("the ", "battle of ", "siege of ", etc.),
+// strips year suffixes in parens, collapses whitespace, removes most punctuation.
+// Goal: "Battle of Hastings (1066)" and "the battle of hastings" should collapse
+// to the same key so Claude can't paraphrase its way past the exclusion list.
+function normalizeEventName(name) {
+  if (!name) return '';
+  let s = String(name).toLowerCase();
+  s = s.replace(/\([^)]*\)/g, ' ');           // strip parenthetical years/notes
+  s = s.replace(/[–—−]/g, '-');// normalize dashes
+  s = s.replace(/[^\w\s-]/g, ' ');            // strip punctuation except hyphen
+  s = s.replace(/\s+/g, ' ').trim();
+  // Strip common leading articles/prefixes (one pass per token until stable)
+  const prefixes = [
+    'the ', 'a ', 'an ',
+    'battle of ', 'siege of ', 'sack of ', 'fall of ', 'rise of ',
+    'treaty of ', 'peace of ', 'edict of ', 'council of ',
+    'death of ', 'birth of ', 'coronation of ', 'assassination of ',
+  ];
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const p of prefixes) {
+      if (s.startsWith(p)) { s = s.slice(p.length); changed = true; }
+    }
+  }
+  return s;
 }
 
 // ── TIMELINE ADMIN: browse + QC ────────────────────────────────────────
