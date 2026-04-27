@@ -240,29 +240,53 @@ async function handleGetSets(body, env) {
     const targetLang = lang || 'en';
     const now = Math.floor(Date.now()/1000);
 
-    let sets;
+    // Two-query pattern, ~5-10x faster than ORDER BY RANDOM() over a big pool:
+    //   1. Fetch eligible IDs only (small payload, uses idx_event_sets_filter)
+    //   2. Shuffle in JS, take first n
+    //   3. Fetch event JSON for the n picked IDs by primary key (instant)
+    // ORDER BY RANDOM() forces SQLite to scan + sort the whole matching set,
+    // which got slow once event_sets had 1000+ rows per theme/diff.
     const themeFilter = theme_slug ? `AND theme_slug=?` : `AND (theme_slug IS NULL OR theme_slug='')`;
 
+    let idsResult;
     if (excludeIds.length > 0) {
       const placeholders = excludeIds.map(()=>'?').join(',');
       const binds = theme_slug
-        ? [diff, targetLang, theme_slug, ...excludeIds, n]
-        : [diff, targetLang, ...excludeIds, n];
-      sets = await env.db.prepare(`
-        SELECT id, events FROM event_sets
+        ? [diff, targetLang, theme_slug, ...excludeIds]
+        : [diff, targetLang, ...excludeIds];
+      idsResult = await env.db.prepare(`
+        SELECT id FROM event_sets
         WHERE diff=? AND lang=? ${themeFilter} AND id NOT IN (${placeholders})
-        ORDER BY RANDOM() LIMIT ?
       `).bind(...binds).all();
     } else {
-      const binds = theme_slug ? [diff, targetLang, theme_slug, n] : [diff, targetLang, n];
-      sets = await env.db.prepare(`
-        SELECT id, events FROM event_sets
+      const binds = theme_slug ? [diff, targetLang, theme_slug] : [diff, targetLang];
+      idsResult = await env.db.prepare(`
+        SELECT id FROM event_sets
         WHERE diff=? AND lang=? ${themeFilter}
-        ORDER BY RANDOM() LIMIT ?
       `).bind(...binds).all();
     }
 
-    const results = sets.results || [];
+    const allIds = (idsResult.results || []).map(r => r.id);
+    // Fisher-Yates shuffle in place, then slice
+    for (let i = allIds.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [allIds[i], allIds[j]] = [allIds[j], allIds[i]];
+    }
+    const pickedIds = allIds.slice(0, n);
+
+    let results = [];
+    if (pickedIds.length > 0) {
+      const placeholders = pickedIds.map(()=>'?').join(',');
+      const fetched = await env.db.prepare(`
+        SELECT id, events FROM event_sets WHERE id IN (${placeholders})
+      `).bind(...pickedIds).all();
+      // Preserve the shuffled order (IN doesn't guarantee return order)
+      const byId = new Map((fetched.results || []).map(r => [r.id, r]));
+      for (const id of pickedIds) {
+        const row = byId.get(id);
+        if (row) results.push(row);
+      }
+    }
 
     if (userId) {
       for (const s of results) {
