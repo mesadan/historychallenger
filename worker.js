@@ -3230,15 +3230,14 @@ Return ONLY valid JSON:
 // ── PAINTING ID GAME ──────────────────────────────────────────
 
 // The Curator's Eye difficulty model:
-//   sameEraDistractors    how many of the 3 distractors are from the SAME era as the answer
-//   sameRegionDistractors how many of those same-era distractors must ALSO match the region
-// Easy   = 0 same-era distractors (3 different-era → era of painting alone solves it)
-// Medium = 1 same-era distractor  (player must know more than the era)
-// Hard   = 3 same-era distractors AND all 3 must also share the answer's region
+// Distractors are PRE-BAKED per artwork per difficulty by Claude
+// (scripts/backfill_distractors.mjs). At game time the worker just reads
+// artworks.distractors_easy / _medium / _hard. Zero LLM, zero pool query.
+//   distractorColumn = which DB column to read for this difficulty
 const PAINTING_DIFFICULTY = {
-  easy:   { label: 'Apprentice', sameEraDistractors: 0, sameRegionDistractors: 0, multiplier: 1.0, cluePenalty: 15 },
-  medium: { label: 'Strategist', sameEraDistractors: 1, sameRegionDistractors: 0, multiplier: 1.5, cluePenalty: 15 },
-  hard:   { label: 'Imperator',  sameEraDistractors: 3, sameRegionDistractors: 3, multiplier: 2.0, cluePenalty: 15 },
+  easy:   { label: 'Apprentice', distractorColumn: 'distractors_easy',   multiplier: 1.0, cluePenalty: 15 },
+  medium: { label: 'Strategist', distractorColumn: 'distractors_medium', multiplier: 1.5, cluePenalty: 15 },
+  hard:   { label: 'Imperator',  distractorColumn: 'distractors_hard',   multiplier: 2.0, cluePenalty: 15 },
 };
 const PAINTING_ROUNDS = 5;
 // Exclude artworks the user has seen in their last N painting sessions
@@ -3258,91 +3257,34 @@ function shuffleArray(arr){
   return a;
 }
 
-// Pick 3 distractor scene strings for one artwork from the session's
-// distractor pool, honoring the difficulty's era/region quotas.
-// pool is an array of {scene, depicted_era, depicted_region}.
-// excludeSceneKeys is a Set of lowercased scene strings already used
-// elsewhere in this session (correct answers + earlier-round distractors)
-// — passed in so the SAME scene never appears twice in one session.
-// Falls back gracefully if the same-era / same-region pool is too small.
-function pickDistractorsForArtwork(artwork, pool, cfg, excludeSceneKeys){
-  const era = (artwork.depicted_era || '').toLowerCase();
-  const region = (artwork.depicted_region || '').toLowerCase();
-  const correctScene = artwork.scene || '';
-  const correctSceneKey = correctScene.toLowerCase();
-
-  // Bucket the pool
-  const sameEraSameRegion = [];
-  const sameEraOnly = [];
-  const differentEra = [];
-  for (const p of pool) {
-    const s = p.scene;
-    if (!s || s.toLowerCase() === correctSceneKey) continue;
-    const pEra = (p.depicted_era || '').toLowerCase();
-    const pRegion = (p.depicted_region || '').toLowerCase();
-    if (era && pEra === era) {
-      if (region && pRegion === region) sameEraSameRegion.push(s);
-      else sameEraOnly.push(s);
-    } else {
-      differentEra.push(s);
-    }
-  }
-  shuffleArray(sameEraSameRegion);
-  shuffleArray(sameEraOnly);
-  shuffleArray(differentEra);
-
-  const out = [];
-  // Seed seen with anything already used in this session + the correct answer
-  const seen = new Set(excludeSceneKeys || []);
-  seen.add(correctSceneKey);
-  const tryAdd = (s) => {
-    if (!s) return false;
-    const k = s.toLowerCase();
-    if (seen.has(k)) return false;
-    out.push(s); seen.add(k);
-    return true;
+// Read the pre-baked distractors column for a difficulty. Falls back through
+// other difficulty columns and finally the legacy artwork.distractors field
+// so any artwork without the new columns still produces 4 options.
+function readBakedDistractors(artwork, distractorColumn){
+  const tryParse = (v) => {
+    try {
+      const arr = JSON.parse(v);
+      return Array.isArray(arr) ? arr.filter(s => typeof s === 'string' && s.trim()).slice(0, 3) : null;
+    } catch(e) { return null; }
   };
-
-  // 1. Fill same-era + same-region quota first (Hard mode)
-  for (const s of sameEraSameRegion) {
-    if (out.length >= cfg.sameRegionDistractors) break;
-    tryAdd(s);
-  }
-  // 2. Top up same-era (any region) to reach sameEraDistractors
-  for (const s of sameEraOnly) {
-    if (out.length >= cfg.sameEraDistractors) break;
-    tryAdd(s);
-  }
-  // 3. If we hit the same-era quota target but skipped over usable
-  //    same-era-same-region candidates, push leftovers (Hard fallback)
-  for (const s of sameEraSameRegion) {
-    if (out.length >= cfg.sameEraDistractors) break;
-    tryAdd(s);
-  }
-  // 4. Fill remaining slots with different-era distractors
-  for (const s of differentEra) {
-    if (out.length >= 3) break;
-    tryAdd(s);
-  }
-  // 5. Last-resort: pull from any pool to guarantee 3 distractors
-  if (out.length < 3) {
-    for (const p of pool) {
-      if (out.length >= 3) break;
-      tryAdd(p.scene);
+  const order = [distractorColumn, 'distractors_medium', 'distractors_easy', 'distractors_hard', 'distractors'];
+  for (const col of order) {
+    if (artwork[col]) {
+      const parsed = tryParse(artwork[col]);
+      if (parsed && parsed.length === 3) return parsed;
     }
   }
-  return out.slice(0, 3);
+  return [];
 }
 
-// buildPaintingRound now takes pre-built options from the session record.
-// Passing options=null falls back to the legacy artwork.distractors field
-// so any in-flight pre-migration session still completes cleanly.
-function buildPaintingRound(artwork, roundNum, env, options){
+// buildPaintingRound takes pre-built options from the session record.
+// If options is missing/malformed, falls back to reading the artwork's
+// pre-baked distractors column for the session's difficulty.
+function buildPaintingRound(artwork, roundNum, env, options, distractorColumn){
   let opts = options;
   if (!Array.isArray(opts) || opts.length !== 4) {
-    let distractors = [];
-    try { distractors = JSON.parse(artwork.distractors || '[]'); } catch(e) { distractors = []; }
-    opts = shuffleArray([artwork.scene, ...distractors.slice(0, 3)]);
+    const distractors = readBakedDistractors(artwork, distractorColumn || 'distractors_medium');
+    opts = shuffleArray([artwork.scene, ...distractors]);
   }
   return {
     round: roundNum,
@@ -3437,34 +3379,13 @@ async function handleStartPaintingSession(body, env) {
       return json({ error: 'Not enough artworks. Seed more first.' }, 500);
     }
 
-    // Fetch the distractor pool ONCE: just scene + era + region for every other artwork.
-    // ~120 KB for ~1200 rows. After this, every per-round operation is zero queries.
-    const pickIds = picks.map(p => p.id);
-    const pickPlaceholders = pickIds.map(() => '?').join(',');
-    const poolRows = await env.db.prepare(
-      `SELECT scene, depicted_era, depicted_region FROM artworks
-       WHERE id NOT IN (${pickPlaceholders})`
-    ).bind(...pickIds).all();
-
-    // Dedupe the pool by scene name → one row per unique scene.
-    // Without this, popular scenes (like "Judgment of Paris" with 10+ paintings)
-    // dominate the random shuffle and recur as distractors session after session.
-    const pool = [];
-    const seenPoolScenes = new Set();
-    for (const p of (poolRows.results || [])) {
-      const k = (p.scene || '').toLowerCase();
-      if (!k || seenPoolScenes.has(k)) continue;
-      seenPoolScenes.add(k);
-      pool.push(p);
-    }
-
-    // Build options for every round up front and cache them in the session.
-    // sessionUsed accumulates every scene used (correct + distractor) so no
-    // scene appears twice across the 5 rounds of one session.
-    const sessionUsed = new Set(picks.map(p => (p.scene || '').toLowerCase()));
+    // Build options for every round from the pre-baked distractor column for
+    // this difficulty. No pool fetch, no LLM, no dynamic logic — Claude curated
+    // these one time via scripts/backfill_distractors.mjs and they live in
+    // artworks.distractors_easy / _medium / _hard. Each is a JSON array of 3
+    // plausible scene strings designed to match the painting thematically.
     const roundOptions = picks.map(art => {
-      const distractors = pickDistractorsForArtwork(art, pool, cfg, sessionUsed);
-      for (const d of distractors) sessionUsed.add(d.toLowerCase());
+      const distractors = readBakedDistractors(art, cfg.distractorColumn);
       return shuffleArray([art.scene, ...distractors]);
     });
 
@@ -3484,7 +3405,7 @@ async function handleStartPaintingSession(body, env) {
       difficulty: diffKey,
       difficulty_label: cfg.label,
       total_rounds: PAINTING_ROUNDS,
-      round: buildPaintingRound(first, 1, env, roundOptions[0])
+      round: buildPaintingRound(first, 1, env, roundOptions[0], cfg.distractorColumn)
     }, 200);
   } catch(e) {
     const msg = e.message || '';
@@ -3605,7 +3526,7 @@ async function handleSubmitPaintingAnswer(body, env) {
 
       return json({
         reveal,
-        next_round: buildPaintingRound(nextArt, newRoundNum + 1, env, nextOpts),
+        next_round: buildPaintingRound(nextArt, newRoundNum + 1, env, nextOpts, (PAINTING_DIFFICULTY[session.difficulty] || PAINTING_DIFFICULTY.medium).distractorColumn),
         completed: false
       }, 200);
     }
