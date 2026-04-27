@@ -142,6 +142,10 @@ Events: ${JSON.stringify(events)}`;
       if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
       return handleDeleteHQQuestion(body, env);
     }
+    if (action === 'delete_hq_questions_bulk') {
+      if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
+      return handleBulkDeleteHQQuestions(body, env);
+    }
     if (action === 'update_hq_question') {
       if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
       return handleUpdateHQQuestion(body, env);
@@ -1854,6 +1858,22 @@ async function handleDeleteHQQuestion(body, env) {
     await env.db.prepare(`DELETE FROM hq_questions WHERE id=?`).bind(id).run();
     await env.db.prepare(`DELETE FROM hq_seen_questions WHERE question_id=?`).bind(id).run();
     return json({ ok: true }, 200);
+  } catch(e) {
+    return json({ error: e.message }, 500);
+  }
+}
+
+async function handleBulkDeleteHQQuestions(body, env) {
+  const { ids } = body;
+  if (!Array.isArray(ids) || ids.length === 0) return json({ error: 'Missing ids array' }, 400);
+  // Cap at 500 per call so a runaway request can't blow up D1.
+  const cleanIds = ids.filter(x => typeof x === 'string' && x.length).slice(0, 500);
+  if (!cleanIds.length) return json({ error: 'No valid ids' }, 400);
+  try {
+    const placeholders = cleanIds.map(() => '?').join(',');
+    await env.db.prepare(`DELETE FROM hq_questions WHERE id IN (${placeholders})`).bind(...cleanIds).run();
+    await env.db.prepare(`DELETE FROM hq_seen_questions WHERE question_id IN (${placeholders})`).bind(...cleanIds).run();
+    return json({ ok: true, deleted: cleanIds.length, requested: ids.length, capped: ids.length > cleanIds.length }, 200);
   } catch(e) {
     return json({ error: e.message }, 500);
   }
