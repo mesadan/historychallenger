@@ -169,6 +169,15 @@ Events: ${JSON.stringify(events)}`;
     if (action === 'submit_painting_answer')  return handleSubmitPaintingAnswer(body, env);
     if (action === 'reveal_painting_clue')    return handleRevealPaintingClue(body, env);
 
+    if (action === 'list_artworks') {
+      if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
+      return handleListArtworks(body, env);
+    }
+    if (action === 'delete_artworks_bulk') {
+      if (body.admin_key !== env.ADMIN_KEY) return json({ error: 'Unauthorised' }, 401);
+      return handleBulkDeleteArtworks(body, env);
+    }
+
     // ── USER REPORTS (any game) ──────────────────────────────────
     if (action === 'submit_report')           return handleSubmitReport(body, env);
     if (action === 'list_reports') {
@@ -3517,6 +3526,65 @@ async function handleRevealPaintingClue(body, env) {
     else return json({ error: 'Unknown clue type' }, 400);
 
     return json({ clue_type, value }, 200);
+  } catch(e) {
+    return json({ error: e.message }, 500);
+  }
+}
+
+// Admin: list artworks for the curation tab in seed.html.
+// Optional filters: source ('met'|'wm'), depicted_era, depicted_region, difficulty, search.
+// Returns the columns the curation UI needs (no full distractor JSON).
+async function handleListArtworks(body, env) {
+  const { source, depicted_era, depicted_region, difficulty, search, limit } = body;
+  try {
+    const clauses = [];
+    const binds = [];
+    if (source && source !== 'all') { clauses.push('source=?'); binds.push(source); }
+    if (depicted_era && depicted_era !== 'all') { clauses.push('depicted_era=?'); binds.push(depicted_era); }
+    if (depicted_region && depicted_region !== 'all') { clauses.push('depicted_region=?'); binds.push(depicted_region); }
+    if (difficulty && difficulty !== 'all') { clauses.push('difficulty=?'); binds.push(parseInt(difficulty, 10) || 0); }
+    if (search && String(search).trim()) {
+      clauses.push('(LOWER(title) LIKE ? OR LOWER(scene) LIKE ?)');
+      const s = '%' + String(search).toLowerCase().trim() + '%';
+      binds.push(s, s);
+    }
+    const where = clauses.length ? 'WHERE ' + clauses.join(' AND ') : '';
+    const cap = Math.min(Math.max(parseInt(limit, 10) || 600, 50), 2000);
+
+    const rows = await env.db.prepare(
+      `SELECT id, source, title, scene, scene_long, depicted_era, depicted_region,
+              culture, difficulty, image_key, thumb_key, source_url, play_count, attribution
+       FROM artworks ${where}
+       ORDER BY id
+       LIMIT ${cap}`
+    ).bind(...binds).all();
+
+    const totalRow = await env.db.prepare(`SELECT COUNT(*) as n FROM artworks ${where}`).bind(...binds).first();
+
+    const base = (env.R2_PAINTINGS_BASE_URL || '').replace(/\/$/, '');
+    const list = (rows.results || []).map(r => ({
+      ...r,
+      image_url: r.image_key ? base + '/' + r.image_key : null,
+      thumb_url: r.thumb_key ? base + '/' + r.thumb_key : null,
+    }));
+
+    return json({ artworks: list, total: totalRow?.n || 0, shown: list.length, capped: (totalRow?.n || 0) > list.length }, 200);
+  } catch(e) {
+    return json({ error: e.message }, 500);
+  }
+}
+
+// Admin: bulk delete artworks by id. DB row only; orphan R2 images can be
+// swept by a separate one-shot script (cheap, infrequent).
+async function handleBulkDeleteArtworks(body, env) {
+  const { ids } = body;
+  if (!Array.isArray(ids) || ids.length === 0) return json({ error: 'Missing ids array' }, 400);
+  const cleanIds = ids.filter(x => typeof x === 'string' && x.length).slice(0, 500);
+  if (!cleanIds.length) return json({ error: 'No valid ids' }, 400);
+  try {
+    const placeholders = cleanIds.map(() => '?').join(',');
+    await env.db.prepare(`DELETE FROM artworks WHERE id IN (${placeholders})`).bind(...cleanIds).run();
+    return json({ ok: true, deleted: cleanIds.length, requested: ids.length, capped: ids.length > cleanIds.length }, 200);
   } catch(e) {
     return json({ error: e.message }, 500);
   }

@@ -74,6 +74,7 @@ select,input{background:#111;color:#fff;border:1px solid #333;padding:6px 10px;b
   <button class="tab" onclick="switchTab('dispatch')">⚔ Dispatch</button>
   <button class="tab" onclick="switchTab('hq')">📊 HQ</button>
   <button class="tab" onclick="switchTab('audience')">🎭 Audience</button>
+  <button class="tab" onclick="switchTab('paintings')">🖼 Paintings</button>
   <button class="tab" onclick="switchTab('reports')">⚑ Reports</button>
 </div>
 
@@ -1884,6 +1885,99 @@ async function updateHQQ(id, difficulty, level){
   <div id="audience-scenarios" style="margin-top:.5rem"><span style="color:#555">Click Refresh to load.</span></div>
 </div>
 
+<!-- PAINTINGS TAB (The Curator's Eye admin) -->
+<div id="tab-paintings" class="tab-content">
+  <style>
+    .pa-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:.5rem .25rem;border-bottom:1px solid #1a1a1a;margin-bottom:.75rem}
+    .pa-toolbar select,.pa-toolbar input{background:#0d0d0d;color:#ddd;border:1px solid #333;padding:5px 8px;font-size:12px;border-radius:3px}
+    .pa-toolbar input.search{flex:1;min-width:160px;max-width:280px}
+    .pa-toolbar button{background:#1a1a1a;color:#c8903a;border:1px solid #333;border-radius:3px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer}
+    .pa-toolbar button:hover{background:#2a2a08;border-color:#c8903a}
+    .pa-bulk{display:none;flex-wrap:wrap;gap:8px;align-items:center;padding:.5rem .25rem;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:4px;margin-bottom:.5rem}
+    .pa-bulk button{font-size:11px;padding:4px 10px;border-radius:3px;cursor:pointer}
+    .pa-bulk .pa-del{background:#2a0a0a;color:#cc6644;border:1px solid #442020}
+    .pa-bulk .pa-del:hover{background:#3a0d0d}
+    .pa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+    .pa-card{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:6px;overflow:hidden;display:flex;flex-direction:column;font-size:12px;position:relative;transition:border-color .12s}
+    .pa-card.sel{border-color:#c8903a;box-shadow:0 0 0 1px #c8903a55}
+    .pa-card .pa-cb{position:absolute;top:6px;left:6px;z-index:2;width:18px;height:18px;cursor:pointer}
+    .pa-card .pa-thumb{display:block;width:100%;height:160px;object-fit:cover;background:#000;border-bottom:1px solid #1a1a1a}
+    .pa-card .pa-thumb-missing{display:flex;align-items:center;justify-content:center;height:160px;color:#444;font-size:11px;background:#080808;border-bottom:1px solid #1a1a1a}
+    .pa-card .pa-meta{padding:6px 8px 4px;display:flex;flex-direction:column;gap:3px}
+    .pa-card .pa-scene{color:#ddd;font-weight:600;line-height:1.3;font-size:12.5px}
+    .pa-card .pa-title{color:#777;font-style:italic;font-size:11px;line-height:1.35;max-height:30px;overflow:hidden}
+    .pa-card .pa-tags{display:flex;flex-wrap:wrap;gap:4px;padding:4px 8px 8px}
+    .pa-card .pa-tag{font-size:10px;padding:1px 5px;border:1px solid #333;border-radius:2px;color:#888}
+    .pa-card .pa-tag.src-met{color:#5acc8a;border-color:#5acc8a44}
+    .pa-card .pa-tag.src-wm{color:#88aacc;border-color:#88aacc44}
+    .pa-card .pa-tag.diff-1{color:#5acc8a}
+    .pa-card .pa-tag.diff-2{color:#8acc5a}
+    .pa-card .pa-tag.diff-3{color:#c8a028}
+    .pa-card .pa-tag.diff-4{color:#cc8844}
+    .pa-card .pa-tag.diff-5{color:#cc4444}
+    .pa-card .pa-actions{padding:4px 8px 8px;display:flex;justify-content:space-between;align-items:center}
+    .pa-card .pa-actions a{color:#666;font-size:10px}
+    .pa-card .pa-actions button{padding:2px 7px;font-size:11px;background:#1a0a0a;color:#cc6644;border:1px solid #331515;border-radius:3px;cursor:pointer}
+  </style>
+  <div class="ttl">
+    <span style="font-size:18px">🖼</span>
+    <strong style="color:#c8903a;font-size:14px">The Curator's Eye, library</strong>
+    <span style="color:#555;font-size:12px;font-style:italic">DB-only delete (R2 images stay; sweep separately)</span>
+  </div>
+  <div class="pa-toolbar">
+    <label style="color:#666;font-size:12px">Source</label>
+    <select id="pa-source">
+      <option value="all">All</option>
+      <option value="met">Met</option>
+      <option value="wm">Wikimedia</option>
+    </select>
+    <label style="color:#666;font-size:12px">Era</label>
+    <select id="pa-era">
+      <option value="all">All</option>
+      <option value="ancient">Ancient</option>
+      <option value="medieval">Medieval</option>
+      <option value="modern">Modern</option>
+    </select>
+    <label style="color:#666;font-size:12px">Region</label>
+    <select id="pa-region">
+      <option value="all">All</option>
+      <option value="Mediterranean">Mediterranean</option>
+      <option value="Western Europe">Western Europe</option>
+      <option value="Northern Europe">Northern Europe</option>
+      <option value="Eastern Europe">Eastern Europe</option>
+      <option value="Middle East">Middle East</option>
+      <option value="North Africa">North Africa</option>
+      <option value="Sub-Saharan Africa">Sub-Saharan Africa</option>
+      <option value="South Asia">South Asia</option>
+      <option value="East Asia">East Asia</option>
+      <option value="Southeast Asia">Southeast Asia</option>
+      <option value="Central Asia">Central Asia</option>
+      <option value="Americas">Americas</option>
+      <option value="Oceania">Oceania</option>
+      <option value="Mythological / unspecified">Mythological / unspecified</option>
+    </select>
+    <label style="color:#666;font-size:12px">Diff</label>
+    <select id="pa-diff">
+      <option value="all">All</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+    <input class="search" id="pa-search" type="text" placeholder="Search title or scene...">
+    <button onclick="loadArtworks()">Load</button>
+    <span id="pa-count" style="color:#555;font-size:12px;margin-left:auto"></span>
+  </div>
+  <div class="pa-bulk" id="pa-bulk">
+    <button onclick="paSelectAll(true)">Select all visible</button>
+    <button onclick="paSelectAll(false)">Clear</button>
+    <button onclick="paBulkDelete()" class="pa-del">🗑 Delete selected</button>
+    <span id="pa-selcount" style="color:#888;font-size:11px;margin-left:auto">0 selected</span>
+  </div>
+  <div id="pa-grid" class="pa-grid"></div>
+</div>
+
 <!-- REPORTS TAB -->
 <div id="tab-reports" class="tab-content">
   <style>
@@ -2109,6 +2203,107 @@ function renderAudienceScenario(sc){
       <span>Starting conviction: <strong style="color:#ddd">${sc.starting_conviction}</strong></span>
     </div>
   </div>`;
+}
+</script>
+
+<script>
+// ── PAINTINGS TAB (The Curator's Eye library admin) ─────────────────
+async function loadArtworks(){
+  const grid = document.getElementById('pa-grid');
+  const cnt = document.getElementById('pa-count');
+  const bulk = document.getElementById('pa-bulk');
+  grid.innerHTML = '<div style="padding:1rem;color:#555;font-size:12px">Loading...</div>';
+  bulk.style.display = 'none';
+  const payload = {
+    action:'list_artworks',
+    admin_key:ADMIN_KEY,
+    source:document.getElementById('pa-source').value,
+    depicted_era:document.getElementById('pa-era').value,
+    depicted_region:document.getElementById('pa-region').value,
+    difficulty:document.getElementById('pa-diff').value,
+    search:document.getElementById('pa-search').value,
+    limit:600,
+  };
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d = await res.json();
+    if (d.error) { grid.innerHTML = '<div class="err" style="padding:1rem">'+d.error+'</div>'; cnt.textContent=''; return; }
+    const arts = d.artworks || [];
+    cnt.textContent = arts.length + ' shown'
+      + (d.total > arts.length ? ' (of '+d.total+' total, capped at '+arts.length+', narrow filters to see the rest)' : '')
+      + (d.total ? '' : '');
+    if (!arts.length) { grid.innerHTML = '<div style="padding:1rem;color:#555;font-size:12px">No artworks match.</div>'; return; }
+    bulk.style.display = 'flex';
+    paRefreshCount();
+    grid.innerHTML = arts.map(renderArtworkCard).join('');
+  } catch(e) { grid.innerHTML = '<div class="err" style="padding:1rem">Network error: '+e.message+'</div>'; cnt.textContent=''; }
+}
+
+function renderArtworkCard(a){
+  const escAttr = (s) => String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const esc = (s) => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const thumb = a.thumb_url
+    ? `<img class="pa-thumb" loading="lazy" src="${escAttr(a.thumb_url)}" alt="${escAttr(a.scene)}" onerror="this.outerHTML='<div class=\\'pa-thumb-missing\\'>image missing</div>'">`
+    : `<div class="pa-thumb-missing">no thumb</div>`;
+  const srcTag = a.source ? `<span class="pa-tag src-${esc(a.source)}">${esc(a.source)}</span>` : '';
+  const diffTag = a.difficulty ? `<span class="pa-tag diff-${a.difficulty}">d${a.difficulty}</span>` : '';
+  const eraTag = a.depicted_era ? `<span class="pa-tag">${esc(a.depicted_era)}</span>` : '';
+  const regionTag = a.depicted_region ? `<span class="pa-tag">${esc(a.depicted_region)}</span>` : '';
+  const sourceLink = a.source_url ? `<a href="${escAttr(a.source_url)}" target="_blank" rel="noopener">source ↗</a>` : '<span></span>';
+  return `<div class="pa-card" data-id="${escAttr(a.id)}">
+    <input type="checkbox" class="pa-cb" data-id="${escAttr(a.id)}" onchange="paRefreshCount();this.closest('.pa-card').classList.toggle('sel',this.checked)">
+    ${thumb}
+    <div class="pa-meta">
+      <div class="pa-scene">${esc(a.scene || '(no scene)')}</div>
+      <div class="pa-title">${esc(a.title || '')}</div>
+    </div>
+    <div class="pa-tags">${srcTag}${diffTag}${eraTag}${regionTag}</div>
+    <div class="pa-actions">
+      ${sourceLink}
+      <button onclick="paDeleteOne('${escAttr(a.id)}')">🗑</button>
+    </div>
+  </div>`;
+}
+
+function paSelectAll(state){
+  for (const cb of document.querySelectorAll('.pa-cb')) {
+    cb.checked = state;
+    cb.closest('.pa-card').classList.toggle('sel', state);
+  }
+  paRefreshCount();
+}
+function paRefreshCount(){
+  const n = document.querySelectorAll('.pa-cb:checked').length;
+  document.getElementById('pa-selcount').textContent = n + ' selected';
+}
+async function paBulkDelete(){
+  const ids = [...document.querySelectorAll('.pa-cb:checked')].map(cb => cb.dataset.id);
+  if (!ids.length) { alert('Nothing selected'); return; }
+  if (!confirm('Delete '+ids.length+' artwork'+(ids.length===1?'':'s')+' from the DB? (R2 images stay until you sweep them.)')) return;
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'delete_artworks_bulk',admin_key:ADMIN_KEY,ids})});
+    const d = await res.json();
+    if (d.error) { alert('Error: '+d.error); return; }
+    for (const id of ids) document.querySelectorAll(`.pa-card[data-id="${id}"]`).forEach(el => el.remove());
+    paRefreshCount();
+    const cnt = document.getElementById('pa-count');
+    if (cnt) {
+      const remaining = document.querySelectorAll('.pa-cb').length;
+      cnt.textContent = remaining + ' shown';
+    }
+  } catch(e) { alert('Network error: '+e.message); }
+}
+async function paDeleteOne(id){
+  if (!confirm('Delete this artwork from the DB?')) return;
+  try {
+    const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'delete_artworks_bulk',admin_key:ADMIN_KEY,ids:[id]})});
+    const d = await res.json();
+    if (d.error) { alert('Error: '+d.error); return; }
+    document.querySelectorAll(`.pa-card[data-id="${id}"]`).forEach(el => el.remove());
+    paRefreshCount();
+  } catch(e) { alert('Network error: '+e.message); }
 }
 </script>
 
