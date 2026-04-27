@@ -3301,7 +3301,7 @@ async function handleStartPaintingSession(body, env) {
 }
 
 async function handleRevealPaintingClue(body, env) {
-  const { session_id, clue_type } = body;  // 'medium' | 'culture' | 'creation_year'
+  const { session_id, clue_type } = body;  // 'medium' | 'culture' | 'era_depicted' (legacy: 'creation_year')
   if (!session_id || !clue_type) return json({ error: 'Missing fields' }, 400);
   try {
     const session = await env.db.prepare(`SELECT * FROM painting_sessions WHERE id=?`).bind(session_id).first();
@@ -3318,10 +3318,13 @@ async function handleRevealPaintingClue(body, env) {
     let value = null;
     if (clue_type === 'medium')        value = art.medium || 'Unknown medium';
     else if (clue_type === 'culture')  value = art.culture || art.classification || 'Unknown culture';
-    else if (clue_type === 'creation_year') {
-      if (art.creation_year == null) value = 'Date unknown';
-      else if (art.creation_year < 0) value = `Created around ${Math.abs(art.creation_year)} BC`;
-      else value = `Created around ${art.creation_year} AD`;
+    else if (clue_type === 'era_depicted' || clue_type === 'creation_year') {
+      // 'creation_year' kept for backward compat with cached frontends; both now return depicted_era.
+      const era = (art.depicted_era || '').toLowerCase();
+      if (era === 'ancient')       value = 'Ancient (before 500 AD)';
+      else if (era === 'medieval') value = 'Medieval (500 to 1500 AD)';
+      else if (era === 'modern')   value = 'Modern (after 1500 AD)';
+      else                         value = 'Era unknown';
     }
     else return json({ error: 'Unknown clue type' }, 400);
 
