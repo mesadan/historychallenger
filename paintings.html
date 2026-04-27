@@ -101,7 +101,7 @@ const WORKER = 'https://histroychallenger-api.maletethan.workers.dev';
 
 let S = {
   phase: 'intro',            // intro | loading | round | final | error
-  difficulty: 'medium',
+  difficulty: 'master',
   sessionId: null,
   round: null,               // {round, total, artwork_id, image_url, options}
   answered: false,
@@ -130,9 +130,9 @@ function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&am
 
 function renderIntro(){
   const diffs = [
-    { key:'easy',   label:'Apprentice', hint:'Famous scenes, iconic artworks.' },
-    { key:'medium', label:'Strategist', hint:'Well-known but not universal.' },
-    { key:'hard',   label:'Imperator',  hint:'Obscure works, specialist eye.' },
+    { key:'disciple', label:'Disciple',       hint:"Wrong options span different eras. The painting's age narrows it down." },
+    { key:'master',   label:'Master',         hint:"One wrong option shares the era. You need more than period." },
+    { key:'keeper',   label:'Keeper of Time', hint:'All four share era and region. Only the scene itself tells them apart.' },
   ];
   return `<div class="intro-card">
     <div class="eyebrow">The Curator's Eye</div>

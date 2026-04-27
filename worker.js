@@ -3232,12 +3232,19 @@ Return ONLY valid JSON:
 // The Curator's Eye difficulty model:
 // Distractors are PRE-BAKED per artwork per difficulty by Claude
 // (scripts/backfill_distractors.mjs). At game time the worker just reads
-// artworks.distractors_easy / _medium / _hard. Zero LLM, zero pool query.
-//   distractorColumn = which DB column to read for this difficulty
+// the relevant DB column. Zero LLM, zero pool query.
+//
+// Difficulty NAMES align with Timeline / Overlap (disciple / master / keeper).
+// DB column NAMES stay easy/medium/hard (no schema churn) — distractorColumn
+// maps the difficulty key to its underlying column.
+//
+//   disciple → 0 same-era distractors (era of subject narrows it down)
+//   master   → 1 same-era distractor  (need more than period)
+//   keeper   → 3 same-era + same-region distractors (scene only)
 const PAINTING_DIFFICULTY = {
-  easy:   { label: 'Apprentice', distractorColumn: 'distractors_easy',   multiplier: 1.0, cluePenalty: 15 },
-  medium: { label: 'Strategist', distractorColumn: 'distractors_medium', multiplier: 1.5, cluePenalty: 15 },
-  hard:   { label: 'Imperator',  distractorColumn: 'distractors_hard',   multiplier: 2.0, cluePenalty: 15 },
+  disciple: { label: 'Disciple',       distractorColumn: 'distractors_easy',   multiplier: 1.0, cluePenalty: 15 },
+  master:   { label: 'Master',         distractorColumn: 'distractors_medium', multiplier: 1.5, cluePenalty: 15 },
+  keeper:   { label: 'Keeper of Time', distractorColumn: 'distractors_hard',   multiplier: 2.0, cluePenalty: 15 },
 };
 const PAINTING_ROUNDS = 5;
 // Exclude artworks the user has seen in their last N painting sessions
@@ -3298,7 +3305,10 @@ function buildPaintingRound(artwork, roundNum, env, options, distractorColumn){
 
 async function handleStartPaintingSession(body, env) {
   const { token, difficulty } = body;
-  const diffKey = PAINTING_DIFFICULTY[difficulty] ? difficulty : 'medium';
+  // Accept legacy easy/medium/hard from any cached frontends and map to the new keys.
+  const legacyMap = { easy: 'disciple', medium: 'master', hard: 'keeper' };
+  const requested = legacyMap[difficulty] || difficulty;
+  const diffKey = PAINTING_DIFFICULTY[requested] ? requested : 'master';
   const cfg = PAINTING_DIFFICULTY[diffKey];
 
   let userId = null;
@@ -3482,7 +3492,7 @@ async function handleSubmitPaintingAnswer(body, env) {
     const correct = (String(chosen_option) === String(art.scene));
     const cluesUsed = Math.max(0, Math.min(3, parseInt(clues_used, 10) || 0));
 
-    const cfg = PAINTING_DIFFICULTY[session.difficulty] || PAINTING_DIFFICULTY.medium;
+    const cfg = PAINTING_DIFFICULTY[session.difficulty] || PAINTING_DIFFICULTY.master;
     const basePoints = correct ? 50 : 0;
     const roundXp = Math.max(0, Math.round(basePoints * cfg.multiplier - cluesUsed * cfg.cluePenalty));
 
@@ -3526,7 +3536,7 @@ async function handleSubmitPaintingAnswer(body, env) {
 
       return json({
         reveal,
-        next_round: buildPaintingRound(nextArt, newRoundNum + 1, env, nextOpts, (PAINTING_DIFFICULTY[session.difficulty] || PAINTING_DIFFICULTY.medium).distractorColumn),
+        next_round: buildPaintingRound(nextArt, newRoundNum + 1, env, nextOpts, (PAINTING_DIFFICULTY[session.difficulty] || PAINTING_DIFFICULTY.master).distractorColumn),
         completed: false
       }, 200);
     }
