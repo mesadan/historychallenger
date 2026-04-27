@@ -3301,7 +3301,12 @@ async function handleStartPaintingSession(body, env) {
 }
 
 async function handleRevealPaintingClue(body, env) {
-  const { session_id, clue_type } = body;  // 'medium' | 'culture' | 'era_depicted' (legacy: 'creation_year')
+  // Current clue types: 'time' | 'culture' | 'region'
+  // Legacy aliases kept so cached frontends don't 400:
+  //   'culture'                       → culture_clue (was art.culture)
+  //   'era_depicted' / 'creation_year' → time clue
+  //   'medium'                        → time clue (medium card was retired)
+  const { session_id, clue_type } = body;
   if (!session_id || !clue_type) return json({ error: 'Missing fields' }, 400);
   try {
     const session = await env.db.prepare(`SELECT * FROM painting_sessions WHERE id=?`).bind(session_id).first();
@@ -3315,16 +3320,23 @@ async function handleRevealPaintingClue(body, env) {
     const art = await env.db.prepare(`SELECT * FROM artworks WHERE id=?`).bind(artId).first();
     if (!art) return json({ error: 'Artwork missing' }, 500);
 
-    let value = null;
-    if (clue_type === 'medium')        value = art.medium || 'Unknown medium';
-    else if (clue_type === 'culture')  value = art.culture || art.classification || 'Unknown culture';
-    else if (clue_type === 'era_depicted' || clue_type === 'creation_year') {
-      // 'creation_year' kept for backward compat with cached frontends; both now return depicted_era.
+    const eraFallback = () => {
       const era = (art.depicted_era || '').toLowerCase();
-      if (era === 'ancient')       value = 'Ancient (before 500 AD)';
-      else if (era === 'medieval') value = 'Medieval (500 to 1500 AD)';
-      else if (era === 'modern')   value = 'Modern (after 1500 AD)';
-      else                         value = 'Era unknown';
+      if (era === 'ancient')  return 'Ancient (before 500 AD)';
+      if (era === 'medieval') return 'Medieval (500 to 1500 AD)';
+      if (era === 'modern')   return 'Modern (after 1500 AD)';
+      return 'Time period unknown';
+    };
+
+    let value = null;
+    if (clue_type === 'time' || clue_type === 'era_depicted' || clue_type === 'creation_year' || clue_type === 'medium') {
+      value = art.time_clue || eraFallback();
+    }
+    else if (clue_type === 'culture') {
+      value = art.culture_clue || art.culture || art.classification || 'Cultural context unknown';
+    }
+    else if (clue_type === 'region') {
+      value = art.depicted_region || 'Region unknown';
     }
     else return json({ error: 'Unknown clue type' }, 400);
 

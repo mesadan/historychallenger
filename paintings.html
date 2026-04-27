@@ -107,7 +107,7 @@ let S = {
   answered: false,
   lastReveal: null,
   pickedOption: null,
-  clues: {},                 // {medium?: string, culture?: string, creation_year?: string}
+  clues: {},                 // {time?: string, culture?: string, region?: string}
   cluesUsedThisRound: 0,
   revealingClue: null,
   final: null,
@@ -141,7 +141,7 @@ function renderIntro(){
     <div class="rules">
       <div class="rules-row"><span class="rules-icon">🖼</span> Five rounds. One painting or artefact each.</div>
       <div class="rules-row"><span class="rules-icon">🎯</span> Pick the correct scene from four options.</div>
-      <div class="rules-row"><span class="rules-icon">🔍</span> Three clue cards per round: medium, culture, creation year. Each costs XP.</div>
+      <div class="rules-row"><span class="rules-icon">🔍</span> Three clue cards per round: time period, culture, region. Each costs XP.</div>
       <div class="rules-row"><span class="rules-icon">🏆</span> Score on accuracy plus difficulty. More clues revealed, less XP.</div>
     </div>
     <div class="diff-row">
@@ -186,8 +186,9 @@ function renderRound(){
   }).join('');
 
   const clueCards = [
-    { key:'culture', name:'Culture / period' },
-    { key:'era_depicted', name:'Era depicted' },
+    { key:'time', name:'Time period' },
+    { key:'culture', name:'Culture' },
+    { key:'region', name:'Region' },
   ].map(c => {
     const v = S.clues[c.key];
     const busy = S.revealingClue === c.key;
