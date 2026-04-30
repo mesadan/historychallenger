@@ -23,6 +23,7 @@ export default {
     if (action === 'verify_token')    return handleVerifyToken(body, env);
     if (action === 'save_session')    return handleSaveSession(body, env);
     if (action === 'get_profile')     return handleGetProfile(body, env);
+    if (action === 'get_progression') return handleGetProgression(body, env);
     if (action === 'update_profile')  return handleUpdateProfile(body, env);
     if (action === 'delete_account')  return handleDeleteAccount(body, env);
 
@@ -236,11 +237,17 @@ Return ONLY valid JSON: {"sets":[[{"name":"...","year":0,"desc":"..."}]]}`;
 async function handleGetSets(body, env) {
   const { diff, lang, needed, token, seen_ids, theme_slug } = body;
   if (!diff) return json({ error: 'Missing diff' }, 400);
+  const diffKey = normalizeDiffKey(diff);
 
   try {
     let userId = null;
     if (token) {
       try { const p = await verifyJWT(token, env.JWT_SECRET); userId = p.sub; } catch(e) {}
+    }
+
+    // Gating: master needs 500 disciple mastery in timeline; keeper needs 500 master.
+    if (!(await isDifficultyUnlocked(env, userId, 'timeline', diffKey))) {
+      return json({ error: 'Difficulty locked', locked: true, diff: diffKey, gate: 'mastery_threshold' }, 403);
     }
 
     let excludeIds = seen_ids || [];
@@ -907,29 +914,38 @@ async function handleSaveSession(body, env) {
     const now = Math.floor(Date.now() / 1000);
     const today = new Date().toISOString().split('T')[0];
     const gtype = game_type || 'timeline';
+    const diffKey = normalizeDiffKey(diff);
 
     await env.db.prepare(`INSERT INTO game_sessions (id, user_id, diff, rounds, scores, avg_score, game_type, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
-      .bind(sessionId, userId, diff || '', rounds || 0, JSON.stringify(scores || []), avg_score ?? null, gtype, now).run();
+      .bind(sessionId, userId, diffKey || '', rounds || 0, JSON.stringify(scores || []), avg_score ?? null, gtype, now).run();
 
     const user = await env.db.prepare('SELECT * FROM users WHERE id=?').bind(userId).first();
     if (user) {
       const newGames = (user.total_games || 0) + 1;
 
-      let xp_earned = 0;
-      if (gtype === 'dispatch') {
-        xp_earned = 75;
-      } else if (avg_score != null) {
-        const diffMult = { disciple:1, master:1.5, keeper:2 }[diff] || 1;
-        xp_earned = Math.round(100 * diffMult * (avg_score / 100));
-      }
+      // Unified XP via the new helper. Dispatch and Persona get flat
+      // participation (50). Skill-based games scale by perf + difficulty.
+      const performance = (gtype === 'dispatch' || gtype === 'persona')
+        ? 0
+        : (avg_score == null ? 0 : Number(avg_score));
+      const xp_earned = computeSessionXP(gtype, diffKey, performance);
+
+      // Mastery only for the 4 skill-track games (Timeline, Overlap,
+      // Curator's Eye, Audience). Returns 0 for dispatch/persona/hq.
+      const mastery_earned = computeSessionMastery(gtype, diffKey, performance);
+
       const newXp = (user.total_xp || 0) + xp_earned;
 
-      const newAvg = gtype === 'dispatch'
-        ? (user.avg_score || 0)
-        : ((user.avg_score || 0) * (user.total_games || 0) + (avg_score || 0)) / newGames;
-      const newBest = gtype === 'dispatch'
-        ? (user.best_score || 0)
-        : Math.max(user.best_score || 0, avg_score || 0);
+      // best_score only updated by skill games where avg_score is meaningful
+      const isSkillGame = (gtype !== 'dispatch' && gtype !== 'persona' && avg_score != null);
+      const newBest = isSkillGame ? Math.max(user.best_score || 0, Number(avg_score) || 0) : (user.best_score || 0);
+      // avg_score on user row: keep a running average ONLY across timeline-shaped
+      // games (timeline/overlap/paintings) to avoid mixing scales. Audience
+      // writes its own avg via judge_dialogue, dispatch/persona don't have a meaningful score.
+      let newAvg = user.avg_score || 0;
+      if (gtype === 'timeline' || gtype === 'overlap' || gtype === 'paintings') {
+        newAvg = ((user.avg_score || 0) * (user.total_games || 0) + (Number(avg_score) || 0)) / newGames;
+      }
 
       let streak = user.current_streak || 0;
       const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
@@ -940,8 +956,12 @@ async function handleSaveSession(body, env) {
 
       await env.db.prepare(`UPDATE users SET total_games=?, avg_score=?, best_score=?, current_streak=?, longest_streak=?, last_streak_date=?, last_played=?, total_rounds=total_rounds+?, total_xp=? WHERE id=?`)
         .bind(newGames, Math.round(newAvg*10)/10, newBest, streak, Math.max(user.longest_streak||0, streak), today, now, rounds||0, newXp, userId).run();
+
+      if (mastery_earned > 0) {
+        await awardMastery(env, userId, gtype, diffKey, mastery_earned);
+      }
     }
-    return json({ ok: true }, 200);
+    return json({ ok: true, xp_earned: undefined }, 200);
   } catch (e) {
     return json({ ok: false, error: e.message }, 200);
   }
@@ -962,6 +982,63 @@ async function handleGetProfile(body, env) {
   } catch (e) {
     return json({ error: e.message }, 500);
   }
+}
+
+// Returns the current user's full progression snapshot:
+//   - total_xp + derived player level
+//   - hq_score (the HQ skill metric, lives outside the mastery table)
+//   - per-game-per-difficulty mastery points + unlocked flag + threshold
+//   - current_streak / longest_streak
+//
+// Used by the frontend to render the lock state on each game's intro card
+// and the mastery grid on the profile page. Guests get a permissive payload
+// (everything unlocked, zero points) so they can browse and play freely.
+async function handleGetProgression(body, env) {
+  const { token } = body;
+  let userId = null;
+  let user = null;
+  if (token) {
+    try {
+      const payload = await verifyJWT(token, env.JWT_SECRET);
+      userId = payload.sub;
+      user = await env.db.prepare('SELECT * FROM users WHERE id=?').bind(userId).first();
+    } catch (e) { /* fall through as guest */ }
+  }
+
+  // Build the per-game grid for the 4 mastery-bearing games
+  const grid = {};
+  for (const game of PROGRESSION.MASTERY_GAMES) {
+    grid[game] = { disciple: { points: 0, unlocked: true }, master: { points: 0, unlocked: true }, keeper: { points: 0, unlocked: true } };
+  }
+  if (userId) {
+    const rows = await env.db.prepare(
+      `SELECT game_type, diff_key, points FROM user_mastery WHERE user_id=?`
+    ).bind(userId).all();
+    for (const r of (rows.results || [])) {
+      if (grid[r.game_type] && grid[r.game_type][r.diff_key]) {
+        grid[r.game_type][r.diff_key].points = r.points || 0;
+      }
+    }
+    // Apply unlock logic per game
+    for (const game of PROGRESSION.MASTERY_GAMES) {
+      grid[game].disciple.unlocked = true;
+      grid[game].master.unlocked   = (grid[game].disciple.points >= PROGRESSION.MASTERY_GATE_MASTER);
+      grid[game].keeper.unlocked   = (grid[game].master.points >= PROGRESSION.MASTERY_GATE_KEEPER);
+    }
+  }
+
+  return json({
+    total_xp:        user?.total_xp || 0,
+    hq_score:        user?.hq_score || null,
+    current_streak:  user?.current_streak || 0,
+    longest_streak:  user?.longest_streak || 0,
+    last_played:     user?.last_played || null,
+    mastery:         grid,
+    gates: {
+      master_threshold: PROGRESSION.MASTERY_GATE_MASTER,
+      keeper_threshold: PROGRESSION.MASTERY_GATE_KEEPER,
+    }
+  }, 200);
 }
 
 async function handleUpdateProfile(body, env) {
@@ -1127,11 +1204,17 @@ Return ONLY the corrected set as valid JSON with exactly the same fields. No mar
 async function handleGetOverlapSets(body, env) {
   const { diff, needed, token, seen_ids } = body;
   if (!diff) return json({ error: 'Missing diff' }, 400);
+  const diffKey = normalizeDiffKey(diff);
 
   try {
     let userId = null;
     if (token) {
       try { const p = await verifyJWT(token, env.JWT_SECRET); userId = p.sub; } catch(e) {}
+    }
+
+    // Gating: master needs 500 disciple mastery in overlap; keeper needs 500 master.
+    if (!(await isDifficultyUnlocked(env, userId, 'overlap', diffKey))) {
+      return json({ error: 'Difficulty locked', locked: true, diff: diffKey, gate: 'mastery_threshold' }, 403);
     }
 
     let excludeIds = (seen_ids || []).map(id => id.replace(/^ov_/, ''));
@@ -1611,6 +1694,109 @@ function json(data, status) {
   });
 }
 
+// ── DUAL-TRACK PROGRESSION (XP + MASTERY) ─────────────────────────────────────
+// Two parallel systems:
+//
+//   XP        = participation, lifetime, all 7 games contribute, drives the
+//               profile player-level. Awarded on every completed session.
+//
+//   Mastery   = skill, per-game-per-difficulty, 4 games contribute (Timeline,
+//               Overlap, Audience, Curator's Eye). Used to gate higher
+//               difficulties: Master needs 500 mastery in Disciple of the same
+//               game; Keeper needs 500 mastery in Master of the same game.
+//
+// HQ has its own adaptive hq_score (50-990) and is not in the mastery table.
+// Dispatch and Persona are "discovery" experiences and only contribute XP.
+const PROGRESSION = {
+  XP_BASE:           50,                                 // base for any completed session
+  XP_DIFF_BONUS:     { disciple: 0, master: 25, keeper: 50 },
+  XP_PERF_CAP:       50,                                 // performance bonus cap (avg_score/2)
+  XP_HQ_PERF_CAP:    100,                                // HQ rewards a wider band on completion
+  MASTERY_MULT:      { disciple: 1.0, master: 1.5, keeper: 2.0 },
+  MASTERY_GATE_MASTER: 500,                              // mastery in disciple to unlock master
+  MASTERY_GATE_KEEPER: 500,                              // mastery in master to unlock keeper
+  MASTERY_GAMES:     ['timeline', 'overlap', 'paintings', 'dialogue'],
+};
+
+// Map any legacy difficulty key to the unified vocabulary.
+// Audience used easy/medium/hard before the rename; cached frontends or
+// in-flight body params may still send those.
+function normalizeDiffKey(diffKey) {
+  if (!diffKey) return diffKey;
+  return ({ easy: 'disciple', medium: 'master', hard: 'keeper' })[diffKey] || diffKey;
+}
+
+// Compute XP awarded for a completed session.
+// performance is a 0-100 number (avg_score, conviction%, accuracy %, etc.).
+// For dispatch/persona it is ignored (flat participation).
+// For HQ on completion it scales 0-100 from a normalised final-hq metric.
+function computeSessionXP(gameType, diffKey, performance) {
+  if (gameType === 'dispatch' || gameType === 'persona') return PROGRESSION.XP_BASE;
+  const perf = Math.max(0, Math.min(100, Number(performance) || 0));
+  if (gameType === 'hq') {
+    return PROGRESSION.XP_BASE + Math.round(perf * (PROGRESSION.XP_HQ_PERF_CAP / 100));
+  }
+  const diff = normalizeDiffKey(diffKey);
+  const diffBonus = PROGRESSION.XP_DIFF_BONUS[diff] || 0;
+  const perfBonus = Math.min(PROGRESSION.XP_PERF_CAP, Math.round(perf / 2));
+  return PROGRESSION.XP_BASE + diffBonus + perfBonus;
+}
+
+// Compute mastery added for a completed session.
+// Only the 4 mastery-bearing games contribute. performance is 0-100.
+function computeSessionMastery(gameType, diffKey, performance) {
+  if (!PROGRESSION.MASTERY_GAMES.includes(gameType)) return 0;
+  const diff = normalizeDiffKey(diffKey);
+  const mult = PROGRESSION.MASTERY_MULT[diff] || 1.0;
+  const perf = Math.max(0, Math.min(100, Number(performance) || 0));
+  return Math.round(perf * mult);
+}
+
+// Persist mastery delta for a (user, game, diff) cell. Idempotent upsert.
+async function awardMastery(env, userId, gameType, diffKey, points) {
+  if (!userId || !points || points <= 0) return;
+  if (!PROGRESSION.MASTERY_GAMES.includes(gameType)) return;
+  const diff = normalizeDiffKey(diffKey);
+  if (!diff) return;
+  const now = Math.floor(Date.now()/1000);
+  await env.db.prepare(
+    `INSERT INTO user_mastery (user_id, game_type, diff_key, points, last_session_at)
+     VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT(user_id, game_type, diff_key) DO UPDATE SET
+       points = points + excluded.points,
+       last_session_at = excluded.last_session_at`
+  ).bind(userId, gameType, diff, points, now).run();
+}
+
+async function getMasteryPoints(env, userId, gameType, diffKey) {
+  if (!userId) return 0;
+  const diff = normalizeDiffKey(diffKey);
+  const row = await env.db.prepare(
+    `SELECT points FROM user_mastery WHERE user_id=? AND game_type=? AND diff_key=?`
+  ).bind(userId, gameType, diff).first();
+  return row?.points || 0;
+}
+
+// Returns true if the requested difficulty is unlocked for this user in this game.
+// Disciple is always unlocked. Master requires 500 mastery in Disciple; Keeper
+// requires 500 in Master. Guests (no userId) always pass; gating is for signed-in
+// players whose progress we can track.
+async function isDifficultyUnlocked(env, userId, gameType, diffKey) {
+  if (!userId) return true;
+  if (!PROGRESSION.MASTERY_GAMES.includes(gameType)) return true;
+  const diff = normalizeDiffKey(diffKey);
+  if (diff === 'disciple') return true;
+  if (diff === 'master') {
+    const pts = await getMasteryPoints(env, userId, gameType, 'disciple');
+    return pts >= PROGRESSION.MASTERY_GATE_MASTER;
+  }
+  if (diff === 'keeper') {
+    const pts = await getMasteryPoints(env, userId, gameType, 'master');
+    return pts >= PROGRESSION.MASTERY_GATE_KEEPER;
+  }
+  return true;
+}
+
 // ── HQ ADAPTIVE QUIZ ──────────────────────────────────────────────────────────
 
 async function handleSeedHQ(body, env, apiKey) {
@@ -1782,12 +1968,38 @@ async function handleSubmitHQAnswer(body, env) {
     ).bind(userId, question_id, Math.floor(Date.now()/1000)).run();
 
     if (isComplete) {
+      const completedTs = Math.floor(Date.now()/1000);
       await env.db.prepare(
         `UPDATE hq_sessions SET current_hq=?, questions_answered=?, final_hq=?, completed=1, completed_at=? WHERE id=?`
-      ).bind(newHQ, newAnswered, newHQ, Math.floor(Date.now()/1000), session_id).run();
+      ).bind(newHQ, newAnswered, newHQ, completedTs, session_id).run();
+
+      // Award XP on HQ completion via the unified helper. Performance is
+      // derived from the final HQ score: 0 at hq=50, ~50 at hq=500,
+      // 100 at hq=990. HQ does not contribute to the per-difficulty mastery
+      // table; its hq_score on the user row IS its skill metric.
+      const hqPerf = Math.round(((newHQ - 50) / 940) * 100);
+      const xpEarned = computeSessionXP('hq', null, hqPerf);
+
+      // Update streak + total_xp + total_games on the user row.
+      const userRow = await env.db.prepare(`SELECT * FROM users WHERE id=?`).bind(userId).first();
+      const today = new Date().toISOString().split('T')[0];
+      const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+      const yStr = yesterday.toISOString().split('T')[0];
+      let streak = userRow?.current_streak || 0;
+      if (userRow?.last_streak_date === today) { /* same-day */ }
+      else if (userRow?.last_streak_date === yStr) { streak++; }
+      else { streak = 1; }
+      const newXp = (userRow?.total_xp || 0) + xpEarned;
+      const newGames = (userRow?.total_games || 0) + 1;
+
       await env.db.prepare(
-        `UPDATE users SET hq_score=?, hq_taken_at=? WHERE id=?`
-      ).bind(newHQ, Math.floor(Date.now()/1000), userId).run();
+        `UPDATE users SET hq_score=?, hq_taken_at=?, total_xp=?, total_games=?, current_streak=?, longest_streak=?, last_streak_date=?, last_played=?, total_rounds=total_rounds+? WHERE id=?`
+      ).bind(newHQ, completedTs, newXp, newGames, streak, Math.max(userRow?.longest_streak||0, streak), today, completedTs, newAnswered, userId).run();
+
+      // Log to game_sessions for profile history
+      await env.db.prepare(
+        `INSERT INTO game_sessions (id, user_id, diff, rounds, scores, avg_score, game_type, completed_at) VALUES (?, ?, ?, ?, ?, ?, 'hq', ?)`
+      ).bind(crypto.randomUUID(), userId, '', newAnswered, JSON.stringify({ final_hq: newHQ, xp_earned: xpEarned }), hqPerf, completedTs).run();
 
       const pctRow = await env.db.prepare(
         `SELECT
@@ -1797,7 +2009,7 @@ async function handleSubmitHQAnswer(body, env) {
       const total_takers = pctRow?.total || 0;
       const percentile = total_takers > 0 ? Math.round((pctRow.below / total_takers) * 100) : null;
 
-      return json({ correct, correct_idx: question.correct_idx, hq_delta: Math.round(delta), new_hq: newHQ, questions_answered: newAnswered, completed: true, final_hq: newHQ, total_takers, percentile }, 200);
+      return json({ correct, correct_idx: question.correct_idx, hq_delta: Math.round(delta), new_hq: newHQ, questions_answered: newAnswered, completed: true, final_hq: newHQ, xp_earned: xpEarned, total_takers, percentile }, 200);
     }
 
     await env.db.prepare(
@@ -2037,9 +2249,9 @@ STYLE (strict): Write in American English. Do NOT use em dashes (—). Use comma
 const STYLE_RULE = 'STYLE: American English spelling throughout (color, honor, organize, center, defense). Do NOT use em dashes (—). Use commas, periods, or colons instead.';
 
 const DIALOGUE_DIFFICULTY_PRESETS = {
-  easy:   { label: 'Apprentice',  win_at: 75,  lose_at: 0,   stubbornness: 0.7, clues_allowed: 3, hint: 'Listens with patience. Three clue cards available.' },
-  medium: { label: 'Strategist',  win_at: 90,  lose_at: 5,   stubbornness: 1.0, clues_allowed: 2, hint: 'Weighs every word. Two clue cards available.' },
-  hard:   { label: 'Imperator',   win_at: 100, lose_at: 12,  stubbornness: 1.4, clues_allowed: 1, hint: 'Will not be moved by anything but masterful argument. Only one clue card available.' }
+  disciple: { label: 'Disciple',       win_at: 75,  lose_at: 0,   stubbornness: 0.7, clues_allowed: 3, hint: 'Listens with patience. Three clue cards available.' },
+  master:   { label: 'Master',         win_at: 90,  lose_at: 5,   stubbornness: 1.0, clues_allowed: 2, hint: 'Weighs every word. Two clue cards available.' },
+  keeper:   { label: 'Keeper of Time', win_at: 100, lose_at: 12,  stubbornness: 1.4, clues_allowed: 1, hint: 'Will not be moved by anything but masterful argument. Only one clue card available.' }
 };
 
 const DIALOGUE_SCENARIOS = {
@@ -2885,12 +3097,19 @@ async function handleStartDialogue(body, env) {
   const sc = DIALOGUE_SCENARIOS[scenario_id];
   if (!sc) return json({ error: 'Scenario not found' }, 404);
 
-  const diffKey = (sc.difficulty_presets && sc.difficulty_presets[difficulty]) ? difficulty : 'medium';
+  // Accept legacy easy/medium/hard from cached frontends and map to the new keys.
+  const requestedDiff = normalizeDiffKey(difficulty);
+  const diffKey = (sc.difficulty_presets && sc.difficulty_presets[requestedDiff]) ? requestedDiff : 'master';
   const diffCfg = sc.difficulty_presets[diffKey];
 
   let userId = null;
   if (token) {
     try { const p = await verifyJWT(token, env.JWT_SECRET); userId = p.sub; } catch(e) {}
+  }
+
+  // Gating: master needs 500 disciple mastery in dialogue; keeper needs 500 master.
+  if (!(await isDifficultyUnlocked(env, userId, 'dialogue', diffKey))) {
+    return json({ error: 'Difficulty locked', locked: true, diff: diffKey, gate: 'mastery_threshold' }, 403);
   }
 
   // Validate evidence loadout if scenario supports it
@@ -2957,7 +3176,8 @@ async function handleRevealDialogueClue(body, env) {
     const idx = parseInt(clue_idx, 10);
     if (isNaN(idx) || idx < 0 || idx >= sc.clues.length) return json({ error: 'Invalid clue index' }, 400);
 
-    const diffKey = sc.difficulty_presets[session.difficulty] ? session.difficulty : 'medium';
+    const sessDiff = normalizeDiffKey(session.difficulty);
+    const diffKey = sc.difficulty_presets[sessDiff] ? sessDiff : 'master';
     const allowed = sc.difficulty_presets[diffKey].clues_allowed || 0;
     const used = session.clues_used || 0;
     if (used >= allowed) return json({ error: 'No clue reveals remaining' }, 400);
@@ -2986,7 +3206,8 @@ async function handleDialogueTurn(body, env, apiKey) {
 
     if (session.turn_count >= sc.max_turns) return json({ error: 'No turns remaining' }, 400);
 
-    const diffKey = sc.difficulty_presets[session.difficulty] ? session.difficulty : 'medium';
+    const sessDiff = normalizeDiffKey(session.difficulty);
+    const diffKey = sc.difficulty_presets[sessDiff] ? sessDiff : 'master';
     const diffCfg = sc.difficulty_presets[diffKey];
 
     // Validate evidence deploy if requested
@@ -3164,7 +3385,8 @@ async function handleJudgeDialogue(body, env, apiKey) {
 
     const criteriaList = sc.win_criteria.map((c,i) => `${i+1}. ${c.id}, ${c.label}: ${c.desc}`).join('\n');
 
-    const diffKey = sc.difficulty_presets[session.difficulty] ? session.difficulty : 'medium';
+    const sessDiff = normalizeDiffKey(session.difficulty);
+    const diffKey = sc.difficulty_presets[sessDiff] ? sessDiff : 'master';
     const diffCfg = sc.difficulty_presets[diffKey];
     const finalConv = session.conviction;
 
@@ -3221,13 +3443,16 @@ Return ONLY valid JSON:
     const criteriaMet = Array.isArray(parsed.criteria_met) ? parsed.criteria_met : [];
     const verdictText = parsed.verdict_text || '';
 
-    // ── XP scoring ───────────────────────────────────────────────
+    // ── XP + Mastery scoring ────────────────────────────────────
+    // Map verdict to a 0-100 performance metric, then apply the unified
+    // formulas. Clue use reduces effective performance (10 points per clue
+    // used) so heavy clue users earn less mastery and a slightly lower XP.
     const cluesUsed = session.clues_used || 0;
     const cluesAllowed = diffCfg.clues_allowed || 0;
-    const baseByVerdict = { Convinced: 200, Wavered: 75, Firm: 25 };
-    const diffMult     = { easy: 1.0, medium: 1.5, hard: 2.0 }[diffKey] || 1.0;
-    const cluePenalty  = cluesUsed * 25;
-    const xpEarned     = Math.max(0, Math.round((baseByVerdict[verdict] || 0) * diffMult - cluePenalty));
+    const verdictPerf = ({ Convinced: 100, Wavered: 50, Firm: 0 })[verdict] || 0;
+    const performance = Math.max(0, verdictPerf - cluesUsed * 10);
+    const xpEarned = computeSessionXP('dialogue', diffKey, performance);
+    const masteryEarned = computeSessionMastery('dialogue', diffKey, performance);
 
     const now = Math.floor(Date.now()/1000);
     await env.db.prepare(
@@ -3240,6 +3465,7 @@ Return ONLY valid JSON:
         const sessionScores = JSON.stringify({
           verdict,
           xp_earned: xpEarned,
+          mastery_earned: masteryEarned,
           clues_used: cluesUsed,
           clues_allowed: cluesAllowed,
           scenario_id: session.scenario_id,
@@ -3249,6 +3475,8 @@ Return ONLY valid JSON:
         await env.db.prepare(
           `INSERT INTO game_sessions (id, user_id, diff, rounds, scores, avg_score, game_type, completed_at) VALUES (?, ?, ?, ?, ?, ?, 'dialogue', ?)`
         ).bind(crypto.randomUUID(), session.user_id, diffKey, session.turn_count || 0, sessionScores, session.conviction || 0, now).run();
+
+        await awardMastery(env, session.user_id, 'dialogue', diffKey, masteryEarned);
 
         const user = await env.db.prepare('SELECT * FROM users WHERE id=?').bind(session.user_id).first();
         if (user) {
@@ -3275,6 +3503,7 @@ Return ONLY valid JSON:
       final_reply: finalReply,
       conviction: session.conviction,
       xp_earned: xpEarned,
+      mastery_earned: masteryEarned,
       clues_used: cluesUsed,
       clues_allowed: cluesAllowed,
       evidence_loadout: evidenceLoadout,
@@ -3373,6 +3602,11 @@ async function handleStartPaintingSession(body, env) {
   let userId = null;
   if (token) {
     try { const p = await verifyJWT(token, env.JWT_SECRET); userId = p.sub; } catch(e) {}
+  }
+
+  // Gating: master needs 500 disciple mastery in paintings; keeper needs 500 master.
+  if (!(await isDifficultyUnlocked(env, userId, 'paintings', diffKey))) {
+    return json({ error: 'Difficulty locked', locked: true, diff: diffKey, gate: 'mastery_threshold' }, 403);
   }
 
   try {
@@ -3659,9 +3893,13 @@ async function handleSubmitPaintingAnswer(body, env) {
       }, 200);
     }
 
-    // Final round: complete the session and award XP
-    const totalXp = answers.reduce((s, a) => s + (a.round_xp || 0), 0);
+    // Final round: compute authoritative session XP + mastery via the unified
+    // helpers (overrides the per-round XP display, which is purely UX feedback).
     const score = answers.filter(a => a.correct).length;
+    const performance = Math.round((score / PAINTING_ROUNDS) * 100);
+    const diffKey = normalizeDiffKey(session.difficulty);
+    const totalXp = computeSessionXP('paintings', diffKey, performance);
+    const masteryEarned = computeSessionMastery('paintings', diffKey, performance);
 
     await env.db.prepare(
       `UPDATE painting_sessions SET round_num=?, answers=?, status='complete', completed_at=?, xp_earned=?, score=? WHERE id=?`
@@ -3672,13 +3910,16 @@ async function handleSubmitPaintingAnswer(body, env) {
       try {
         const sessionScores = JSON.stringify({
           xp_earned: totalXp,
+          mastery_earned: masteryEarned,
           score,
-          difficulty: session.difficulty,
+          difficulty: diffKey,
           rounds: answers.map(a => ({ correct: a.correct, clues_used: a.clues_used, round_xp: a.round_xp }))
         });
         await env.db.prepare(
           `INSERT INTO game_sessions (id, user_id, diff, rounds, scores, avg_score, game_type, completed_at) VALUES (?, ?, ?, ?, ?, ?, 'paintings', ?)`
-        ).bind(crypto.randomUUID(), session.user_id, session.difficulty, PAINTING_ROUNDS, sessionScores, Math.round((score / PAINTING_ROUNDS) * 100), now).run();
+        ).bind(crypto.randomUUID(), session.user_id, diffKey, PAINTING_ROUNDS, sessionScores, performance, now).run();
+
+        await awardMastery(env, session.user_id, 'paintings', diffKey, masteryEarned);
 
         const user = await env.db.prepare('SELECT * FROM users WHERE id=?').bind(session.user_id).first();
         if (user) {
@@ -3705,7 +3946,8 @@ async function handleSubmitPaintingAnswer(body, env) {
         score,
         total: PAINTING_ROUNDS,
         xp_earned: totalXp,
-        difficulty: session.difficulty,
+        mastery_earned: masteryEarned,
+        difficulty: diffKey,
         difficulty_label: cfg.label
       }
     }, 200);
