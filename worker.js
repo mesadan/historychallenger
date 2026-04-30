@@ -24,6 +24,7 @@ export default {
     if (action === 'save_session')    return handleSaveSession(body, env);
     if (action === 'get_profile')     return handleGetProfile(body, env);
     if (action === 'get_progression') return handleGetProgression(body, env);
+    if (action === 'get_leaderboard') return handleGetLeaderboard(body, env);
     if (action === 'update_profile')  return handleUpdateProfile(body, env);
     if (action === 'delete_account')  return handleDeleteAccount(body, env);
 
@@ -1039,6 +1040,39 @@ async function handleGetProgression(body, env) {
       keeper_threshold: PROGRESSION.MASTERY_GATE_KEEPER,
     }
   }, 200);
+}
+
+// Public leaderboard: top N users by total_xp, excluding the project owner.
+// No auth required. Returns only display fields: name, avatar, total_xp,
+// hq_score (optional), current_streak (optional). No emails or user IDs.
+const LEADERBOARD_EXCLUDE_EMAILS = ['maletethan@gmail.com'];
+async function handleGetLeaderboard(body, env) {
+  try {
+    const limit = Math.min(Math.max(parseInt(body?.limit, 10) || 10, 1), 50);
+    const excludePlaceholders = LEADERBOARD_EXCLUDE_EMAILS.map(() => '?').join(',');
+    const rows = await env.db.prepare(
+      `SELECT name, avatar, total_xp, hq_score, current_streak, longest_streak
+       FROM users
+       WHERE total_xp > 0
+         AND email NOT IN (${excludePlaceholders})
+       ORDER BY total_xp DESC, longest_streak DESC
+       LIMIT ?`
+    ).bind(...LEADERBOARD_EXCLUDE_EMAILS, limit).all();
+
+    // Strip avatar URLs that look weird (defensive); keep name plain.
+    const players = (rows.results || []).map((r, i) => ({
+      rank: i + 1,
+      name: r.name || 'Anonymous',
+      avatar: r.avatar || null,
+      total_xp: r.total_xp || 0,
+      hq_score: r.hq_score || null,
+      current_streak: r.current_streak || 0,
+    }));
+
+    return json({ players, total: players.length }, 200);
+  } catch(e) {
+    return json({ error: e.message }, 500);
+  }
 }
 
 async function handleUpdateProfile(body, env) {

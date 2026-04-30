@@ -338,6 +338,42 @@ footer{
   </div>
 </section>
 
+<!-- LEADERBOARD -->
+<section id="leaderboard" style="padding:5rem 1.5rem;background:var(--section-alt);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="section-inner">
+    <div class="section-label">Hall of Fame</div>
+    <h2 class="section-title" style="margin-bottom:2rem">Top players</h2>
+    <div id="leaderboard-list" style="background:var(--card-bg);border:1.5px solid var(--border);border-radius:3px;overflow:hidden;max-width:640px">
+      <div style="padding:1.4rem 1.6rem;color:var(--ink-light);font-style:italic;font-size:15px">Loading...</div>
+    </div>
+    <div id="leaderboard-empty" style="display:none;background:var(--card-bg);border:1.5px solid var(--border);border-radius:3px;padding:1.4rem 1.6rem;color:var(--ink-light);font-style:italic;font-size:15px;max-width:640px">
+      No players yet. Be the first to climb the ladder.
+    </div>
+  </div>
+</section>
+
+<style>
+.lb-row{display:grid;grid-template-columns:36px 40px 1fr auto;gap:14px;align-items:center;padding:.85rem 1.4rem;border-bottom:1px solid var(--border);font-family:'Crimson Text',Georgia,serif;color:var(--ink)}
+.lb-row:last-child{border-bottom:none}
+.lb-rank{font-family:'Playfair Display',serif;font-style:italic;font-size:18px;font-weight:400;color:var(--gold);text-align:center}
+.lb-rank.gold{color:#a86a08;font-weight:700}
+.lb-rank.silver{color:#7a6040;font-weight:700}
+.lb-rank.bronze{color:#8a4a08;font-weight:700}
+.lb-avatar{width:36px;height:36px;border-radius:50%;background:var(--parchment-darker);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.lb-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.lb-avatar .lb-initials{font-family:'Playfair Display',serif;font-size:14px;color:var(--ink-light)}
+.lb-name{font-size:16px;color:var(--ink)}
+.lb-streak{font-size:11px;color:var(--gold);font-style:italic;margin-top:1px}
+.lb-xp{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);font-weight:400;font-variant-numeric:tabular-nums;text-align:right}
+.lb-xp-lbl{font-size:10px;color:var(--ink-light);letter-spacing:.12em;text-transform:uppercase;font-family:'Crimson Text',serif;margin-top:1px}
+@media(max-width:520px){
+  .lb-row{grid-template-columns:28px 32px 1fr auto;gap:10px;padding:.7rem 1rem}
+  .lb-name{font-size:14px}
+  .lb-xp{font-size:16px}
+  .lb-avatar{width:32px;height:32px}
+}
+</style>
+
 <!-- ABOUT -->
 <section id="about" class="about-section">
   <div class="section-inner">
@@ -597,6 +633,60 @@ applyLang();
   }
   document.addEventListener('DOMContentLoaded', addPersonaLink);
   setTimeout(addPersonaLink, 200);
+})();
+</script>
+
+<script>
+// ── LEADERBOARD ─────────────────────────────────────────────────────
+(async function loadLeaderboard(){
+  const WORKER = 'https://histroychallenger-api.maletethan.workers.dev';
+  const list = document.getElementById('leaderboard-list');
+  const empty = document.getElementById('leaderboard-empty');
+  if (!list) return;
+  try {
+    const res = await fetch(WORKER, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'get_leaderboard', limit: 10 }),
+    });
+    const d = await res.json();
+    if (d.error) { list.innerHTML = '<div style="padding:1.4rem 1.6rem;color:var(--ink-light);font-style:italic">Could not load leaderboard.</div>'; return; }
+    const players = d.players || [];
+    if (!players.length) { list.style.display = 'none'; if (empty) empty.style.display = 'block'; return; }
+
+    const esc = (s) => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const initials = (name) => {
+      const parts = String(name||'').trim().split(/\s+/).slice(0,2);
+      return parts.map(p => p.charAt(0).toUpperCase()).join('') || '?';
+    };
+    const rankClass = (r) => r === 1 ? 'gold' : r === 2 ? 'silver' : r === 3 ? 'bronze' : '';
+    const ordinal = (n) => {
+      const s = ['th','st','nd','rd'], v = n % 100;
+      return n + (s[(v-20)%10] || s[v] || s[0]);
+    };
+
+    list.innerHTML = players.map(p => {
+      const avatarHTML = p.avatar
+        ? `<img src="${esc(p.avatar)}" alt="${esc(p.name)}" referrerpolicy="no-referrer" onerror="this.parentNode.innerHTML='<span class=\\'lb-initials\\'>${esc(initials(p.name))}</span>'">`
+        : `<span class="lb-initials">${esc(initials(p.name))}</span>`;
+      const streakHTML = p.current_streak >= 3
+        ? `<div class="lb-streak">🔥 ${p.current_streak}-day streak</div>` : '';
+      return `<div class="lb-row">
+        <div class="lb-rank ${rankClass(p.rank)}">${p.rank}<span style="font-size:.6em;opacity:.7;vertical-align:super">${ordinal(p.rank).replace(p.rank,'')}</span></div>
+        <div class="lb-avatar">${avatarHTML}</div>
+        <div>
+          <div class="lb-name">${esc(p.name)}</div>
+          ${streakHTML}
+        </div>
+        <div>
+          <div class="lb-xp">${p.total_xp.toLocaleString()}</div>
+          <div class="lb-xp-lbl">XP</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="padding:1.4rem 1.6rem;color:var(--ink-light);font-style:italic">Could not load leaderboard.</div>';
+  }
 })();
 </script>
 </body>
