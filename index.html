@@ -342,35 +342,67 @@ footer{
 <section id="leaderboard" style="padding:5rem 1.5rem;background:var(--section-alt);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
   <div class="section-inner">
     <div class="section-label">Hall of Fame</div>
-    <h2 class="section-title" style="margin-bottom:2rem">Top players</h2>
-    <div id="leaderboard-list" style="background:var(--card-bg);border:1.5px solid var(--border);border-radius:3px;overflow:hidden;max-width:640px">
-      <div style="padding:1.4rem 1.6rem;color:var(--ink-light);font-style:italic;font-size:15px">Loading...</div>
-    </div>
-    <div id="leaderboard-empty" style="display:none;background:var(--card-bg);border:1.5px solid var(--border);border-radius:3px;padding:1.4rem 1.6rem;color:var(--ink-light);font-style:italic;font-size:15px;max-width:640px">
-      No players yet. Be the first to climb the ladder.
+    <h2 class="section-title" style="margin-bottom:.4rem">Top players</h2>
+    <p style="font-size:15px;color:var(--ink-light);font-style:italic;margin-bottom:2rem;max-width:580px">XP rewards every session you play; Mastery rewards how skillfully you play the four difficulty-tiered games.</p>
+    <div class="lb-grid">
+      <div class="lb-panel">
+        <div class="lb-panel-head">
+          <span class="lb-panel-icon">🎯</span>
+          <div>
+            <div class="lb-panel-title">Top by XP</div>
+            <div class="lb-panel-sub">Most active across all games</div>
+          </div>
+        </div>
+        <div id="lb-xp-list" class="lb-list">
+          <div class="lb-loading">Loading...</div>
+        </div>
+      </div>
+      <div class="lb-panel">
+        <div class="lb-panel-head">
+          <span class="lb-panel-icon">🏆</span>
+          <div>
+            <div class="lb-panel-title">Top by Mastery</div>
+            <div class="lb-panel-sub">Sharpest players across the quiz games</div>
+          </div>
+        </div>
+        <div id="lb-mastery-list" class="lb-list">
+          <div class="lb-loading">Loading...</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
 <style>
-.lb-row{display:grid;grid-template-columns:36px 40px 1fr auto;gap:14px;align-items:center;padding:.85rem 1.4rem;border-bottom:1px solid var(--border);font-family:'Crimson Text',Georgia,serif;color:var(--ink)}
+.lb-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem}
+@media(max-width:760px){.lb-grid{grid-template-columns:1fr}}
+.lb-panel{background:var(--card-bg);border:1.5px solid var(--border);border-radius:3px;overflow:hidden;display:flex;flex-direction:column}
+.lb-panel-head{display:flex;align-items:center;gap:12px;padding:1rem 1.4rem;border-bottom:1px solid var(--border);background:var(--parchment-dark)}
+.lb-panel-icon{font-size:22px;line-height:1}
+.lb-panel-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;color:var(--ink);font-style:italic}
+.lb-panel-sub{font-size:12px;color:var(--ink-light);font-style:italic;margin-top:1px}
+.lb-list{display:flex;flex-direction:column}
+.lb-loading{padding:1.4rem 1.6rem;color:var(--ink-light);font-style:italic;font-size:14px}
+.lb-empty{padding:1.4rem 1.6rem;color:var(--ink-light);font-style:italic;font-size:14px}
+.lb-row{display:grid;grid-template-columns:30px 36px 1fr auto;gap:12px;align-items:center;padding:.7rem 1.2rem;border-bottom:1px solid var(--border);font-family:'Crimson Text',Georgia,serif;color:var(--ink)}
 .lb-row:last-child{border-bottom:none}
-.lb-rank{font-family:'Playfair Display',serif;font-style:italic;font-size:18px;font-weight:400;color:var(--gold);text-align:center}
+.lb-rank{font-family:'Playfair Display',serif;font-style:italic;font-size:17px;font-weight:400;color:var(--gold);text-align:center}
 .lb-rank.gold{color:#a86a08;font-weight:700}
 .lb-rank.silver{color:#7a6040;font-weight:700}
 .lb-rank.bronze{color:#8a4a08;font-weight:700}
-.lb-avatar{width:36px;height:36px;border-radius:50%;background:var(--parchment-darker);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.lb-avatar{width:32px;height:32px;border-radius:50%;background:var(--parchment-darker);overflow:hidden;display:flex;align-items:center;justify-content:center}
 .lb-avatar img{width:100%;height:100%;object-fit:cover;display:block}
-.lb-avatar .lb-initials{font-family:'Playfair Display',serif;font-size:14px;color:var(--ink-light)}
-.lb-name{font-size:16px;color:var(--ink)}
+.lb-avatar .lb-initials{font-family:'Playfair Display',serif;font-size:13px;color:var(--ink-light)}
+.lb-name{font-size:15px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lb-streak{font-size:11px;color:var(--gold);font-style:italic;margin-top:1px}
-.lb-xp{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);font-weight:400;font-variant-numeric:tabular-nums;text-align:right}
-.lb-xp-lbl{font-size:10px;color:var(--ink-light);letter-spacing:.12em;text-transform:uppercase;font-family:'Crimson Text',serif;margin-top:1px}
+.lb-score{font-family:'Playfair Display',serif;font-size:17px;color:var(--gold);font-weight:400;font-variant-numeric:tabular-nums;text-align:right}
+.lb-score-lbl{font-size:9px;color:var(--ink-light);letter-spacing:.14em;text-transform:uppercase;font-family:'Crimson Text',serif;margin-top:1px}
 @media(max-width:520px){
-  .lb-row{grid-template-columns:28px 32px 1fr auto;gap:10px;padding:.7rem 1rem}
-  .lb-name{font-size:14px}
-  .lb-xp{font-size:16px}
-  .lb-avatar{width:32px;height:32px}
+  .lb-row{grid-template-columns:24px 28px 1fr auto;gap:9px;padding:.6rem .9rem}
+  .lb-name{font-size:13.5px}
+  .lb-score{font-size:15px}
+  .lb-avatar{width:28px;height:28px}
+  .lb-rank{font-size:15px}
 }
 </style>
 
@@ -637,56 +669,67 @@ applyLang();
 </script>
 
 <script>
-// ── LEADERBOARD ─────────────────────────────────────────────────────
-(async function loadLeaderboard(){
+// ── LEADERBOARD: two panels (XP + Mastery), 5 players each ─────────
+(function(){
   const WORKER = 'https://histroychallenger-api.maletethan.workers.dev';
-  const list = document.getElementById('leaderboard-list');
-  const empty = document.getElementById('leaderboard-empty');
-  if (!list) return;
-  try {
-    const res = await fetch(WORKER, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'get_leaderboard', limit: 10 }),
-    });
-    const d = await res.json();
-    if (d.error) { list.innerHTML = '<div style="padding:1.4rem 1.6rem;color:var(--ink-light);font-style:italic">Could not load leaderboard.</div>'; return; }
-    const players = d.players || [];
-    if (!players.length) { list.style.display = 'none'; if (empty) empty.style.display = 'block'; return; }
 
-    const esc = (s) => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    const initials = (name) => {
-      const parts = String(name||'').trim().split(/\s+/).slice(0,2);
-      return parts.map(p => p.charAt(0).toUpperCase()).join('') || '?';
-    };
-    const rankClass = (r) => r === 1 ? 'gold' : r === 2 ? 'silver' : r === 3 ? 'bronze' : '';
-    const ordinal = (n) => {
-      const s = ['th','st','nd','rd'], v = n % 100;
-      return n + (s[(v-20)%10] || s[v] || s[0]);
-    };
+  const esc = (s) => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const initials = (name) => {
+    const parts = String(name||'').trim().split(/\s+/).slice(0,2);
+    return parts.map(p => p.charAt(0).toUpperCase()).join('') || '?';
+  };
+  const rankClass = (r) => r === 1 ? 'gold' : r === 2 ? 'silver' : r === 3 ? 'bronze' : '';
 
-    list.innerHTML = players.map(p => {
+  function renderPanel(targetId, players, scoreLabel){
+    const el = document.getElementById(targetId);
+    if (!el) return;
+    if (!players.length) {
+      el.innerHTML = '<div class="lb-empty">No qualifying players yet. Be the first.</div>';
+      return;
+    }
+    el.innerHTML = players.map(p => {
       const avatarHTML = p.avatar
         ? `<img src="${esc(p.avatar)}" alt="${esc(p.name)}" referrerpolicy="no-referrer" onerror="this.parentNode.innerHTML='<span class=\\'lb-initials\\'>${esc(initials(p.name))}</span>'">`
         : `<span class="lb-initials">${esc(initials(p.name))}</span>`;
       const streakHTML = p.current_streak >= 3
         ? `<div class="lb-streak">🔥 ${p.current_streak}-day streak</div>` : '';
       return `<div class="lb-row">
-        <div class="lb-rank ${rankClass(p.rank)}">${p.rank}<span style="font-size:.6em;opacity:.7;vertical-align:super">${ordinal(p.rank).replace(p.rank,'')}</span></div>
+        <div class="lb-rank ${rankClass(p.rank)}">${p.rank}</div>
         <div class="lb-avatar">${avatarHTML}</div>
-        <div>
+        <div style="min-width:0">
           <div class="lb-name">${esc(p.name)}</div>
           ${streakHTML}
         </div>
         <div>
-          <div class="lb-xp">${p.total_xp.toLocaleString()}</div>
-          <div class="lb-xp-lbl">XP</div>
+          <div class="lb-score">${(p.score||0).toLocaleString()}</div>
+          <div class="lb-score-lbl">${scoreLabel}</div>
         </div>
       </div>`;
     }).join('');
-  } catch(e) {
-    list.innerHTML = '<div style="padding:1.4rem 1.6rem;color:var(--ink-light);font-style:italic">Could not load leaderboard.</div>';
   }
+
+  async function fetchAndRender(metric, targetId, scoreLabel){
+    try {
+      const res = await fetch(WORKER, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'get_leaderboard', metric, limit: 5 }),
+      });
+      const d = await res.json();
+      if (d.error) {
+        const el = document.getElementById(targetId);
+        if (el) el.innerHTML = '<div class="lb-empty">Could not load.</div>';
+        return;
+      }
+      renderPanel(targetId, d.players || [], scoreLabel);
+    } catch(e) {
+      const el = document.getElementById(targetId);
+      if (el) el.innerHTML = '<div class="lb-empty">Could not load.</div>';
+    }
+  }
+
+  fetchAndRender('xp',      'lb-xp-list',      'XP');
+  fetchAndRender('mastery', 'lb-mastery-list', 'Mastery');
 })();
 </script>
 </body>

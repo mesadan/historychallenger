@@ -1042,34 +1042,55 @@ async function handleGetProgression(body, env) {
   }, 200);
 }
 
-// Public leaderboard: top N users by total_xp, excluding the project owner.
-// No auth required. Returns only display fields: name, avatar, total_xp,
-// hq_score (optional), current_streak (optional). No emails or user IDs.
+// Public leaderboard: top N users ranked by either XP (participation) or
+// total Mastery (skill, summed across the 4 mastery-bearing games).
+// No auth required. Excludes the project owner via LEADERBOARD_EXCLUDE_EMAILS.
+// Returns only display fields: name, avatar, score, streak. No emails / IDs.
+//
+// body.metric:
+//   'xp'      (default) ranks by users.total_xp
+//   'mastery'           ranks by SUM(user_mastery.points)
 const LEADERBOARD_EXCLUDE_EMAILS = ['maletethan@gmail.com'];
 async function handleGetLeaderboard(body, env) {
   try {
     const limit = Math.min(Math.max(parseInt(body?.limit, 10) || 10, 1), 50);
+    const metric = (body?.metric === 'mastery') ? 'mastery' : 'xp';
     const excludePlaceholders = LEADERBOARD_EXCLUDE_EMAILS.map(() => '?').join(',');
-    const rows = await env.db.prepare(
-      `SELECT name, avatar, total_xp, hq_score, current_streak, longest_streak
-       FROM users
-       WHERE total_xp > 0
-         AND email NOT IN (${excludePlaceholders})
-       ORDER BY total_xp DESC, longest_streak DESC
-       LIMIT ?`
-    ).bind(...LEADERBOARD_EXCLUDE_EMAILS, limit).all();
 
-    // Strip avatar URLs that look weird (defensive); keep name plain.
+    let rows;
+    if (metric === 'xp') {
+      rows = await env.db.prepare(
+        `SELECT name, avatar, total_xp AS score, current_streak, longest_streak
+         FROM users
+         WHERE total_xp > 0
+           AND email NOT IN (${excludePlaceholders})
+         ORDER BY total_xp DESC, longest_streak DESC
+         LIMIT ?`
+      ).bind(...LEADERBOARD_EXCLUDE_EMAILS, limit).all();
+    } else {
+      // Mastery: sum across all (game, diff) cells per user.
+      rows = await env.db.prepare(
+        `SELECT u.name, u.avatar, u.current_streak, u.longest_streak,
+                COALESCE(SUM(m.points), 0) AS score
+         FROM users u
+         LEFT JOIN user_mastery m ON m.user_id = u.id
+         WHERE u.email NOT IN (${excludePlaceholders})
+         GROUP BY u.id
+         HAVING score > 0
+         ORDER BY score DESC, u.longest_streak DESC
+         LIMIT ?`
+      ).bind(...LEADERBOARD_EXCLUDE_EMAILS, limit).all();
+    }
+
     const players = (rows.results || []).map((r, i) => ({
       rank: i + 1,
       name: r.name || 'Anonymous',
       avatar: r.avatar || null,
-      total_xp: r.total_xp || 0,
-      hq_score: r.hq_score || null,
+      score: r.score || 0,
       current_streak: r.current_streak || 0,
     }));
 
-    return json({ players, total: players.length }, 200);
+    return json({ metric, players, total: players.length }, 200);
   } catch(e) {
     return json({ error: e.message }, 500);
   }
