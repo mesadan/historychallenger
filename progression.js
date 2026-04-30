@@ -97,4 +97,106 @@ if (document.readyState === 'loading') {
 } else {
   window.hcLoadProgression();
 }
+
+// ── AUTH NUDGE ─────────────────────────────────────────────────────
+// Inline banner shown to guests (no JWT in localStorage) after they
+// finish a session. Single shared helper across all games so the copy
+// and behaviour stay consistent. Dismiss is per-session (sessionStorage)
+// so a guest who declines on Timeline doesn't get re-prompted on Overlap
+// in the same browsing session, but a fresh tab still nudges.
+//
+// USAGE:
+//   window.hcShowAuthNudge({ xp: 120, mastery: 80 })
+//   window.hcShowAuthNudge()  // generic message
+//
+// Skips automatically if a hc_token is already in localStorage.
+const NUDGE_DISMISS_KEY = 'hc_nudge_dismissed_v1';
+const NUDGE_CSS = `
+#hc-auth-nudge{position:fixed;left:50%;bottom:18px;transform:translate(-50%, 30px);
+  z-index:8500;display:none;opacity:0;transition:opacity .25s, transform .25s;
+  background:#1a150e;color:#f5edd8;border:1px solid #c49020;border-radius:6px;
+  box-shadow:0 12px 28px rgba(0,0,0,.55);
+  padding:14px 18px;font-family:'Crimson Text',Georgia,serif;font-size:14px;line-height:1.45;
+  max-width:520px;width:calc(100% - 36px);
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+#hc-auth-nudge.show{display:flex;opacity:1;transform:translate(-50%, 0)}
+#hc-auth-nudge .hc-nudge-text{flex:1;min-width:200px}
+#hc-auth-nudge .hc-nudge-title{font-family:'Playfair Display',serif;font-style:italic;font-size:16px;color:#f5edd8;margin-bottom:2px}
+#hc-auth-nudge .hc-nudge-sub{font-size:13px;color:#a08868;font-style:italic}
+#hc-auth-nudge .hc-nudge-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+#hc-auth-nudge .hc-nudge-signin{
+  background:#c49020;color:#1a150e;border:1px solid #c8a028;border-radius:3px;
+  padding:8px 14px;font-family:'Playfair Display',serif;font-style:italic;font-size:14px;
+  cursor:pointer;font-weight:400}
+#hc-auth-nudge .hc-nudge-signin:hover{background:#e0a84a}
+#hc-auth-nudge .hc-nudge-dismiss{
+  background:transparent;color:#a08868;border:none;font-family:'Crimson Text',serif;
+  font-size:12px;cursor:pointer;padding:4px 8px;font-style:italic}
+#hc-auth-nudge .hc-nudge-dismiss:hover{color:#f5edd8}
+@media(max-width:520px){
+  #hc-auth-nudge{padding:12px 14px;left:12px;right:12px;width:auto;transform:translateY(30px)}
+  #hc-auth-nudge.show{transform:translateY(0)}
+}`;
+
+function injectNudgeStyles(){
+  if (document.getElementById('hc-auth-nudge-styles')) return;
+  const s = document.createElement('style');
+  s.id = 'hc-auth-nudge-styles';
+  s.textContent = NUDGE_CSS;
+  document.head.appendChild(s);
+}
+
+window.hcShowAuthNudge = function(opts){
+  // Skip if already signed in
+  if (localStorage.getItem('hc_token')) return;
+  // Skip if dismissed this browsing session
+  try { if (sessionStorage.getItem(NUDGE_DISMISS_KEY)) return; } catch(e) {}
+
+  injectNudgeStyles();
+  let el = document.getElementById('hc-auth-nudge');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'hc-auth-nudge';
+    document.body.appendChild(el);
+  }
+
+  const xp = opts && typeof opts.xp === 'number' ? opts.xp : null;
+  const mastery = opts && typeof opts.mastery === 'number' ? opts.mastery : null;
+  let earned = '';
+  if (xp != null && xp > 0 && mastery != null && mastery > 0) earned = `${xp} XP and ${mastery} Mastery`;
+  else if (xp != null && xp > 0) earned = `${xp} XP`;
+  else if (mastery != null && mastery > 0) earned = `${mastery} Mastery`;
+
+  const title = earned
+    ? `You earned ${earned} this session.`
+    : 'Save your progress.';
+  const sub = 'Sign in to track XP, mastery, streaks, and your full history across all games.';
+
+  el.innerHTML = `
+    <div class="hc-nudge-text">
+      <div class="hc-nudge-title">${title}</div>
+      <div class="hc-nudge-sub">${sub}</div>
+    </div>
+    <div class="hc-nudge-actions">
+      <button class="hc-nudge-signin" onclick="window.hcNudgeSignIn()">Sign in with Google</button>
+      <button class="hc-nudge-dismiss" onclick="window.hcNudgeDismiss()">Maybe later</button>
+    </div>`;
+  // Show on next frame so the transition runs
+  requestAnimationFrame(() => el.classList.add('show'));
+};
+
+window.hcNudgeSignIn = function(){
+  // Use the global sign-in if a page exposed it; otherwise route to profile
+  // (which handles the OAuth flow on every page).
+  if (typeof window._hcSignIn === 'function') {
+    try { window._hcSignIn(); return; } catch(e) {}
+  }
+  window.location.href = '/profile';
+};
+
+window.hcNudgeDismiss = function(){
+  try { sessionStorage.setItem(NUDGE_DISMISS_KEY, '1'); } catch(e) {}
+  const el = document.getElementById('hc-auth-nudge');
+  if (el) el.classList.remove('show');
+};
 })();

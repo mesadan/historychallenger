@@ -141,7 +141,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000;color:#fff;disp
 .guest-banner-cta{background:#c8903a;color:#000;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
 </style>
 <script src="/nav.js?v=5" defer></script>
-<script src="/progression.js?v=1" defer></script>
+<script src="/progression.js?v=2" defer></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 /* Parchment theme overrides */
@@ -507,6 +507,8 @@ async function showFinal(){
       await fetch(WORKER, {method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({action:'save_session', token:getToken(), diff:S.diff, rounds:S.sets.length, scores:[], avg_score:pct, game_type:'overlap'})});
     }catch(e){}
+  } else if (window.hcShowAuthNudge) {
+    window.hcShowAuthNudge();
   }
   document.getElementById('mets').style.display = 'none';
   const m = pct>=90?'🏆 Keeper of Time':pct>=70?'⚔️ Master':pct>=50?'🕯 Disciple':'📜 Initiate';

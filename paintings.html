@@ -95,7 +95,7 @@ a{color:#8a6208;text-decoration:none}
 .loading{color:#5a3e1a;font-style:italic;text-align:center;padding:2rem}
 </style>
 <script src="/nav.js?v=5" defer></script>
-<script src="/progression.js?v=1" defer></script>
+<script src="/progression.js?v=2" defer></script>
 </head>
 <body>
 
@@ -126,7 +126,10 @@ function render(){
   if (S.phase === 'intro')   p.innerHTML = renderIntro();
   if (S.phase === 'loading') p.innerHTML = `<div class="loading">Preparing the gallery...</div>`;
   if (S.phase === 'round')   p.innerHTML = renderRound();
-  if (S.phase === 'final')   p.innerHTML = renderFinal();
+  if (S.phase === 'final') {
+    p.innerHTML = renderFinal();
+    if (window.hcShowAuthNudge && S.final) window.hcShowAuthNudge({ xp: S.final.xp_earned, mastery: S.final.mastery_earned });
+  }
   if (S.phase === 'error')   p.innerHTML = `<div class="error-box">${escapeHtml(S.errorMsg || 'Something went wrong.')}</div>
     <div style="text-align:center;margin-top:1rem"><button class="back-btn" onclick="goIntro()">Back</button></div>`;
 }
