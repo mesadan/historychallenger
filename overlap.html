@@ -59,9 +59,12 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000;color:#fff;disp
 .setup-title{font-size:17px;font-weight:700;color:#fff;margin-bottom:.35rem;font-family:Georgia,serif}
 .diff-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1.25rem}
 @media(max-width:500px){.diff-grid{grid-template-columns:1fr}}
-.dc{border:1px solid #2a2a2a;border-radius:10px;padding:10px 12px;cursor:pointer;background:#111;transition:border-color .12s,background .12s;-webkit-tap-highlight-color:transparent}
+.dc{border:1px solid #2a2a2a;border-radius:10px;padding:10px 12px;cursor:pointer;background:#111;transition:border-color .12s,background .12s;-webkit-tap-highlight-color:transparent;position:relative}
 .dc:hover{background:#181818;border-color:#555}
 .dc.sel{border-color:#c8903a;background:#1a1000}
+.dc.locked{opacity:.5;cursor:not-allowed;background:#0a0a0a}
+.dc.locked:hover{border-color:#2a2a2a;background:#0a0a0a}
+.dc .lock-mark{position:absolute;top:6px;right:8px;font-size:13px}
 .dn{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px}
 .dt{font-size:10px;color:#c8903a;background:#111;border:1px solid #2a2a2a;border-radius:3px;padding:1px 5px;display:inline-block;margin-bottom:4px;letter-spacing:.02em}
 .dd{font-size:11px;color:#666;line-height:1.4}
@@ -138,6 +141,7 @@ body{font-family:Georgia,'Times New Roman',serif;background:#000;color:#fff;disp
 .guest-banner-cta{background:#c8903a;color:#000;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
 </style>
 <script src="/nav.js?v=5" defer></script>
+<script src="/progression.js?v=1" defer></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 /* Parchment theme overrides */
@@ -273,13 +277,23 @@ function renderSetup(){
     <div class="sf">
       <div class="section-num">I, Difficulty</div>
       <div class="diff-grid">
-        ${diffs.map(d => `
-          <div class="dc ${S.diff===d.k?'sel':''}" onclick="selDiff('${d.k}')">
+        ${diffs.map(d => {
+          const locked = window.hcIsLocked && window.hcIsLocked('overlap', d.k);
+          const reason = locked && window.hcLockedReason ? window.hcLockedReason('overlap', d.k) : '';
+          const cls = ['dc'];
+          if (S.diff===d.k && !locked) cls.push('sel');
+          if (locked) cls.push('locked');
+          const click = locked
+            ? `onclick="alert('Locked. Need '+'${reason}'+' to unlock '+'${d.name}'+'.')"`
+            : `onclick="selDiff('${d.k}')"`;
+          return `<div class="${cls.join(' ')}" ${click}>
+            ${locked?'<span class="lock-mark">🔒</span>':''}
             <div style="font-size:20px;margin-bottom:6px">${d.icon}</div>
             <div class="dn">${d.name}</div>
             <div class="dt">${d.tag}</div>
-            <div class="dd">${d.desc}</div>
-          </div>`).join('')}
+            <div class="dd">${locked ? 'Locked, '+reason : d.desc}</div>
+          </div>`;
+        }).join('')}
       </div>
       <div class="divider"></div>
       <div class="section-num">II, Rounds</div>
@@ -306,6 +320,13 @@ async function startGame(){
     const res = await fetch(WORKER, {method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({action:'get_overlap_sets', diff:S.diff, needed:S.rounds, token, seen_ids:seenIds})});
     const data = await res.json();
+    if(data.locked){
+      hideOverlay();
+      const reason = window.hcLockedReason ? window.hcLockedReason('overlap', S.diff) : '';
+      alert('That difficulty is locked. ' + (reason ? 'Progress: '+reason : 'Earn more mastery first.'));
+      renderSetup();
+      return;
+    }
     if(data.error) throw new Error(data.error);
 
     const sets = data.sets || [];
@@ -526,6 +547,7 @@ function hideOverlay(){
 // ── INIT ──────────────────────────────────────────────────────────
 initAuth();
 renderSetup();
+window.addEventListener('hc-progression-loaded', () => { if (S.phase === 'setup') renderSetup(); });
 </script>
 
 </body>

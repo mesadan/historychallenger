@@ -28,9 +28,13 @@ a{color:#8a6208;text-decoration:none}
 .rules-row{display:flex;gap:.5rem;margin-bottom:.3rem}
 .rules-icon{width:22px;text-align:center;flex-shrink:0}
 .diff-row{display:flex;gap:.6rem;margin-bottom:1.25rem;flex-wrap:wrap}
-.diff-btn{flex:1;min-width:140px;background:#fff8e8;border:1.5px solid #c8b888;border-radius:4px;padding:.7rem .8rem;cursor:pointer;text-align:center;transition:all .15s;font-family:'Crimson Text',serif}
+.diff-btn{flex:1;min-width:140px;background:#fff8e8;border:1.5px solid #c8b888;border-radius:4px;padding:.7rem .8rem;cursor:pointer;text-align:center;transition:all .15s;font-family:'Crimson Text',serif;position:relative}
 .diff-btn:hover{border-color:#8a6208;background:#fdf4dc}
 .diff-btn.sel{border-color:#8a6208;background:#f0e6cc;color:#1a150e}
+.diff-btn.locked{opacity:.55;cursor:not-allowed;background:#f0e6cc}
+.diff-btn.locked:hover{border-color:#c8b888;background:#f0e6cc}
+.diff-btn .lock-mark{display:none;position:absolute;top:6px;right:8px;font-size:13px}
+.diff-btn.locked .lock-mark{display:block}
 .diff-name{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:#1a150e;display:block;margin-bottom:.15rem}
 .diff-hint{font-size:11px;color:#7a6040;line-height:1.4}
 .start-btn{background:#8a6208;color:#f5edd8;border:1.5px solid #c8a028;border-radius:3px;padding:14px 28px;font-family:'Playfair Display',serif;font-style:italic;font-size:16px;cursor:pointer;min-width:240px}
@@ -91,6 +95,7 @@ a{color:#8a6208;text-decoration:none}
 .loading{color:#5a3e1a;font-style:italic;text-align:center;padding:2rem}
 </style>
 <script src="/nav.js?v=5" defer></script>
+<script src="/progression.js?v=1" defer></script>
 </head>
 <body>
 
@@ -145,10 +150,19 @@ function renderIntro(){
       <div class="rules-row"><span class="rules-icon">🏆</span> Score on accuracy plus difficulty. More clues revealed, less XP.</div>
     </div>
     <div class="diff-row">
-      ${diffs.map(d => `<div class="diff-btn ${S.difficulty===d.key?'sel':''}" onclick="setDiff('${d.key}')">
-        <span class="diff-name">${d.label}</span>
-        <span class="diff-hint">${d.hint}</span>
-      </div>`).join('')}
+      ${diffs.map(d => {
+        const locked = window.hcIsLocked && window.hcIsLocked('paintings', d.key);
+        const reason = locked && window.hcLockedReason ? window.hcLockedReason('paintings', d.key) : '';
+        const cls = ['diff-btn'];
+        if (S.difficulty===d.key && !locked) cls.push('sel');
+        if (locked) cls.push('locked');
+        const click = locked ? `onclick="alert('Locked. Need ${escapeHtml(reason)} to unlock ${escapeHtml(d.label)}.')"` : `onclick="setDiff('${d.key}')"`;
+        return `<div class="${cls.join(' ')}" ${click}>
+          <span class="lock-mark">🔒</span>
+          <span class="diff-name">${d.label}</span>
+          <span class="diff-hint">${locked ? 'Locked, '+reason : d.hint}</span>
+        </div>`;
+      }).join('')}
     </div>
     <div class="actions">
       <button class="start-btn" onclick="startSession()">Begin the gallery</button>
@@ -261,6 +275,11 @@ async function startSession(){
     const res = await fetch(WORKER, {method:'POST',headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ action:'start_painting_session', token: getToken(), difficulty: S.difficulty })});
     const d = await res.json();
+    if (d.locked) {
+      const reason = window.hcLockedReason ? window.hcLockedReason('paintings', S.difficulty) : '';
+      alert('That difficulty is locked. ' + (reason ? 'Progress: '+reason : 'Earn more mastery first.'));
+      S.phase = 'intro'; render(); return;
+    }
     if (d.error) { S.errorMsg = d.error; S.phase = 'error'; render(); return; }
     S.sessionId = d.session_id;
     S.round = d.round;
@@ -319,6 +338,8 @@ async function revealClue(key){
 }
 
 render();
+// Re-render when progression data loads so locked-state is reflected.
+window.addEventListener('hc-progression-loaded', () => { if (S.phase === 'intro') render(); });
 </script>
 
 </body>

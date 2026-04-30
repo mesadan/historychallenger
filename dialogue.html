@@ -45,9 +45,13 @@ a{color:#8a6208;text-decoration:none}
 .rules-row{display:flex;gap:.5rem;margin-bottom:.4rem}
 .rules-icon{width:20px;text-align:center;flex-shrink:0}
 .diff-row{display:flex;gap:.5rem;margin-bottom:1.25rem;flex-wrap:wrap}
-.diff-btn{flex:1;min-width:120px;background:#fff8e8;border:1.5px solid #c8b888;border-radius:4px;padding:.6rem .8rem;cursor:pointer;text-align:center;transition:all .15s;font-family:'Crimson Text',serif}
+.diff-btn{flex:1;min-width:120px;background:#fff8e8;border:1.5px solid #c8b888;border-radius:4px;padding:.6rem .8rem;cursor:pointer;text-align:center;transition:all .15s;font-family:'Crimson Text',serif;position:relative}
 .diff-btn:hover{border-color:#8a6208;background:#fdf4dc}
 .diff-btn.sel{border-color:#8a6208;background:#f0e6cc;color:#1a150e}
+.diff-btn.locked{opacity:.55;cursor:not-allowed;background:#f0e6cc}
+.diff-btn.locked:hover{border-color:#c8b888;background:#f0e6cc}
+.diff-btn .lock-mark{display:none;position:absolute;top:6px;right:8px;font-size:13px}
+.diff-btn.locked .lock-mark{display:block}
 .diff-name{font-family:'Playfair Display',serif;font-style:italic;font-size:15px;color:#1a150e;display:block;margin-bottom:.15rem}
 .diff-hint{font-size:11px;color:#7a6040;line-height:1.4}
 .intro-actions{display:flex;gap:.75rem;flex-wrap:wrap}
@@ -177,6 +181,7 @@ a{color:#8a6208;text-decoration:none}
 }
 </style>
 <script src="/nav.js?v=5" defer></script>
+<script src="/progression.js?v=1" defer></script>
 </head>
 <body>
 
@@ -190,7 +195,7 @@ let S = {
   scenarios:[],
   scenarioId:null,
   scenario:null,
-  difficulty:'medium',
+  difficulty:'master',
   sessionId:null,
   messages:[],
   turn:0,
@@ -261,11 +266,19 @@ function renderIntro(){
   const sc = S.scenario;
   if (!sc) return renderLoading('Preparing the audience…');
 
-  const diffs = (sc.difficulty_presets ? Object.entries(sc.difficulty_presets) : []).map(([k,v]) => `
-    <div class="diff-btn ${S.difficulty===k?'sel':''}" onclick="setDifficulty('${k}')">
+  const diffs = (sc.difficulty_presets ? Object.entries(sc.difficulty_presets) : []).map(([k,v]) => {
+    const locked = window.hcIsLocked && window.hcIsLocked('dialogue', k);
+    const reason = locked && window.hcLockedReason ? window.hcLockedReason('dialogue', k) : '';
+    const cls = ['diff-btn'];
+    if (S.difficulty===k && !locked) cls.push('sel');
+    if (locked) cls.push('locked');
+    const click = locked ? `onclick="alert('Locked. Need ${escapeHtml(reason)} to unlock ${escapeHtml(v.label)}.')"` : `onclick="setDifficulty('${k}')"`;
+    return `<div class="${cls.join(' ')}" ${click}>
+      <span class="lock-mark">🔒</span>
       <span class="diff-name">${escapeHtml(v.label)}</span>
-      <span class="diff-hint">${escapeHtml(v.hint)}</span>
-    </div>`).join('');
+      <span class="diff-hint">${locked ? 'Locked, '+escapeHtml(reason) : escapeHtml(v.hint)}</span>
+    </div>`;
+  }).join('');
 
   return `<div class="intro-card">
     <div class="scenario-date">${escapeHtml(sc.date_label)}</div>
@@ -651,6 +664,11 @@ async function startSession(){
     const res = await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify(payload)});
     const d = await res.json();
+    if (d.locked) {
+      const reason = window.hcLockedReason ? window.hcLockedReason('dialogue', S.difficulty) : '';
+      alert('That difficulty is locked. ' + (reason ? 'Progress: '+reason : 'Earn more mastery first.'));
+      S.phase = 'intro'; render(); return;
+    }
     if (d.error) { S.errorMsg=d.error; S.phase='error'; render(); return; }
     S.scenario = d.scenario;
     S.sessionId = d.session_id;
@@ -781,6 +799,8 @@ function resetIntro(){
   } else {
     loadScenarios();
   }
+  // Re-render when progression loads so locked-state on diff buttons updates.
+  window.addEventListener('hc-progression-loaded', () => { if (S.phase === 'intro') render(); });
 })();
 </script>
 
