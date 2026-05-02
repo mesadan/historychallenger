@@ -29,6 +29,7 @@ export default {
     if (action === 'get_leaderboard') return handleGetLeaderboard(body, env);
     if (action === 'update_profile')  return handleUpdateProfile(body, env);
     if (action === 'delete_account')  return handleDeleteAccount(body, env);
+    if (action === 'export_my_data')  return handleExportMyData(body, env);
 
     // ── POOL ──────────────────────────────────────────────────────────
     if (action === 'get_sets')        return handleGetSets(body, env);
@@ -1296,10 +1297,86 @@ async function handleDeleteAccount(body, env) {
   const { token } = body;
   let payload;
   try { payload = await verifyJWT(token, env.JWT_SECRET); } catch(e) { return json({ error: 'Not authenticated' }, 401); }
+  const userId = payload.sub;
 
-  await env.db.prepare('DELETE FROM game_sessions WHERE user_id = ?').bind(payload.sub).run();
-  await env.db.prepare('DELETE FROM users WHERE id = ?').bind(payload.sub).run();
+  // Look up the email first so we can also clean magic_links rows by email.
+  let email = null;
+  try {
+    const u = await env.db.prepare('SELECT email FROM users WHERE id = ?').bind(userId).first();
+    email = u?.email || null;
+  } catch(e) { /* ignore: user row may already be gone on retry */ }
+
+  // GDPR Right to Erasure: wipe everything tied to this user across all
+  // per-user tables. Order doesn't matter (no FKs in D1) but we group by
+  // table for clarity. Wrapped in try/catch each so a missing-table error
+  // (during migrations) doesn't break the whole deletion.
+  const safeRun = async (sql, ...args) => {
+    try { await env.db.prepare(sql).bind(...args).run(); } catch(e) { /* swallow */ }
+  };
+
+  // 1. Per-game session histories
+  await safeRun('DELETE FROM game_sessions WHERE user_id = ?', userId);
+  await safeRun('DELETE FROM dialogue_sessions WHERE user_id = ?', userId);
+  await safeRun('DELETE FROM painting_sessions WHERE user_id = ?', userId);
+  await safeRun('DELETE FROM dispatch_sessions WHERE user_id = ?', userId);
+  await safeRun('DELETE FROM hq_sessions WHERE user_id = ?', userId);
+
+  // 2. Per-user dedup / progression state
+  await safeRun('DELETE FROM user_seen_sets WHERE user_id = ?', userId);
+  await safeRun('DELETE FROM hq_seen_questions WHERE user_id = ?', userId);
+  await safeRun('DELETE FROM user_mastery WHERE user_id = ?', userId);
+
+  // 3. User-submitted reports (cross-game flagging)
+  await safeRun('DELETE FROM user_reports WHERE user_id = ?', userId);
+
+  // 4. Magic-link rows (auth tokens we mailed to this email address)
+  if (email) {
+    await safeRun('DELETE FROM magic_links WHERE email = ?', email);
+  }
+
+  // 5. Finally, the user row itself
+  await safeRun('DELETE FROM users WHERE id = ?', userId);
+
   return json({ ok: true }, 200);
+}
+
+// Right to Data Portability: returns a JSON dump of every row this user
+// has across all per-user tables. Caller saves it as a file. No external
+// (third-party) data is included; if you ever add Resend log mirroring or
+// similar, document it here too.
+async function handleExportMyData(body, env) {
+  const { token } = body;
+  let payload;
+  try { payload = await verifyJWT(token, env.JWT_SECRET); } catch(e) { return json({ error: 'Not authenticated' }, 401); }
+  const userId = payload.sub;
+
+  const safeAll = async (sql, ...args) => {
+    try { const r = await env.db.prepare(sql).bind(...args).all(); return r.results || []; }
+    catch(e) { return []; }
+  };
+  const safeFirst = async (sql, ...args) => {
+    try { return await env.db.prepare(sql).bind(...args).first(); }
+    catch(e) { return null; }
+  };
+
+  const user = await safeFirst('SELECT * FROM users WHERE id=?', userId);
+  if (!user) return json({ error: 'User not found' }, 404);
+
+  const dump = {
+    exported_at: new Date().toISOString(),
+    note: 'This is everything History Challenger has stored about you. Right to Data Portability (GDPR Art. 20).',
+    user,
+    game_sessions:     await safeAll('SELECT * FROM game_sessions     WHERE user_id=?', userId),
+    dialogue_sessions: await safeAll('SELECT * FROM dialogue_sessions WHERE user_id=?', userId),
+    painting_sessions: await safeAll('SELECT * FROM painting_sessions WHERE user_id=?', userId),
+    dispatch_sessions: await safeAll('SELECT * FROM dispatch_sessions WHERE user_id=?', userId),
+    hq_sessions:       await safeAll('SELECT * FROM hq_sessions       WHERE user_id=?', userId),
+    user_mastery:      await safeAll('SELECT * FROM user_mastery      WHERE user_id=?', userId),
+    user_seen_sets:    await safeAll('SELECT * FROM user_seen_sets    WHERE user_id=?', userId),
+    hq_seen_questions: await safeAll('SELECT * FROM hq_seen_questions WHERE user_id=?', userId),
+    user_reports:      await safeAll('SELECT * FROM user_reports      WHERE user_id=?', userId),
+  };
+  return json(dump, 200);
 }
 
 async function handleGetStats(body, env) {

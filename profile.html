@@ -213,7 +213,7 @@ async function saveProfileAvatar(){
 }
 
 async function deleteAccount(){
-  if(!confirm('Delete your account? This will permanently erase all your scores and history. This cannot be undone.')) return;
+  if(!confirm('Delete your account? This will permanently erase all your scores, sessions, mastery, streaks, reports, and any pending sign-in links sent to your email. This cannot be undone.')) return;
   if(!confirm('Absolutely sure? All data will be gone.')) return;
   try{
     const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
@@ -222,6 +222,25 @@ async function deleteAccount(){
     if(d.ok){ clearToken(); window.location.href='/'; }
     else { alert(d.error||'Error deleting account'); }
   }catch(e){ alert('Network error'); }
+}
+
+async function exportMyData(){
+  try{
+    const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'export_my_data',token:getToken()})});
+    const d=await res.json();
+    if(d.error){ alert(d.error); return; }
+    const blob = new Blob([JSON.stringify(d, null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = 'historychallenger-data-' + stamp + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }catch(e){ alert('Network error: '+e.message); }
 }
 
 function diffLabel(d){return{disciple:'🕯 Disciple',master:'⚔️ Master',keeper:'🏆 Keeper'}[d]||d;}
@@ -494,7 +513,14 @@ function renderProfile(data){
       </div>
       <div class="settings-msg" id="settings-msg"></div>
       <hr class="settings-divider">
-      <button class="danger-btn" onclick="deleteAccount()">Delete account</button>
+      <div class="settings-section-label" style="margin-top:.25rem">Your data</div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+        <button class="settings-save" style="background:#1a1a1a;color:#c8903a;border:1px solid #c8903a" onclick="exportMyData()">⬇ Download my data (JSON)</button>
+        <button class="danger-btn" onclick="deleteAccount()">Delete account</button>
+      </div>
+      <div style="font-size:11px;color:#666;margin-top:.6rem;line-height:1.5">
+        Download exports a JSON file with everything stored about your account. Delete permanently removes your account and all per-user data (sessions, mastery, streaks, reports). Both are GDPR rights. Questions: <a href="mailto:info@historychallenger.com" style="color:#c8903a">info@historychallenger.com</a>.
+      </div>
     </div>
 
     <!-- TIER / XP -->

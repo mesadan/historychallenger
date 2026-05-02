@@ -445,14 +445,25 @@ footer{
 <!-- PRIVACY -->
 <div id="privacy" class="legal-wrap">
   <button class="legal-back" onclick="showLegal(null)">← Back</button>
-  <h1>Privacy Policy</h1><div class="legal-date">Last updated: April 2026</div>
+  <h1>Privacy Policy</h1><div class="legal-date">Last updated: May 2026</div>
   <h2>Who we are</h2><p>History Challenger is operated as an independent project. Contact: <a href="mailto:info@historychallenger.com">info@historychallenger.com</a></p>
-  <h2>What data we collect</h2><p>Guests: nothing stored on our servers. Signed-in users: email, display name, profile picture, game scores and session history.</p>
-  <h2>How we use your data</h2><p>Solely to provide the game experience. We do not sell your data or use it for advertising.</p>
-  <h2>Data storage</h2><p>Data is stored in Cloudflare's D1 database infrastructure with encrypted connections.</p>
-  <h2>Your rights (GDPR)</h2><p>EEA users may access, correct, or delete personal data at any time. Contact <a href="mailto:info@historychallenger.com">info@historychallenger.com</a>.</p>
-  <h2>Cookies</h2><p>A single authentication token in browser local storage. No advertising cookies or third-party tracking.</p>
-  <h2>Third-party services</h2><p>Google OAuth for sign-in. Anthropic's Claude API for content generation.</p>
+  <h2>What data we collect</h2>
+  <p><strong>Guests:</strong> nothing stored on our servers.</p>
+  <p><strong>Signed-in users (Google or email):</strong> email, display name, profile picture (Google users only), and per-game data: session history, scores, mastery points, streaks, and any reports you submit.</p>
+  <h2>How we use your data</h2><p>Solely to provide the game experience: track your progress, gate higher difficulties via mastery thresholds, show your stats on your profile, rank you on the public leaderboards (display name + avatar only, never email). We do not sell your data, share it with advertisers, or use it for marketing.</p>
+  <h2>Data storage</h2><p>All player data is stored in Cloudflare D1 (SQLite at the edge) with encrypted connections. Avatars and game images sit in Cloudflare R2 object storage. We do not run our own servers.</p>
+  <h2>Third-party sub-processors</h2>
+  <p><strong>Google</strong>, when you sign in with Google OAuth (your Google ID, email, name, and avatar are returned to us).</p>
+  <p><strong>Resend</strong>, when you sign in with email magic links. Resend transmits the sign-in link from <code>noreply@historychallenger.com</code> to your inbox and retains its send logs (sender, recipient, subject, status) for roughly 90 days for delivery debugging. We never send marketing email through Resend; only one-time sign-in links you request.</p>
+  <p><strong>Anthropic (Claude)</strong>, for AI-generated content: quiz questions, painting curation, the Audience game's roleplay responses. Conversation transcripts in the Audience game are stored on our database tied to your account; you can delete them at any time via the profile page.</p>
+  <p><strong>Cloudflare</strong>, our hosting provider (D1, R2, Workers, Pages, DNS). Cloudflare may collect standard request logs (IP, user agent, request path) for security and analytics; we do not have access to per-request logs.</p>
+  <h2>Your rights (GDPR + similar)</h2>
+  <p><strong>Right to access + portability:</strong> the profile page has a "Download my data" button that exports a JSON file with everything we have stored about you.</p>
+  <p><strong>Right to erasure:</strong> the profile page has a "Delete account" button that permanently wipes your user row, all session histories (timeline / overlap / dispatch / audience / paintings / HQ), mastery, streaks, reports, and any pending sign-in links sent to your email. The action is instant and irreversible.</p>
+  <p>If you cannot reach those buttons (e.g. you have lost access to the email), write to <a href="mailto:info@historychallenger.com">info@historychallenger.com</a> and we will action your request within 30 days.</p>
+  <h2>Cookies + local storage</h2><p>One authentication token in browser local storage so we know who you are between visits. One sessionStorage flag if you dismiss the sign-in prompt. No advertising cookies, no third-party tracking pixels.</p>
+  <h2>Data retention</h2><p>While your account exists, indefinitely. After deletion, immediately wiped from our database. Cloudflare and Resend may retain their own infrastructure logs per their respective policies (typically 30 to 90 days).</p>
+  <h2>Children</h2><p>The site is not directed at children under 13 (or 16 in the EEA). We do not knowingly collect data from children.</p>
   <h2>Contact</h2><p><a href="mailto:info@historychallenger.com">info@historychallenger.com</a></p>
 </div>
 
