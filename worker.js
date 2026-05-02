@@ -1071,8 +1071,12 @@ async function handleVerifyMagicLink(body, env) {
     } else {
       // Create a new email-only user. id prefix 'e_' distinguishes from
       // 'g_' Google users; the suffix is just a random ID for uniqueness.
+      // Default display name is anonymised ("Player abc12") so the email
+      // local part (which is often a real name fragment) does NOT leak
+      // onto the public leaderboard before the player edits their profile.
       userId = 'e_' + crypto.randomUUID().replace(/-/g, '');
-      const displayName = email.split('@')[0];
+      const suffix = crypto.randomUUID().replace(/-/g, '').slice(0, 5);
+      const displayName = 'Player ' + suffix;
       await env.db.prepare(
         `INSERT INTO users (id, email, name, avatar, provider) VALUES (?, ?, ?, '', 'email')`
       ).bind(userId, email, displayName).run();
@@ -1238,6 +1242,10 @@ async function handleGetLeaderboard(body, env) {
     const metric = (body?.metric === 'mastery') ? 'mastery' : 'xp';
     const excludePlaceholders = LEADERBOARD_EXCLUDE_EMAILS.map(() => '?').join(',');
 
+    // Note on COALESCE(leaderboard_visible, 1): the column was added
+    // mid-flight; existing rows may be NULL until the migration backfills.
+    // Treating NULL as visible matches the default behaviour we promised
+    // existing players (opt-out, not opt-in).
     let rows;
     if (metric === 'xp') {
       rows = await env.db.prepare(
@@ -1245,6 +1253,7 @@ async function handleGetLeaderboard(body, env) {
          FROM users
          WHERE total_xp > 0
            AND email NOT IN (${excludePlaceholders})
+           AND COALESCE(leaderboard_visible, 1) = 1
          ORDER BY total_xp DESC, longest_streak DESC
          LIMIT ?`
       ).bind(...LEADERBOARD_EXCLUDE_EMAILS, limit).all();
@@ -1256,6 +1265,7 @@ async function handleGetLeaderboard(body, env) {
          FROM users u
          LEFT JOIN user_mastery m ON m.user_id = u.id
          WHERE u.email NOT IN (${excludePlaceholders})
+           AND COALESCE(u.leaderboard_visible, 1) = 1
          GROUP BY u.id
          HAVING score > 0
          ORDER BY score DESC, u.longest_streak DESC
@@ -1278,7 +1288,7 @@ async function handleGetLeaderboard(body, env) {
 }
 
 async function handleUpdateProfile(body, env) {
-  const { token, name, avatar } = body;
+  const { token, name, avatar, leaderboard_visible } = body;
   let payload;
   try { payload = await verifyJWT(token, env.JWT_SECRET); } catch(e) { return json({ error: 'Not authenticated' }, 401); }
 
@@ -1286,6 +1296,7 @@ async function handleUpdateProfile(body, env) {
   const values = [];
   if (name !== undefined) { updates.push('name = ?'); values.push(String(name).slice(0, 100)); }
   if (avatar !== undefined) { updates.push('avatar = ?'); values.push(String(avatar).slice(0, 500)); }
+  if (leaderboard_visible !== undefined) { updates.push('leaderboard_visible = ?'); values.push(leaderboard_visible ? 1 : 0); }
   if (!updates.length) return json({ error: 'Nothing to update' }, 400);
 
   values.push(payload.sub);

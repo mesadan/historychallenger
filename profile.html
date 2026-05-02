@@ -212,6 +212,23 @@ async function saveProfileAvatar(){
   }catch(e){ msg.textContent='Network error'; }
 }
 
+async function saveLeaderboardVisibility(){
+  const visible=document.getElementById('settings-leaderboard').checked;
+  const msg=document.getElementById('settings-msg');
+  msg.textContent='Saving…';
+  try{
+    const res=await fetch(WORKER,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'update_profile',token:getToken(),leaderboard_visible:visible})});
+    const d=await res.json();
+    if(d.ok){
+      msg.textContent = visible
+        ? 'You will appear on the public leaderboard.'
+        : 'Hidden from the public leaderboard.';
+      setTimeout(()=>{msg.textContent='';},3000);
+    } else { msg.textContent=d.error||'Error saving'; }
+  }catch(e){ msg.textContent='Network error'; }
+}
+
 async function deleteAccount(){
   if(!confirm('Delete your account? This will permanently erase all your scores, sessions, mastery, streaks, reports, and any pending sign-in links sent to your email. This cannot be undone.')) return;
   if(!confirm('Absolutely sure? All data will be gone.')) return;
@@ -510,6 +527,14 @@ function renderProfile(data){
         <span class="settings-label">Picture URL</span>
         <input id="settings-avatar" class="settings-input" type="url" value="${avatarVal}" placeholder="https://…">
         <button class="settings-save" onclick="saveProfileAvatar()">Save</button>
+      </div>
+      <div class="settings-row" style="align-items:flex-start">
+        <span class="settings-label">Public leaderboard</span>
+        <label style="flex:1;display:flex;align-items:center;gap:8px;font-size:13px;color:#aaa;cursor:pointer">
+          <input id="settings-leaderboard" type="checkbox" style="width:16px;height:16px;cursor:pointer" ${user.leaderboard_visible !== 0 ? 'checked' : ''}>
+          Show my display name and avatar on the homepage leaderboard
+        </label>
+        <button class="settings-save" onclick="saveLeaderboardVisibility()">Save</button>
       </div>
       <div class="settings-msg" id="settings-msg"></div>
       <hr class="settings-divider">
