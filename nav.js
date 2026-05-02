@@ -108,7 +108,7 @@ function injectNav(){
   document.body.insertBefore(nav, document.body.firstChild);
 }
 
-function signIn(){
+function signInGoogle(){
   const p=new URLSearchParams({
     client_id:CLIENT_ID,
     redirect_uri:'https://historychallenger.com/auth-callback.html',
@@ -118,7 +118,19 @@ function signIn(){
   });
   window.location.href='https://accounts.google.com/o/oauth2/v2/auth?'+p;
 }
-window._hcSignIn=signIn;
+// The "Sign in" button in the nav now opens the dual-option nudge
+// (Google + email magic link) instead of routing straight to Google.
+// The nudge calls _hcSignIn() if its Google button is clicked, so we
+// keep that name pointing at the actual Google flow.
+function signIn(){
+  if (typeof window.hcShowAuthNudge === 'function') {
+    window.hcShowAuthNudge({ force: true });
+    return;
+  }
+  signInGoogle();
+}
+window._hcSignIn=signInGoogle;
+window._hcOpenSignIn=signIn;
 
 function signOut(){
   localStorage.removeItem('hc_token');
@@ -151,7 +163,7 @@ function render(user){
   const area=document.getElementById('nav-auth-area');
   if(!area)return;
   if(!user){
-    area.innerHTML=`<button class="hcn-signin" onclick="window._hcSignIn()">Sign in</button>`;
+    area.innerHTML=`<button class="hcn-signin" onclick="window._hcOpenSignIn()">Sign in</button>`;
     return;
   }
   area.innerHTML=`

@@ -220,8 +220,16 @@ function nudgeRenderSent(el, email){
 window.hcShowAuthNudge = function(opts){
   // Skip if already signed in
   if (localStorage.getItem('hc_token')) return;
-  // Skip if dismissed this browsing session
-  try { if (sessionStorage.getItem(NUDGE_DISMISS_KEY)) return; } catch(e) {}
+
+  const force = !!(opts && opts.force);
+  // Skip if dismissed this browsing session, unless force=true (user
+  // explicitly clicked the Sign in button)
+  if (!force) {
+    try { if (sessionStorage.getItem(NUDGE_DISMISS_KEY)) return; } catch(e) {}
+  } else {
+    // Clear dismiss so the close button works the next time too
+    try { sessionStorage.removeItem(NUDGE_DISMISS_KEY); } catch(e) {}
+  }
 
   const xp = opts && typeof opts.xp === 'number' ? opts.xp : null;
   const mastery = opts && typeof opts.mastery === 'number' ? opts.mastery : null;
@@ -229,7 +237,13 @@ window.hcShowAuthNudge = function(opts){
   if (xp != null && xp > 0 && mastery != null && mastery > 0) earned = `${xp} XP and ${mastery} Mastery`;
   else if (xp != null && xp > 0) earned = `${xp} XP`;
   else if (mastery != null && mastery > 0) earned = `${mastery} Mastery`;
-  nudgeEarnedTitle = earned ? `You earned ${earned} this session.` : '';
+  if (earned) {
+    nudgeEarnedTitle = `You earned ${earned} this session.`;
+  } else if (force) {
+    nudgeEarnedTitle = 'Sign in or create your account';
+  } else {
+    nudgeEarnedTitle = '';
+  }
 
   const el = nudgeEnsureEl();
   nudgeRenderChoice(el);
