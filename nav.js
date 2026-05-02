@@ -20,14 +20,15 @@ s.textContent=`
   width:100%;
 }
 #hc-nav .hc-logo{
-  font-family:'Playfair Display',Georgia,serif;
-  font-size:17px;font-weight:700;font-style:italic;
-  color:#f5edd8;text-decoration:none;letter-spacing:.02em;
-  display:flex;align-items:center;gap:10px;
+  font-family:'Cinzel',Georgia,serif;
+  font-size:14px;font-weight:600;
+  color:#f5edd8;text-decoration:none;letter-spacing:.16em;
+  text-transform:uppercase;
+  display:flex;align-items:center;gap:11px;
 }
 #hc-nav .hc-logo .hc-wordmark{color:#f5edd8}
 #hc-nav .hc-logo .hc-wordmark > span{color:#c49020}
-#hc-nav .hc-logo-mark{width:22px;height:30px;color:#c49020;flex-shrink:0;display:block}
+#hc-nav .hc-logo-mark{width:28px;height:28px;color:#c49020;flex-shrink:0;display:block}
 #hc-nav .hc-links{display:flex;align-items:center;gap:6px;}
 #hc-nav .hc-link{
   color:#9a8060;font-size:14px;text-decoration:none;
@@ -86,19 +87,17 @@ function injectNav(){
     const active = path.includes(l.key) ? ' active' : '';
     return `<a href="${l.href}" class="hc-link${active}">${l.label}</a>`;
   }).join('');
-  const hourglassSvg = `
-    <svg class="hc-logo-mark" viewBox="0 0 80 110" aria-hidden="true" focusable="false">
-      <g transform="skewX(-10) translate(8,0)">
-        <rect x="6" y="6" width="60" height="5" rx="1" fill="currentColor"/>
-        <path d="M 9 12 L 63 12 L 38 55 Z" fill="currentColor"/>
-        <path d="M 38 55 L 63 98 L 9 98 Z" fill="currentColor"/>
-        <rect x="6" y="99" width="60" height="5" rx="1" fill="currentColor"/>
-        <rect x="37" y="48" width="2" height="14" fill="currentColor" opacity=".4"/>
-      </g>
+  // Monogram: a Trajan-style C wraps the H from top, left, and bottom.
+  const monogramSvg = `
+    <svg class="hc-logo-mark" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+      <path d="M 76 20 A 34 34 0 1 0 76 80" fill="none" stroke="currentColor" stroke-width="13" stroke-linecap="round"/>
+      <rect x="42" y="33" width="7" height="34" fill="currentColor"/>
+      <rect x="60" y="33" width="7" height="34" fill="currentColor"/>
+      <rect x="49" y="46" width="11" height="7" fill="currentColor"/>
     </svg>`;
   nav.innerHTML = `
     <a href="/" class="hc-logo" aria-label="History Challenger home">
-      ${hourglassSvg}
+      ${monogramSvg}
       <span class="hc-wordmark">History <span>Challenger</span></span>
     </a>
     <div class="hc-links">
