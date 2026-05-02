@@ -7,16 +7,16 @@
 <meta name="robots" content="noindex">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#000;color:#fff;min-height:100vh}
+body{font-family:'EB Garamond',Georgia,serif;background:#000;color:#fff;min-height:100vh}
 a{color:#c8903a;text-decoration:none}
 
 /* XP / TIER */
 .tier-section{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:14px;padding:1.5rem;margin-bottom:2rem;text-align:center}
-.tier-name{font-family:Georgia,serif;font-size:1.4rem;font-weight:700;color:#c8903a;margin-bottom:.2rem}
-.tier-xp{font-size:12px;color:#aaa;margin-bottom:.75rem;font-family:-apple-system,sans-serif}
+.tier-name{font-family:'Cinzel',Georgia,serif;font-size:1.4rem;font-weight:700;color:#c8903a;margin-bottom:.2rem}
+.tier-xp{font-size:12px;color:#aaa;margin-bottom:.75rem;font-family:'EB Garamond',Georgia,serif}
 .tier-bar-wrap{height:6px;background:#1a1a1a;border-radius:3px;overflow:hidden;margin-bottom:.4rem}
 .tier-bar-fill{height:100%;background:linear-gradient(90deg,#8a6208,#c8903a);border-radius:3px;transition:width 1s ease}
-.tier-bar-labels{display:flex;justify-content:space-between;font-size:10px;color:#888;font-family:-apple-system,sans-serif}
+.tier-bar-labels{display:flex;justify-content:space-between;font-size:10px;color:#888;font-family:'EB Garamond',Georgia,serif}
 
 /* LAYOUT */
 .page{max-width:900px;margin:0 auto;padding:2.5rem 1.5rem 5rem}
@@ -26,18 +26,18 @@ a{color:#c8903a;text-decoration:none}
 .avatar-wrap{position:relative}
 .profile-avatar{width:72px;height:72px;border-radius:50%;object-fit:cover;border:2px solid #c8903a;display:block}
 .avatar-placeholder{width:72px;height:72px;border-radius:50%;background:#d4b98a;border:2px solid #c8903a;display:flex;align-items:center;justify-content:center;font-size:28px}
-.profile-info h1{font-family:Georgia,serif;font-size:1.75rem;font-weight:700;margin-bottom:.2rem;color:#1a150e}
+.profile-info h1{font-family:'Cinzel',Georgia,serif;font-size:1.75rem;font-weight:700;margin-bottom:.2rem;color:#1a150e}
 .profile-info .email{font-size:13px;color:#5a3e1a;margin-bottom:.4rem}
 .profile-info .joined{font-size:12px;color:#7a6040}
 .hero-btns{display:flex;gap:.5rem;margin-left:auto;align-items:center;flex-wrap:wrap}
-.sign-out-btn{background:none;border:1px solid #b8a878;color:#5a3e1a;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:-apple-system,sans-serif}
+.sign-out-btn{background:none;border:1px solid #b8a878;color:#5a3e1a;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:'EB Garamond',Georgia,serif}
 .sign-out-btn:hover{border-color:#8a6208;color:#3a2e1e}
-.edit-profile-btn{background:none;border:1px solid #b8a878;color:#5a3e1a;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:-apple-system,sans-serif}
+.edit-profile-btn{background:none;border:1px solid #b8a878;color:#5a3e1a;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;font-family:'EB Garamond',Georgia,serif}
 .edit-profile-btn:hover{border-color:#8a6208;color:#3a2e1e}
 
 /* HQ BADGE */
 .hq-badge{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:10px;padding:.5rem .9rem;text-align:center;min-width:70px}
-.hq-badge-val{font-family:Georgia,serif;font-size:1.4rem;font-weight:700;line-height:1}
+.hq-badge-val{font-family:'Cinzel',Georgia,serif;font-size:1.4rem;font-weight:700;line-height:1}
 .hq-badge-lbl{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-top:1px}
 .hq-no-score{font-size:12px;color:#7a6040;text-decoration:none;white-space:nowrap}
 .hq-no-score:hover{color:#8a6208}
@@ -45,10 +45,10 @@ a{color:#c8903a;text-decoration:none}
 /* SETTINGS PANEL */
 .settings-panel{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:14px;padding:1.5rem;margin-bottom:2rem;display:none}
 .settings-panel.open{display:block}
-.settings-section-label{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem;font-family:-apple-system,sans-serif}
+.settings-section-label{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem;font-family:'EB Garamond',Georgia,serif}
 .settings-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;flex-wrap:wrap}
 .settings-label{font-size:13px;color:#aaa;min-width:120px}
-.settings-input{flex:1;min-width:180px;background:#1a1a1a;border:1px solid #333;color:#fff;border-radius:8px;padding:7px 12px;font-size:13px;font-family:-apple-system,sans-serif}
+.settings-input{flex:1;min-width:180px;background:#1a1a1a;border:1px solid #333;color:#fff;border-radius:8px;padding:7px 12px;font-size:13px;font-family:'EB Garamond',Georgia,serif}
 .settings-input:focus{outline:none;border-color:#c8903a}
 .settings-save{background:#c8903a;color:#000;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
 .settings-save:hover{background:#b07828}
@@ -60,20 +60,20 @@ a{color:#c8903a;text-decoration:none}
 /* STAT CARDS */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1rem;margin-bottom:2.5rem}
 .stat-card{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:12px;padding:1.25rem;text-align:center}
-.stat-val{font-family:Georgia,serif;font-size:2rem;font-weight:700;color:#c8903a;line-height:1}
-.stat-lbl{font-size:12px;color:#bbb;margin-top:.4rem;font-family:-apple-system,sans-serif}
+.stat-val{font-family:'Cinzel',Georgia,serif;font-size:2rem;font-weight:700;color:#c8903a;line-height:1}
+.stat-lbl{font-size:12px;color:#bbb;margin-top:.4rem;font-family:'EB Garamond',Georgia,serif}
 .stat-card.highlight{border-color:#c8903a33;background:#0a0800}
 
 /* CHART */
 .chart-section{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:14px;padding:1.5rem;margin-bottom:2rem}
-.section-title{font-size:13px;color:#3a2e1e;letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:1.25rem;font-family:-apple-system,sans-serif}
+.section-title{font-size:13px;color:#3a2e1e;letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:1.25rem;font-family:'EB Garamond',Georgia,serif}
 .chart-section .section-title{color:#aaa}
 .chart-wrap{height:140px;position:relative;display:flex;align-items:flex-end;gap:6px}
 .chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
 .chart-bar{width:100%;border-radius:3px 3px 0 0;min-height:3px;transition:height .6s ease;position:relative;cursor:default}
-.chart-bar:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #333;color:#fff;font-size:11px;padding:3px 8px;border-radius:5px;white-space:nowrap;font-family:-apple-system,sans-serif;z-index:10}
-.chart-label{font-size:9px;color:#888;text-align:center;font-family:-apple-system,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
-.chart-empty{display:flex;align-items:center;justify-content:center;height:100%;color:#666;font-size:14px;font-family:-apple-system,sans-serif}
+.chart-bar:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #333;color:#fff;font-size:11px;padding:3px 8px;border-radius:5px;white-space:nowrap;font-family:'EB Garamond',Georgia,serif;z-index:10}
+.chart-label{font-size:9px;color:#888;text-align:center;font-family:'EB Garamond',Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.chart-empty{display:flex;align-items:center;justify-content:center;height:100%;color:#666;font-size:14px;font-family:'EB Garamond',Georgia,serif}
 
 /* BREAKDOWN */
 .breakdown-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
@@ -90,7 +90,7 @@ a{color:#c8903a;text-decoration:none}
 .session-row{display:flex;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid #111;gap:1rem}
 .session-row:last-child{border-bottom:none}
 .session-row:hover{background:#111}
-.session-score{font-family:Georgia,serif;font-size:1.5rem;font-weight:700;min-width:54px;text-align:center}
+.session-score{font-family:'Cinzel',Georgia,serif;font-size:1.5rem;font-weight:700;min-width:54px;text-align:center}
 .session-score.great{color:#5acc8a}
 .session-score.good{color:#c8903a}
 .session-score.ok{color:#888}
@@ -104,7 +104,7 @@ a{color:#c8903a;text-decoration:none}
 
 /* STREAK */
 .streak-display{display:flex;align-items:center;justify-content:center;gap:1.5rem;background:#0a0800;border:1px solid #c8903a33;border-radius:14px;padding:1.5rem;margin-bottom:2rem}
-.streak-num{font-family:Georgia,serif;font-size:3rem;font-weight:700;color:#c8903a;line-height:1}
+.streak-num{font-family:'Cinzel',Georgia,serif;font-size:3rem;font-weight:700;color:#c8903a;line-height:1}
 .streak-info{text-align:left}
 .streak-label{font-size:14px;font-weight:600;color:#fff}
 .streak-sub{font-size:12px;color:#aaa;margin-top:.2rem}
@@ -114,7 +114,7 @@ a{color:#c8903a;text-decoration:none}
 .empty-state{text-align:center;padding:3rem;color:#888;font-size:14px;line-height:1.8}
 .empty-state a{color:#c8903a}
 .not-signed-in{text-align:center;padding:5rem 1.5rem}
-.not-signed-in h2{font-family:Georgia,serif;font-size:1.5rem;margin-bottom:.75rem;color:#1a150e}
+.not-signed-in h2{font-family:'Cinzel',Georgia,serif;font-size:1.5rem;margin-bottom:.75rem;color:#1a150e}
 .not-signed-in p{color:#7a6040;margin-bottom:1.5rem;font-size:15px}
 .sign-in-btn{background:#c8903a;color:#000;border:none;border-radius:10px;padding:12px 28px;font-size:16px;font-weight:700;cursor:pointer}
 
@@ -129,7 +129,7 @@ a{color:#c8903a;text-decoration:none}
 </style>
 <script src="/nav.js?v=6" defer></script>
 <script src="/progression.js?v=5" defer></script>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 /* Parchment theme overrides */
 :root{
@@ -139,7 +139,7 @@ a{color:#c8903a;text-decoration:none}
 html,body{background:#f0e6cc !important}
 .card{background:#faf4e4 !important;border-color:#c8b888 !important;border-radius:3px !important;box-shadow:0 2px 8px rgba(26,21,14,.06) !important}
 .hdr{border-bottom-color:#c8b888 !important}
-.ttl{font-family:'Playfair Display',serif !important;font-weight:400 !important;color:#1a150e !important;font-size:clamp(20px,3vw,26px) !important}
+.ttl{font-family:'Cinzel',Georgia,serif !important;font-weight:400 !important;color:#1a150e !important;font-size:clamp(20px,3vw,26px) !important}
 .ttl-sub{color:#7a6040 !important}
 .met{background:#faf4e4 !important;border-color:#c8b888 !important;border-radius:2px !important;color:#3a2e1e !important}
 </style>
@@ -304,7 +304,7 @@ function renderNotSignedIn(){
         <form id="email-signin-form" onsubmit="emailSignIn(event)" style="display:flex;flex-direction:column;gap:.5rem;width:100%">
           <input id="email-signin-input" type="email" required autocomplete="email"
                  placeholder="you@example.com"
-                 style="padding:11px 14px;border:1.5px solid #c8b888;border-radius:6px;background:#faf4e4;color:#1a150e;font-family:'Crimson Text',Georgia,serif;font-size:15px;width:100%">
+                 style="padding:11px 14px;border:1.5px solid #c8b888;border-radius:6px;background:#faf4e4;color:#1a150e;font-family:'EB Garamond',Georgia,serif;font-size:15px;width:100%">
           <button type="submit" class="sign-in-btn" style="background:#1a150e;color:#f5edd8;border:1px solid #3a2e1e;width:100%">Email me a sign-in link</button>
         </form>
         <div id="email-signin-status" style="font-size:13px;color:#5a3e1a;font-style:italic;min-height:18px;text-align:center"></div>
@@ -397,7 +397,7 @@ function renderProfile(data){
     const hasAny = diffs.some(d => bMap[`${g}_${d}`]);
     if(!hasAny) return '';
     return `<div style="margin-bottom:1.5rem">
-      <div style="font-size:12px;color:#3a2e1e;font-family:-apple-system,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem">${gameLabel(g)}</div>
+      <div style="font-size:12px;color:#3a2e1e;font-family:'EB Garamond',Georgia,serif;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem">${gameLabel(g)}</div>
       <div class="breakdown-grid">
         ${diffs.map(d => {
           const b = bMap[`${g}_${d}`];
@@ -419,7 +419,7 @@ function renderProfile(data){
 
   const dispatchTotal = (breakdown||[]).filter(b=>b.game_type==='dispatch').reduce((s,b)=>s+(b.games||0),0);
   const dispatchBreakdown = dispatchTotal>0 ? `<div style="margin-bottom:1.5rem">
-    <div style="font-size:12px;color:#3a2e1e;font-family:-apple-system,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem">${gameLabel('dispatch')}</div>
+    <div style="font-size:12px;color:#3a2e1e;font-family:'EB Garamond',Georgia,serif;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem">${gameLabel('dispatch')}</div>
     <div class="dispatch-card">
       <div class="breakdown-row"><span class="breakdown-key">Campaigns completed</span><span class="breakdown-val">${dispatchTotal}</span></div>
     </div>
@@ -441,7 +441,7 @@ function renderProfile(data){
     const shown = dialogueSessions.length;
     const winPct = shown>0 ? Math.round((won/shown)*100) : 0;
     dialogueBreakdown = `<div style="margin-bottom:1.5rem">
-      <div style="font-size:12px;color:#3a2e1e;font-family:-apple-system,sans-serif;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem">${gameLabel('dialogue')}</div>
+      <div style="font-size:12px;color:#3a2e1e;font-family:'EB Garamond',Georgia,serif;text-transform:uppercase;letter-spacing:.08em;font-weight:600;margin-bottom:.75rem">${gameLabel('dialogue')}</div>
       <div class="dispatch-card">
         <div class="breakdown-row"><span class="breakdown-key">Audiences granted</span><span class="breakdown-val">${dialogueTotal}</span></div>
         ${shown>0?`<div class="breakdown-row"><span class="breakdown-key">Convinced / Wavered / Firm <span style="font-size:10px;color:#888">(last ${shown})</span></span><span class="breakdown-val">${won} / ${wavered} / ${firm}</span></div>
