@@ -19,8 +19,10 @@ export default {
     const { action } = body;
 
     // ── AUTH ──────────────────────────────────────────────────────────
-    if (action === 'google_callback') return handleGoogleCallback(body, env);
-    if (action === 'verify_token')    return handleVerifyToken(body, env);
+    if (action === 'google_callback')    return handleGoogleCallback(body, env);
+    if (action === 'verify_token')       return handleVerifyToken(body, env);
+    if (action === 'request_magic_link') return handleRequestMagicLink(body, env);
+    if (action === 'verify_magic_link')  return handleVerifyMagicLink(body, env);
     if (action === 'save_session')    return handleSaveSession(body, env);
     if (action === 'get_profile')     return handleGetProfile(body, env);
     if (action === 'get_progression') return handleGetProgression(body, env);
@@ -902,6 +904,184 @@ async function handleVerifyToken(body, env) {
     return json({ user }, 200);
   } catch (e) {
     return json({ error: 'Invalid token' }, 401);
+  }
+}
+
+// ── MAGIC LINK AUTH ─────────────────────────────────────────────
+// Two endpoints. Works alongside Google OAuth (which is unchanged).
+//
+//   request_magic_link({email})
+//     Validates email, rate-limits to 3 per email per hour, generates
+//     a 32-byte URL-safe token, stores it with a 15-min expiry, and
+//     emails the player a sign-in link via Resend.
+//
+//   verify_magic_link({token})
+//     Looks up the token. If valid (exists, not used, not expired),
+//     marks it used, finds-or-creates the user by email, issues a JWT,
+//     returns {token, user}. If the email matches an existing Google
+//     OAuth account, the user logs into THAT account (no duplicates).
+//
+// Safety rules followed (all five):
+//   1. token is crypto-random (32 bytes via crypto.getRandomValues)
+//   2. expiry is 15 min
+//   3. single-use (used_at marker on first verify)
+//   4. rate limited (3 req per email per hour)
+//   5. email body says "you requested this; if not, ignore"
+
+const MAGIC_LINK_TTL_SECONDS = 15 * 60;     // 15 minutes
+const MAGIC_LINK_RATE_LIMIT  = 3;           // per email per hour
+const MAGIC_LINK_RATE_WINDOW = 60 * 60;     // 1 hour
+const MAGIC_LINK_FROM        = 'History Challenger <noreply@historychallenger.com>';
+const MAGIC_LINK_REPLY_TO    = 'info@historychallenger.com';
+const APP_BASE_URL           = 'https://historychallenger.com';
+
+function isValidEmail(s) {
+  if (typeof s !== 'string') return false;
+  s = s.trim().toLowerCase();
+  if (s.length < 5 || s.length > 254) return false;
+  // Pragmatic regex: not a full RFC 5322 parser, but rejects the obvious junk.
+  return /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(s);
+}
+
+// Generate a URL-safe random token. 32 random bytes encoded base64-url
+// gives us ~43 chars of entropy: way more than enough.
+function generateMagicLinkToken() {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  // base64url: replace +/= for URL safety
+  const b64 = btoa(String.fromCharCode(...bytes));
+  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+async function handleRequestMagicLink(body, env) {
+  const rawEmail = (body?.email || '').trim().toLowerCase();
+  if (!isValidEmail(rawEmail)) {
+    return json({ error: 'Please enter a valid email address.' }, 400);
+  }
+  if (!env.RESEND_API_KEY) {
+    return json({ error: 'Email sign-in is not configured. Try Google sign-in instead.' }, 500);
+  }
+  try {
+    const now = Math.floor(Date.now() / 1000);
+
+    // Rate limit: count recent requests for this email
+    const recentRow = await env.db.prepare(
+      `SELECT COUNT(*) as n FROM magic_links WHERE email = ? AND created_at >= ?`
+    ).bind(rawEmail, now - MAGIC_LINK_RATE_WINDOW).first();
+    if ((recentRow?.n || 0) >= MAGIC_LINK_RATE_LIMIT) {
+      return json({ error: 'Too many sign-in requests. Please wait an hour and try again.' }, 429);
+    }
+
+    const token = generateMagicLinkToken();
+    const expiresAt = now + MAGIC_LINK_TTL_SECONDS;
+
+    await env.db.prepare(
+      `INSERT INTO magic_links (token, email, expires_at, created_at) VALUES (?, ?, ?, ?)`
+    ).bind(token, rawEmail, expiresAt, now).run();
+
+    const link = `${APP_BASE_URL}/auth-magic.html?token=${encodeURIComponent(token)}`;
+    const subject = 'Your History Challenger sign-in link';
+    const html = magicLinkEmailHtml(link, rawEmail);
+    const text = magicLinkEmailText(link, rawEmail);
+
+    const sendRes = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: MAGIC_LINK_FROM,
+        to: rawEmail,
+        reply_to: MAGIC_LINK_REPLY_TO,
+        subject,
+        html,
+        text,
+      }),
+    });
+    if (!sendRes.ok) {
+      const detail = await sendRes.text();
+      // Roll back the token row so the user isn't penalised by rate limit
+      await env.db.prepare(`DELETE FROM magic_links WHERE token = ?`).bind(token).run();
+      return json({ error: 'Could not send the email. Please try again.', detail: detail.slice(0, 200) }, 500);
+    }
+
+    return json({ ok: true, message: 'Sign-in link sent. Check your inbox (and spam folder).' }, 200);
+  } catch (e) {
+    return json({ error: 'Server error: ' + e.message }, 500);
+  }
+}
+
+function magicLinkEmailHtml(link, email) {
+  return `<!doctype html>
+<html><body style="margin:0;padding:0;background:#f0e6cc;font-family:Georgia,serif;color:#1a150e">
+  <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f0e6cc;padding:40px 20px">
+    <tr><td align="center">
+      <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:520px;background:#faf4e4;border:1px solid #c8b888;border-radius:6px;padding:32px 36px">
+        <tr><td>
+          <div style="font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#8a6208;margin-bottom:14px">History Challenger</div>
+          <h1 style="font-family:Georgia,serif;font-weight:400;font-size:22px;color:#1a150e;margin:0 0 14px;line-height:1.3">Sign in to your account</h1>
+          <p style="font-size:15px;color:#3a2e1e;line-height:1.7;margin:0 0 22px">You asked to sign in with this email. Click the button below to continue. The link expires in 15 minutes and can only be used once.</p>
+          <p style="margin:0 0 28px"><a href="${link}" style="display:inline-block;background:#8a6208;color:#f5edd8;text-decoration:none;border:1px solid #c8a028;border-radius:3px;padding:13px 26px;font-family:Georgia,serif;font-style:italic;font-size:15px">Sign in to History Challenger</a></p>
+          <p style="font-size:13px;color:#5a3e1a;line-height:1.65;margin:0 0 14px">Or paste this URL into your browser:<br><span style="font-family:monospace;font-size:12px;color:#8a6208;word-break:break-all">${link}</span></p>
+          <hr style="border:none;border-top:1px solid #c8b888;margin:24px 0">
+          <p style="font-size:12px;color:#7a6040;line-height:1.6;margin:0;font-style:italic">If you did not request this, you can safely ignore this email; nobody can sign in without clicking the link. Reply to this email or write to <a href="mailto:info@historychallenger.com" style="color:#8a6208">info@historychallenger.com</a> if you need help.</p>
+        </td></tr>
+      </table>
+      <div style="font-size:11px;color:#7a6040;margin-top:18px;font-family:Georgia,serif;font-style:italic">Sent to ${email} by historychallenger.com</div>
+    </td></tr>
+  </table>
+</body></html>`;
+}
+
+function magicLinkEmailText(link, email) {
+  return `History Challenger sign-in link\n\nYou asked to sign in with this email. Open this link to continue:\n\n${link}\n\nThe link expires in 15 minutes and can only be used once.\n\nIf you did not request this, you can safely ignore this email; nobody can sign in without clicking the link.\n\nQuestions: info@historychallenger.com\n\nSent to ${email} by historychallenger.com`;
+}
+
+async function handleVerifyMagicLink(body, env) {
+  const token = (body?.token || '').trim();
+  if (!token || token.length < 20 || token.length > 200) {
+    return json({ error: 'Invalid sign-in link.' }, 400);
+  }
+  try {
+    const now = Math.floor(Date.now() / 1000);
+    const row = await env.db.prepare(
+      `SELECT email, expires_at, used_at FROM magic_links WHERE token = ?`
+    ).bind(token).first();
+
+    if (!row) return json({ error: 'This sign-in link is invalid.' }, 400);
+    if (row.used_at) return json({ error: 'This sign-in link was already used. Request a new one.' }, 400);
+    if (row.expires_at < now) return json({ error: 'This sign-in link has expired. Request a new one.' }, 400);
+
+    // Single-use: mark consumed BEFORE issuing the JWT so a double-click
+    // can't double-redeem
+    await env.db.prepare(
+      `UPDATE magic_links SET used_at = ? WHERE token = ? AND used_at IS NULL`
+    ).bind(now, token).run();
+
+    const email = row.email;
+
+    // Account linking by email: if a user with this email already exists
+    // (e.g. they signed up with Google before), log into THAT account.
+    let user = await env.db.prepare(`SELECT * FROM users WHERE email = ?`).bind(email).first();
+    let userId;
+    if (user) {
+      userId = user.id;
+    } else {
+      // Create a new email-only user. id prefix 'e_' distinguishes from
+      // 'g_' Google users; the suffix is just a random ID for uniqueness.
+      userId = 'e_' + crypto.randomUUID().replace(/-/g, '');
+      const displayName = email.split('@')[0];
+      await env.db.prepare(
+        `INSERT INTO users (id, email, name, avatar, provider) VALUES (?, ?, ?, '', 'email')`
+      ).bind(userId, email, displayName).run();
+      user = await env.db.prepare(`SELECT * FROM users WHERE id = ?`).bind(userId).first();
+    }
+
+    const jwt = await createJWT({ sub: userId, email }, env.JWT_SECRET);
+    return json({ token: jwt, user }, 200);
+  } catch (e) {
+    return json({ error: 'Server error: ' + e.message }, 500);
   }
 }
 

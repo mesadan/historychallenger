@@ -128,7 +128,7 @@ a{color:#c8903a;text-decoration:none}
 }
 </style>
 <script src="/nav.js?v=5" defer></script>
-<script src="/progression.js?v=2" defer></script>
+<script src="/progression.js?v=3" defer></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 /* Parchment theme overrides */
@@ -262,9 +262,58 @@ function renderNotSignedIn(){
       <div style="font-size:48px;margin-bottom:1rem">📜</div>
       <h2>Sign in to see your profile</h2>
       <p>Your scores, streaks and history are saved when you play signed in.</p>
-      <button class="sign-in-btn" onclick="signIn()">Sign in with Google</button>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:.6rem;max-width:320px;margin:1rem auto 0">
+        <button class="sign-in-btn" onclick="signIn()" style="width:100%">Sign in with Google</button>
+        <div style="font-size:12px;color:#7a6040;font-style:italic;margin:.4rem 0">or</div>
+        <form id="email-signin-form" onsubmit="emailSignIn(event)" style="display:flex;flex-direction:column;gap:.5rem;width:100%">
+          <input id="email-signin-input" type="email" required autocomplete="email"
+                 placeholder="you@example.com"
+                 style="padding:11px 14px;border:1.5px solid #c8b888;border-radius:6px;background:#faf4e4;color:#1a150e;font-family:'Crimson Text',Georgia,serif;font-size:15px;width:100%">
+          <button type="submit" class="sign-in-btn" style="background:#1a150e;color:#f5edd8;border:1px solid #3a2e1e;width:100%">Email me a sign-in link</button>
+        </form>
+        <div id="email-signin-status" style="font-size:13px;color:#5a3e1a;font-style:italic;min-height:18px;text-align:center"></div>
+      </div>
       <div style="margin-top:1.5rem"><a href="/play.html">← Back to game</a></div>
     </div>`;
+}
+
+async function emailSignIn(ev){
+  if (ev) ev.preventDefault();
+  const inp = document.getElementById('email-signin-input');
+  const status = document.getElementById('email-signin-status');
+  const form = document.getElementById('email-signin-form');
+  if (!inp || !status) return;
+  const email = inp.value.trim().toLowerCase();
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    status.textContent = 'Please enter a valid email address.';
+    status.style.color = '#7a0a0a';
+    return;
+  }
+  status.textContent = 'Sending...';
+  status.style.color = '#5a3e1a';
+  inp.disabled = true;
+  if (form) form.querySelector('button').disabled = true;
+  try {
+    const res = await fetch(WORKER, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'request_magic_link', email }),
+    });
+    const d = await res.json();
+    if (d.error) {
+      status.textContent = d.error;
+      status.style.color = '#7a0a0a';
+      inp.disabled = false;
+      if (form) form.querySelector('button').disabled = false;
+      return;
+    }
+    status.innerHTML = 'Check your inbox at <strong>' + email.replace(/[<>&]/g,'') + '</strong>. The link expires in 15 minutes.';
+    status.style.color = '#3a7a3a';
+  } catch(e) {
+    status.textContent = 'Network error. Try again.';
+    status.style.color = '#7a0a0a';
+    inp.disabled = false;
+    if (form) form.querySelector('button').disabled = false;
+  }
 }
 
 function renderProfile(data){

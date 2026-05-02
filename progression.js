@@ -133,9 +133,23 @@ const NUDGE_CSS = `
   background:transparent;color:#a08868;border:none;font-family:'Crimson Text',serif;
   font-size:12px;cursor:pointer;padding:4px 8px;font-style:italic}
 #hc-auth-nudge .hc-nudge-dismiss:hover{color:#f5edd8}
+#hc-auth-nudge .hc-nudge-email{
+  background:transparent;color:#c49020;border:1px solid #3a2a14;border-radius:3px;
+  padding:7px 12px;font-family:'Crimson Text',serif;font-size:13px;cursor:pointer;font-style:italic}
+#hc-auth-nudge .hc-nudge-email:hover{background:#241a0e;border-color:#c49020;color:#f5edd8}
+#hc-auth-nudge.hc-nudge-form{flex-direction:column;align-items:stretch}
+#hc-auth-nudge .hc-nudge-emailrow{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+#hc-auth-nudge .hc-nudge-input{
+  flex:1;min-width:160px;background:#0d0a05;color:#f5edd8;border:1px solid #3a2a14;
+  border-radius:3px;padding:8px 10px;font-family:'Crimson Text',serif;font-size:14px}
+#hc-auth-nudge .hc-nudge-input:focus{outline:none;border-color:#c49020}
+#hc-auth-nudge .hc-nudge-status{font-size:12px;color:#a08868;font-style:italic;margin-top:8px;min-height:16px}
+#hc-auth-nudge .hc-nudge-status.err{color:#cc6644}
+#hc-auth-nudge .hc-nudge-status.ok{color:#5acc8a}
 @media(max-width:520px){
   #hc-auth-nudge{padding:12px 14px;left:12px;right:12px;width:auto;transform:translateY(30px)}
   #hc-auth-nudge.show{transform:translateY(0)}
+  #hc-auth-nudge .hc-nudge-actions{flex-wrap:wrap}
 }`;
 
 function injectNudgeStyles(){
@@ -146,12 +160,10 @@ function injectNudgeStyles(){
   document.head.appendChild(s);
 }
 
-window.hcShowAuthNudge = function(opts){
-  // Skip if already signed in
-  if (localStorage.getItem('hc_token')) return;
-  // Skip if dismissed this browsing session
-  try { if (sessionStorage.getItem(NUDGE_DISMISS_KEY)) return; } catch(e) {}
+// Internal state used by the nudge to remember pending email + form mode.
+let nudgeEarnedTitle = '';
 
+function nudgeEnsureEl(){
   injectNudgeStyles();
   let el = document.getElementById('hc-auth-nudge');
   if (!el) {
@@ -159,6 +171,57 @@ window.hcShowAuthNudge = function(opts){
     el.id = 'hc-auth-nudge';
     document.body.appendChild(el);
   }
+  return el;
+}
+
+function nudgeRenderChoice(el){
+  el.classList.remove('hc-nudge-form');
+  el.innerHTML = `
+    <div class="hc-nudge-text">
+      <div class="hc-nudge-title">${nudgeEarnedTitle || 'Save your progress.'}</div>
+      <div class="hc-nudge-sub">Sign in to track XP, mastery, streaks, and your full history across all games.</div>
+    </div>
+    <div class="hc-nudge-actions">
+      <button class="hc-nudge-signin" onclick="window.hcNudgeSignIn()">Sign in with Google</button>
+      <button class="hc-nudge-email" onclick="window.hcNudgeShowEmailForm()">Use email instead</button>
+      <button class="hc-nudge-dismiss" onclick="window.hcNudgeDismiss()">Maybe later</button>
+    </div>`;
+}
+
+function nudgeRenderEmailForm(el){
+  el.classList.add('hc-nudge-form');
+  el.innerHTML = `
+    <div class="hc-nudge-text" style="width:100%">
+      <div class="hc-nudge-title">Sign in by email</div>
+      <div class="hc-nudge-sub">We'll email you a one-time link. The link expires in 15 minutes.</div>
+      <form class="hc-nudge-emailrow" onsubmit="window.hcNudgeSubmitEmail(event)">
+        <input id="hc-nudge-email-input" type="email" required autocomplete="email"
+               placeholder="you@example.com" class="hc-nudge-input">
+        <button type="submit" class="hc-nudge-signin">Send link</button>
+        <button type="button" class="hc-nudge-dismiss" onclick="window.hcNudgeBackToChoice()">Back</button>
+      </form>
+      <div id="hc-nudge-status" class="hc-nudge-status"></div>
+    </div>`;
+  setTimeout(() => { const inp = document.getElementById('hc-nudge-email-input'); if (inp) inp.focus(); }, 50);
+}
+
+function nudgeRenderSent(el, email){
+  el.classList.add('hc-nudge-form');
+  el.innerHTML = `
+    <div class="hc-nudge-text" style="width:100%">
+      <div class="hc-nudge-title">Check your inbox</div>
+      <div class="hc-nudge-sub">We sent a sign-in link to <strong style="color:#f5edd8">${email.replace(/[<>&]/g,'')}</strong>. Click it within 15 minutes to finish signing in. (Check your spam folder if you don't see it.)</div>
+      <div class="hc-nudge-actions" style="margin-top:10px">
+        <button class="hc-nudge-dismiss" onclick="window.hcNudgeDismiss()">Close</button>
+      </div>
+    </div>`;
+}
+
+window.hcShowAuthNudge = function(opts){
+  // Skip if already signed in
+  if (localStorage.getItem('hc_token')) return;
+  // Skip if dismissed this browsing session
+  try { if (sessionStorage.getItem(NUDGE_DISMISS_KEY)) return; } catch(e) {}
 
   const xp = opts && typeof opts.xp === 'number' ? opts.xp : null;
   const mastery = opts && typeof opts.mastery === 'number' ? opts.mastery : null;
@@ -166,22 +229,10 @@ window.hcShowAuthNudge = function(opts){
   if (xp != null && xp > 0 && mastery != null && mastery > 0) earned = `${xp} XP and ${mastery} Mastery`;
   else if (xp != null && xp > 0) earned = `${xp} XP`;
   else if (mastery != null && mastery > 0) earned = `${mastery} Mastery`;
+  nudgeEarnedTitle = earned ? `You earned ${earned} this session.` : '';
 
-  const title = earned
-    ? `You earned ${earned} this session.`
-    : 'Save your progress.';
-  const sub = 'Sign in to track XP, mastery, streaks, and your full history across all games.';
-
-  el.innerHTML = `
-    <div class="hc-nudge-text">
-      <div class="hc-nudge-title">${title}</div>
-      <div class="hc-nudge-sub">${sub}</div>
-    </div>
-    <div class="hc-nudge-actions">
-      <button class="hc-nudge-signin" onclick="window.hcNudgeSignIn()">Sign in with Google</button>
-      <button class="hc-nudge-dismiss" onclick="window.hcNudgeDismiss()">Maybe later</button>
-    </div>`;
-  // Show on next frame so the transition runs
+  const el = nudgeEnsureEl();
+  nudgeRenderChoice(el);
   requestAnimationFrame(() => el.classList.add('show'));
 };
 
@@ -192,6 +243,53 @@ window.hcNudgeSignIn = function(){
     try { window._hcSignIn(); return; } catch(e) {}
   }
   window.location.href = '/profile';
+};
+
+window.hcNudgeShowEmailForm = function(){
+  const el = document.getElementById('hc-auth-nudge');
+  if (el) nudgeRenderEmailForm(el);
+};
+
+window.hcNudgeBackToChoice = function(){
+  const el = document.getElementById('hc-auth-nudge');
+  if (el) nudgeRenderChoice(el);
+};
+
+window.hcNudgeSubmitEmail = async function(ev){
+  if (ev) ev.preventDefault();
+  const inp = document.getElementById('hc-nudge-email-input');
+  const status = document.getElementById('hc-nudge-status');
+  if (!inp) return;
+  const email = inp.value.trim().toLowerCase();
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    if (status) { status.textContent = 'Please enter a valid email address.'; status.className = 'hc-nudge-status err'; }
+    return;
+  }
+  if (status) { status.textContent = 'Sending...'; status.className = 'hc-nudge-status'; }
+  // Disable inputs during request
+  inp.disabled = true;
+  const btn = inp.parentElement.querySelector('.hc-nudge-signin');
+  if (btn) btn.disabled = true;
+  try {
+    const res = await fetch('https://histroychallenger-api.maletethan.workers.dev', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'request_magic_link', email }),
+    });
+    const d = await res.json();
+    if (d.error) {
+      if (status) { status.textContent = d.error; status.className = 'hc-nudge-status err'; }
+      inp.disabled = false;
+      if (btn) btn.disabled = false;
+      return;
+    }
+    const el = document.getElementById('hc-auth-nudge');
+    if (el) nudgeRenderSent(el, email);
+  } catch(e) {
+    if (status) { status.textContent = 'Network error. Try again.'; status.className = 'hc-nudge-status err'; }
+    inp.disabled = false;
+    if (btn) btn.disabled = false;
+  }
 };
 
 window.hcNudgeDismiss = function(){
