@@ -112,13 +112,16 @@ if (document.readyState === 'loading') {
 // Skips automatically if a hc_token is already in localStorage.
 const NUDGE_DISMISS_KEY = 'hc_nudge_dismissed_v1';
 const NUDGE_CSS = `
+/* Hidden by default. Critically: display:none means the element does not
+   participate in layout and cannot capture clicks, so the page footer
+   (which sits in the same bottom area) stays clickable. */
 #hc-auth-nudge{position:fixed;left:50%;bottom:18px;transform:translate(-50%, 30px);
   z-index:8500;display:none;opacity:0;transition:opacity .25s, transform .25s;
   background:#1a150e;color:#f5edd8;border:1px solid #c49020;border-radius:6px;
   box-shadow:0 12px 28px rgba(0,0,0,.55);
   padding:14px 18px;font-family:'Crimson Text',Georgia,serif;font-size:14px;line-height:1.45;
   max-width:520px;width:calc(100% - 36px);
-  display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  align-items:center;gap:14px;flex-wrap:wrap}
 #hc-auth-nudge.show{display:flex;opacity:1;transform:translate(-50%, 0)}
 #hc-auth-nudge .hc-nudge-text{flex:1;min-width:200px}
 #hc-auth-nudge .hc-nudge-title{font-family:'Playfair Display',serif;font-style:italic;font-size:16px;color:#f5edd8;margin-bottom:2px}
