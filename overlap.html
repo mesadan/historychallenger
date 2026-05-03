@@ -403,7 +403,8 @@ function renderRound(){
 function answer(idx){
   const set = S.sets[S.round];
   const chosen = set.options[idx];
-  S.score += chosen.correct ? 1 : 0;
+  const pts = chosen.correct ? 1 : 0;
+  S.score += pts;
   S.answered++;
 
   // Disable all buttons immediately
