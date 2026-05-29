@@ -980,7 +980,7 @@ async function handleRequestMagicLink(body, env) {
       `INSERT INTO magic_links (token, email, expires_at, created_at) VALUES (?, ?, ?, ?)`
     ).bind(token, rawEmail, expiresAt, now).run();
 
-    const link = `${APP_BASE_URL}/auth-magic.html?token=${encodeURIComponent(token)}`;
+    const link = `${APP_BASE_URL}/auth-magic?token=${encodeURIComponent(token)}`;
     const subject = 'Your History Challenger sign-in link';
     const html = magicLinkEmailHtml(link, rawEmail);
     const text = magicLinkEmailText(link, rawEmail);

@@ -75,13 +75,13 @@ function injectNav(){
   const nav = document.createElement('nav');
   nav.id = 'hc-nav';
   const links = [
-    {href:'/dispatch.html',  label:'Dispatch',      key:'dispatch'},
-    {href:'/play.html',      label:'Timeline',      key:'play'},
-    {href:'/overlap.html',   label:'Overlap',       key:'overlap'},
-    {href:'/persona.html',   label:'Who Are You?',  key:'persona'},
-    {href:'/hq.html',        label:'HQ Test',       key:'hq'},
-    {href:'/dialogue.html',  label:'Audience',      key:'dialogue'},
-    {href:'/paintings.html', label:"The Curator's Eye", key:'paintings'},
+    {href:'/dispatch',  label:'Dispatch',      key:'dispatch'},
+    {href:'/play',      label:'Timeline',      key:'play'},
+    {href:'/overlap',   label:'Overlap',       key:'overlap'},
+    {href:'/persona',   label:'Who Are You?',  key:'persona'},
+    {href:'/hq',        label:'HQ Test',       key:'hq'},
+    {href:'/dialogue',  label:'Audience',      key:'dialogue'},
+    {href:'/paintings', label:"The Curator's Eye", key:'paintings'},
   ];
   const linksHtml = links.map(l=>{
     const active = path.includes(l.key) ? ' active' : '';
@@ -179,13 +179,13 @@ function render(user){
           <div><span class="hcn-sv">${user.current_streak||0}</span><span class="hcn-sl">Streak</span></div>
         </div>
         <hr class="hcn-hr">
-        <a href="/profile.html" class="hcn-item">📊 My profile</a>
-        <a href="/hq.html" class="hcn-item">🧠 HQ Test</a>
-        <a href="/dialogue.html" class="hcn-item">🎭 Audience</a>
+        <a href="/profile" class="hcn-item">📊 My profile</a>
+        <a href="/hq" class="hcn-item">🧠 HQ Test</a>
+        <a href="/dialogue" class="hcn-item">🎭 Audience</a>
         <hr class="hcn-hr">
-        <a href="/dispatch.html" class="hcn-item">⚔ Dispatch</a>
-        <a href="/play.html" class="hcn-item">🧭 History Challenger</a>
-        <a href="/overlap.html" class="hcn-item">⏳ Did They Overlap?</a>
+        <a href="/dispatch" class="hcn-item">⚔ Dispatch</a>
+        <a href="/play" class="hcn-item">🧭 History Challenger</a>
+        <a href="/overlap" class="hcn-item">⏳ Did They Overlap?</a>
         <hr class="hcn-hr">
         <button class="hcn-item red" onclick="window._hcSignOut()">Sign out</button>
       </div>

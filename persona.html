@@ -8,7 +8,7 @@
 <meta property="og:title" content="Which Historical Leader Are You?">
 <meta property="og:description" content="25 decisions. No dates, no names. Discover which historical leader you think like.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://historychallenger.com/persona.html">
+<meta property="og:url" content="https://historychallenger.com/persona">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://historychallenger.com/persona">
@@ -224,7 +224,7 @@ a{color:#c8903a;text-decoration:none}
 
     <div class="dispatch-cta">
       <p>Now experience these decisions from the inside. Dispatch puts you in the room where history was actually made, the same dispatches, the same choices, the same weight.</p>
-      <a href="/dispatch.html">Play Dispatch →</a>
+      <a href="/dispatch">Play Dispatch →</a>
     </div>
 
     <div class="result-actions">
@@ -850,7 +850,7 @@ function renderTraitBars(traits) {
 function shareResult() {
   const ranked = buildRanking();
   const top = ranked[0];
-  const text = `I think like ${top.leader.name} (${Math.round(top.pickPct)}% match), History Challenger's decision profile test. 25 decisions, no dates, no names.\nhttps://historychallenger.com/persona.html`;
+  const text = `I think like ${top.leader.name} (${Math.round(top.pickPct)}% match), History Challenger's decision profile test. 25 decisions, no dates, no names.\nhttps://historychallenger.com/persona`;
   if (navigator.share) {
     navigator.share({ text }).catch(() => {});
   } else {

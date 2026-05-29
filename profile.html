@@ -309,7 +309,7 @@ function renderNotSignedIn(){
         </form>
         <div id="email-signin-status" style="font-size:13px;color:#5a3e1a;font-style:italic;min-height:18px;text-align:center"></div>
       </div>
-      <div style="margin-top:1.5rem"><a href="/play.html">← Back to game</a></div>
+      <div style="margin-top:1.5rem"><a href="/play">← Back to game</a></div>
     </div>`;
 }
 
@@ -454,7 +454,7 @@ function renderProfile(data){
   // Sessions: last 10
   const recentSessions = (sessions||[]).slice(0,10);
   const sessionsHTML = recentSessions.length===0
-    ? `<div class="empty-state">No games yet. <a href="/play.html">Play your first game →</a></div>`
+    ? `<div class="empty-state">No games yet. <a href="/play">Play your first game →</a></div>`
     : recentSessions.map(s => {
       if(s.game_type==='dispatch'){
         return `<div class="session-row">
@@ -509,7 +509,7 @@ function renderProfile(data){
       <div class="hero-btns">
         ${user.hq_score
           ? `<div class="hq-badge"><div class="hq-badge-val" style="color:${hqColor(user.hq_score)}">${Math.round(user.hq_score)}<span style="font-size:.65em;color:#666;font-weight:400"> / 990</span></div><div class="hq-badge-lbl">HQ</div></div>`
-          : `<a href="/hq.html" class="hq-no-score">Take HQ test →</a>`}
+          : `<a href="/hq" class="hq-no-score">Take HQ test →</a>`}
         <button class="edit-profile-btn" onclick="toggleSettings()">Edit profile</button>
         <button class="sign-out-btn" onclick="signOut()">Sign out</button>
       </div>
@@ -604,7 +604,7 @@ function renderProfile(data){
     <div class="sessions-list">${sessionsHTML}</div>
 
     <div style="text-align:center;margin-top:2rem">
-      <a href="/games.html" style="color:#c8903a;font-size:15px;font-weight:600">Play another game →</a>
+      <a href="/" style="color:#c8903a;font-size:15px;font-weight:600">Play another game →</a>
     </div>`;
 }
 
@@ -631,7 +631,7 @@ async function init(){
     if(data.error){renderNotSignedIn();return;}
     renderProfile(data);
   }catch(e){
-    document.getElementById('page').innerHTML=`<div class="loading">Failed to load profile. <a href="/play.html">Go back to game</a></div>`;
+    document.getElementById('page').innerHTML=`<div class="loading">Failed to load profile. <a href="/play">Go back to game</a></div>`;
   }
 }
 

@@ -21,7 +21,46 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const SITEMAP = path.join(PROJECT_ROOT, 'sitemap.xml');
 
+// Pages that Cloudflare Pages serves at clean URLs (no .html).
+// auth-callback.html is intentionally excluded: Google's registered OAuth
+// redirect URI uses the .html suffix and must keep matching.
+const CLEAN_PAGES = [
+  'dispatch','play','overlap','persona','hq','dialogue','paintings',
+  'blog','misconceptions','battles','coincidences','blog-index',
+  'profile','auth-magic'
+];
+
+async function scanForStaleHtmlLinks() {
+  const exts = ['.html','.js'];
+  const entries = await fs.readdir(PROJECT_ROOT);
+  const files = entries.filter(f => exts.includes(path.extname(f)));
+  const issues = [];
+  const pageAlt = CLEAN_PAGES.join('|');
+  const patterns = [
+    { name: 'og:url with .html',  re: new RegExp(`<meta\\s+property=["']og:url["']\\s+content=["']https://historychallenger\\.com/(${pageAlt})\\.html`, 'gi') },
+    { name: 'canonical with .html', re: new RegExp(`rel=["']canonical["']\\s+href=["']https://historychallenger\\.com/(${pageAlt})\\.html`, 'gi') },
+    { name: 'internal href with .html', re: new RegExp(`href=["']/(${pageAlt})\\.html`, 'g') },
+  ];
+  for (const f of files) {
+    const txt = await fs.readFile(path.join(PROJECT_ROOT, f), 'utf8');
+    for (const p of patterns) {
+      let m;
+      while ((m = p.re.exec(txt))) {
+        const line = txt.slice(0, m.index).split('\n').length;
+        issues.push(`  ${f}:${line}  ${p.name}: ${m[0]}`);
+      }
+    }
+  }
+  if (issues.length) {
+    console.log('Stale .html references found (Cloudflare Pages will 308-redirect these, Google flags as "Page with redirect"):\n');
+    console.log(issues.join('\n'));
+    console.log(`\nFix: drop the .html from the listed lines. Allowed exception: auth-callback.html (OAuth).`);
+    process.exit(1);
+  }
+}
+
 async function main() {
+  await scanForStaleHtmlLinks();
   const xml = await fs.readFile(SITEMAP, 'utf8');
   const locs = [...xml.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/g)].map(m => m[1].trim());
   if (!locs.length) {

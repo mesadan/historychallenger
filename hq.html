@@ -9,7 +9,7 @@
 <meta property="og:title" content="History Quotient | Test Your Depth of Historical Knowledge">
 <meta property="og:description" content="Thirty adaptive questions across every era. Your score reflects not what you remember, but what you really know.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://historychallenger.com/hq.html">
+<meta property="og:url" content="https://historychallenger.com/hq">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://historychallenger.com/hq">
 <style>
@@ -253,7 +253,7 @@ function renderResult(){
     <div class="result-actions">
       <button class="start-btn" onclick="startSession()">Retake Assessment</button>
       ${wrong>0?`<button class="review-btn" onclick="showReview()">Review your ${wrong} wrong answer${wrong===1?'':'s'}</button>`:''}
-      <a href="/profile.html" class="result-link">View Profile →</a>
+      <a href="/profile" class="result-link">View Profile →</a>
     </div>
     ${!getToken()?`<p class="guest-note" style="margin-top:1rem">Sign in to save this score to your profile.</p>`:''}
   </div></div>`;
