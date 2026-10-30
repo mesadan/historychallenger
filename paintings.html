@@ -89,7 +89,23 @@ a{color:#8a6208;text-decoration:none}
 </head>
 <body>
 
-<div class="page" id="page"></div>
+<div class="page" id="page">
+  <!-- SSR fallback for crawlers. The game JS overwrites this on mount. -->
+  <div class="intro-card">
+    <div class="eyebrow">The Curator's Eye</div>
+    <h1 class="title">Look at a painting, name what it depicts</h1>
+    <p class="sub">Five historical artworks per session. Four possible scenes per artwork. Your job is to figure out what the painting is actually showing, not when it was made.</p>
+    <div class="rules">
+      <div class="rules-row"><span class="rules-icon">🖼</span> Five rounds. One painting or artefact each.</div>
+      <div class="rules-row"><span class="rules-icon">🎯</span> Pick the correct scene from four options.</div>
+      <div class="rules-row"><span class="rules-icon">🏆</span> Score on accuracy plus difficulty.</div>
+    </div>
+    <p class="sub" style="margin-top:1.25rem">Artworks are drawn from the Metropolitan Museum of Art's open collection. Three difficulty tiers: Disciple (wrong options span different eras), Master (one wrong option shares the era), Keeper of Time (all four options share era and region, only the scene itself can tell them apart).</p>
+    <div class="actions">
+      <button class="start-btn" onclick="startSession()">Begin the gallery</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const WORKER = 'https://histroychallenger-api.maletethan.workers.dev';

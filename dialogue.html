@@ -185,7 +185,28 @@ a{color:#8a6208;text-decoration:none}
 </head>
 <body>
 
-<div class="page" id="page"></div>
+<div class="page" id="page">
+  <!-- SSR fallback content for crawlers. The game JS replaces this
+       as soon as it mounts, so human users never see this version. -->
+  <div class="pick-header">
+    <div class="pick-eyebrow">Audience</div>
+    <h1 class="pick-title">Talk to Historical Figures with AI</h1>
+    <p class="pick-sub">Seven historical figures. Seven decisions. Convince them, or be dismissed. An AI-driven historical roleplay game from History Challenger, powered by Claude.</p>
+  </div>
+  <div class="pick-grid">
+    <div class="pick-card"><div class="pick-date">216 BC, Cannae</div><div class="pick-figure">Hannibal Barca</div><div class="pick-role">You play Maharbal, commander of the Numidian cavalry.</div><div class="pick-goal">Convince Hannibal to march on Rome immediately after the victory at Cannae.</div></div>
+    <div class="pick-card"><div class="pick-date">326 BC, the Hyphasis</div><div class="pick-figure">Alexander the Great</div><div class="pick-role">You play Coenus, senior commander of the Macedonian phalanx.</div><div class="pick-goal">Convince Alexander to turn the army back and march home from India.</div></div>
+    <div class="pick-card"><div class="pick-date">1281 AD, Dadu</div><div class="pick-figure">Kublai Khan</div><div class="pick-role">You play a trusted Mongol general.</div><div class="pick-goal">Convince Kublai not to launch the second invasion of Japan.</div></div>
+    <div class="pick-card"><div class="pick-date">532 AD, Constantinople</div><div class="pick-figure">Emperor Justinian</div><div class="pick-role">You play Theodora's trusted counsel during the Nika riots.</div><div class="pick-goal">Convince Justinian to stay and put down the revolt, not to flee Constantinople.</div></div>
+    <div class="pick-card"><div class="pick-date">1815 AD, Elysée Palace</div><div class="pick-figure">Napoleon Bonaparte</div><div class="pick-role">You play one of his marshals after Waterloo.</div><div class="pick-goal">Convince Napoleon to abdicate cleanly rather than fight on.</div></div>
+    <div class="pick-card"><div class="pick-date">690 AD, Luoyang</div><div class="pick-figure">Empress Wu Zetian</div><div class="pick-role">You play a senior court official.</div><div class="pick-goal">Convince Empress Wu to formally take the imperial title and found her own dynasty, the Zhou.</div></div>
+    <div class="pick-card"><div class="pick-date">1587 AD, Greenwich Palace</div><div class="pick-figure">Queen Elizabeth I</div><div class="pick-role">You play Lord Burghley, her chief minister.</div><div class="pick-goal">Convince Elizabeth to sign the warrant for Mary Queen of Scots' execution.</div></div>
+  </div>
+  <p style="margin-top:2rem;font-size:14px;color:#5a3e1a;font-style:italic;text-align:center">
+    Eight messages. Fifteen minutes per audience. No vague flattery, no modern knowledge, no deus ex machina.
+    Historical plausibility is scored by the AI judge after each session.
+  </p>
+</div>
 
 <script>
 const WORKER = 'https://histroychallenger-api.maletethan.workers.dev';
